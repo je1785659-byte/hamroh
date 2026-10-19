@@ -24,6 +24,8 @@ const hhmm=m=>{m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2
 
 const DISHES=["Baliq sho'rva", "Bodring-pomidor salati", "Chuchvara", "Dimlama", "Fricadelkali sho'rva", "Go'shtli grechka", "Issiq buterbrod", "Karam do'lma", "Kartoshka pyuresi", "Kartoshka quymoq", "Kartoshkali xonim", "Lag'mon", "Loviya salati", "Loviya sho'rva", "Manti", "Mastava", "Moshxo'rda", "Okroshka", "Osh", "Pishloqli tovuq", "Pomidorli makaron", "Pomidorli tuxum", "Qalampir do'lma", "Qo'ziqorinli grechka", "Qo'ziqorinli kartoshka", "Qo'ziqorinli makaron", "Qo'ziqorinli sho'rva", "Qovoq manti", "Qovoq sho'rva-pyure", "Qovoqli bo'tqa", "Qovurilgan baliq", "Qovurma sho'rva", "Qozon kabob", "Quymoq", "Sabzavot ragu", "Sabzavotli guruch", "Sarimsoqli baqlajon", "Sarimsoqli non", "Shakshuka", "Shirguruch", "Smetanali tovuq", "Smetanali tvorog", "Sosiska kartoshka bilan", "Sosiskali makaron", "Sosiskali omlet", "Sutli grechka", "Sutli makaron", "Tovuq sho'rva", "Tovuqli lapsha", "Tovuqli osh", "Tovuqli salat", "Tuxumli kartoshka", "Tuxumli non", "Tvorogli sirniki", "Tvorogli zapekanka", "Yupqa blinchik"];
 const slug=n=>n.toLowerCase().replace(/[‘’ʻ']/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+let CFG=null,CFG_AT=0;
+async function cfg(){if(CFG&&Date.now()-CFG_AT<300000)return CFG;try{const r=await fetch(APP_URL+'bot-config.json',{cf:{cacheTtl:300}});if(r.ok){CFG=await r.json();CFG_AT=Date.now()}}catch(e){}return CFG||{}}
 const NAMES=['Bomdod','Quyosh','Peshin','Asr','Shom','Xufton'];
 const appBtn=(t='🚀 Ilovani ochish',url=APP_URL)=>({text:t,web_app:{url}});
 const shareBtn={text:'📤 Do‘stlarga ulashish',url:'https://t.me/share/url?url='+encodeURIComponent(SHARE_LINK)+'&text='+encodeURIComponent('Namoz vaqtlari, retseptlar, valyuta kursi va bolalar o‘yinlari — Hamroh ilovasida')};
@@ -59,16 +61,17 @@ Boshlash uchun pastdagi tugmani bosing 👇
 
 Buyruqlar: /namoz · /kurs · /taom · /yordam`;
 async function onMessage(env,msg){
+  const C=await cfg(); const ST=C.start||START, DL=(C.dishes&&C.dishes.length)?C.dishes:DISHES;
   const chat=msg.chat.id, text=(msg.text||'').trim(), cmd=text.split(/[\s@]/)[0].toLowerCase();
   if(msg.chat.type!=='private'&&!text.startsWith('/'))return;
   if(cmd==='/start'){
-    const r=await tg(env,'sendPhoto',{chat_id:chat,photo:COVER,caption:START,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn]]}});
-    if(!r.ok) await tg(env,'sendMessage',{chat_id:chat,text:START,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn]]}});
+    const r=await tg(env,'sendPhoto',{chat_id:chat,photo:COVER,caption:ST,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn],...((C.extraButtons||[]).map(x=>[x.webapp?appBtn(x.text,x.webapp):{text:x.text,url:x.url}]))]}});
+    if(!r.ok) await tg(env,'sendMessage',{chat_id:chat,text:ST,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn],...((C.extraButtons||[]).map(x=>[x.webapp?appBtn(x.text,x.webapp):{text:x.text,url:x.url}]))]}});
     return;
   }
   if(cmd==='/namoz') return tg(env,'sendMessage',{chat_id:chat,text:namozText(0)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()});
   if(cmd==='/kurs') return tg(env,'sendMessage',{chat_id:chat,text:await kursText(),parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('💱 Konvertorni ochish')]]}});
-  if(cmd==='/taom'){const n=DISHES[Math.floor(Math.random()*DISHES.length)];
+  if(cmd==='/taom'){const n=DL[Math.floor(Math.random()*DL.length)];
     return tg(env,'sendMessage',{chat_id:chat,text:`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,parse_mode:'HTML',
       reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',web_app:{url:APP_URL+'?r='+slug(n)}}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
   if(cmd==='/yordam'||cmd==='/help') return tg(env,'sendMessage',{chat_id:chat,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()]]},
@@ -76,9 +79,10 @@ async function onMessage(env,msg){
   if(msg.chat.type==='private') return tg(env,'sendMessage',{chat_id:chat,text:'Quyidagi tugma orqali ilovani oching yoki /yordam ni bosing.',reply_markup:{inline_keyboard:[[appBtn()]]}});
 }
 async function onCallback(env,q){
+  const C=await cfg(); const DL=(C.dishes&&C.dishes.length)?C.dishes:DISHES;
   const d=q.data||'';
   if(d.startsWith('nm:')){const i=+d.slice(3);if(CENTRES[i]) await tg(env,'editMessageText',{chat_id:q.message.chat.id,message_id:q.message.message_id,text:namozText(i)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()})}
-  if(d==='taom'){const n=DISHES[Math.floor(Math.random()*DISHES.length)];
+  if(d==='taom'){const n=DL[Math.floor(Math.random()*DL.length)];
     await tg(env,'editMessageText',{chat_id:q.message.chat.id,message_id:q.message.message_id,parse_mode:'HTML',text:`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,
       reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',web_app:{url:APP_URL+'?r='+slug(n)}}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
   await tg(env,'answerCallbackQuery',{callback_query_id:q.id});
