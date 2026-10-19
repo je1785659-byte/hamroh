@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
 <title>Hamroh Mini App</title>
@@ -2339,6 +2340,9 @@ function pvSigns(){
   $('#pvsgq').onclick=()=>pvStart(pvShuffle(l).map(signQuestion),SGROUPS.find(x=>x[0]===pvSignG)[1]+' belgilar','practice');
 }
 
+const APP_VER='20261020b';
+(function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
+  const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava};
 /* ---------- ASOSIY ---------- */
 const TILE_COL={audio:['#5b1f6e','#b0479a'],qibla:['#08332f','#2e9e7a'],tasbeh:['#5b3a1a','#c08a3e'],namoz:['#08332f','#127061'],food:['#9c2a22','#e0812a'],cash:['#14296e','#3563d4'],quiz:['#35217a','#7a4fd6'],kids:['#0f6aa6','#33b2df'],doc:['#25304a','#4a5d86'],prava:['#4a3200','#d99a00']};
