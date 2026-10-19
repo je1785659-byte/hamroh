@@ -484,6 +484,31 @@ button.rate.sel{background:color-mix(in srgb,var(--sec) 10%,transparent);border-
 @keyframes pop-in{from{opacity:0;transform:scale(.85) translateY(20px)}}
 @keyframes spin-in{from{transform:rotate(-90deg) scale(.7)}}
 @media (prefers-reduced-motion:reduce){.rv-card,.rv-img img{animation:none}}
+body[data-sec="prava"]{--sec-a:#4a3200;--sec-b:#d99a00;--sec:#b07c00}
+.sign{width:100%;height:100%;display:block}
+.pv-ready{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pv-ring{--p:0;width:78px;height:78px;border-radius:50%;flex:none;display:grid;place-content:center;text-align:center;background:radial-gradient(closest-side,var(--surface) 76%,transparent 78%),conic-gradient(var(--sec) calc(var(--p)*1%),var(--surface-2) 0)}
+.pv-ring span{font-family:var(--display);font-size:22px;font-weight:700;line-height:1}.pv-ring small{font-size:10px;color:var(--muted)}
+.pv-main{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:linear-gradient(135deg,var(--sec-a),var(--sec-b));color:#fff;border:0}
+.pv-main b{display:block;font-size:16px}.pv-main small{opacity:.85;font-size:12.5px}.pv-main>span:nth-child(2){flex:1}
+.pv-ic{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:22px;flex:none}.pv-ic svg{width:24px;height:24px}.pv-go{font-size:20px}
+.pv-prog{display:flex;gap:3px}.pv-prog i{flex:1;height:6px;border-radius:4px;background:var(--surface-2);cursor:pointer}
+.pv-prog i.ok{background:var(--good)}.pv-prog i.bad{background:var(--bad)}.pv-prog i.cur{outline:2px solid var(--sec);outline-offset:1px}
+.pv-q h3{font-size:17px;line-height:1.35;margin:4px 0 12px}
+.pv-pic{border-radius:14px;overflow:hidden;background:var(--surface-2);margin-bottom:12px;display:grid;place-items:center}
+.pv-pic img{width:100%;display:block}.pv-pic.sign-pic{padding:18px}.pv-pic.sign-pic .sign{width:132px;height:132px}
+.pv-opts{display:flex;flex-direction:column;gap:8px}
+.pv-opt{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:12px;font-size:14.5px;line-height:1.35;font-weight:500}
+.pv-opt span{flex:none;font-size:11px;font-weight:700;background:var(--surface-2);border-radius:7px;padding:3px 6px;color:var(--muted)}
+.pv-opt.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,var(--surface))}.pv-opt.ok span{background:var(--good);color:#fff}
+.pv-opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--surface))}.pv-opt.bad span{background:var(--bad);color:#fff}
+.pv-opt.dim{opacity:.55}.pv-opt:disabled{cursor:default}
+.pv-iz{margin-top:12px;padding:12px;border-radius:12px;background:var(--surface-2);font-size:14px;line-height:1.45}.pv-iz small{display:block;margin-top:6px;color:var(--muted);font-size:11.5px}
+.pv-res{text-align:center}.pv-res h3{font-family:var(--display);font-size:22px;margin:8px 0 4px}
+.pv-big{width:64px;height:64px;border-radius:50%;margin:4px auto 0;display:grid;place-items:center;font-size:30px;color:#fff;background:var(--good)}.pv-res.bad .pv-big{background:var(--bad)}
+.pv-wr,.pv-sign{display:flex;gap:12px;align-items:flex-start}.pv-ws{width:44px;height:44px;flex:none}.pv-sp{width:58px;height:58px;flex:none}
+.pv-signs{display:flex;flex-direction:column;gap:10px}.pv-sign b{font-size:14.5px}
+.pv-tgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.pv-tgrid .chip{justify-content:center}
 </style>
 </head>
 <body>
@@ -531,6 +556,7 @@ const ICONS = {
   doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg>'
 };
 ICONS.audio='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="5" height="7" rx="2"/><rect x="16" y="14" width="5" height="7" rx="2"/></svg>';
+ICONS.prava='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><path d="M3.5 10.5l6.2 1M14.3 11.5l6.2-1M12 14.5V21"/></svg>';
 ICONS.home='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>';
 const TABS = [['home','Asosiy'],['namoz','Namoz'],['food','Taomlar'],['cash','Valyuta'],['quiz','Viktorina']];
 const HERO = {
@@ -540,7 +566,8 @@ const HERO = {
   quiz:['Viktorina',"6 mavzu, kunlik savol va o'z viktorinangizni tuzish"],
   kids:['Bolalar uchun',"20 ta o'yin · harflar, raqamlar, mantiq va xotira · 3–12 yosh"],
   audio:['Audio',"Qur'on tilovati, she'rlar va qo'shiqlar"],
-  doc:['Hujjatlar',"PDF, rasm va matn bilan ishlash — fayllar telefoningizdan chiqmaydi"]
+  doc:['Hujjatlar',"PDF, rasm va matn bilan ishlash — fayllar telefoningizdan chiqmaydi"],
+  prava:['Prava imtihoni',"Imtihon rejimi, xatolar ustida ishlash va yo'l belgilari"]
 };
 let current = store.get('tab','home');
 function renderTabs(){
@@ -1817,7 +1844,7 @@ function viewSaved(){
 }
 // open a shared recipe: t.me/bot/app?startapp=r_osh
 (function(){try{const tq=new URLSearchParams(location.search).get('t');if(tq){current=tq;store.set('tab',tq)}}catch(e){}})();
-(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
+(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
 
 const TOOLIC={qibla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
  tasbeh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="17.5" cy="15" r="2"/><circle cx="12" cy="18.5" r="2"/><circle cx="6.5" cy="15" r="2"/><circle cx="6.5" cy="8.5" r="2"/></svg>',
@@ -2106,9 +2133,215 @@ async function deliver(blob,name,text){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
 }
 
-const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc};
+/* ---------- PRAVA: IMTIHONGA TAYYORLANISH ---------- */
+// Exam rules (YHXX): 20 savol, 18 to'g'ri javob kerak (≤2 xato).
+const PV_CFG={n:20,min:25,maxErr:2};
+// Official ticket base plugs in here: prava/index.json -> {source:{name,url},tickets:N}; prava/bilet-N.json -> [{id,q,img,o:[..],a:0,iz}]
+let PV_DB=null, pvDbTried=false;
+async function pvLoadDb(){if(pvDbTried)return PV_DB;pvDbTried=true;
+  try{const r=await fetch('prava/index.json',{cache:'no-store'});if(r.ok){const j=await r.json();if(j&&j.tickets>0)PV_DB=j}}catch(e){}return PV_DB}
+const pvTicketCache={};
+async function pvTicket(n){if(pvTicketCache[n])return pvTicketCache[n];const r=await fetch(`prava/bilet-${n}.json`);if(!r.ok)throw 0;
+  const l=(await r.json()).map((q,i)=>({...q,key:'b'+n+':'+(i+1),bilet:n,no:i+1}));pvTicketCache[n]=l;return l}
+
+/* --- Yo'l belgilari (o'zimiz chizgan SVG) --- */
+const SR='#d6202a',SB='#1d5fbf',SK='#1b1b1b';
+const sv=b=>`<svg viewBox="0 0 100 100" class="sign" aria-hidden="true">${b}</svg>`;
+const sTri=i=>`<polygon points="50,7 95,89 5,89" fill="#fff" stroke="${SR}" stroke-width="8" stroke-linejoin="round"/>${i}`;
+const sCirc=i=>`<circle cx="50" cy="50" r="43" fill="#fff" stroke="${SR}" stroke-width="10"/>${i}`;
+const sBlue=i=>`<circle cx="50" cy="50" r="46" fill="${SB}"/>${i}`;
+const sSq=i=>`<rect x="5" y="5" width="90" height="90" rx="10" fill="${SB}"/>${i}`;
+const ahead=(c)=>`<defs><marker id="ah${c.slice(1)}" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="2.4" markerHeight="2.4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${c}"/></marker></defs>`;
+const arw=(d,c='#fff',w=9)=>`${ahead(c)}<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linejoin="round" marker-end="url(#ah${c.slice(1)})"/>`;
+const man=(c,x=0,y=0,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><circle cx="52" cy="24" r="6" fill="${c}" stroke="none"/><path d="M50 33L45 55L36 74M45 55L57 72M48 39L37 49M48 39L61 47"/></g>`;
+const slash=`<path d="M20 80L80 20" stroke="${SR}" stroke-width="9"/>`;
+const car=(x,y,c)=>`<g transform="translate(${x} ${y})"><rect x="0" y="6" width="22" height="34" rx="6" fill="${c}"/><rect x="4" y="12" width="14" height="8" rx="2" fill="#fff" opacity=".8"/></g>`;
+const SIGNS=[
+ // g: 1 ogohlantiruvchi, 2 imtiyoz, 3 taqiqlovchi, 4 buyuruvchi, 5 ko'rsatma va axborot
+ {k:'svetofor',g:1,n:"Svetofor bilan tartibga solinadigan chorraha",d:"Oldinda harakat svetofor bilan boshqariladigan chorraha, piyodalar o'tish joyi yoki yo'l qismi bor.",s:sTri(`<rect x="40" y="36" width="20" height="46" rx="6" fill="${SK}"/><circle cx="50" cy="47" r="5" fill="${SR}"/><circle cx="50" cy="59" r="5" fill="#f5c400"/><circle cx="50" cy="71" r="5" fill="#2bb24c"/>`)},
+ {k:'piyoda_ogoh',g:1,n:"Piyodalar o'tish joyi (ogohlantiruvchi)",d:"Oldinda piyodalar o'tish joyi bor. Tezlikni kamaytiring va piyodalarga yo'l berishga tayyor turing.",s:sTri(man(SK,4,22,.78)+`<path d="M24 82h52" stroke="${SK}" stroke-width="4" stroke-dasharray="6 4"/>`)},
+ {k:'bolalar',g:1,n:"Bolalar",d:"Bolalar muassasalari (maktab, bog'cha, oromgoh) yaqinidagi yo'l qismi: bolalar yo'lga to'satdan chiqib qolishi mumkin.",s:sTri(man(SK,-8,28,.7)+man(SK,16,34,.6))},
+ {k:'burilish_ong',g:1,n:"Xavfli burilish (o'ngga)",d:"Oldinda ko'rinish cheklangan, o'ngga xavfli burilish bor.",s:sTri(arw('M42 82V58Q42 48 52 46L60 45','#1b1b1b',7))},
+ {k:'burilish_chap',g:1,n:"Xavfli burilish (chapga)",d:"Oldinda ko'rinish cheklangan, chapga xavfli burilish bor.",s:sTri(arw('M58 82V58Q58 48 48 46L40 45','#1b1b1b',7))},
+ {k:'ikki_tomon',g:1,n:"Ikki tomonlama harakat",d:"Bir tomonlama harakatli yo'ldan (qatnov qismidan) qarama-qarshi harakatli yo'l qismi boshlanadi.",s:sTri(arw('M40 82V44','#1b1b1b',6)+arw('M60 40V80','#1b1b1b',6))},
+ {k:'boshqa_xavf',g:1,n:"Boshqa xavflar",d:"Boshqa ogohlantiruvchi belgilar bilan ko'rsatilmagan xavfli yo'l qismi bor.",s:sTri(`<rect x="45" y="36" width="10" height="30" rx="4" fill="${SK}"/><circle cx="50" cy="76" r="6" fill="${SK}"/>`)},
+ {k:'teng_kesishma',g:1,n:"Teng ahamiyatli yo'llar kesishmasi",d:"Oldinda teng ahamiyatli yo'llar kesishmasi: o'ng tomondan kelayotgan transportga yo'l bering.",s:sTri(`<path d="M34 46L66 80M66 46L34 80" stroke="${SK}" stroke-width="8" stroke-linecap="round"/>`)},
+ {k:'aylanma_ogoh',g:1,n:"Aylanma harakatli chorraha",d:"Oldinda aylanma harakat tashkil etilgan chorraha bor.",s:sTri(`<g fill="none" stroke="${SK}" stroke-width="5">${ahead('#1b1b1b')}<path d="M36 62A14 14 0 0 1 50 48" marker-end="url(#ah1b1b1b)"/><path d="M58 50A14 14 0 0 1 62 72" marker-end="url(#ah1b1b1b)"/><path d="M54 78A14 14 0 0 1 37 70" marker-end="url(#ah1b1b1b)"/></g>`)},
+ {k:'torayish',g:1,n:"Yo'lning torayishi",d:"Oldinda yo'l ikki tomondan torayadi.",s:sTri(`<path d="M36 84V68L42 56V40M64 84V68L58 56V40" fill="none" stroke="${SK}" stroke-width="6" stroke-linejoin="round"/>`)},
+ {k:'notekislik',g:1,n:"Sun'iy notekislik",d:"Oldinda tezlikni majburan kamaytirish uchun qilingan sun'iy notekislik (\"lejachiy\") bor.",s:sTri(`<path d="M18 80H36Q50 54 64 80H82" fill="none" stroke="${SK}" stroke-width="6"/>`)},
+ {k:'shlagbaum',g:1,n:"Shlagbaumli temir yo'l kesishmasi",d:"Oldinda shlagbaum bilan jihozlangan temir yo'l kesishmasi bor.",s:sTri(`<rect x="30" y="48" width="40" height="30" fill="none" stroke="${SK}" stroke-width="5"/><path d="M30 58H70M30 68H70M40 48V78M50 48V78M60 48V78" stroke="${SK}" stroke-width="3"/>`)},
+ {k:'asosiy',g:2,n:"Asosiy yo'l",d:"Siz asosiy yo'ldasiz: tartibga solinmagan chorrahalardan birinchi bo'lib o'tish huquqiga egasiz.",s:`<rect x="17" y="17" width="66" height="66" transform="rotate(45 50 50)" fill="#fff" stroke="#bbb" stroke-width="1.5"/><rect x="29" y="29" width="42" height="42" transform="rotate(45 50 50)" fill="#f5c400"/>`},
+ {k:'asosiy_oxiri',g:2,n:"Asosiy yo'lning oxiri",d:"Asosiy yo'l tugaydi: bundan keyin imtiyoz huquqi bekor bo'ladi.",s:`<rect x="17" y="17" width="66" height="66" transform="rotate(45 50 50)" fill="#fff" stroke="#bbb" stroke-width="1.5"/><rect x="29" y="29" width="42" height="42" transform="rotate(45 50 50)" fill="#f5c400"/><path d="M28 72L72 28" stroke="${SK}" stroke-width="5"/><path d="M33 77L77 33M23 67L67 23" stroke="${SK}" stroke-width="2"/>`},
+ {k:'yol_ber',g:2,n:"Yo'l bering",d:"Kesib o'tilayotgan yo'ldagi transport vositalariga, asosiy yo'l bo'lsa — unda harakatlanayotganlarga yo'l berish kerak.",s:`<polygon points="6,12 94,12 50,92" fill="#fff" stroke="${SR}" stroke-width="8" stroke-linejoin="round"/>`},
+ {k:'stop',g:2,n:"To'xtamasdan harakatlanish taqiqlanadi",d:"To'xtash chizig'i oldida, u bo'lmasa — kesishma chegarasida albatta to'xtab, kesib o'tilayotgan yo'ldagi transportga yo'l berish shart.",s:`<polygon points="30,4 70,4 96,30 96,70 70,96 30,96 4,70 4,30" fill="${SR}" stroke="#fff" stroke-width="3"/><text x="50" y="60" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="26" fill="#fff">STOP</text>`},
+ {k:'ikkinchi_daraja',g:2,n:"Ikkinchi darajali yo'l bilan kesishma",d:"Oldinda ikkinchi darajali yo'l bilan kesishma: siz asosiy yo'ldasiz.",s:sTri(`<path d="M50 40V84" stroke="${SK}" stroke-width="10"/><path d="M33 64H67" stroke="${SK}" stroke-width="5"/>`)},
+ {k:'kirish_taq',g:3,n:"Kirish taqiqlangan",d:"Shu yo'nalishda barcha transport vositalarining kirishi taqiqlanadi.",s:`<circle cx="50" cy="50" r="46" fill="${SR}"/><rect x="18" y="41" width="64" height="18" fill="#fff"/>`},
+ {k:'harakat_taq',g:3,n:"Harakatlanish taqiqlangan",d:"Barcha transport vositalarining harakatlanishi taqiqlanadi.",s:sCirc('')},
+ {k:'quvib_taq',g:3,n:"Quvib o'tish taqiqlangan",d:"Belgi ta'sir oralig'ida transport vositalarini quvib o'tish taqiqlanadi (istisnolar qoidalarda ko'rsatilgan).",s:sCirc(car(24,30,SR)+car(54,30,SK))},
+ {k:'tezlik40',g:3,n:"Eng yuqori tezlik cheklangan (40)",d:"Belgida ko'rsatilgan tezlikdan — soatiga 40 km dan oshiq tezlikda harakatlanish taqiqlanadi.",s:sCirc(`<text x="50" y="64" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="40" fill="${SK}">40</text>`)},
+ {k:'tezlik60',g:3,n:"Eng yuqori tezlik cheklangan (60)",d:"Belgida ko'rsatilgan tezlikdan — soatiga 60 km dan oshiq tezlikda harakatlanish taqiqlanadi.",s:sCirc(`<text x="50" y="64" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="40" fill="${SK}">60</text>`)},
+ {k:'toxtash_taq',g:3,n:"To'xtash taqiqlangan",d:"Transport vositalarining to'xtashi ham, to'xtab turishi ham taqiqlanadi.",s:`<circle cx="50" cy="50" r="43" fill="${SB}" stroke="${SR}" stroke-width="10"/><path d="M22 22L78 78M78 22L22 78" stroke="${SR}" stroke-width="9"/>`},
+ {k:'turish_taq',g:3,n:"To'xtab turish taqiqlangan",d:"To'xtab turish taqiqlanadi. Yo'lovchini chiqarish yoki tushirish uchun qisqa to'xtashga ruxsat beriladi.",s:`<circle cx="50" cy="50" r="43" fill="${SB}" stroke="${SR}" stroke-width="10"/><path d="M22 22L78 78" stroke="${SR}" stroke-width="9"/>`},
+ {k:'chap_taq',g:3,n:"Chapga burilish taqiqlangan",d:"Belgi o'rnatilgan chorrahada chapga burilish taqiqlanadi.",s:sCirc(arw('M60 80V52Q60 40 48 40H34','#1b1b1b',8)+slash)},
+ {k:'ong_taq',g:3,n:"O'ngga burilish taqiqlangan",d:"Belgi o'rnatilgan chorrahada o'ngga burilish taqiqlanadi.",s:sCirc(arw('M40 80V52Q40 40 52 40H66','#1b1b1b',8)+slash)},
+ {k:'qayrilish_taq',g:3,n:"Qayrilib olish taqiqlangan",d:"Belgi ta'sir oralig'ida qayrilib olish taqiqlanadi.",s:sCirc(arw('M60 80V44Q60 30 48 30Q38 30 38 44V62','#1b1b1b',7)+slash)},
+ {k:'signal_taq',g:3,n:"Ovozli signal berish taqiqlangan",d:"Ovozli signal berish taqiqlanadi (yo'l-transport hodisasining oldini olish holati bundan mustasno).",s:sCirc(`<path d="M28 42H40L60 30V70L40 58H28Z" fill="${SK}"/><path d="M66 40Q72 50 66 60" fill="none" stroke="${SK}" stroke-width="4"/>`+slash)},
+ {k:'piyoda_taq',g:3,n:"Piyodalar harakatlanishi taqiqlangan",d:"Piyodalarning harakatlanishi taqiqlanadi.",s:sCirc(man(SK,-2,4,.95)+slash)},
+ {k:'cheklov_oxiri',g:3,n:"Barcha cheklovlar ta'sir oralig'ining oxiri",d:"Bir nechta taqiqlovchi belgilar (tezlik, quvib o'tish va boshqalar) ta'siri shu yerda tugaydi.",s:`<circle cx="50" cy="50" r="44" fill="#fff" stroke="#888" stroke-width="2"/><path d="M22 70L70 22M28 76L76 28M34 82L82 34" stroke="#555" stroke-width="3"/>`},
+ {k:'togri',g:4,n:"To'g'riga harakatlanish",d:"Faqat to'g'riga harakatlanishga ruxsat beriladi.",s:sBlue(arw('M50 82V30'))},
+ {k:'ongga',g:4,n:"O'ngga harakatlanish",d:"Faqat o'ngga burilishga ruxsat beriladi.",s:sBlue(arw('M40 82V54Q40 42 52 42H66'))},
+ {k:'chapga',g:4,n:"Chapga harakatlanish",d:"Faqat chapga burilishga ruxsat beriladi.",s:sBlue(arw('M60 82V54Q60 42 48 42H34'))},
+ {k:'togri_ong',g:4,n:"To'g'riga yoki o'ngga harakatlanish",d:"Faqat to'g'riga yoki o'ngga harakatlanishga ruxsat beriladi.",s:sBlue(arw('M44 84V24',undefined,8)+arw('M44 62Q44 52 56 52H68',undefined,8))},
+ {k:'togri_chap',g:4,n:"To'g'riga yoki chapga harakatlanish",d:"Faqat to'g'riga yoki chapga harakatlanishga ruxsat beriladi.",s:sBlue(arw('M56 84V24',undefined,8)+arw('M56 62Q56 52 44 52H32',undefined,8))},
+ {k:'aylanma',g:4,n:"Aylanma harakatlanish",d:"Strelkalar ko'rsatgan yo'nalishda aylanma harakatlanishga ruxsat beriladi.",s:sBlue(`${ahead('#ffffff')}<g fill="none" stroke="#fff" stroke-width="7"><path d="M30 58A21 21 0 0 1 46 30" marker-end="url(#ahffffff)"/><path d="M58 31A21 21 0 0 1 70 60" marker-end="url(#ahffffff)"/><path d="M62 72A21 21 0 0 1 34 72" marker-end="url(#ahffffff)"/></g>`)},
+ {k:'aylanib_ong',g:4,n:"To'siqni o'ng tomondan aylanib o'tish",d:"To'siqni (orolcha, ajratuvchi bo'lak) faqat o'ng tomondan aylanib o'tishga ruxsat beriladi.",s:sBlue(arw('M32 30L64 64'))},
+ {k:'piyoda_yolka',g:4,n:"Piyodalar yo'lkasi",d:"Faqat piyodalar harakatlanishiga ruxsat beriladi.",s:sBlue(man('#fff',-2,4,.95))},
+ {k:'bir_tomon',g:5,n:"Bir tomonlama harakatli yo'l",d:"Yo'lning butun kengligi bo'ylab transport bir yo'nalishda harakatlanadi.",s:sSq(arw('M50 84V26','#ffffff',12))},
+ {k:'piyoda_otish',g:5,n:"Piyodalar o'tish joyi",d:"Shu yerda piyodalar o'tish joyi joylashgan: piyodalarga yo'l berish shart.",s:sSq(`<polygon points="50,14 88,84 12,84" fill="#fff"/>`+man(SK,4,22,.74))},
+ {k:'berk',g:5,n:"Berk ko'cha",d:"Oldindagi yo'lda o'tish joyi yo'q (berk ko'cha).",s:sSq(`<rect x="42" y="38" width="16" height="48" fill="#fff"/><rect x="24" y="20" width="52" height="18" fill="${SR}"/>`)},
+ {k:'avtobus',g:5,n:"Avtobus va (yoki) trolleybus bekati",d:"Avtobus va (yoki) trolleybusning to'xtash joyi.",s:`<rect x="5" y="5" width="90" height="90" rx="10" fill="#fff" stroke="${SB}" stroke-width="6"/><rect x="22" y="26" width="56" height="40" rx="8" fill="${SK}"/><rect x="28" y="32" width="44" height="16" rx="3" fill="#fff"/><circle cx="34" cy="70" r="6" fill="${SK}"/><circle cx="66" cy="70" r="6" fill="${SK}"/>`},
+ {k:'parking',g:5,n:"To'xtab turish joyi",d:"Transport vositalari to'xtab turishi uchun ajratilgan joy.",s:sSq(`<text x="50" y="74" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="62" fill="#fff">P</text>`)},
+ {k:'aholi',g:5,n:"Aholi punktining boshlanishi",d:"Aholi punkti boshlanadi: shu yerdan aholi punktlari uchun belgilangan tezlik va boshqa talablar amal qiladi.",s:`<rect x="4" y="24" width="92" height="52" rx="5" fill="#fff" stroke="${SK}" stroke-width="3"/><text x="50" y="58" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="19" fill="${SK}">QARSHI</text>`}
+];
+const SGROUPS=[[1,"Ogohlantiruvchi"],[2,"Imtiyoz belgilari"],[3,"Taqiqlovchi"],[4,"Buyuruvchi"],[5,"Ko'rsatma va axborot"]];
+const signSVG=s=>sv(s.s);
+function signQuestion(s,seed){
+  const same=SIGNS.filter(x=>x.k!==s.k&&x.g===s.g), other=SIGNS.filter(x=>x.k!==s.k&&x.g!==s.g);
+  const pick=[...pvShuffle(same).slice(0,2),...pvShuffle(other).slice(0,1)];
+  while(pick.length<3)pick.push(pvShuffle(other)[pick.length]);
+  const o=pvShuffle([s.n,...pick.map(x=>x.n)]);
+  return {key:'s:'+s.k,kind:'sign',sign:s.k,q:'Bu belgi nimani bildiradi?',o,a:o.indexOf(s.n),iz:s.d,src:"Yo'l harakati qoidalari, 1-ilova (Yo'l belgilari)"};
+}
+const pvShuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* --- Holat --- */
+let pvs=store.get('pv',{mis:{},hist:[],exams:[],passed:0});
+const pvSave=()=>store.set('pv',pvs);
+let pvRun=null, pvTimer=null, pvView='menu', pvSignG=1;
+function pvReady(){const h=pvs.hist.slice(-50);return h.length?Math.round(h.reduce((a,b)=>a+b,0)/h.length*100):0}
+function pvBack(label='← Prava'){return `<div class="kbar"><button class="chip" id="pvback">${label}</button><b>${pvRun?esc(pvRun.title):'Prava'}</b><span></span></div>`}
+function pvStop(){clearInterval(pvTimer);pvTimer=null}
+
+function viewPrava(){
+  pvStop();
+  if(pvView==='run'&&pvRun) return pvDraw();
+  if(pvView==='signs') return pvSigns();
+  pvView='menu';pvRun=null;setHero('prava');
+  const misN=Object.keys(pvs.mis).length, rd=pvReady(), last=pvs.exams.slice(-1)[0];
+  $('#screen').innerHTML=`
+    <section class="card pv-ready"><div><div class="label">Tayyorlik darajasi</div><div class="big">${rd}<small>%</small></div>
+      <div class="note" style="margin-top:4px">${pvs.hist.length?`So'nggi ${Math.min(50,pvs.hist.length)} ta javob bo'yicha`:"Birinchi mashqni boshlang"}${last?` · oxirgi imtihon: ${last.ok?'o\'tdi':'o\'tmadi'} (${last.c}/${last.n})`:''}</div></div>
+      <div class="pv-ring" style="--p:${rd}"><span>${pvs.passed}</span><small>o'tilgan</small></div></section>
+    <button class="card pv-main" id="pvexam"><span class="pv-ic">⏱</span><span><b>Haqiqiy imtihon rejimi</b><small>${PV_CFG.n} savol · ${PV_CFG.min} daqiqa · ${PV_CFG.maxErr} tagacha xato</small></span><span class="pv-go">→</span></button>
+    <div class="qtopics">
+      <button class="qtopic" id="pvtickets"><span class="kic" style="background:linear-gradient(135deg,#7a5a00,#e0a400)">▤</span><b>Biletlar</b><small id="pvtsub">Tekshirilmoqda…</small></button>
+      <button class="qtopic" id="pvmis"><span class="kic" style="background:linear-gradient(135deg,#8a1f1f,#e0524a)">✕</span><b>Xatolar ustida ishlash</b><small>${misN?misN+' ta savol':"Hozircha xato yo'q"}</small></button>
+      <button class="qtopic" id="pvsignq"><span class="kic" style="background:linear-gradient(135deg,#14296e,#3563d4)">◆</span><b>Belgilar mashqi</b><small>${SIGNS.length} ta belgi bo'yicha</small></button>
+      <button class="qtopic" id="pvsigns"><span class="kic" style="background:linear-gradient(135deg,#0f5b3a,#2e9e6a)">▲</span><b>Yo'l belgilari</b><small>Ma'lumotnoma</small></button>
+    </div>
+    <section class="card" id="pvdbnote"><p class="note" style="margin:0">Rasmiy biletlar bazasi tekshirilmoqda…</p></section>`;
+  $('#pvexam').onclick=()=>pvStartExam();
+  $('#pvmis').onclick=()=>{const l=Object.values(pvs.mis);if(!l.length){toast("Xato qilingan savollar shu yerga yig'iladi");return}pvStart(pvShuffle(l).slice(0,PV_CFG.n),'Xatolar ustida ishlash','practice')};
+  $('#pvsignq').onclick=()=>pvStart(pvShuffle(SIGNS).slice(0,PV_CFG.n).map(signQuestion),'Belgilar mashqi','practice');
+  $('#pvsigns').onclick=()=>{pvView='signs';pvSigns()};
+  pvLoadDb().then(db=>{if(current!=='prava'||pvView!=='menu')return;
+    $('#pvtsub').textContent=db?db.tickets+' ta bilet':'Tez orada';
+    $('#pvdbnote').innerHTML=db?`<p class="note" style="margin:0">Biletlar manbasi: <a href="${esc(db.source.url)}" target="_blank" rel="noopener">${esc(db.source.name)}</a></p>`
+      :`<div class="label">Biletlar tez orada</div><p class="sub" style="margin:6px 0 0">Rasmiy imtihon biletlari mualliflik huquqi egasining ruxsati bilan qo'shiladi. Hozircha imtihon rejimi yo'l belgilari bo'yicha ishlaydi.</p>`;
+    $('#pvtickets').onclick=()=>db?pvTickets():toast('Biletlar tez orada qo\'shiladi')});
+}
+async function pvStartExam(){
+  const db=await pvLoadDb();
+  if(!db) return pvStart(pvShuffle(SIGNS).slice(0,PV_CFG.n).map(signQuestion),'Imtihon · belgilar','exam');
+  toast('Savollar yuklanmoqda…');
+  try{const ns=pvShuffle([...Array(db.tickets)].map((_,i)=>i+1)).slice(0,PV_CFG.n);
+    const qs=await Promise.all(ns.map(async n=>{const t=await pvTicket(n);return t[Math.floor(Math.random()*t.length)]}));
+    pvStart(qs,'Imtihon','exam')}catch(e){toast("Internetni tekshiring")}
+}
+function pvTickets(){
+  $('#hero').hidden=true;
+  $('#screen').innerHTML=pvBack()+`<section class="card"><div class="pv-tgrid">${[...Array(PV_DB.tickets)].map((_,i)=>`<button class="chip" data-t="${i+1}">${i+1}</button>`).join('')}</div></section>`;
+  $('#pvback').onclick=()=>viewPrava();
+  $('#screen').querySelectorAll('[data-t]').forEach(b=>b.onclick=async()=>{try{const n=+b.dataset.t;pvStart(await pvTicket(n),n+'-bilet','practice')}catch(e){toast('Internetni tekshiring')}});
+}
+function pvStart(qs,title,mode){
+  pvRun={qs,title,mode,i:0,ans:[],t0:Date.now(),done:false};pvView='run';window.scrollTo(0,0);pvDraw();
+  if(mode==='exam'){pvTimer=setInterval(()=>{if(current!=='prava'||!pvRun||pvRun.done){pvStop();return}
+    const left=PV_CFG.min*60-(Date.now()-pvRun.t0)/1000;const el=$('#pvclock');if(el)el.textContent=mmss2(Math.max(0,left));
+    if(left<=0){pvStop();pvFinish('vaqt')}},1000)}
+}
+function pvDraw(){
+  const r=pvRun;$('#hero').hidden=true;
+  if(r.done) return pvResult();
+  const q=r.qs[r.i], a=r.ans[r.i], errs=r.ans.filter((x,i)=>x!=null&&x!==r.qs[i].a).length;
+  const pic=q.kind==='sign'?`<div class="pv-pic sign-pic">${signSVG(SIGNS.find(s=>s.k===q.sign))}</div>`:q.img?`<div class="pv-pic"><img src="${esc(q.img)}" alt="" loading="lazy"></div>`:'';
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="pvback">✕ Yopish</button><b>${esc(r.title)}</b>${r.mode==='exam'?`<span class="badge old" id="pvclock">${mmss2(PV_CFG.min*60-(Date.now()-r.t0)/1000)}</span>`:`<span class="badge old">${r.i+1}/${r.qs.length}</span>`}</div>
+    <div class="pv-prog">${r.qs.map((x,i)=>`<i class="${r.ans[i]==null?'':r.ans[i]===x.a?'ok':'bad'} ${i===r.i?'cur':''}" data-j="${i}"></i>`).join('')}</div>
+    <section class="card pv-q">${pic}
+      <div class="label">${r.i+1}-savol${q.bilet?` · ${q.bilet}-bilet`:''}${r.mode==='exam'?` · xatolar: ${errs}/${PV_CFG.maxErr}`:''}</div>
+      <h3>${esc(q.q)}</h3>
+      <div class="pv-opts">${q.o.map((o,i)=>`<button class="pv-opt ${a==null?'':i===q.a?'ok':i===a?'bad':'dim'}" data-o="${i}" ${a!=null?'disabled':''}><span>F${i+1}</span>${esc(o)}</button>`).join('')}</div>
+      ${a!=null&&q.iz?`<div class="pv-iz"><b>${a===q.a?"To'g'ri!":"Noto'g'ri."}</b> ${esc(q.iz)}${q.src?`<small>Manba: ${esc(q.src)}</small>`:''}</div>`:''}
+    </section>
+    ${a!=null?`<button class="btn pv-next" id="pvnext">${r.i<r.qs.length-1?'Keyingi savol →':'Natijani ko\'rish'}</button>`:''}`;
+  $('#pvback').onclick=()=>{if(r.ans.some(x=>x!=null)&&!r.done&&r.mode==='exam'){tg&&tg.showPopup?tg.showPopup({message:'Imtihonni to\'xtatasizmi?',buttons:[{id:'y',type:'destructive',text:'To\'xtatish'},{type:'cancel'}]},id=>{if(id==='y'){pvStop();pvRun=null;pvView='menu';viewPrava()}}):(pvStop(),pvRun=null,pvView='menu',viewPrava());return}
+    pvStop();pvRun=null;pvView='menu';viewPrava()};
+  $('#screen').querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>{r.i=+b.dataset.j;pvDraw()});
+  $('#screen').querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>pvAnswer(+b.dataset.o));
+  const n=$('#pvnext');if(n)n.onclick=()=>{const nx=r.ans.findIndex((x,i)=>i>r.i&&x==null),any=r.ans.length<r.qs.length||r.ans.includes(undefined);
+    const firstOpen=[...r.qs.keys()].find(i=>r.ans[i]==null);
+    if(firstOpen===undefined){pvFinish();return}r.i=nx>0?nx:firstOpen;window.scrollTo(0,0);pvDraw()};
+}
+function pvAnswer(i){
+  const r=pvRun,q=r.qs[r.i];if(r.ans[r.i]!=null)return;r.ans[r.i]=i;const ok=i===q.a;
+  pvs.hist.push(ok?1:0);if(pvs.hist.length>200)pvs.hist=pvs.hist.slice(-200);
+  if(ok){delete pvs.mis[q.key]}else{pvs.mis[q.key]=q}pvSave();
+  haptic(ok?'light':'heavy');
+  const errs=r.ans.filter((x,j)=>x!=null&&x!==r.qs[j].a).length;
+  pvDraw();
+  if(r.mode==='exam'&&errs>PV_CFG.maxErr){setTimeout(()=>pvFinish('xato'),900)}
+}
+function pvFinish(why){
+  const r=pvRun;if(!r||r.done)return;r.done=true;pvStop();
+  const c=r.qs.filter((q,i)=>r.ans[i]===q.a).length, e=r.ans.filter((x,i)=>x!=null&&x!==r.qs[i].a).length;
+  r.res={c,e,why,ok:r.mode==='exam'?(e<=PV_CFG.maxErr&&!why&&c>=r.qs.length-PV_CFG.maxErr):c===r.qs.length,sec:Math.round((Date.now()-r.t0)/1000)};
+  if(r.mode==='exam'){pvs.exams.push({c,n:r.qs.length,ok:r.res.ok,at:Date.now()});pvs.exams=pvs.exams.slice(-30);if(r.res.ok){pvs.passed++;addCoins(10)}pvSave()}
+  haptic(r.res.ok?'done':'heavy');pvResult();
+}
+function pvResult(){
+  const r=pvRun,s=r.res;window.scrollTo(0,0);
+  const wrong=r.qs.map((q,i)=>({q,i})).filter(({q,i})=>r.ans[i]!=null&&r.ans[i]!==q.a);
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="pvback">← Prava</button><b>${esc(r.title)}</b><span></span></div>
+    <section class="card pv-res ${s.ok?'ok':'bad'}"><div class="pv-big">${s.ok?'✓':'✕'}</div>
+      <h3>${r.mode==='exam'?(s.ok?"Imtihondan o'tdingiz!":s.why==='vaqt'?'Vaqt tugadi':"Imtihondan o'tmadingiz"):(s.ok?'Hammasi to\'g\'ri!':'Mashq tugadi')}</h3>
+      <p class="sub">${s.c} ta to'g'ri · ${s.e} ta xato · ${mmss2(s.sec)}${r.mode==='exam'?`<br>O'tish uchun kamida ${r.qs.length-PV_CFG.maxErr} ta to'g'ri javob kerak`:''}</p>
+      ${r.mode==='exam'&&s.ok?'<p class="note">+10 tanga</p>':''}</section>
+    <div class="swap"><button class="btn" id="pvagain">Qayta boshlash</button>${wrong.length?`<button class="btn alt" id="pvwrong">Xatolarni qayta yechish</button>`:''}</div>
+    ${wrong.length?`<div class="sec-title"><b>Xato javoblar</b></div>${wrong.map(({q,i})=>`<section class="card pv-wr">${q.kind==='sign'?`<span class="pv-ws">${signSVG(SIGNS.find(x=>x.k===q.sign))}</span>`:''}<div><b>${esc(q.q)}</b>
+      <p class="note" style="margin:4px 0 0">Siz: <s>${esc(q.o[r.ans[i]])}</s><br>To'g'ri: <b style="color:var(--good)">${esc(q.o[q.a])}</b></p></div></section>`).join('')}`:''}
+    <button class="btn alt" id="pvshare" style="width:100%;margin-top:4px">Do'stlarga ulashish</button>`;
+  $('#pvback').onclick=()=>{pvRun=null;pvView='menu';viewPrava()};
+  $('#pvagain').onclick=()=>r.mode==='exam'?pvStartExam():pvStart(pvShuffle(r.qs),r.title,r.mode);
+  const w=$('#pvwrong');if(w)w.onclick=()=>pvStart(wrong.map(x=>x.q),'Xatolar ustida ishlash','practice');
+  $('#pvshare').onclick=()=>{const t=r.mode==='exam'?`Hamroh'da prava imtihonini ${s.ok?'topshirdim':'sinab ko\'rdim'}: ${s.c}/${r.qs.length} ✅ Siz ham sinab ko'ring!`:`Hamroh'da yo'l belgilari mashqi: ${s.c}/${r.qs.length}`;
+    const u=`https://t.me/share/url?url=${encodeURIComponent(BOT_LINK+'?startapp=prava')}&text=${encodeURIComponent(t)}`;tg&&tg.openTelegramLink?tg.openTelegramLink(u):window.open(u,'_blank')};
+}
+function pvSigns(){
+  $('#hero').hidden=true;
+  const l=SIGNS.filter(s=>s.g===pvSignG);
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="pvback">← Prava</button><b>Yo'l belgilari</b><span></span></div>
+    <div class="chips" id="pvsg" style="overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px">${SGROUPS.map(([g,n])=>`<button class="chip" data-g="${g}" aria-pressed="${g===pvSignG}" style="flex:none">${n}</button>`).join('')}</div>
+    <div class="pv-signs">${l.map(s=>`<section class="card pv-sign"><span class="pv-sp">${signSVG(s)}</span><div><b>${esc(s.n)}</b><p class="note" style="margin:4px 0 0">${esc(s.d)}</p></div></section>`).join('')}</div>
+    <button class="btn" id="pvsgq" style="width:100%">Shu guruh bo'yicha mashq</button>
+    <p class="note" style="margin:0 4px">Belgilar sxematik tarzda chizilgan. To'liq ro'yxat va ta'sir oralig'i: Yo'l harakati qoidalari, 1-ilova.</p>`;
+  $('#pvback').onclick=()=>{pvView='menu';viewPrava()};
+  $('#pvsg').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;pvSignG=+b.dataset.g;pvSigns()};
+  $('#pvsgq').onclick=()=>pvStart(pvShuffle(l).map(signQuestion),SGROUPS.find(x=>x[0]===pvSignG)[1]+' belgilar','practice');
+}
+
+const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava};
 /* ---------- ASOSIY ---------- */
-const TILE_COL={audio:['#5b1f6e','#b0479a'],qibla:['#08332f','#2e9e7a'],tasbeh:['#5b3a1a','#c08a3e'],namoz:['#08332f','#127061'],food:['#9c2a22','#e0812a'],cash:['#14296e','#3563d4'],quiz:['#35217a','#7a4fd6'],kids:['#0f6aa6','#33b2df'],doc:['#25304a','#4a5d86']};
+const TILE_COL={audio:['#5b1f6e','#b0479a'],qibla:['#08332f','#2e9e7a'],tasbeh:['#5b3a1a','#c08a3e'],namoz:['#08332f','#127061'],food:['#9c2a22','#e0812a'],cash:['#14296e','#3563d4'],quiz:['#35217a','#7a4fd6'],kids:['#0f6aa6','#33b2df'],doc:['#25304a','#4a5d86'],prava:['#4a3200','#d99a00']};
 let homeTick=null, homeDish=null;
 function viewHome(){
   clearInterval(homeTick);
@@ -2123,6 +2356,7 @@ function viewHome(){
       <button class="np-mini" id="hnp"></button>
     </section>
     <div class="tiles">${tiles.map(([k,l,s])=>`<button class="tile" data-go="${k==='qibla'||k==='tasbeh'?'namoz':k}" ${k==='qibla'||k==='tasbeh'?`data-pv="${k}"`:''}><span class="t-ic" style="background:linear-gradient(135deg,${TILE_COL[k][0]},${TILE_COL[k][1]})">${ICONS[k]||TOOLIC[k]}</span><span><b>${l}</b><small>${s}</small></span></button>`).join('')}</div>
+    <button class="card pv-main" data-go="prava" style="margin:0;background:linear-gradient(135deg,#4a3200,#d99a00)"><span class="pv-ic">${ICONS.prava}</span><span><b>Prava imtihoniga tayyorlaning</b><small>Imtihon rejimi · xatolar ustida ishlash · yo'l belgilari</small></span><span class="pv-go">→</span></button>
     ${weatherCard()}
     <div class="sec-title"><b>Bugun nima pishiramiz?</b><button data-go="food">Barchasi</button></div>
     <button class="card dish-card" id="hdish" style="text-align:left;width:100%">
