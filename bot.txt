@@ -74,8 +74,10 @@ async function onMessage(env,msg){
   if(cmd==='/taom'){const n=DL[Math.floor(Math.random()*DL.length)];
     return tg(env,'sendMessage',{chat_id:chat,text:`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,parse_mode:'HTML',
       reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',web_app:{url:APP_URL+'?r='+slug(n)}}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
+  if(cmd==='/hujjat') return tg(env,'sendMessage',{chat_id:chat,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('📄 Hujjatlar bo‘limini ochish',APP_URL+'?t=doc')]]},
+    text:`📄 <b>Hujjatlar bilan ishlash</b>\n\n• Rasmlardan PDF\n• PDF birlashtirish\n• Sahifalarni ajratish\n• PDF → rasm\n• Rasmdan matn (o‘zbek, rus, ingliz)\n• Rasmni siqish\n• Lotin ↔ Kirill\n\nTayyor fayl shu chatga yuboriladi.`});
   if(cmd==='/yordam'||cmd==='/help') return tg(env,'sendMessage',{chat_id:chat,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()]]},
-    text:`<b>Hamroh bot buyruqlari</b>\n\n/start — bosh sahifa\n/namoz — bugungi namoz vaqtlari\n/kurs — valyuta kursi\n/taom — bugun nima pishiramiz?\n\nTo‘liq imkoniyatlar — «Hamroh» ilovasida.`});
+    text:`<b>Hamroh bot buyruqlari</b>\n\n/start — bosh sahifa\n/namoz — bugungi namoz vaqtlari\n/kurs — valyuta kursi\n/taom — bugun nima pishiramiz?\n/hujjat — PDF va hujjatlar\n\nTo‘liq imkoniyatlar — «Hamroh» ilovasida.`});
   if(msg.chat.type==='private') return tg(env,'sendMessage',{chat_id:chat,text:'Quyidagi tugma orqali ilovani oching yoki /yordam ni bosing.',reply_markup:{inline_keyboard:[[appBtn()]]}});
 }
 async function onCallback(env,q){
@@ -87,8 +89,34 @@ async function onCallback(env,q){
       reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',web_app:{url:APP_URL+'?r='+slug(n)}}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
   await tg(env,'answerCallbackQuery',{callback_query_id:q.id});
 }
+
+// ---- Mini App → chat file delivery (initData is verified with the bot token) ----
+const CORS={'access-control-allow-origin':'*','access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':'content-type'};
+const J=(o,s=200)=>new Response(JSON.stringify(o),{status:s,headers:{...CORS,'content-type':'application/json'}});
+async function hmac(key,msg){const k=await crypto.subtle.importKey('raw',typeof key==='string'?new TextEncoder().encode(key):key,{name:'HMAC',hash:'SHA-256'},false,['sign']);return new Uint8Array(await crypto.subtle.sign('HMAC',k,new TextEncoder().encode(msg)))}
+async function verifyInit(initData,token){
+  const p=new URLSearchParams(initData);const hash=p.get('hash');if(!hash)return null;p.delete('hash');
+  const dcs=[...p.entries()].sort(([a],[b])=>a<b?-1:1).map(([k,v])=>k+'='+v).join('\n');
+  const secret=await hmac('WebAppData',token);const calc=[...await hmac(secret,dcs)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  if(calc!==hash)return null;if(Date.now()/1000-(+p.get('auth_date')||0)>86400)return null;
+  try{return JSON.parse(p.get('user'))}catch(e){return null}
+}
+async function handleSend(req,env){
+  let form;try{form=await req.formData()}catch(e){return J({ok:false,error:'form'},400)}
+  const user=await verifyInit(form.get('initData')||'',env.BOT_TOKEN);if(!user||!user.id)return J({ok:false,error:'auth'},403);
+  const file=form.get('file'),text=form.get('text');
+  if(file&&typeof file!=='string'){
+    const fd=new FormData();fd.append('chat_id',String(user.id));fd.append('document',file,file.name||'hujjat');const cap=String(form.get('caption')||'').slice(0,1000);if(cap)fd.append('caption',cap+'\n\n— Hamroh ilovasi');
+    const r=await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/sendDocument`,{method:'POST',body:fd});const j=await r.json();return J({ok:!!j.ok,error:j.description},j.ok?200:502);
+  }
+  if(text){const t=String(text);for(let i=0;i<t.length&&i<40000;i+=4000){const j=await tg(env,'sendMessage',{chat_id:user.id,text:t.slice(i,i+4000)});if(!j.ok)return J({ok:false,error:j.description},502)}return J({ok:true})}
+  return J({ok:false,error:'empty'},400);
+}
 export default {
   async fetch(req,env){
+    const path=new URL(req.url).pathname;
+    if(req.method==='OPTIONS')return new Response(null,{headers:CORS});
+    if(path==='/send'&&req.method==='POST')return handleSend(req,env);
     if(req.method!=='POST') return new Response('Hamroh bot ishlayapti ✅');
     if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
     const u=await req.json().catch(()=>({}));
