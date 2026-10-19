@@ -1764,7 +1764,7 @@ function weatherCard(){
 
 /* ---------- SEVIMLILAR, XARID RO'YXATI, ULASHISH ---------- */
 // BOT_LINK: Mini App link from BotFather, e.g. "https://t.me/hamroh_bot/app". Empty → share text only.
-const BOT_LINK='';
+const BOT_LINK='https://t.me/Hamronilovabot/app';
 let favs=new Set(store.get('favs',[])), shop=store.get('shop',[]); // shop: [{t, done}]
 const saveFav=()=>store.set('favs',[...favs]), saveShop=()=>store.set('shop',shop);
 function addShop(items){let n=0;items.forEach(t=>{if(!shop.some(s=>s.t.toLowerCase()===t.toLowerCase()&&!s.done)){shop.push({t,done:false});n++}});saveShop();return n}
