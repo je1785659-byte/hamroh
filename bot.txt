@@ -1,0 +1,94 @@
+// Hamroh bot — Cloudflare Worker (Telegram webhook).
+// Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
+const APP_URL='https://je1785659-byte.github.io/hamroh/';
+const SHARE_LINK='https://t.me/Hamronilovabot/app';
+const COVER=APP_URL+'cover.png';
+const PT_CFG={fajr:15.5,isha:15,ishaAdd:2.5,maghribAdd:3.5,asrFactor:2,tz:5,checked:'19.10.2026'};
+const CENTRES=[["Toshkent shahri", "Toshkent", 41.265, 69.216], ["Toshkent viloyati", "Nurafshon", 41.032, 69.363], ["Andijon", "Andijon", 40.783, 72.351], ["Buxoro", "Buxoro", 39.77, 64.431], ["Farg'ona", "Farg'ona", 40.384, 71.784], ["Jizzax", "Jizzax", 40.134, 67.83], ["Xorazm", "Urganch", 41.552, 60.631], ["Namangan", "Namangan", 40.998, 71.673], ["Navoiy", "Navoiy", 40.084, 65.379], ["Qashqadaryo", "Qarshi", 38.861, 65.789], ["Qoraqalpog'iston", "Nukus", 42.459, 59.606], ["Samarqand", "Samarqand", 39.655, 66.964], ["Sirdaryo", "Guliston", 40.495, 68.775], ["Surxondaryo", "Termiz", 37.224, 67.278]];
+const PNAMES=[['fajr','Bomdod'],['sunrise','Quyosh'],['dhuhr','Peshin'],['asr','Asr'],['maghrib','Shom'],['isha','Xufton']];
+const rad=Math.PI/180;
+function jdate(y,m,d){if(m<=2){y--;m+=12}const A=Math.floor(y/100),B=2-A+Math.floor(A/4);return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+B-1524.5}
+function sunpos(jd){const d=jd-2451545,g=(357.529+.98560028*d)%360,q=(280.459+.98564736*d)%360,L=(q+1.915*Math.sin(g*rad)+.02*Math.sin(2*g*rad))%360,e=23.439-.00000036*d;
+  const RA=Math.atan2(Math.cos(e*rad)*Math.sin(L*rad),Math.cos(L*rad))/rad/15,dec=Math.asin(Math.sin(e*rad)*Math.sin(L*rad))/rad;let eq=q/15-((RA%24)+24)%24;eq=((eq+12)%24+24)%24-12;return[dec,eq]}
+function prayerTimes(y,m,d,lat,lng){
+  const jd=jdate(y,m,d)-lng/(15*24);
+  const mid=t=>((12-sunpos(jd+t)[1])%24+24)%24;
+  const ang=(a,t,ccw)=>{const dec=sunpos(jd+t)[0];const c=(-Math.sin(a*rad)-Math.sin(dec*rad)*Math.sin(lat*rad))/(Math.cos(dec*rad)*Math.cos(lat*rad));const T=Math.acos(Math.max(-1,Math.min(1,c)))/rad/15;return mid(t)+(ccw?-T:T)};
+  const asr=t=>{const dec=sunpos(jd+t)[0];const a=-Math.atan(1/(PT_CFG.asrFactor+Math.tan(Math.abs((lat-dec)*rad))))/rad;return ang(a,t,false)};
+  let t=[5/24,6/24,.5,13/24,.75,.75];
+  for(let k=0;k<2;k++) t=[ang(PT_CFG.fajr,t[0],true)/24,ang(.833,t[1],true)/24,mid(t[2])/24,asr(t[3])/24,ang(.833,t[4],false)/24,ang(PT_CFG.isha,t[5],false)/24];
+  const adj=PT_CFG.tz-lng/15, add=[0,0,0,0,PT_CFG.maghribAdd,PT_CFG.ishaAdd];
+  return t.map((x,i)=>Math.round((x*24+adj)*60+add[i]));  // minutes from local midnight
+}
+const hhmm=m=>{m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+
+const DISHES=["Baliq sho'rva", "Bodring-pomidor salati", "Chuchvara", "Dimlama", "Fricadelkali sho'rva", "Go'shtli grechka", "Issiq buterbrod", "Karam do'lma", "Kartoshka pyuresi", "Kartoshka quymoq", "Kartoshkali xonim", "Lag'mon", "Loviya salati", "Loviya sho'rva", "Manti", "Mastava", "Moshxo'rda", "Okroshka", "Osh", "Pishloqli tovuq", "Pomidorli makaron", "Pomidorli tuxum", "Qalampir do'lma", "Qo'ziqorinli grechka", "Qo'ziqorinli kartoshka", "Qo'ziqorinli makaron", "Qo'ziqorinli sho'rva", "Qovoq manti", "Qovoq sho'rva-pyure", "Qovoqli bo'tqa", "Qovurilgan baliq", "Qovurma sho'rva", "Qozon kabob", "Quymoq", "Sabzavot ragu", "Sabzavotli guruch", "Sarimsoqli baqlajon", "Sarimsoqli non", "Shakshuka", "Shirguruch", "Smetanali tovuq", "Smetanali tvorog", "Sosiska kartoshka bilan", "Sosiskali makaron", "Sosiskali omlet", "Sutli grechka", "Sutli makaron", "Tovuq sho'rva", "Tovuqli lapsha", "Tovuqli osh", "Tovuqli salat", "Tuxumli kartoshka", "Tuxumli non", "Tvorogli sirniki", "Tvorogli zapekanka", "Yupqa blinchik"];
+const slug=n=>n.toLowerCase().replace(/[‘’ʻ']/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const NAMES=['Bomdod','Quyosh','Peshin','Asr','Shom','Xufton'];
+const appBtn=(t='🚀 Ilovani ochish',url=APP_URL)=>({text:t,web_app:{url}});
+const shareBtn={text:'📤 Do‘stlarga ulashish',url:'https://t.me/share/url?url='+encodeURIComponent(SHARE_LINK)+'&text='+encodeURIComponent('Namoz vaqtlari, retseptlar, valyuta kursi va bolalar o‘yinlari — Hamroh ilovasida')};
+
+async function tg(env,method,body){
+  const r=await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+  return r.json();
+}
+function uzToday(){const n=new Date(Date.now()+5*3600e3);return[n.getUTCFullYear(),n.getUTCMonth()+1,n.getUTCDate(),n.getUTCHours()*60+n.getUTCMinutes()]}
+function namozText(i){
+  const [r,name,lat,lng]=CENTRES[i];const [y,m,d,now]=uzToday();const t=prayerTimes(y,m,d,lat,lng);
+  const nx=[0,2,3,4,5].find(k=>t[k]>now);
+  const rows=t.map((v,k)=>`${k===nx?'▶️':'▫️'} <b>${NAMES[k]}</b> — ${hhmm(v)}`).join('\n');
+  return `🕌 <b>${name}</b> (${r})\n${d}.${String(m).padStart(2,'0')}.${y}\n\n${rows}\n\n${nx!==undefined?`Keyingi: <b>${NAMES[nx]}</b>, ${Math.floor((t[nx]-now)/60)?Math.floor((t[nx]-now)/60)+' soat ':''}${(t[nx]-now)%60} daqiqadan so‘ng`:'Bugungi namozlar tugadi'}\n\n<i>Tuman va qishloq bo‘yicha aniq vaqt — ilovada</i>`;
+}
+const regionKb=()=>({inline_keyboard:[...Array.from({length:Math.ceil(CENTRES.length/2)},(_,i)=>CENTRES.slice(i*2,i*2+2).map((c,k)=>({text:c[0],callback_data:'nm:'+(i*2+k)}))),[appBtn('📍 Joylashuv bo‘yicha — ilovada',APP_URL)]]});
+async function kursText(){
+  try{const r=await fetch('https://cbu.uz/uz/arkhiv-kursov-valyut/json/',{cf:{cacheTtl:1800}});const j=await r.json();
+    const pick=['USD','EUR','RUB','KZT','CNY','TRY'].map(c=>j.find(x=>x.Ccy===c)).filter(Boolean);
+    return `💵 <b>Markaziy bank kursi</b> · ${j[0].Date}\n\n`+pick.map(x=>`<b>${x.Ccy}</b> — ${Number(x.Rate).toLocaleString('ru-RU')} so‘m ${+x.Diff>=0?'🔺':'🔻'}${Math.abs(+x.Diff)}`).join('\n')+`\n\n<i>Barcha valyutalar va konvertor — ilovada</i>`;
+  }catch(e){return 'Kursni olib bo‘lmadi. Birozdan keyin qayta urinib ko‘ring.'}
+}
+const START=`<b>Assalomu alaykum! Hamroh’ga xush kelibsiz</b> 👋
+
+Oilangiz uchun kundalik yordamchi:
+🕌 Namoz vaqtlari, qibla, tasbeh va tilovat
+🍲 68 ta retsept va «Muzlatkichda nima bor?»
+💵 Markaziy bank kursi va konvertor
+🧠 Viktorina va kunlik savol
+🧸 Bolalar uchun 20 ta o‘yin
+
+Boshlash uchun pastdagi tugmani bosing 👇
+
+Buyruqlar: /namoz · /kurs · /taom · /yordam`;
+async function onMessage(env,msg){
+  const chat=msg.chat.id, text=(msg.text||'').trim(), cmd=text.split(/[\s@]/)[0].toLowerCase();
+  if(msg.chat.type!=='private'&&!text.startsWith('/'))return;
+  if(cmd==='/start'){
+    const r=await tg(env,'sendPhoto',{chat_id:chat,photo:COVER,caption:START,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn]]}});
+    if(!r.ok) await tg(env,'sendMessage',{chat_id:chat,text:START,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn]]}});
+    return;
+  }
+  if(cmd==='/namoz') return tg(env,'sendMessage',{chat_id:chat,text:namozText(0)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()});
+  if(cmd==='/kurs') return tg(env,'sendMessage',{chat_id:chat,text:await kursText(),parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('💱 Konvertorni ochish')]]}});
+  if(cmd==='/taom'){const n=DISHES[Math.floor(Math.random()*DISHES.length)];
+    return tg(env,'sendMessage',{chat_id:chat,text:`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,parse_mode:'HTML',
+      reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',url:SHARE_LINK+'?startapp=r_'+slug(n)}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
+  if(cmd==='/yordam'||cmd==='/help') return tg(env,'sendMessage',{chat_id:chat,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()]]},
+    text:`<b>Hamroh bot buyruqlari</b>\n\n/start — bosh sahifa\n/namoz — bugungi namoz vaqtlari\n/kurs — valyuta kursi\n/taom — bugun nima pishiramiz?\n\nTo‘liq imkoniyatlar — «Hamroh» ilovasida.`});
+  if(msg.chat.type==='private') return tg(env,'sendMessage',{chat_id:chat,text:'Quyidagi tugma orqali ilovani oching yoki /yordam ni bosing.',reply_markup:{inline_keyboard:[[appBtn()]]}});
+}
+async function onCallback(env,q){
+  const d=q.data||'';
+  if(d.startsWith('nm:')){const i=+d.slice(3);if(CENTRES[i]) await tg(env,'editMessageText',{chat_id:q.message.chat.id,message_id:q.message.message_id,text:namozText(i)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()})}
+  if(d==='taom'){const n=DISHES[Math.floor(Math.random()*DISHES.length)];
+    await tg(env,'editMessageText',{chat_id:q.message.chat.id,message_id:q.message.message_id,parse_mode:'HTML',text:`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,
+      reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',url:SHARE_LINK+'?startapp=r_'+slug(n)}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
+  await tg(env,'answerCallbackQuery',{callback_query_id:q.id});
+}
+export default {
+  async fetch(req,env){
+    if(req.method!=='POST') return new Response('Hamroh bot ishlayapti ✅');
+    if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
+    const u=await req.json().catch(()=>({}));
+    try{ if(u.message) await onMessage(env,u.message); else if(u.callback_query) await onCallback(env,u.callback_query); }catch(e){console.log(e)}
+    return new Response('ok');
+  }
+};
