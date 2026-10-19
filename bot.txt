@@ -70,7 +70,7 @@ async function onMessage(env,msg){
   if(cmd==='/kurs') return tg(env,'sendMessage',{chat_id:chat,text:await kursText(),parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('💱 Konvertorni ochish')]]}});
   if(cmd==='/taom'){const n=DISHES[Math.floor(Math.random()*DISHES.length)];
     return tg(env,'sendMessage',{chat_id:chat,text:`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,parse_mode:'HTML',
-      reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',url:SHARE_LINK+'?startapp=r_'+slug(n)}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
+      reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',web_app:{url:APP_URL+'?r='+slug(n)}}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
   if(cmd==='/yordam'||cmd==='/help') return tg(env,'sendMessage',{chat_id:chat,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()]]},
     text:`<b>Hamroh bot buyruqlari</b>\n\n/start — bosh sahifa\n/namoz — bugungi namoz vaqtlari\n/kurs — valyuta kursi\n/taom — bugun nima pishiramiz?\n\nTo‘liq imkoniyatlar — «Hamroh» ilovasida.`});
   if(msg.chat.type==='private') return tg(env,'sendMessage',{chat_id:chat,text:'Quyidagi tugma orqali ilovani oching yoki /yordam ni bosing.',reply_markup:{inline_keyboard:[[appBtn()]]}});
@@ -80,7 +80,7 @@ async function onCallback(env,q){
   if(d.startsWith('nm:')){const i=+d.slice(3);if(CENTRES[i]) await tg(env,'editMessageText',{chat_id:q.message.chat.id,message_id:q.message.message_id,text:namozText(i)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()})}
   if(d==='taom'){const n=DISHES[Math.floor(Math.random()*DISHES.length)];
     await tg(env,'editMessageText',{chat_id:q.message.chat.id,message_id:q.message.message_id,parse_mode:'HTML',text:`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,
-      reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',url:SHARE_LINK+'?startapp=r_'+slug(n)}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
+      reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',web_app:{url:APP_URL+'?r='+slug(n)}}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
   await tg(env,'answerCallbackQuery',{callback_query_id:q.id});
 }
 export default {
