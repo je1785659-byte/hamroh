@@ -1,0 +1,262 @@
+[
+{
+"id": "m3-1",
+"q": "Mexanik transport vositasini shatakka olib ketayotgan transport vositasining eng yuqori tezligi qancha?",
+"o": [
+"Soatiga 50 km",
+"Soatiga 60 km",
+"Soatiga 70 km",
+"Soatiga 40 km"
+],
+"a": 0,
+"iz": "Mexanik transport vositalarini shatakka olib ketayotganda tezlik soatiga 50 km dan oshmasligi kerak.",
+"src": "YHQ, 80-band"
+},
+{
+"id": "m3-2",
+"q": "Ovozli signal berishga qachon ruxsat etiladi?",
+"o": [
+"Istalgan vaqtda",
+"Aholi punktida piyodalarni chaqirish uchun",
+"Aholi punktidan tashqarida quvib o'tishni ogohlantirish uchun va YTH oldini olish uchun",
+"Tirbandlikda harakatni tezlashtirish uchun"
+],
+"a": 2,
+"iz": "Ovozli signal faqat aholi punktidan tashqarida quvib o'tish haqida ogohlantirish va yo'l-transport hodisasining oldini olish uchun beriladi. Boshqa hollarda taqiqlanadi.",
+"src": "YHQ, 48-band"
+},
+{
+"id": "m3-3",
+"q": "Kuzovida odam tashiyotgan yuk avtomobili har qanday yo'lda qanday tezlikdan oshmasligi kerak?",
+"o": [
+"Soatiga 70 km",
+"Soatiga 80 km",
+"Soatiga 50 km",
+"Soatiga 60 km"
+],
+"a": 3,
+"iz": "Kuzovida odam tashiyotgan yuk avtomobillari barcha yo'llarda soatiga 60 km dan oshmagan tezlikda harakatlanadi.",
+"src": "YHQ, 80-band"
+},
+{
+"id": "m3-4",
+"q": "O'ngga yoki chapga burilayotgan haydovchi kimga yo'l berishi shart?",
+"o": [
+"Burilayotgan yo'lning qatnov qismini kesib o'tayotgan piyodalarga",
+"Hech kimga",
+"Faqat avtobuslarga",
+"Faqat yuk avtomobillariga"
+],
+"a": 0,
+"iz": "O'ngga yoki chapga burilayotgan haydovchi kesib o'tilayotgan yo'lning qatnov qismini kesib o'tayotgan piyodalarga va velosiped yo'lkasidagi velosipedchilarga yo'l berishi shart.",
+"src": "YHQ, 96-band"
+},
+{
+"id": "m3-5",
+"q": "Yashil chiroqda chapga burilayotgan relssiz transport vositasining haydovchisi kimga yo'l beradi?",
+"o": [
+"Faqat orqadan kelayotganlarga",
+"Qarama-qarshi tomondan to'g'riga va o'ngga harakatlanayotganlarga",
+"Hech kimga",
+"Faqat o'ngga burilayotganlarga"
+],
+"a": 1,
+"iz": "Yashil ishorada chapga burilayotgan yoki qayrilib olayotgan relssiz transport vositasi qarama-qarshi tomondan to'g'riga va o'ngga harakatlanayotgan transport vositalariga yo'l berishi shart.",
+"src": "YHQ, 99-band"
+},
+{
+"id": "m3-6",
+"q": "Quvib o'tishni boshlashdan oldin haydovchi qaysi ishorani yoqadi?",
+"o": [
+"Avariya yorug'lik signalizatsiyasini",
+"Chapga burilish ko'rsatkichini",
+"O'ngga burilish ko'rsatkichini",
+"Tumanga qarshi chiroqni"
+],
+"a": 1,
+"iz": "Quvib o'tishdan oldin haydovchi chapga burilish ko'rsatkichini yoqib, quvib o'tish xavfsiz ekaniga ishonch hosil qiladi.",
+"src": "YHQ, 82-band"
+},
+{
+"id": "m3-7",
+"q": "Qayrilib olish joylarida va ulardan qancha masofada to'xtash taqiqlanadi?",
+"o": [
+"Ulardan oldin va keyin 10 m dan kam masofada",
+"Ulardan oldin va keyin 30 m dan kam masofada",
+"Ulardan oldin va keyin 50 m dan kam masofada",
+"Faqat qayrilib olish joyining o'zida"
+],
+"a": 1,
+"iz": "Qayrilib olish joylarida va ulardan oldin hamda keyin 30 m dan kam masofada to'xtash taqiqlanadi.",
+"src": "YHQ, 91-band"
+},
+{
+"id": "m3-8",
+"q": "Aholi punktlaridan tashqarida uzoq vaqt to'xtab turish, tunash va dam olish qayerda mumkin?",
+"o": [
+"Istalgan joyda",
+"Yo'l yoqasida avariya chirog'ini yoqib",
+"Qatnov qismi chetida",
+"Faqat maxsus maydonchalarda yoki yo'ldan tashqarida"
+],
+"a": 3,
+"iz": "Aholi punktlaridan tashqarida uzoq vaqt to'xtab turish, tunash va dam olish faqat maxsus maydonchalarda yoki yo'ldan tashqarida amalga oshiriladi.",
+"src": "YHQ, 90-band"
+},
+{
+"id": "m3-9",
+"q": "Ko'priklar, yo'l o'tkazgichlar, estakadalarda va ularning ostida quvib o'tishga ruxsat etiladimi?",
+"o": [
+"Ha, ruxsat etiladi",
+"Uch qatorli bo'lsa ruxsat etiladi",
+"Yo'q, taqiqlanadi",
+"Faqat yuk avtomobillari uchun taqiqlanadi"
+],
+"a": 2,
+"iz": "Ko'priklarda, yo'l o'tkazgichlarda, estakadalarda va ularning ostida quvib o'tish taqiqlanadi.",
+"src": "YHQ, 86-band"
+},
+{
+"id": "m3-10",
+"q": "Maktab va maktabgacha ta'lim muassasalari yaqinidagi tegishli belgilar ta'sir oralig'ida eng yuqori tezlik qancha?",
+"o": [
+"Soatiga 30 km",
+"Soatiga 20 km",
+"Soatiga 50 km",
+"Soatiga 40 km"
+],
+"a": 0,
+"iz": "Maktab va maktabgacha ta'lim muassasalari oldi va orqasidagi (300 m dan kam) yo'l qismida tezlik soatiga 30 km dan oshmasligi kerak.",
+"src": "YHQ, 78-band"
+},
+{
+"id": "m3-11",
+"q": "Svetoforning yashil miltillovchi ishorasi nimani bildiradi?",
+"o": [
+"Harakatni taqiqlaydi",
+"Chorraha tartibga solinmaganini bildiradi",
+"Faqat piyodalarga ruxsat beradi",
+"Harakatga ruxsat beradi va tez orada taqiqlovchi ishora yonishini bildiradi"
+],
+"a": 3,
+"iz": "Yashil miltillovchi ishora harakatga ruxsat beradi va uning amal qilish vaqti tugab, tez orada taqiqlovchi ishora yonishini bildiradi.",
+"src": "YHQ, 31-band"
+},
+{
+"id": "m3-12",
+"q": "Transport vositasi bilan yaxlit chiziq (qatnov qismi chetidan tashqari) orasidagi masofa qanchadan kam bo'lsa, to'xtash taqiqlanadi?",
+"o": [
+"1,5 m",
+"3 m",
+"2 m",
+"5 m"
+],
+"a": 1,
+"iz": "Yaxlit chiziq, ajratuvchi bo'lak yoki qatnov qismining qarama-qarshi cheti bilan transport vositasi orasidagi masofa 3 m dan kam bo'ladigan joylarda to'xtash taqiqlanadi.",
+"src": "YHQ, 91-band"
+},
+{
+"id": "m3-13",
+"q": "Yo'lning ko'rinish cheklangan qismlarida va ko'tarilish cho'qqisida quvib o'tishga ruxsat etiladimi?",
+"o": [
+"Ha, ehtiyotkorlik bilan ruxsat etiladi",
+"Yo'q, taqiqlanadi",
+"Ovozli signal berib ruxsat etiladi",
+"Faqat mototsikllarga ruxsat etiladi"
+],
+"a": 1,
+"iz": "Ko'tarilish cho'qqilarida va ko'rinish cheklangan yo'l qismlarida quvib o'tish taqiqlanadi.",
+"src": "YHQ, 86-band"
+},
+{
+"id": "m3-14",
+"q": "Temir yo'l kesishmasidan qancha masofada to'xtab turish taqiqlanadi?",
+"o": [
+"Ikkala tomonda 100 m dan kam masofada",
+"Faqat kesishmaning o'zida",
+"Ikkala tomonda 30 m dan kam masofada",
+"Ikkala tomonda 50 m dan kam masofada"
+],
+"a": 3,
+"iz": "Temir yo'l kesishmalaridan ikkala tomonda 50 m dan kam masofada to'xtab turish taqiqlanadi.",
+"src": "YHQ, 92-band"
+},
+{
+"id": "m3-15",
+"q": "Keskin tormozlashga qachon ruxsat etiladi?",
+"o": [
+"Istalgan vaqtda",
+"Yo'l-transport hodisasining oldini olish uchun zarur bo'lganda",
+"Orqadagi haydovchini ogohlantirish uchun",
+"Faqat aholi punktidan tashqarida"
+],
+"a": 1,
+"iz": "Yo'l-transport hodisasining oldini olish zarurati bo'lmasa, keskin tormozlash taqiqlanadi.",
+"src": "YHQ, 81-band"
+},
+{
+"id": "m3-16",
+"q": "Taqiqlovchi belgi bo'lmasa, svetoforning chapga burilish strelkasi yana nimaga ruxsat beradi?",
+"o": [
+"Qayrilib olishga",
+"To'g'riga harakatlanishga",
+"O'ngga burilishga",
+"To'xtab turishga"
+],
+"a": 0,
+"iz": "Belgilar bilan taqiqlanmagan bo'lsa, chapga burilishga ruxsat beruvchi strelka qayrilib olishga ham ruxsat beradi.",
+"src": "YHQ, 32-band"
+},
+{
+"id": "m3-17",
+"q": "Tartibga solinmagan chorrahada ikkinchi darajali yo'lda harakatlanayotganda quvib o'tishga ruxsat etiladimi?",
+"o": [
+"Yo'q, taqiqlanadi",
+"Faqat chap tomondan ruxsat etiladi",
+"Ha, ruxsat etiladi",
+"Faqat kunduzi ruxsat etiladi"
+],
+"a": 0,
+"iz": "Tartibga solinmagan chorrahalarda ikkinchi darajali yo'lda harakatlanayotganda quvib o'tish taqiqlanadi.",
+"src": "YHQ, 86-band"
+},
+{
+"id": "m3-18",
+"q": "Aylanma harakat tashkil etilgan chorrahada qaysi transport vositalari imtiyozga ega?",
+"o": [
+"Hajmi kattaroq transport vositalari",
+"Aylanaga kirib kelayotganlar",
+"O'ng tomondan kelayotganlar",
+"Aylana bo'ylab harakatlanayotganlar"
+],
+"a": 3,
+"iz": "Aylanma harakat tashkil etilgan chorrahada aylana bo'ylab harakatlanayotgan transport vositalari unga kirib kelayotganlarga nisbatan imtiyozga ega.",
+"src": "YHQ, 98-band"
+},
+{
+"id": "m3-19",
+"q": "Tirkamali yuk avtomobillari aholi punktlaridan tashqarida qanday tezlikdan oshmasligi kerak?",
+"o": [
+"Soatiga 80 km",
+"Soatiga 90 km",
+"Soatiga 70 km",
+"Soatiga 60 km"
+],
+"a": 2,
+"iz": "Tirkamali yuk avtomobillari aholi punktlaridan tashqarida soatiga 70 km dan oshmagan tezlikda harakatlanishi kerak.",
+"src": "YHQ, 79-band"
+},
+{
+"id": "m3-20",
+"q": "\"To'xtash\" deganda transport vositasining qancha vaqtgacha to'xtatilishi tushuniladi?",
+"o": [
+"10 daqiqagacha",
+"5 daqiqagacha",
+"15 daqiqagacha",
+"20 daqiqagacha"
+],
+"a": 0,
+"iz": "To'xtash — transport vositasi harakatini 10 daqiqagacha bo'lgan muddatga to'xtatish. Undan ko'p vaqt to'xtab turish hisoblanadi.",
+"src": "YHQ, 6-band"
+}
+]

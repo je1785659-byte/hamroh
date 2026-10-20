@@ -2246,8 +2246,8 @@ function viewPrava(){
   $('#pvsignq').onclick=()=>pvStart(pvShuffle(SIGNS).slice(0,PV_CFG.n).map(signQuestion),'Belgilar mashqi','practice');
   $('#pvsigns').onclick=()=>{pvView='signs';pvSigns()};
   pvLoadDb().then(db=>{if(current!=='prava'||pvView!=='menu')return;
-    $('#pvtsub').textContent=db?db.tickets+' ta bilet':'Tez orada';
-    $('#pvdbnote').innerHTML=db?`<p class="note" style="margin:0">Biletlar manbasi: <a href="${esc(db.source.url)}" target="_blank" rel="noopener">${esc(db.source.name)}</a></p>`
+    $('#pvtsub').textContent=db?db.tickets+(db.kind==='mashq'?' ta mashq bileti':' ta bilet'):'Tez orada';
+    $('#pvdbnote').innerHTML=db?(db.kind==='mashq'?`<div class="label">Mashq biletlari</div><p class="sub" style="margin:6px 0 0">Savollar <a href="${esc(db.source.url)}" target="_blank" rel="noopener">${esc(db.source.name)}</a> matni asosida tuzilgan, har bir izohda qoidaning bandi ko'rsatilgan. Bu rasmiy imtihon biletlari emas — ular ruxsat bilan keyinroq qo'shiladi.</p>`:`<p class="note" style="margin:0">Biletlar manbasi: <a href="${esc(db.source.url)}" target="_blank" rel="noopener">${esc(db.source.name)}</a></p>`)
       :`<div class="label">Biletlar tez orada</div><p class="sub" style="margin:6px 0 0">Rasmiy imtihon biletlari mualliflik huquqi egasining ruxsati bilan qo'shiladi. Hozircha imtihon rejimi yo'l belgilari bo'yicha ishlaydi.</p>`;
     $('#pvtickets').onclick=()=>db?pvTickets():toast('Biletlar tez orada qo\'shiladi')});
 }
@@ -2256,8 +2256,9 @@ async function pvStartExam(){
   if(!db) return pvStart(pvShuffle(SIGNS).slice(0,PV_CFG.n).map(signQuestion),'Imtihon · belgilar','exam');
   toast('Savollar yuklanmoqda…');
   try{const ns=pvShuffle([...Array(db.tickets)].map((_,i)=>i+1)).slice(0,PV_CFG.n);
-    const qs=await Promise.all(ns.map(async n=>{const t=await pvTicket(n);return t[Math.floor(Math.random()*t.length)]}));
-    pvStart(qs,'Imtihon','exam')}catch(e){toast("Internetni tekshiring")}
+    const ls=(await Promise.all(ns.map(n=>pvTicket(n)))).map(l=>pvShuffle(l)),qs=[];
+    for(let k=0;qs.length<PV_CFG.n&&k<40;k++)for(const l of ls){if(qs.length>=PV_CFG.n)break;if(l[k])qs.push(l[k])}
+    pvStart(pvShuffle(qs),'Imtihon','exam')}catch(e){toast("Internetni tekshiring")}
 }
 function pvTickets(){
   $('#hero').hidden=true;
@@ -2340,7 +2341,7 @@ function pvSigns(){
   $('#pvsgq').onclick=()=>pvStart(pvShuffle(l).map(signQuestion),SGROUPS.find(x=>x[0]===pvSignG)[1]+' belgilar','practice');
 }
 
-const APP_VER='20261020b';
+const APP_VER='20261020c';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava};

@@ -1,0 +1,262 @@
+[
+{
+"id": "m2-1",
+"q": "Aholi punktlaridan tashqarida avariya to'xtash belgisi transport vositasidan qancha masofaga qo'yiladi?",
+"o": [
+"Kamida 15 m",
+"Kamida 20 m",
+"Kamida 50 m",
+"Kamida 30 m"
+],
+"a": 3,
+"iz": "Aholi punktlaridan tashqarida avariya to'xtash belgisi transport vositasidan kamida 30 m masofaga qo'yiladi.",
+"src": "YHQ, 51-band"
+},
+{
+"id": "m2-2",
+"q": "Tartibga soluvchi qo'lini yuqoriga ko'targan bo'lsa, bu nimani bildiradi?",
+"o": [
+"Faqat piyodalar harakati taqiqlanadi",
+"Barcha yo'nalishlarda transport va piyodalar harakati taqiqlanadi",
+"Faqat tramvaylarga ruxsat beriladi",
+"Faqat o'ngga burilishga ruxsat beriladi"
+],
+"a": 1,
+"iz": "Qo'l yuqoriga ko'tarilganda barcha yo'nalishlarda transport vositalari va piyodalar harakatlanishi taqiqlanadi (42-bandda ko'rsatilgan hollar bundan mustasno).",
+"src": "YHQ, 38-band"
+},
+{
+"id": "m2-3",
+"q": "Ko'rinish 100 m dan kam bo'lgan xavfli burilishlarda to'xtashga ruxsat etiladimi?",
+"o": [
+"5 daqiqagacha ruxsat etiladi",
+"Faqat kunduzi ruxsat etiladi",
+"Avariya chirog'i yoqilgan bo'lsa ruxsat etiladi",
+"Yo'q, taqiqlanadi"
+],
+"a": 3,
+"iz": "Ko'tarilish cho'qqisi yaqinida va xavfli burilishlarda, ko'rinish 100 m dan kam bo'lsa, to'xtash taqiqlanadi.",
+"src": "YHQ, 91-band"
+},
+{
+"id": "m2-4",
+"q": "Sizni quvib o'tishayotgan bo'lsa, nima taqiqlanadi?",
+"o": [
+"O'ng chetga yaqinroq harakatlanish",
+"Tezlikni oshirish va quvib o'tishga xalaqit beradigan boshqa harakatlar",
+"Harakatni o'z qatorida davom ettirish",
+"Tezlikni kamaytirish"
+],
+"a": 1,
+"iz": "Quvib o'tilayotgan transport vositasining haydovchisiga tezlikni oshirish yoki boshqa harakatlar bilan quvib o'tishga xalaqit berish taqiqlanadi.",
+"src": "YHQ, 84-band"
+},
+{
+"id": "m2-5",
+"q": "Ogohlantiruvchi ishora bergan haydovchi imtiyozga ega bo'ladimi?",
+"o": [
+"Ha, unga hamma yo'l berishi shart",
+"Yo'q, ishora imtiyoz bermaydi va ehtiyot choralaridan ozod qilmaydi",
+"Faqat aholi punktida imtiyoz beradi",
+"Faqat burilishda imtiyoz beradi"
+],
+"a": 1,
+"iz": "Ogohlantiruvchi ishora berish haydovchiga imtiyoz bermaydi va uni ehtiyot choralarini ko'rishdan ozod qilmaydi.",
+"src": "YHQ, 46-band"
+},
+{
+"id": "m2-6",
+"q": "Xavf paydo bo'lganda haydovchi nima qilishi kerak?",
+"o": [
+"Faqat avariya chirog'ini yoqishi kerak",
+"Tezlikni transport vositasi to'liq to'xtagunicha kamaytirishi yoki xavfsiz aylanib o'tishi kerak",
+"Ovozli signal berib, tezlikni saqlashi kerak",
+"Chap qatorga o'tib, tezlikni oshirishi kerak"
+],
+"a": 1,
+"iz": "Haydovchi sezishi mumkin bo'lgan xavf paydo bo'lganda tezlikni to'liq to'xtashgacha kamaytirishi yoki boshqalarga xavf tug'dirmasdan to'siqni aylanib o'tishi kerak.",
+"src": "YHQ, 77-band"
+},
+{
+"id": "m2-7",
+"q": "Aholi punktlarida transport vositalarining eng yuqori ruxsat etilgan tezligi qancha?",
+"o": [
+"Soatiga 70 km",
+"Soatiga 80 km",
+"Soatiga 90 km",
+"Soatiga 60 km"
+],
+"a": 0,
+"iz": "Aholi punktlarida transport vositalari soatiga 70 km dan oshmagan tezlikda harakatlanishi kerak (belgilar bilan boshqacha tartib o'rnatilmagan bo'lsa).",
+"src": "YHQ, 78-band"
+},
+{
+"id": "m2-8",
+"q": "Svetofor ishoralari imtiyoz belgilariga zid bo'lsa, haydovchi nimaga amal qiladi?",
+"o": [
+"Imtiyoz belgilariga",
+"Svetofor ishoralariga",
+"O'ng tomondagi transportga yo'l berish qoidasiga",
+"Yo'l chiziqlariga"
+],
+"a": 1,
+"iz": "Svetofor ishoralari imtiyoz belgilariga zid bo'lsa, haydovchilar svetofor ishoralariga amal qilishi kerak.",
+"src": "YHQ, 43-band"
+},
+{
+"id": "m2-9",
+"q": "Aholi punktlaridan tashqarida shaharlararo avtobuslar va mikroavtobuslar uchun eng yuqori tezlik qancha?",
+"o": [
+"Soatiga 100 km",
+"Soatiga 80 km",
+"Soatiga 90 km",
+"Soatiga 70 km"
+],
+"a": 2,
+"iz": "Shaharlararo qatnovchi avtobuslar va mikroavtobuslar aholi punktlaridan tashqarida soatiga 90 km dan oshmagan tezlikda harakatlanadi.",
+"src": "YHQ, 79-band"
+},
+{
+"id": "m2-10",
+"q": "Ko'priklarda to'xtash qachon taqiqlanadi?",
+"o": [
+"Shu yo'nalishda uchtadan kam harakatlanish qatori bo'lsa",
+"Har doim taqiqlanadi",
+"Faqat kechasi taqiqlanadi",
+"Hech qachon taqiqlanmaydi"
+],
+"a": 0,
+"iz": "Shu yo'nalishda harakatlanish qatorlari uchtadan kam bo'lgan ko'priklar, yo'l o'tkazgichlar va estakadalarda to'xtash taqiqlanadi.",
+"src": "YHQ, 91-band"
+},
+{
+"id": "m2-11",
+"q": "Burilish ko'rsatkichlari ishlamasa, to'xtash ishorasi qo'l bilan qanday beriladi?",
+"o": [
+"Chap yoki o'ng qo'l yuqoriga ko'tariladi",
+"Qo'l aylantiriladi",
+"Chap qo'l yon tomonga uzatiladi",
+"O'ng qo'l pastga tushiriladi"
+],
+"a": 0,
+"iz": "To'xtash ishorasi chap yoki o'ng qo'lni yuqoriga ko'tarish bilan beriladi.",
+"src": "YHQ, 45-band"
+},
+{
+"id": "m2-12",
+"q": "Aholi punktlarida yo'lning chap tomonida qayerda to'xtash va to'xtab turishga ruxsat etiladi?",
+"o": [
+"Har qanday yo'lda",
+"Faqat to'rt qatorli yo'llarda",
+"Har bir yo'nalishda bitta qatori bo'lgan, o'rtasida tramvay yo'li yo'q yo'llarda va bir tomonlama yo'llarda",
+"Hech qayerda ruxsat etilmaydi"
+],
+"a": 2,
+"iz": "Aholi punktlarida chap tomonda to'xtash va to'xtab turishga o'rtasida tramvay yo'li bo'lmagan, har yo'nalishda bittadan qatorli yo'llarda va bir tomonlama yo'llarda ruxsat etiladi.",
+"src": "YHQ, 88-band"
+},
+{
+"id": "m2-13",
+"q": "Teng ahamiyatli yo'llar kesishmasida tramvay va relssiz transport vositasidan qaysi biri imtiyozga ega?",
+"o": [
+"Tramvay, harakat yo'nalishidan qat'i nazar",
+"Relssiz transport vositasi",
+"Chap tomondagi transport vositasi",
+"O'ng tomondagi transport vositasi"
+],
+"a": 0,
+"iz": "Teng ahamiyatli yo'llar kesishmasida tramvay harakat yo'nalishidan qat'i nazar relssiz transport vositalariga nisbatan imtiyozga ega.",
+"src": "YHQ, 105-band"
+},
+{
+"id": "m2-14",
+"q": "Bolalar guruhini tashkiliy tarzda tashiyotgan transport vositasining eng yuqori tezligi qancha?",
+"o": [
+"Soatiga 70 km",
+"Soatiga 60 km",
+"Soatiga 50 km",
+"Soatiga 80 km"
+],
+"a": 1,
+"iz": "Bolalar guruhini tashkiliy tashiyotgan transport vositalari barcha yo'llarda soatiga 60 km dan oshmagan tezlikda harakatlanadi.",
+"src": "YHQ, 80-band"
+},
+{
+"id": "m2-15",
+"q": "Chorrahadan keyin tirbandlik bo'lib, siz ko'ndalang harakatga to'siq bo'lib qolishingiz mumkin bo'lsa, nima qilish kerak?",
+"o": [
+"Chorrahaga kirmaslik kerak",
+"Ruxsat beruvchi ishora bo'lsa kirish mumkin",
+"Avariya chirog'ini yoqib kirish mumkin",
+"Ovozli signal berib kirish mumkin"
+],
+"a": 0,
+"iz": "Tirbandlik tufayli ko'ndalang harakatga to'siq bo'lib to'xtab qolishga majbur bo'ladigan haydovchiga chorrahaga kirish taqiqlanadi.",
+"src": "YHQ, 97-band"
+},
+{
+"id": "m2-16",
+"q": "Chapga burilish ishorasini yoqib, manyovrni boshlagan transport vositasini qaysi tomondan quvib o'tish kerak?",
+"o": [
+"O'ng tomondan",
+"Bunday transport vositasini quvib o'tish mumkin emas",
+"Ikkala tomondan ham",
+"Chap tomondan"
+],
+"a": 0,
+"iz": "Chapga burilish ishorasini berib, manyovrni boshlagan transport vositasini o'ng tomondan quvib o'tiladi.",
+"src": "YHQ, 83-band"
+},
+{
+"id": "m2-17",
+"q": "Ikkinchi darajali yo'lda harakatlanayotgan haydovchi kimga yo'l berishi kerak?",
+"o": [
+"Hech kimga",
+"Faqat o'ng tomondagilarga",
+"Asosiy yo'lda yaqinlashayotgan transport vositalariga, ularning keyingi yo'nalishidan qat'i nazar",
+"Faqat asosiy yo'lda to'g'riga ketayotganlarga"
+],
+"a": 2,
+"iz": "Teng bo'lmagan yo'llar kesishmasida ikkinchi darajali yo'ldagi haydovchi asosiy yo'lda yaqinlashayotgan transport vositalariga, ularning keyingi harakat yo'nalishidan qat'i nazar, yo'l berishi shart.",
+"src": "YHQ, 104-band"
+},
+{
+"id": "m2-18",
+"q": "Tartibga soluvchi qo'llarini yon tomonga uzatgan. Uning chap yoki o'ng yonidan kelayotgan relssiz transport vositalari qayerga harakatlanishi mumkin?",
+"o": [
+"To'g'riga va o'ngga",
+"Har qanday yo'nalishga",
+"Faqat chapga",
+"Harakatlanish taqiqlanadi"
+],
+"a": 0,
+"iz": "Qo'llar yon tomonga uzatilgan yoki tushirilgan bo'lsa, chap va o'ng yon tomondan relssiz transport vositalari to'g'riga va o'ngga harakatlanishi mumkin.",
+"src": "YHQ, 38-band"
+},
+{
+"id": "m2-19",
+"q": "Ruxsat beruvchi ishora yonganda haydovchi kimga yo'l berishi kerak?",
+"o": [
+"Chorrahadan o'tishni tugatayotgan transport vositalari va o'tishni tugatayotgan piyodalarga",
+"Faqat orqadan kelayotganlarga",
+"Hech kimga",
+"Faqat tramvayga"
+],
+"a": 0,
+"iz": "Ruxsat beruvchi ishora yonganda haydovchi chorrahadan o'tishni tugatayotgan transport vositalari va shu yo'nalishda o'tishni tugatayotgan piyodalarga yo'l berishi shart.",
+"src": "YHQ, 103-band"
+},
+{
+"id": "m2-20",
+"q": "Svetoforning qizil va sariq ishoralari birga yonsa, bu nimani bildiradi?",
+"o": [
+"Harakatga ruxsat beriladi",
+"Ehtiyotkorlik bilan harakatlanishga ruxsat beriladi",
+"Harakat taqiqlanadi, tez orada yashil ishora yonadi",
+"Faqat o'ngga burilishga ruxsat beriladi"
+],
+"a": 2,
+"iz": "Qizil va sariq ishoralar birga yonsa, harakat taqiqlanadi va tez orada yashil ishora yonishi haqida xabar beriladi.",
+"src": "YHQ, 31-band"
+}
+]

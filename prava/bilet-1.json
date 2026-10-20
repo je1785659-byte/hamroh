@@ -1,0 +1,262 @@
+[
+{
+"id": "m1-1",
+"q": "Aholi punktlaridan tashqarida yengil avtomobillar uchun eng yuqori tezlik qancha?",
+"o": [
+"Soatiga 80 km",
+"Soatiga 100 km",
+"Soatiga 110 km",
+"Soatiga 90 km"
+],
+"a": 1,
+"iz": "Aholi punktlaridan tashqarida yengil avtomobillar va ruxsat etilgan to'liq massasi 3,5 t gacha bo'lgan yuk avtomobillari soatiga 100 km dan oshmagan tezlikda harakatlanadi.",
+"src": "YHQ, 79-band"
+},
+{
+"id": "m1-2",
+"q": "Quyidagi joylardan qayerda quvib o'tish taqiqlanadi?",
+"o": [
+"Tartibga solinadigan chorrahalarda",
+"Aholi punktidan tashqaridagi to'g'ri yo'lda",
+"Ko'rinish yaxshi bo'lgan tekis yo'lda",
+"Bir tomonlama harakatli yo'lda"
+],
+"a": 0,
+"iz": "Tartibga solinadigan chorrahalarda quvib o'tish taqiqlanadi.",
+"src": "YHQ, 86-band"
+},
+{
+"id": "m1-3",
+"q": "Aholi punktlarida avariya to'xtash belgisi transport vositasidan qancha masofaga qo'yiladi?",
+"o": [
+"Kamida 15 m",
+"Kamida 30 m",
+"Kamida 10 m",
+"Kamida 20 m"
+],
+"a": 0,
+"iz": "Avariya to'xtash belgisi aholi punktlarida transport vositasidan kamida 15 m, aholi punktlaridan tashqarida kamida 30 m masofaga qo'yiladi.",
+"src": "YHQ, 51-band"
+},
+{
+"id": "m1-4",
+"q": "Aholi punktidan tashqarida tirkama tortib ketayotgan yengil avtomobil uchun eng yuqori tezlik qancha?",
+"o": [
+"Soatiga 70 km",
+"Soatiga 90 km",
+"Soatiga 100 km",
+"Soatiga 80 km"
+],
+"a": 3,
+"iz": "Tirkamali yengil avtomobillar, boshqa avtobuslar, mototsikllar va to'liq massasi 3,5 t dan ortiq yuk avtomobillari aholi punktidan tashqarida soatiga 80 km dan oshmagan tezlikda harakatlanadi.",
+"src": "YHQ, 79-band"
+},
+{
+"id": "m1-5",
+"q": "Haydovchi yo'l qoplamasi borligini aniqlay olmasa (qorong'ilik, loy, qor) va imtiyoz belgilari bo'lmasa, o'zini qaysi yo'lda deb hisoblashi kerak?",
+"o": [
+"Ikkinchi darajali yo'lda",
+"Asosiy yo'lda",
+"Avtomagistralda",
+"Teng ahamiyatli yo'lda"
+],
+"a": 0,
+"iz": "Haydovchi qoplama borligini aniqlay olmasa va imtiyoz belgilari bo'lmasa, o'zini ikkinchi darajali yo'lda turibman deb hisoblashi kerak.",
+"src": "YHQ, 108-band"
+},
+{
+"id": "m1-6",
+"q": "Yo'nalishli transport vositalarining to'xtash joylaridan qancha masofada to'xtash taqiqlanadi (yo'lovchi chiqarish-tushirishdan tashqari)?",
+"o": [
+"Ulardan oldin va keyin 10 m dan kam masofada",
+"Faqat to'xtash joyining o'zida",
+"Ulardan oldin va keyin 15 m dan kam masofada",
+"Ulardan oldin va keyin 30 m dan kam masofada"
+],
+"a": 2,
+"iz": "Yo'nalishli transport vositalari to'xtash joylarida va ulardan 15 m dan kam masofada to'xtash taqiqlanadi (ularga xalal bermaydigan yo'lovchi chiqarish-tushirish bundan mustasno).",
+"src": "YHQ, 91-band"
+},
+{
+"id": "m1-7",
+"q": "Svetoforning qo'shimcha seksiyasi o'chiq bo'lsa, bu nimani bildiradi?",
+"o": [
+"Shu seksiya ko'rsatgan yo'nalishda harakat taqiqlanadi",
+"Shu yo'nalishda harakatga ruxsat beriladi",
+"Faqat tramvaylarga ruxsat beriladi",
+"Ehtiyotkorlik bilan harakatlanish mumkin"
+],
+"a": 0,
+"iz": "Qo'shimcha seksiyaning o'chiq ishorasi shu seksiya tartibga soladigan yo'nalishda harakatni taqiqlaydi.",
+"src": "YHQ, 32-band"
+},
+{
+"id": "m1-8",
+"q": "Tartibga soluvchining ishoralari svetofor, belgilar yoki chiziqlarga zid bo'lsa, nimaga amal qilinadi?",
+"o": [
+"Svetofor ishoralariga",
+"Yo'l chiziqlariga",
+"Yo'l belgilariga",
+"Tartibga soluvchining ishoralariga"
+],
+"a": 3,
+"iz": "Tartibga soluvchining ishoralari va ko'rsatmalari svetofor ishoralari, yo'l belgilari va chiziqlarga zid bo'lsa, haydovchilar tartibga soluvchiga amal qiladi.",
+"src": "YHQ, 43-band"
+},
+{
+"id": "m1-9",
+"q": "Yashildan keyin sariq yonganda, keskin tormozlamasdan to'xtay olmaydigan haydovchi nima qiladi?",
+"o": [
+"Keskin tormozlab to'xtashi shart",
+"Orqaga qaytishi kerak",
+"Avariya chirog'ini yoqib to'xtashi kerak",
+"Harakatni davom ettirishi mumkin"
+],
+"a": 3,
+"iz": "Yashildan keyin sariq yonganda keskin tormozlamasdan to'xtay olmaydigan haydovchilarga harakatni davom ettirishga ruxsat etiladi.",
+"src": "YHQ, 42-band"
+},
+{
+"id": "m1-10",
+"q": "Svetofor sariq rangda miltillab tursa, chorraha qanday hisoblanadi?",
+"o": [
+"Faqat tramvay uchun ochiq",
+"Harakat butunlay taqiqlangan",
+"Tartibga solingan",
+"Tartibga solinmagan"
+],
+"a": 3,
+"iz": "Svetofor sariq rangda miltillasa, ishlamasa yoki tartibga soluvchi bo'lmasa, chorraha tartibga solinmagan hisoblanadi.",
+"src": "YHQ, 98-band"
+},
+{
+"id": "m1-11",
+"q": "Haydovchiga quyidagilardan qaysi biri taqiqlanadi?",
+"o": [
+"Yo'l sharoitiga qarab tezlikni kamaytirish",
+"Zarurat bo'lmasa, juda past tezlikda harakatlanib boshqalarga xalal berish",
+"Xavf paydo bo'lganda to'xtashgacha tezlikni kamaytirish",
+"Oldindagi transport vositasigacha xavfsiz masofa saqlash"
+],
+"a": 1,
+"iz": "Zarurat bo'lmasa, juda past tezlikda harakatlanib boshqa transport vositalariga xalal berish taqiqlanadi.",
+"src": "YHQ, 81-band"
+},
+{
+"id": "m1-12",
+"q": "Piyodalar o'tish joylarida va ulardan oldin qancha masofada to'xtash taqiqlanadi?",
+"o": [
+"10 m dan kam masofada",
+"20 m dan kam masofada",
+"15 m dan kam masofada",
+"5 m dan kam masofada"
+],
+"a": 0,
+"iz": "Piyodalar o'tish joylarida va ulardan oldin 10 m dan kam masofada to'xtash taqiqlanadi.",
+"src": "YHQ, 91-band"
+},
+{
+"id": "m1-13",
+"q": "Chorrahalarda va kesib o'tiladigan qatnov qismi chetidan qancha masofada to'xtash taqiqlanadi?",
+"o": [
+"30 m dan kam masofada",
+"50 m dan kam masofada",
+"15 m dan kam masofada",
+"10 m dan kam masofada"
+],
+"a": 0,
+"iz": "Chorrahalarda va kesib o'tiladigan qatnov qismi chetidan 30 m dan kam masofada to'xtash taqiqlanadi (ba'zi uch tomonlama chorrahalar bundan mustasno).",
+"src": "YHQ, 91-band"
+},
+{
+"id": "m1-14",
+"q": "Quvib o'tish tugagach, haydovchi nima qilishi shart?",
+"o": [
+"Avariya chirog'ini yoqishi",
+"Chap qatorda harakatni davom ettirishi",
+"Avval egallab turgan qatoriga qaytishi",
+"Ovozli signal berishi"
+],
+"a": 2,
+"iz": "Quvib o'tishni tugatgan haydovchi avval egallab turgan qatoriga qaytishi shart.",
+"src": "YHQ, 85-band"
+},
+{
+"id": "m1-15",
+"q": "Kajavasiz ikki g'ildirakli transport vositalarini qatnov qismida qanday qo'yish mumkin?",
+"o": [
+"Ikki qator qilib",
+"Qatnov qismiga qo'yish taqiqlanadi",
+"Faqat bir qator qilib",
+"Uch qator qilib"
+],
+"a": 0,
+"iz": "Qatnov qismida transport vositalari bir qator qilib qo'yiladi, kajavasiz ikki g'ildirakli transport vositalarini esa ikki qator qilib qo'yish mumkin.",
+"src": "YHQ, 89-band"
+},
+{
+"id": "m1-16",
+"q": "Avariya yorug'lik signalizatsiyasi qachon yoqilishi kerak?",
+"o": [
+"Haydovchining ko'zini faralar nuri qamashtirganda",
+"Chapga burilishda",
+"Kunduzi aholi punktida harakatlanganda",
+"Quvib o'tish paytida"
+],
+"a": 0,
+"iz": "Avariya yorug'lik signalizatsiyasi YTHda, to'xtash taqiqlangan joyda majburiy to'xtaganda, faralar nuri ko'zni qamashtirganda, shatakka olganda va bolalarni chiqarish-tushirishda yoqiladi.",
+"src": "YHQ, 50-band"
+},
+{
+"id": "m1-17",
+"q": "Turar joy binolari orasidagi hovlilar va yondosh hududlarda eng yuqori tezlik qancha?",
+"o": [
+"Soatiga 30 km",
+"Soatiga 10 km",
+"Soatiga 40 km",
+"Soatiga 20 km"
+],
+"a": 3,
+"iz": "Hovlilarda va turar joy binolari orasidagi yondosh hududlarda harakatlanish tezligi soatiga 20 km dan oshmasligi kerak.",
+"src": "YHQ, 78-band"
+},
+{
+"id": "m1-18",
+"q": "Temir yo'l kesishmalarida va ulardan oldin qancha masofada quvib o'tish taqiqlanadi?",
+"o": [
+"100 m",
+"150 m",
+"30 m",
+"50 m"
+],
+"a": 0,
+"iz": "Temir yo'l kesishmalarida va ulardan 100 m dan kam masofada quvib o'tish taqiqlanadi.",
+"src": "YHQ, 86-band"
+},
+{
+"id": "m1-19",
+"q": "Teng ahamiyatli yo'llar kesishmasida relssiz transport vositasining haydovchisi kimga yo'l berishi kerak?",
+"o": [
+"O'ng tomondan yaqinlashayotgan transport vositalariga",
+"Hech kimga, chunki yo'llar teng",
+"Chap tomondan yaqinlashayotgan transport vositalariga",
+"Hajmi kattaroq transport vositalariga"
+],
+"a": 0,
+"iz": "Teng ahamiyatli yo'llar kesishmasida relssiz transport vositasining haydovchisi o'ng tomondan yaqinlashayotgan transport vositalariga yo'l berishi shart.",
+"src": "YHQ, 105-band"
+},
+{
+"id": "m1-20",
+"q": "Aholi punktlaridan tashqarida mototsikllar uchun eng yuqori tezlik qancha?",
+"o": [
+"Soatiga 60 km",
+"Soatiga 90 km",
+"Soatiga 100 km",
+"Soatiga 80 km"
+],
+"a": 3,
+"iz": "Mototsikllar va elektromototsikllar aholi punktlaridan tashqarida soatiga 80 km dan oshmagan tezlikda harakatlanadi.",
+"src": "YHQ, 79-band"
+}
+]
