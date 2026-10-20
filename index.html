@@ -559,6 +559,14 @@ body[data-sec="prava"]{--sec-a:#4a3200;--sec-b:#d99a00;--sec:#b07c00}
 .lang-opt{display:flex;justify-content:space-between;align-items:center;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:13px 14px;font-size:15.5px;font-weight:600}
 .lang-opt small{color:var(--muted);font-weight:500}.lang-opt.on{border-color:var(--sec);background:color-mix(in srgb,var(--sec) 10%,var(--surface))}
 body[data-sec="sert"]{--sec-a:#2a1a6e;--sec-b:#6a4fd6;--sec:#5a3fc8}
+.sr-subs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.sr-subs::-webkit-scrollbar{display:none}
+.sr-sub{flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 13px;font-weight:600;font-size:13.5px;white-space:nowrap}
+.sr-sub.on{background:var(--sec);color:#fff;border-color:transparent}
+.sr-pass{background:color-mix(in srgb,var(--sec) 7%,var(--surface));border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;font-size:14.5px;line-height:1.55;max-height:48vh;overflow:auto}.sr-pass p{margin:6px 0 0}
+.sr-wr{width:100%;min-height:200px;resize:vertical;font:inherit;line-height:1.5;padding:12px 14px}
+.sr-tips{margin:6px 0 0;padding-left:18px;font-size:14px;line-height:1.5}.sr-sample p{margin:6px 0 0;line-height:1.55}
+.sr-timer{text-align:center}.sr-timer .big{font-family:var(--display);font-size:46px;margin:4px 0}.sr-timer .big small{font-size:18px;color:var(--muted)}
+.sr-g4{grid-template-columns:repeat(4,1fr)!important}
 .sr-topics{display:flex;flex-direction:column;gap:8px}.sr-top{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;font-weight:600}
 .sr-top>span:nth-child(2){flex:1}.sr-n{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--sec) 14%,var(--surface));color:var(--sec);font-weight:700;flex:none}
 .sr-soon{display:flex;flex-wrap:wrap;gap:8px}.sr-chip{border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:13px;font-weight:600}.sr-chip small{color:var(--muted);font-weight:500}
@@ -629,7 +637,7 @@ const HERO = {
   audio:['Audio',"Qur'on tilovati, she'rlar va qo'shiqlar"],
   doc:['Hujjatlar',"PDF, rasm va matn bilan ishlash — fayllar telefoningizdan chiqmaydi"],
   prava:['Prava imtihoni',"Imtihon rejimi, xatolar ustida ishlash va yo'l belgilari"],
-  sert:['Milliy sertifikat',"Matematika: rasmiy format bo'yicha cheksiz savollar va imtihon rejimi"]
+  sert:['Milliy sertifikat',"8 fan: rasmiy format bo'yicha mashq, izohli savollar va imtihon rejimi"]
 };
 let current = store.get('tab','home');
 function renderTabs(){
@@ -648,7 +656,7 @@ function setHero(t){
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;go(b.dataset.tab)});
 const STAT={secs:0,last:Date.now(),set:new Set(),opened:false,admin:store.get('isAdmin',false)};
 function statSec(x){try{STAT.set.add(x)}catch(e){}}
-const BACK_SEL=['#pvback','#srback','#erback','#kback','#qback','#dback','#screen [data-back]','#qhome'];
+const BACK_SEL=['#pvback','#srback','#wrback','#spback','#erback','#kback','#qback','#dback','#screen [data-back]','#qhome'];
 function backAction(){
   if(typeof cook!=='undefined'&&cook)return closeCook;
   const ls=document.getElementById('langsheet');if(ls)return()=>ls.remove();
@@ -2567,7 +2575,7 @@ const LANGS=[['uz',"O'zbekcha",'Lotin'],['uzc','Ўзбекча','Кирилл'],
 let LANG=store.get('lang',null);
 const I18N_SRC=`Milliy sertifikat|Национальный сертификат|National Certificate
 Milliy sertifikatga tayyorlaning|Подготовка к Национальному сертификату|Prepare for the National Certificate
-Matematika · 45 topshiriq · cheksiz savollar|Математика · 45 заданий · бесконечные вопросы|Math · 45 tasks · endless questions
+8 fan · imtihon rejimi · izohli savollar|8 предметов · режим экзамена · вопросы с пояснениями|8 subjects · exam mode · explained questions
 Matematika: rasmiy format bo'yicha cheksiz savollar va imtihon rejimi|Математика: бесконечные вопросы и режим экзамена в официальном формате|Math: endless questions and exam mode in the official format
 Matematika · to'liq imtihon|Математика · полный экзамен|Math · full exam
 45 topshiriq · 150 daqiqa · rasmiy format|45 заданий · 150 минут · официальный формат|45 tasks · 150 minutes · official format
@@ -3198,7 +3206,7 @@ function trText(t){
 const CYR_KEEP=/(@[\w.]+|https?:\/\/\S+|\b[\w-]+\.(?:uz|net|com|org|ru|io)\b\S*|\b[A-Z]{2,6}\d*\b|\b[A-Z]\d+\b|\b[FU]\d\b)/;
 const CYR_ACR={YHQ:'ЙҲҚ',YTH:'ЙТҲ',YHXX:'ЙҲХХ',IIO:'ИИО',IIB:'ИИБ',BMBA:'БМБА',DTM:'ДТМ',VM:'ВМ',AQSH:'АҚШ'};
 function cyrSafe(t){return t.split(CYR_KEEP).map((x,i)=>i%2?(CYR_ACR[x]||x):lat2cyr(x)).join('')}
-const I18N_SKIP='script,style,textarea,input,[data-noi18n],#dst,.sign text';
+const I18N_SKIP='script,style,textarea,input,[data-noi18n],#dst,.sign text'+(LANG==='uzc'?'':',[data-notr]'); // data-notr: tarjima qilinmaydi, lekin kirillga o'giriladi
 function i18nApply(root){
   if(!LANG||LANG==='uz'||!root)return;
   if(root.nodeType===3){const p=root.parentElement;if(p&&!p.closest(I18N_SKIP)){const v=trText(root.data);if(v!==root.data)root.data=v}return}
@@ -3343,71 +3351,151 @@ const mParse=s=>{s=String(s||'').trim().replace(/\s/g,'').replace(',','.').repla
 const mNice=s=>String(s).replace(/ [+−] 0(?![\d.]|,\d)/g,'').replace(/·-(\d+)/g,'·(−$1)').replace(/(^|[\s(=,;:·])-(\d)/g,'$1−$2');
 const mEq=(a,b)=>Math.abs(a-b)<0.011;
 
-/* ---------- MILLIY SERTIFIKAT: UI ---------- */
-// Rasmiy format (BMBA spetsifikatsiyasi): 45 topshiriq, 150 daqiqa; Y-1: 32, Y-2: 3, O: 10 (a/b).
+/* ---------- MILLIY SERTIFIKAT: UI (ko'p fanli) ---------- */
+// Rasmiy formatlar (BMBA test spetsifikatsiyalari):
+// Matematika 45 / 150 daq · Fizika 45 / 150 (Y-1 32, Y-2 3, O 10) · Geografiya 45 / 150 (Y-1 32, Y-2 3, O-1 4, O-2 6)
+// Tarix 45 / 90 (Y-1 32, Y-2 3, O 10) · Ona tili va adabiyot 45 / 180 (Y-1 32, Y-2 3, O-1 9, O-2 1 — insho)
+// Biologiya va Kimyo 43 / 180 (Y1 32, Y2 3, O1 5 — 1–40 uchun 100 daq; O2 3 ta yozma ish — 80 daq)
 const SR_CFG={min:150,dist:{son:5,alg:5,ten:6,fun:5,anl:3,geo:5,ehm:3}};
+const SUBJ=[
+  {id:'mat',n:'Matematika',ic:'∑',min:150,full:'45 topshiriq · 150 daqiqa',ex:'45 topshiriq · 150 daqiqa · rasmiy format'},
+  {id:'ona',n:"Ona tili va adabiyot",ic:'📖',min:120,full:"45 topshiriq · 180 daqiqa (45-topshiriq — insho)",ex:"Yopiq qism: 35 topshiriq · 120 daqiqa"},
+  {id:'tar',n:'Tarix',ic:'📜',min:70,full:'45 topshiriq · 90 daqiqa',ex:"Yopiq qism: 35 topshiriq · 70 daqiqa"},
+  {id:'bio',n:'Biologiya',ic:'🧬',min:90,full:"43 topshiriq · 180 daqiqa (41–43 — yozma ish)",ex:"Yopiq qism: 35 topshiriq · 90 daqiqa"},
+  {id:'kim',n:'Kimyo',ic:'🧪',min:100,open:5,full:"43 topshiriq · 180 daqiqa (41–43 — yozma ish)",ex:"1–40-topshiriqlar · 100 daqiqa · rasmiy format"},
+  {id:'fiz',n:'Fizika',ic:'⚛️',min:150,open:10,full:'45 topshiriq · 150 daqiqa',ex:'45 topshiriq · 150 daqiqa · rasmiy format'},
+  {id:'geo',n:'Geografiya',ic:'🌍',min:115,full:'45 topshiriq · 150 daqiqa',ex:"Yopiq qism: 35 topshiriq · 115 daqiqa"},
+  {id:'eng',n:'Ingliz tili (CEFR)',ic:'🇬🇧',cefr:true,min:45}
+];
+const SR_GEN={}; // fizika/kimyo hisoblash masalalari generatorlari shu yerga ulanadi
 const SR_GRADES=[[70,'A+'],[65,'A'],[60,'B+'],[55,'B'],[50,'C+'],[46,'C']];
-let srs=store.get('srs',{mis:[],hist:[],exams:[],done:0,streak:0,last:''});
-const srSave=()=>store.set('srs',srs);
+const SR_BLANK=()=>({mis:[],hist:[],exams:[],done:0,streak:0,last:''});
+let SRS_ALL=store.get('srs_all',null);if(!SRS_ALL)SRS_ALL={mat:store.get('srs',SR_BLANK())};
+let srSub=store.get('srSub','mat'),srs=null;
+function srUse(id){if(!SUBJ.some(s=>s.id===id))id='mat';srSub=id;store.set('srSub',id);srs=SRS_ALL[id]||(SRS_ALL[id]=SR_BLANK())}
+srUse(srSub);
+const srSave=()=>store.set('srs_all',SRS_ALL);
+const srS=()=>SUBJ.find(s=>s.id===srSub)||SUBJ[0];
 let srRun=null,srTimer=null,srView='menu';
+const SRB={};
+function srBank(id){if(SRB[id])return Promise.resolve(SRB[id]);
+  return fetch(`sert/${id}.json?v=${APP_VER}`).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{j.q.forEach(q=>{q.kind=q.k||'y1';q.sub=id});SRB[id]=j;return j})}
 const srPts=(q,i)=>q.kind==='o'?3.2:q.kind==='y2'?2.2:(i<20?1.3:2.2);
 function srDay(){const d=uzNow().toISOString().slice(0,10);if(srs.last===d)return;const y=new Date(Date.now()-864e5+5*36e5).toISOString().slice(0,10);srs.streak=srs.last===y?srs.streak+1:1;srs.last=d;srSave()}
-function srStop(){clearInterval(srTimer);srTimer=null}
+function srStop(){clearInterval(srTimer);srTimer=null;try{srHush();clearInterval(spTimer)}catch(e){}}
+function srTopName(q){if(q.tn)return q.tn;const B=SRB[q.sub||srSub];if(q.t&&B){const t=B.topics.find(x=>x[0]===q.t);if(t)return t[1]}
+  if(q.top){const t=MTOP.find(x=>x[0]===q.top);if(t)return t[1]}return ''}
+function srPicker(S){return `<div class="sr-subs">${SUBJ.map(s=>`<button class="sr-sub ${s.id===S.id?'on':''}" data-sub="${s.id}" aria-pressed="${s.id===S.id}"><span>${s.ic}</span>${esc(s.n)}</button>`).join('')}</div>`}
+function srBindPicker(){$('#screen').querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>{if(b.dataset.sub===srSub)return;srUse(b.dataset.sub);statSec('sr_'+srSub);viewSert()});
+  const on=$('#screen .sr-sub.on');if(on){const w=on.parentElement;w.scrollLeft=Math.max(0,on.offsetLeft-w.offsetLeft-(w.clientWidth-on.offsetWidth)/2)}}
+function srReady(S){const best=srs.exams.length?Math.max(...srs.exams.map(e=>e.r)):null,h=srs.hist.slice(-50),acc=h.length?Math.round(h.reduce((a,b)=>a+b,0)/h.length*100):0;
+  return `<section class="card pv-ready"><div><div class="label">${esc(S.n)} · tayyorlik</div><div class="big">${acc}<small>%</small></div>
+    <div class="note" style="margin-top:4px">${h.length?`So'nggi ${h.length} ta javob bo'yicha`:'Birinchi mashqni boshlang'}${best!=null?` · eng yaxshi imtihon: ${best.toFixed(1)} ball (${srGrade(best)})`:''}</div></div>
+    <div class="pv-ring" style="--p:${acc}"><span>${srs.streak||0}</span><small>kun 🔥</small></div></section>`}
 function viewSert(){
   srStop();if(srView==='run'&&srRun)return srDraw();
   srView='menu';srRun=null;setHero('sert');
-  const best=srs.exams.length?Math.max(...srs.exams.map(e=>e.r)):null, h=srs.hist.slice(-50), acc=h.length?Math.round(h.reduce((a,b)=>a+b,0)/h.length*100):0;
-  $('#screen').innerHTML=`
-    <section class="card pv-ready"><div><div class="label">Matematika · tayyorlik</div><div class="big">${acc}<small>%</small></div>
-      <div class="note" style="margin-top:4px">${h.length?`So'nggi ${h.length} ta javob bo'yicha`:'Birinchi mashqni boshlang'}${best!=null?` · eng yaxshi imtihon: ${best.toFixed(1)} ball (${srGrade(best)})`:''}</div></div>
-      <div class="pv-ring" style="--p:${acc}"><span>${srs.streak||0}</span><small>kun 🔥</small></div></section>
-    <button class="card pv-main sr-main" id="srexam"><span class="pv-ic">∑</span><span><b>Matematika · to'liq imtihon</b><small>45 topshiriq · 150 daqiqa · rasmiy format</small></span><span class="pv-go">→</span></button>
+  const S=srS();
+  if(S.cefr)return viewCefr(S);
+  if(S.id==='mat')return srMenuMath(S);
+  srMenuBank(S);
+}
+function srMenuMath(S){
+  $('#screen').innerHTML=`${srPicker(S)}${srReady(S)}
+    <button class="card pv-main sr-main" id="srexam"><span class="pv-ic">∑</span><span><b>Matematika · to'liq imtihon</b><small>${S.ex}</small></span><span class="pv-go">→</span></button>
     <div class="qtopics">
       <button class="qtopic" id="srquick"><span class="kic" style="background:linear-gradient(135deg,#35217a,#7a4fd6)">⚡</span><b>Tezkor mashq</b><small>10 ta aralash savol</small></button>
       <button class="qtopic" id="srmis"><span class="kic" style="background:linear-gradient(135deg,#8a1f1f,#e0524a)">✕</span><b>Xatolar ustida ishlash</b><small>${srs.mis.length?srs.mis.length+' ta savol':"Hozircha xato yo'q"}</small></button>
     </div>
     <div class="sec-title"><b>Mavzular bo'yicha mashq</b><span class="note">har biri 10 savol</span></div>
     <div class="sr-topics">${MTOP.map(([k,n],i)=>`<button class="card sr-top" data-st="${k}"><span class="sr-n">${i+1}</span><span>${esc(n)}</span><span class="pv-go">→</span></button>`).join('')}</div>
-    <div class="sec-title"><b>Boshqa fanlar</b></div>
-    <section class="card"><div class="sr-soon">${[['🇬🇧',"Ingliz tili (CEFR)"],['📜','Tarix'],['🧬','Biologiya'],['📖',"Ona tili va adabiyot"],['⚛','Fizika'],['🧪','Kimyo'],['🌍','Geografiya'],['🇷🇺','Rus tili']].map(([i,n])=>`<span class="sr-chip">${i} ${esc(n)} <small>tez orada</small></span>`).join('')}</div></section>
     <p class="note" style="margin:0 4px">Savollar BMBA e'lon qilgan spetsifikatsiyadagi mavzu va format bo'yicha dastur orqali yaratiladi, javoblari hisoblab tekshiriladi. Bu rasmiy imtihon savollari emas. Ball Rasch shkalasiga taxminan aylantiriladi.</p>`;
+  srBindPicker();
   $('#srexam').onclick=srStartExam;
   $('#srquick').onclick=()=>srStart(Array.from({length:10},()=>mGen(MP(MTOP)[0])),'Tezkor mashq','practice');
-  $('#srmis').onclick=()=>{if(!srs.mis.length){toast("Xato qilingan savollar shu yerga yig'iladi");return}srStart(srs.mis.slice(-20),'Xatolar ustida ishlash','practice')};
+  $('#srmis').onclick=srMistakes;
   $('#screen').querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const k=b.dataset.st;srStart(Array.from({length:10},()=>mGen(k)),MTOP.find(x=>x[0]===k)[1],'practice')});
 }
-const srGrade=r=>(SR_GRADES.find(([t])=>r>=t)||[0,'—'])[1];
+function srMistakes(){if(!srs.mis.length){toast("Xato qilingan savollar shu yerga yig'iladi");return}srStart(srs.mis.slice(-20),'Xatolar ustida ishlash','practice')}
+function srMenuBank(S){
+  $('#screen').innerHTML=`${srPicker(S)}<section class="card"><p class="note">Savollar yuklanmoqda…</p></section>`;srBindPicker();
+  srBank(S.id).then(B=>{if(current!=='sert'||srView!=='menu'||srSub!==S.id)return;
+    const G=SR_GEN[S.id],cnt=t=>B.q.filter(q=>q.t===t).length;
+    $('#screen').innerHTML=`${srPicker(S)}${srReady(S)}
+      <button class="card pv-main sr-main" id="srexam"><span class="pv-ic">${S.ic}</span><span><b>${esc(S.n)} · imtihon</b><small>${S.ex}</small></span><span class="pv-go">→</span></button>
+      <div class="qtopics">
+        <button class="qtopic" id="srquick"><span class="kic" style="background:linear-gradient(135deg,#35217a,#7a4fd6)">⚡</span><b>Tezkor mashq</b><small>10 ta aralash savol</small></button>
+        <button class="qtopic" id="srmis"><span class="kic" style="background:linear-gradient(135deg,#8a1f1f,#e0524a)">✕</span><b>Xatolar ustida ishlash</b><small>${srs.mis.length?srs.mis.length+' ta savol':"Hozircha xato yo'q"}</small></button>
+      </div>
+      ${G?`<div class="sec-title"><b>Hisoblash masalalari</b><span class="note">cheksiz, har biri 10 ta</span></div>
+      <div class="sr-topics">${G.topics.map(([k,n])=>`<button class="card sr-top" data-gt="${k}"><span class="sr-n">∞</span><span>${esc(n)}</span><span class="pv-go">→</span></button>`).join('')}</div>`:''}
+      <div class="sec-title"><b>Bo'limlar bo'yicha mashq</b><span class="note">${B.q.length} ta savol</span></div>
+      <div class="sr-topics">${B.topics.filter(([k])=>cnt(k)).map(([k,n],i)=>`<button class="card sr-top" data-st="${k}"><span class="sr-n">${i+1}</span><span>${esc(n)}<small class="note" style="display:block;font-weight:500">${cnt(k)} ta savol</small></span><span class="pv-go">→</span></button>`).join('')}</div>
+      ${LANG==='ru'||LANG==='en'?`<p class="note" style="margin:0 4px"><b>Savollar hozircha o'zbek tilida.</b></p>`:''}
+      <p class="note" style="margin:0 4px"><span>Savollar BMBA spetsifikatsiyasidagi bo'lim va formatlar bo'yicha tuzilgan, har birida izoh bor.</span> <span>Bu rasmiy imtihon savollari emas.</span> <span>Rasmiy imtihon:</span> <span>${S.full}</span>.${S.open?'':` <span>Ilovada yopiq (test) qismi ishlanadi, ochiq va yozma topshiriqlar baholanmaydi.</span>`} <span>Ball Rasch shkalasiga taxminan aylantiriladi.</span></p>`;
+    srBindPicker();
+    $('#srexam').onclick=()=>srStartBankExam(S,B);
+    const quick=()=>srStart(pvShuffle(B.q.filter(q=>!q.p)).slice(0,10),'Tezkor mashq','practice',quick);
+    const topicRun=k=>{const name=B.topics.find(x=>x[0]===k)[1];let qs=B.q.filter(q=>q.t===k);const ps=[...new Set(qs.filter(q=>q.p).map(q=>q.p))];
+      if(ps.length){const p=MP(ps);qs=qs.filter(q=>q.p===p)}else qs=pvShuffle(qs).slice(0,10);srStart(qs,name,'practice',()=>topicRun(k))};
+    const genRun=k=>srStart(Array.from({length:10},()=>G.y1(k)),G.topics.find(x=>x[0]===k)[1],'practice',()=>genRun(k));
+    $('#srquick').onclick=quick;$('#srmis').onclick=srMistakes;
+    $('#screen').querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>topicRun(b.dataset.st));
+    $('#screen').querySelectorAll('[data-gt]').forEach(b=>b.onclick=()=>genRun(b.dataset.gt));
+  }).catch(()=>{if(current!=='sert')return;$('#screen').innerHTML=`${srPicker(S)}<section class="card"><b>Savollarni yuklab bo'lmadi</b><p class="note" style="margin-top:6px">Internetni tekshirib, qayta oching.</p><button class="btn" id="srretry" style="margin-top:10px">Qayta urinish</button></section>`;srBindPicker();$('#srretry').onclick=()=>srMenuBank(S)});
+}
+function srStartBankExam(S,B){statSec('sr_exam');
+  const used=new Set(),take=(arr,n)=>{const r=pvShuffle(arr.filter(q=>!used.has(q.id))).slice(0,n);r.forEach(q=>used.add(q.id));return r};
+  const qs=[];const E=B.exam||{};
+  for(const [t,n] of Object.entries(E.y1||{}))qs.push(...take(B.q.filter(q=>q.kind==='y1'&&q.t===t&&!q.p),n));
+  if(E.read){let need=E.read;for(const p of pvShuffle(Object.keys(B.passages||{}))){if(need<=0)break;const pq=B.q.filter(q=>q.p===p&&!used.has(q.id)).slice(0,need);pq.forEach(q=>used.add(q.id));qs.push(...pq);need-=pq.length}}
+  if(qs.length<32)qs.push(...take(B.q.filter(q=>q.kind==='y1'&&!q.p),32-qs.length));
+  qs.push(...take(B.q.filter(q=>q.kind==='y2'),3));
+  const G=SR_GEN[S.id];if(S.open&&G&&G.o)for(let i=0;i<S.open;i++)qs.push(G.o());
+  srStart(qs,S.n+' · imtihon','exam');
+}
+const srGrade=r=>((srS().cefr?ENG_GR:SR_GRADES).find(([t])=>r>=t)||[0,'—'])[1];
 function srStartExam(){statSec('sr_exam');
   const qs=[];for(const [k,n] of Object.entries(SR_CFG.dist))for(let i=0;i<n;i++)qs.push(mGen(k));
   for(let i=0;i<3;i++)qs.push(mGenMatch());for(let i=0;i<10;i++)qs.push(mGenOpen());
   srStart(qs,'Matematika · imtihon','exam');
 }
-function srStart(qs,title,mode){
-  qs=qs.filter(Boolean);srRun={qs,title,mode,i:0,ans:[],t0:Date.now(),done:false};srView='run';window.scrollTo(0,0);srDraw();
-  if(mode==='exam')srTimer=setInterval(()=>{if(current!=='sert'||!srRun||srRun.done){srStop();return}const left=SR_CFG.min*60-(Date.now()-srRun.t0)/1000;const el=$('#srclock');if(el)el.textContent=hhmmss(left);if(left<=0){srStop();srFinish()}},1000);
+function srStart(qs,title,mode,again){
+  qs=qs.filter(Boolean);srRun={qs,title,mode,again,i:0,ans:[],t0:Date.now(),done:false,min:srS().min||150};srView='run';window.scrollTo(0,0);srDraw();
+  if(mode==='exam')srTimer=setInterval(()=>{if(current!=='sert'||!srRun||srRun.done){srStop();return}const left=srRun.min*60-(Date.now()-srRun.t0)/1000;const el=$('#srclock');if(el)el.textContent=hhmmss(left);if(left<=0){srStop();srFinish()}},1000);
 }
 const hhmmss=s=>{s=Math.max(0,Math.floor(s));return `${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`};
 function srOk(q,a){if(a==null)return null;if(q.kind==='y1')return a===q.a;if(q.kind==='y2')return q.items.every((it,j)=>a[j]===it.a);
   if(q.kind==='o')return {a:mEq(mParse(a.a),q.va),b:mEq(mParse(a.b),q.vb)}}
-function srAnswered(a,q){return a!=null&&(q.kind!=='y2'||a.every(x=>x!=null))&&(q.kind!=='o'||(a.a!==''||a.b!==''))}
+function srAnswered(a,q){const v=a&&a.val;return v!=null&&(q.kind!=='y2'||(Array.isArray(v)&&v.every(x=>x!=null)))&&(q.kind!=='o'||(v.a!==''||v.b!==''))}
+const SR_ABC='ABCDEF';
+const srNT=q=>!q||!q.sub||q.sub==='mat'?'':q.sub==='eng'?'data-noi18n':'data-notr';
+function srPassage(q){const B=SRB[q.sub];const p=q.p&&B&&B.passages&&B.passages[q.p];if(!p)return '';
+  const body=String(p.x).split(/\n+/).map(x=>`<p>${esc(x)}</p>`).join('');
+  if(p.au)return `<div class="sr-pass sr-audio" data-noi18n><div class="label">${esc(p.t)}</div><div class="row" style="gap:8px;margin-top:8px"><button class="btn" data-say="${esc(q.p)}">▶ Tinglash</button><button class="btn alt" data-hush="1">■ To'xtatish</button></div><details style="margin-top:10px"><summary class="note">Matnni ko'rish (ovoz chiqmasa)</summary>${body}</details></div>`;
+  return `<div class="sr-pass" ${srNT(q)}><div class="label">${esc(p.t||"Matnni o'qing")}</div>${String(p.x).split(/\n+/).map(x=>`<p>${esc(x)}</p>`).join('')}</div>`}
 function srDraw(){
   const r=srRun;$('#hero').hidden=true;if(r.done)return srResult();
   const q=r.qs[r.i],a=r.ans[r.i],shown=r.mode==='practice'&&a!=null&&a.locked;
   const prog=r.qs.map((x,i)=>{const v=r.ans[i];let c='';if(v!=null&&srAnswered(v,x)){if(r.mode==='exam')c='done';else if(v.locked){const ok=srOk(x,v.val);c=(x.kind==='o'?(ok.a&&ok.b):ok)?'ok':'bad'}}return `<i class="${c} ${i===r.i?'cur':''}" data-j="${i}"></i>`}).join('');
   const val=a?a.val:null;let body='';
-  if(q.kind==='y1')body=`<div class="pv-opts">${q.o.map((o,i)=>`<button class="pv-opt ${shown?(i===q.a?'ok':i===val?'bad':'dim'):(i===val?'sel':'')}" data-o="${i}" ${shown?'disabled':''}><span>${'ABCD'[i]}</span>${esc(o)}</button>`).join('')}</div>`;
+  if(q.kind==='y1')body=`<div class="pv-opts">${q.o.map((o,i)=>`<button class="pv-opt ${shown?(i===q.a?'ok':i===val?'bad':'dim'):(i===val?'sel':'')}" data-o="${i}" ${shown?'disabled':''}><span>${SR_ABC[i]}</span>${esc(o)}</button>`).join('')}</div>`;
   if(q.kind==='y2')body=`<div class="sr-match">${q.items.map((it,j)=>`<div class="sr-mi"><p><b>${'ABC'[j]})</b> ${esc(it.q)}</p><div class="chips">${q.o.map((o,k)=>`<button class="chip ${shown?(k===it.a?'ok':val&&val[j]===k?'bad':''):''}" data-m="${j}:${k}" aria-pressed="${!!(val&&val[j]===k)}" ${shown?'disabled':''}>${k+1}) ${esc(o)}</button>`).join('')}</div></div>`).join('')}</div>`;
   if(q.kind==='o'){const ok=shown?srOk(q,val):null;body=`<div class="sr-open">
       <label><span><b>a)</b> ${esc(q.pa)}</span><input class="csearch ${ok?(ok.a?'okin':'badin'):''}" id="sra" inputmode="decimal" value="${esc(val?val.a:'')}" placeholder="Javob" ${shown?'disabled':''}></label>
       <label><span><b>b)</b> ${esc(q.pb)}</span><input class="csearch ${ok?(ok.b?'okin':'badin'):''}" id="srb" inputmode="decimal" value="${esc(val?val.b:'')}" placeholder="Javob" ${shown?'disabled':''}></label>
       <p class="note" style="margin:0">Butun son, o'nli kasr (2,5) yoki oddiy kasr (3/4) ko'rinishida yozing.</p>
       ${shown?'':`<button class="btn" id="srcheck">${r.mode==='exam'?'Javobni saqlash':'Tekshirish'}</button>`}</div>`}
-  const fb=shown?(()=>{const ok=srOk(q,val);const good=q.kind==='o'?(ok.a&&ok.b):ok;return `<div class="pv-iz"><b>${good?"To'g'ri!":"Noto'g'ri."}</b> ${q.kind==='o'?`a) ${mnum(q.va)}; b) ${mnum(q.vb)}. `:q.kind==='y2'?`To'g'ri moslik: ${q.items.map((it,j)=>'ABC'[j]+' → '+(it.a+1)).join(', ')}. `:''}${esc(q.iz||'')}</div>`})():'';
-  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="srback">✕ Yopish</button><b>${esc(r.title)}</b>${r.mode==='exam'?`<span class="badge old" id="srclock">${hhmmss(SR_CFG.min*60-(Date.now()-r.t0)/1000)}</span>`:`<span class="badge old">${r.i+1}/${r.qs.length}</span>`}</div>
+  const fb=shown?(()=>{const ok=srOk(q,val);const good=q.kind==='o'?(ok.a&&ok.b):ok;return `<div class="pv-iz"><b>${good?"To'g'ri!":"Noto'g'ri."}</b> <span ${srNT(q)}>${q.kind==='o'?`a) ${mnum(q.va)}; b) ${mnum(q.vb)}. `:q.kind==='y2'?`To'g'ri moslik: ${q.items.map((it,j)=>'ABC'[j]+' → '+(it.a+1)).join(', ')}. `:''}${esc(q.iz||'')}</span></div>`})():'';
+  const tn=q.kind==='y2'?'':srTopName(q);
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="srback">✕ Yopish</button><b>${esc(r.title)}</b>${r.mode==='exam'?`<span class="badge old" id="srclock">${hhmmss(r.min*60-(Date.now()-r.t0)/1000)}</span>`:`<span class="badge old">${r.i+1}/${r.qs.length}</span>`}</div>
     <div class="pv-prog sr-prog">${prog}</div>
-    <section class="card pv-q"><div class="label">${r.i+1}-topshiriq · ${q.kind==='y1'?'bitta javobli':q.kind==='y2'?'moslashtirish':'ochiq javobli'}${q.top?' · '+esc(MTOP.find(x=>x[0]===q.top)[1]):''}</div>
-      <h3>${esc(q.q)}</h3>${body}${fb}</section>
+    <section class="card pv-q"><div class="label">${r.i+1}-topshiriq · ${q.kind==='y1'?'bitta javobli':q.kind==='y2'?'moslashtirish':'ochiq javobli'}${tn?' · '+esc(tn):''}</div>
+      ${srPassage(q)}<div ${srNT(q)}><h3>${esc(q.q)}</h3>${body}</div>${fb}</section>
     <div class="row" style="gap:8px"><button class="btn alt" id="srprev" ${r.i===0?'disabled':''}>← Oldingi</button><button class="btn" id="srnext">${r.i<r.qs.length-1?'Keyingi →':(r.mode==='exam'?'Yakunlash':'Natija')}</button></div>`;
+  if(r.lp!==q.p){if(r.lp)srHush();r.lp=q.p}
+  $('#screen').querySelectorAll('[data-say]').forEach(b=>b.onclick=()=>{const P=SRB[q.sub]&&SRB[q.sub].passages[b.dataset.say];if(P)srSay(P.x)});
+  $('#screen').querySelectorAll('[data-hush]').forEach(b=>b.onclick=srHush);
   $('#srback').onclick=()=>{const fin=()=>{srStop();srRun=null;srView='menu';viewSert()};if(r.mode==='exam'&&r.ans.some(Boolean)&&tg&&tg.showPopup){tg.showPopup({message:'Imtihonni to\'xtatasizmi?',buttons:[{id:'y',type:'destructive',text:'To\'xtatish'},{type:'cancel'}]},id=>{if(id==='y')fin()})}else fin()};
   $('#screen').querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>{srKeep();r.i=+b.dataset.j;srDraw()});
   const lock=()=>{if(r.mode==='practice'){r.ans[r.i].locked=true;const ok=srOk(q,r.ans[r.i].val);const good=q.kind==='o'?(ok.a&&ok.b):ok;srs.hist.push(good?1:0);srs.hist=srs.hist.slice(-200);srs.done++;
@@ -3427,27 +3515,203 @@ function srFinish(){
   const rasch=Math.round(raw/max*75*10)/10;r.res={raw:Math.round(raw*10)/10,max:Math.round(max*10)/10,c,rasch,g:srGrade(rasch),sec:Math.round((Date.now()-r.t0)/1000)};
   if(r.mode==='exam'){srs.exams.push({r:rasch,at:Date.now()});srs.exams=srs.exams.slice(-30);
     r.qs.forEach((q,i)=>{const ok=srOk(q,r.ans[i]&&r.ans[i].val);const good=q.kind==='o'?(ok&&ok.a&&ok.b):ok;srs.hist.push(good?1:0);if(!good&&q.kind!=='y2')srs.mis=[...srs.mis.filter(x=>x.q!==q.q),q].slice(-50)});srs.hist=srs.hist.slice(-200);srDay();srSave();
-    if(rasch>=46)addCoins(15)}
+    if(rasch>=(srS().cefr?38:46))addCoins(15)}
   haptic('done');srResult();
 }
 function srResult(){
-  const r=srRun,s=r.res;window.scrollTo(0,0);
-  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="srback">← Sertifikat</button><b>${esc(r.title)}</b><span></span></div>
-    <section class="card pv-res ${s.rasch>=46?'ok':'bad'}"><div class="pv-big">${r.mode==='exam'?s.g:(s.c===r.qs.length?'✓':s.c)}</div>
-      <h3>${r.mode==='exam'?(s.rasch>=46?`Taxminiy natija: ${s.rasch} ball`:`Taxminiy natija: ${s.rasch} ball — sertifikatga yetmadi`):`${s.c} / ${r.qs.length} to'g'ri`}</h3>
-      <p class="sub">${r.mode==='exam'?`Xom ball: ${s.raw} / ${s.max} · ${s.c} ta to'liq to'g'ri javob · ${hhmmss(s.sec)}<br>Sertifikat uchun kamida 46 ball (C) kerak. A+ — 70 va undan yuqori.`:`Vaqt: ${hhmmss(s.sec)}`}</p>
-      ${r.mode==='exam'&&s.rasch>=46?'<p class="note">+15 tanga</p>':''}</section>
-    ${r.mode==='exam'?`<section class="card"><div class="label">Darajalar (Rasch, taxminiy)</div><div class="sr-grades">${SR_GRADES.map(([t,g])=>`<span class="${g===s.g?'on':''}"><b>${g}</b>${t}+</span>`).join('')}</div></section>`:''}
+  const r=srRun,s=r.res;window.scrollTo(0,0);const S=srS(),PASS=S.cefr?38:46,GR=S.cefr?ENG_GR:SR_GRADES;
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="srback">← ${esc(S.n)}</button><b>${esc(r.title)}</b><span></span></div>
+    <section class="card pv-res ${s.rasch>=PASS?'ok':'bad'}"><div class="pv-big">${r.mode==='exam'?s.g:(s.c===r.qs.length?'✓':s.c)}</div>
+      <h3>${r.mode==='exam'?(S.cefr?`Taxminiy daraja: ${s.g} (${mnum(s.rasch)} / 75)`:s.rasch>=46?`Taxminiy natija: ${mnum(s.rasch)} ball`:`Taxminiy natija: ${mnum(s.rasch)} ball — sertifikatga yetmadi`):`${s.c} / ${r.qs.length} to'g'ri`}</h3>
+      <p class="sub">${r.mode==='exam'?`Xom ball: ${mnum(s.raw)} / ${mnum(s.max)} · ${s.c} ta to'liq to'g'ri javob · ${hhmmss(s.sec)}<br>${S.cefr?"Multilevel shkalasida taxminan: B1 – 38+, B2 – 51+, C1 – 65+. Writing va Speaking alohida baholanadi.":"Sertifikat uchun kamida 46 ball (C) kerak. A+ — 70 va undan yuqori."}`:`Vaqt: ${hhmmss(s.sec)}`}</p>
+      ${r.mode==='exam'&&s.rasch>=PASS?'<p class="note">+15 tanga</p>':''}</section>
+    ${r.mode==='exam'?`<section class="card"><div class="label">${S.cefr?'Darajalar (taxminiy)':'Darajalar (Rasch, taxminiy)'}</div><div class="sr-grades ${S.cefr?'sr-g4':''}">${GR.map(([t,g])=>`<span class="${g===s.g?'on':''}"><b>${g}</b>${t?t+'+':'<38'}</span>`).join('')}</div></section>`:''}
     <div class="row" style="gap:8px"><button class="btn" id="sragain">Yana boshlash</button><button class="btn alt" id="srreview">Javoblarni ko'rish</button></div>
     <div id="srrev"></div>`;
   $('#srback').onclick=()=>{srRun=null;srView='menu';viewSert()};
-  $('#sragain').onclick=()=>r.mode==='exam'?srStartExam():srStart(r.qs.map(q=>q.top?mGen(q.top):q.kind==='o'?mGenOpen():mGenMatch()),r.title,'practice');
+  $('#sragain').onclick=()=>{if(r.mode==='exam'){if(S.id==='mat')return srStartExam();if(S.cefr)return srBank('eng').then(cefrMock);return srBank(S.id).then(B=>srStartBankExam(S,B))}
+    if(r.again)return r.again();if(S.id==='mat')return srStart(r.qs.map(q=>q.top?mGen(q.top):q.kind==='o'?mGenOpen():mGenMatch()),r.title,'practice');srStart(pvShuffle(r.qs),r.title,'practice')};
   $('#srreview').onclick=()=>{$('#srrev').innerHTML=r.qs.map((q,i)=>{const v=r.ans[i]&&r.ans[i].val,ok=srOk(q,v),good=q.kind==='o'?(ok&&ok.a&&ok.b):ok;
     const right=q.kind==='y1'?q.o[q.a]:q.kind==='y2'?q.items.map((it,j)=>'ABC'[j]+'→'+(it.a+1)).join(', '):`a) ${mnum(q.va)}; b) ${mnum(q.vb)}`;
-    return `<section class="card pv-wr"><div><b>${i+1}. ${esc(q.q)}</b><p class="note" style="margin:4px 0 0">${good?'✓':'✕'} To'g'ri javob: <b style="color:var(--good)">${esc(right)}</b><br>${esc(q.iz||'')}</p></div></section>`}).join('');$('#srreview').disabled=true};
+    return `<section class="card pv-wr" ${srNT(q)}><div><b>${i+1}. ${esc(q.q)}</b><p class="note" style="margin:4px 0 0">${good?'✓':'✕'} To'g'ri javob: <b style="color:var(--good)">${esc(right)}</b><br>${esc(q.iz||'')}</p></div></section>`}).join('');$('#srreview').disabled=true};
+}
+/* ---------- SERTIFIKAT: fizika va kimyo hisoblash masalalari generatori ---------- */
+// Har bir masala qiymatlari tasodifiy tanlanadi, javob formula bo'yicha hisoblanadi.
+const gN=v=>{const r=Math.round(v*1000)/1000;return String(r).replace('.',',')};
+const gR=(v,d=2)=>Math.round(v*10**d)/10**d;
+// To'g'ri javob + 3 ta noto'g'ri variant (hammasi har xil, musbat)
+function gOpts(ans,unit,wrong){const s=new Set([gN(ans)]);const out=[];
+  for(const w of wrong){const x=gR(w,3);if(x>0&&!s.has(gN(x))){s.add(gN(x));out.push(x)}if(out.length===3)break}
+  let k=2;while(out.length<3){const x=gR(ans*k,3);if(x>0&&!s.has(gN(x))){s.add(gN(x));out.push(x)}k=k===2?0.5:k+1}
+  const all=pvShuffle([ans,...out]);return {o:all.map(x=>gN(x)+(unit?(unit[0]==='·'?'':' ')+unit:'')),a:all.indexOf(ans)}}
+function gY(tn,q,ans,unit,wrong,iz){const {o,a}=gOpts(ans,unit,wrong);return {kind:'y1',sub:srSub,tn,q,o,a,iz,gen:1}}
+function gO(tn,q,pa,pb,va,vb,iz){return {kind:'o',sub:srSub,tn,q,pa,pb,va:gR(va,3),vb:gR(vb,3),iz,gen:1}}
+
+/* --- KIMYO --- */
+const KM=[['H₂O',18],['CO₂',44],['NaCl',58.5],['NaOH',40],['H₂SO₄',98],['HCl',36.5],['CaCO₃',100],['O₂',32],['N₂',28],['CH₄',16],['NH₃',17],['KOH',56],['MgO',40],['CuO',80],['Fe₂O₃',160],['SO₂',64],['HNO₃',63],['C₆H₁₂O₆',180],['Al₂O₃',102],['CaO',56],['Na₂CO₃',106]];
+const KG=[['O₂',32],['N₂',28],['CO₂',44],['CH₄',16],['NH₃',17],['H₂',2],['SO₂',64],['C₂H₆',30]];
+const KE=[['H₂O','H',2,18],['H₂O','O',16,18],['CO₂','C',12,44],['NaCl','Na',23,58.5],['CaCO₃','Ca',40,100],['Fe₂O₃','Fe',112,160],['CuO','Cu',64,80],['SO₂','S',32,64],['NH₃','N',14,17],['CH₄','C',12,16],['MgO','Mg',24,40],['SO₃','S',32,80],['NaOH','Na',23,40],['CaO','Ca',40,56]];
+const KN=[0.1,0.2,0.25,0.5,1,1.5,2,2.5,3,4,5];
+const KIM_T=[['mol','Modda miqdori va molyar massa'],['gaz','Gazlar hajmi (normal sharoit)'],['ulush','Elementning massa ulushi'],['erit','Eritmalar konsentratsiyasi']];
+function kimY(k){
+  const tn=KIM_T.find(x=>x[0]===k)[1];
+  if(k==='mol'){const [f,M]=MP(KM),n=MP(KN),m=gR(n*M,2);
+    return MR(0,1)?gY(tn,`${gN(m)} g ${f} necha mol bo'ladi? (M(${f}) = ${gN(M)} g/mol)`,n,'mol',[n*2,n/2,m/10,n+0.5],`n = m / M = ${gN(m)} / ${gN(M)} = ${gN(n)} mol.`)
+      :gY(tn,`${gN(n)} mol ${f} ning massasi qancha? (M(${f}) = ${gN(M)} g/mol)`,m,'g',[m*2,m/2,M,m+M],`m = n · M = ${gN(n)} · ${gN(M)} = ${gN(m)} g.`)}
+  if(k==='gaz'){const [f,M]=MP(KG),n=MP(KN),V=gR(n*22.4,2),m=gR(n*M,2),t=MR(0,2);
+    if(t===0)return gY(tn,`Normal sharoitda ${gN(n)} mol ${f} qancha hajmni egallaydi?`,V,'l',[V*2,V/2,n*11.2+22.4,m],`V = n · 22,4 = ${gN(n)} · 22,4 = ${gN(V)} l.`);
+    if(t===1)return gY(tn,`Normal sharoitda ${gN(V)} l ${f} necha mol?`,n,'mol',[n*2,n/2,V/2,n+1],`n = V / 22,4 = ${gN(V)} / 22,4 = ${gN(n)} mol.`);
+    return gY(tn,`Normal sharoitda ${gN(V)} l ${f} ning massasi qancha? (M = ${gN(M)} g/mol)`,m,'g',[m*2,m/2,V,M],`n = ${gN(V)} / 22,4 = ${gN(n)} mol; m = n · M = ${gN(n)} · ${gN(M)} = ${gN(m)} g.`)}
+  if(k==='ulush'){const [f,e,me,M]=MP(KE),w=gR(me/M*100,1);
+    return gY(tn,`${f} tarkibida ${e} elementining massa ulushi necha foiz? (M(${f}) = ${gN(M)} g/mol)`,w,'%',[gR(100-w,1),gR(w/2,1),gR(w*0.8,1),gR(w+10,1)],`ω(${e}) = ${gN(me)} / ${gN(M)} · 100% ≈ ${gN(w)}%.`)}
+  // erit
+  const t=MR(0,2);
+  if(t===0){const m=MP([50,80,100,120,150,200,250,300,400,500]),w=MP([5,10,12,15,20,25,30,40]),x=gR(m*w/100,2);
+    return gY(tn,`${m} g ${w}% li eritmada necha gramm erigan modda bor?`,x,'g',[m-x,x*2,gR(x/2,2),w],`m(modda) = ${m} · ${w} / 100 = ${gN(x)} g.`)}
+  if(t===1){const s=MP([5,10,15,20,25,30,40,50]),wt=MP([45,70,80,85,90,95,100,150,160,190,200]),w=gR(s/(s+wt)*100,2);
+    return gY(tn,`${s} g tuz ${wt} g suvda eritildi. Eritmadagi tuzning massa ulushi necha foiz?`,w,'%',[gR(s/wt*100,2),gR(w*2,2),gR(w/2,2),gR(100-w,2)],`ω = ${s} / (${s} + ${wt}) · 100% = ${gN(w)}%.`)}
+  const m=MP([100,200,300,400,500]),w1=MP([10,20,30,40]),add=MP([100,200,300,400,500]),w2=gR(m*w1/(m+add),2);
+  return gY(tn,`${m} g ${w1}% li eritmaga ${add} g suv qo'shildi. Hosil bo'lgan eritmaning konsentratsiyasi necha foiz?`,w2,'%',[gR(w1/2,2),gR(m*w1/add,2),gR(w1-add/100,2),gR(w2*1.5,2)],`Modda massasi ${m} · ${w1} / 100 = ${gN(m*w1/100)} g; yangi massa ${m+add} g; ω = ${gN(m*w1/100)} / ${m+add} · 100% = ${gN(w2)}%.`);
+}
+function kimO(){
+  const t=MR(0,2),tn='Hisoblash masalasi';
+  if(t===0){const [f,M]=MP(KG),n=MP(KN),m=gR(n*M,2);
+    return gO(tn,`${gN(m)} g ${f} gazi berilgan (M = ${gN(M)} g/mol).`,"Modda miqdorini toping (mol).","Normal sharoitdagi hajmini toping (l).",n,n*22.4,`n = ${gN(m)} / ${gN(M)} = ${gN(n)} mol; V = n · 22,4 = ${gN(gR(n*22.4,3))} l.`)}
+  if(t===1){const m=MP([100,200,250,400,500]),w=MP([10,20,25,40]),x=m*w/100;
+    return gO(tn,`${m} g ${w}% li tuz eritmasi tayyorlanishi kerak.`,"Necha gramm tuz kerak?","Necha gramm suv kerak?",x,m-x,`m(tuz) = ${m} · ${w} / 100 = ${gN(x)} g; m(suv) = ${m} − ${gN(x)} = ${gN(m-x)} g.`)}
+  const [f,e,me,M]=MP(KE.filter(x=>x[2]<x[3])),n=MP([0.5,1,2,3]),mt=n*M;
+  return gO(tn,`${gN(mt)} g ${f} berilgan (M = ${gN(M)} g/mol).`,"Modda miqdorini toping (mol).",`Undagi ${e} elementining massasini toping (g).`,n,n*me,`n = ${gN(mt)} / ${gN(M)} = ${gN(n)} mol; m(${e}) = ${gN(n)} · ${gN(me)} = ${gN(n*me)} g.`);
+}
+SR_GEN.kim={topics:KIM_T,y1:kimY,o:kimO};
+
+/* --- FIZIKA --- */
+const FIZ_T=[['kin','Kinematika'],['din','Dinamika va bosim'],['ener','Ish, quvvat va energiya'],['issiq','Issiqlik va gaz qonunlari'],['elek',"O'zgarmas tok"],['opt','Optika'],['yadro','Yadro fizikasi']];
+const G10=10;
+function fizY(k){
+  const tn=FIZ_T.find(x=>x[0]===k)[1];
+  if(k==='kin'){const t=MR(0,3);
+    if(t===0){const v=MP([5,10,12,15,20,25,30]),tt=MP([2,4,5,6,8,10,20]),s=v*tt;return gY(tn,`Jism ${v} m/s o'zgarmas tezlik bilan ${tt} s harakatlandi. U qancha yo'l bosib o'tdi?`,s,'m',[v+tt,s/2,s*2,v*tt+10],`s = v · t = ${v} · ${tt} = ${s} m.`)}
+    if(t===1){const a=MP([1,2,3,4,5]),tt=MP([2,3,4,5,6,10]),v=a*tt;return gY(tn,`Tinch holatdan ${a} m/s² tezlanish bilan harakatlangan jism ${tt} s dan keyin qanday tezlikka erishadi?`,v,'m/s',[a+tt,v/2,v*2,a*tt*tt],`v = a · t = ${a} · ${tt} = ${v} m/s.`)}
+    if(t===2){const a=MP([1,2,4]),tt=MP([2,4,5,6,10]),s=a*tt*tt/2;return gY(tn,`Tinch holatdan ${a} m/s² tezlanish bilan harakatlangan jism ${tt} s da qancha yo'l bosadi?`,s,'m',[a*tt*tt,a*tt,s/2,s+a],`s = a·t² / 2 = ${a} · ${tt}² / 2 = ${s} m.`)}
+    const tt=MP([1,2,3,4,5]),h=G10*tt*tt/2;return gY(tn,`Jism ${tt} s davomida erkin tushdi. U qanday balandlikdan tushgan? (g = 10 m/s²)`,h,'m',[G10*tt,h*2,h/2,G10*tt*tt],`h = g·t² / 2 = 10 · ${tt}² / 2 = ${h} m.`)}
+  if(k==='din'){const t=MR(0,3);
+    if(t===0){const m=MP([2,5,10,20,50,100,500]),a=MP([0.5,1,2,3,4]),F=m*a;return gY(tn,`Massasi ${m} kg bo'lgan jismga ${gN(a)} m/s² tezlanish berish uchun qanday kuch kerak?`,F,'N',[m+a,F*2,F/2,m*G10],`F = m · a = ${m} · ${gN(a)} = ${gN(F)} N.`)}
+    if(t===1){const m=MP([0.5,2,5,10,25,60,80]),P=m*G10;return gY(tn,`Massasi ${gN(m)} kg bo'lgan jismning og'irligi qancha? (g = 10 m/s²)`,P,'N',[m,P*2,P/2,P+10],`P = m · g = ${gN(m)} · 10 = ${gN(P)} N.`)}
+    if(t===2){const F=MP([100,200,500,1000,2000]),S=MP([0.1,0.2,0.5,2,4]),p=F/S;return gY(tn,`${F} N kuch ${gN(S)} m² yuzaga tik ta'sir qilmoqda. Bosim qancha?`,p,'Pa',[F*S,p*2,p/2,F+S],`p = F / S = ${F} / ${gN(S)} = ${gN(p)} Pa.`)}
+    const m=MP([2,4,5,10,20]),v=MP([3,5,10,20]),pp=m*v;return gY(tn,`Massasi ${m} kg bo'lgan jism ${v} m/s tezlik bilan harakatlanmoqda. Uning impulsi qancha?`,pp,'kg·m/s',[m*v*v/2,pp*2,m+v,pp/2],`p = m · v = ${m} · ${v} = ${pp} kg·m/s.`)}
+  if(k==='ener'){const t=MR(0,3);
+    if(t===0){const F=MP([10,20,50,100,200]),s=MP([2,5,10,20,50]),A=F*s;return gY(tn,`${F} N kuch ta'sirida jism kuch yo'nalishida ${s} m ko'chdi. Bajarilgan ish qancha?`,A,'J',[F+s,A/2,A*2,F/s],`A = F · s = ${F} · ${s} = ${A} J.`)}
+    if(t===1){const A=MP([600,1200,3000,6000,12000]),tt=MP([10,20,30,60,120]),N=A/tt;return gY(tn,`Dvigatel ${tt} s da ${A} J ish bajardi. Uning quvvati qancha?`,N,'W',[A*tt,N*2,N/2,A-tt],`N = A / t = ${A} / ${tt} = ${gN(N)} W.`)}
+    if(t===2){const m=MP([2,4,10,20,1000]),v=MP([2,3,4,5,10,20]),E=m*v*v/2;return gY(tn,`Massasi ${m} kg bo'lgan jism ${v} m/s tezlik bilan harakatlanmoqda. Kinetik energiyasi qancha?`,E,'J',[m*v,m*v*v,E/2,m*v/2],`Eₖ = m·v² / 2 = ${m} · ${v}² / 2 = ${E} J.`)}
+    const m=MP([1,2,3,5,10]),h=MP([2,5,10,20,50]),E=m*G10*h;return gY(tn,`Massasi ${m} kg bo'lgan jism ${h} m balandlikka ko'tarildi. Potensial energiyasi qancha? (g = 10 m/s²)`,E,'J',[m*h,E/2,E*2,m*G10+h],`Eₚ = m · g · h = ${m} · 10 · ${h} = ${E} J.`)}
+  if(k==='issiq'){const t=MR(0,2);
+    if(t===0){const m=MP([0.5,1,2,3,5]),dT=MP([10,20,40,50,80]),Q=4200*m*dT/1000;return gY(tn,`${gN(m)} kg suvni ${dT} °C ga isitish uchun qancha issiqlik kerak? (c = 4200 J/(kg·°C))`,Q,'kJ',[Q*2,Q/2,m*dT,Q*10],`Q = c · m · Δt = 4200 · ${gN(m)} · ${dT} = ${gN(Q*1000)} J = ${gN(Q)} kJ.`)}
+    if(t===1){const tc=MP([-73,-23,0,27,77,127,227]),T=tc+273;return gY(tn,`${tc} °C harorat Kelvin shkalasida qanchaga teng?`,T,'K',[tc+373,Math.abs(tc-273)||300,T+100,T-27],`T = t + 273 = ${tc} + 273 = ${T} K.`)}
+    const p1=MP([100,200,300]),V1=MP([2,4,6,8]),k2=MP([2,4]),V2=V1/k2,p2=p1*k2;return gY(tn,`Izotermik jarayonda ${V1} l hajmli gaz bosimi ${p1} kPa edi. Hajm ${gN(V2)} l gacha siqilsa, bosim qanday bo'ladi?`,p2,'kPa',[p1/k2,p1+V1,p2*2,p1*V1],`p₁V₁ = p₂V₂ → p₂ = ${p1} · ${V1} / ${gN(V2)} = ${p2} kPa.`)}
+  if(k==='elek'){const t=MR(0,4);
+    if(t===0){const U=MP([6,12,24,36,110,220]),R=MP([2,3,4,6,10,11,20,22]),I=gR(U/R,2);if(Math.abs(I*R-U)>1e-9)return fizY('elek');return gY(tn,`${R} Ω qarshilikli o'tkazgich uchlariga ${U} V kuchlanish berildi. Tok kuchi qancha?`,I,'A',[U*R,gR(R/U,2),I*2,I+1],`I = U / R = ${U} / ${R} = ${gN(I)} A.`)}
+    if(t===1){const U=MP([12,24,110,220]),I=MP([0.5,1,2,5,10]),P=U*I;return gY(tn,`Asbobdagi kuchlanish ${U} V, tok kuchi ${gN(I)} A. Uning quvvati qancha?`,P,'W',[U/I,P*2,P/2,U+I],`P = U · I = ${U} · ${gN(I)} = ${gN(P)} W.`)}
+    if(t===2){const R1=MP([2,3,4,5,6,10]),R2=MP([4,6,8,10,12,20]),R=R1+R2;return gY(tn,`${R1} Ω va ${R2} Ω qarshiliklar ketma-ket ulangan. Umumiy qarshilik qancha?`,R,'Ω',[gR(R1*R2/R,2),R1*R2,Math.abs(R2-R1)||1,R*2],`Ketma-ket ulashda R = R₁ + R₂ = ${R1} + ${R2} = ${R} Ω.`)}
+    if(t===3){const [R1,R2]=MP([[2,2],[3,6],[4,4],[6,12],[10,10],[12,6],[20,5],[30,60]]),R=R1*R2/(R1+R2);return gY(tn,`${R1} Ω va ${R2} Ω qarshiliklar parallel ulangan. Umumiy qarshilik qancha?`,R,'Ω',[R1+R2,gR((R1+R2)/2,2),R1*R2,R*2],`Parallel ulashda R = R₁·R₂ / (R₁ + R₂) = ${R1}·${R2} / ${R1+R2} = ${gN(R)} Ω.`)}
+    const I=MP([0.5,1,2,3,4]),tt=MP([10,20,30,60,120]),q=I*tt;return gY(tn,`O'tkazgichdan ${gN(I)} A tok ${tt} s davomida o'tdi. Qancha zaryad o'tgan?`,q,'C',[I/tt,q*2,q/2,I+tt],`q = I · t = ${gN(I)} · ${tt} = ${gN(q)} C.`)}
+  if(k==='opt'){const t=MR(0,2);
+    if(t===0){const F=MP([0.1,0.2,0.25,0.5,2]),D=gR(1/F,2);return gY(tn,`Linzaning fokus masofasi ${gN(F)} m. Uning optik kuchi qancha?`,D,'dptr',[F,D*2,D/2,D+1],`D = 1 / F = 1 / ${gN(F)} = ${gN(D)} dptr.`)}
+    if(t===1){const [d,f]=MP([[0.3,0.6],[0.2,0.2],[0.6,0.3],[0.4,0.4],[0.3,0.15],[0.15,0.3],[0.5,0.5]]),F=gR(d*f/(d+f),3);return gY(tn,`Buyum yig'uvchi linzadan ${gN(d)} m masofada, tasviri esa linzadan ${gN(f)} m masofada hosil bo'ldi. Fokus masofasi qancha?`,F,'m',[d+f,gR((d+f)/2,3),gR(d*f,3),gR(F*2,3)],`1/F = 1/d + 1/f → F = d·f / (d + f) = ${gN(d)}·${gN(f)} / ${gN(gR(d+f,3))} = ${gN(F)} m.`)}
+    const n=MP([1.25,1.5,2,2.4]),v=gR(3e8/n/1e8,3);return gY(tn,`Yorug'likning sindirish ko'rsatkichi ${gN(n)} bo'lgan muhitdagi tezligi qancha? (c = 3·10⁸ m/s)`,v,'·10⁸ m/s',[gR(3*n,3),3,gR(v/2,3),gR(v+0.5,3)],`v = c / n = 3·10⁸ / ${gN(n)} = ${gN(v)}·10⁸ m/s.`)}
+  // yadro
+  const T=MP([2,5,8,10,12,20]),k2=MP([1,2,3,4]),N0=MP([800,1600,3200,6400]),N=N0/2**k2;
+  return MR(0,1)?gY(tn,`Yarim yemirilish davri ${T} kun bo'lgan ${N0} ta radioaktiv yadrodan ${T*k2} kundan keyin nechtasi qoladi?`,N,'ta',[N0-N,N*2,N/2,N0/k2],`${T*k2} kun = ${k2} ta yarim yemirilish davri: N = ${N0} / 2^${k2} = ${N} ta.`)
+    :gY(tn,`Radioaktiv moddaning yarim yemirilish davri ${T} soat. ${T*k2} soatdan keyin dastlabki yadrolarning qancha qismi qoladi?`,gR(1/2**k2,4),'',[gR(1/(2*k2),4),gR(1-1/2**k2,4),gR(1/2**(k2+1),4),gR(1/k2/3,4)],`${k2} ta yarim yemirilish davrida yadrolar ${2**k2} marta kamayadi: 1/${2**k2} = ${gN(gR(1/2**k2,4))}.`);
+}
+function fizO(k){
+  k=k||MP(['mex','mex','mex','mol','mol','el','el','opt','opt','yad']);const tn='Hisoblash masalasi';
+  if(k==='mex'){const t=MR(0,1);
+    if(t===0){const a=MP([1,2,3,4]),tt=MP([2,4,5,6,10]);return gO(tn,`Avtomobil tinch holatdan ${a} m/s² tezlanish bilan ${tt} s harakatlandi.`,"Oxirgi tezlikni toping (m/s).","Bosib o'tilgan yo'lni toping (m).",a*tt,a*tt*tt/2,`v = a·t = ${a*tt} m/s; s = a·t²/2 = ${a*tt*tt/2} m.`)}
+    const [h,v]=MP([[5,10],[20,20],[45,30],[1.25,5],[80,40]]),m=MP([1,2,5]);return gO(tn,`Massasi ${m} kg bo'lgan jism ${gN(h)} m balandlikdan erkin tushdi (g = 10 m/s², havo qarshiligi hisobga olinmasin).`,"Boshlang'ich potensial energiyasini toping (J).","Yerga urilish paytidagi tezligini toping (m/s).",m*G10*h,v,`Eₚ = m·g·h = ${gN(m*G10*h)} J; mgh = mv²/2 → v = √(2gh) = ${v} m/s.`)}
+  if(k==='mol'){const m=MP([0.5,1,2,4]),dT=MP([20,30,50,80]),P=MP([1000,2000]),Q=4200*m*dT;return gO(tn,`${gN(m)} kg suv ${P} W quvvatli isitgichda ${dT} °C ga isitildi (c = 4200 J/(kg·°C), issiqlik yo'qotilmaydi).`,"Suvga berilgan issiqlik miqdorini toping (kJ).","Isitish uchun ketgan vaqtni toping (s).",Q/1000,Q/P,`Q = c·m·Δt = ${gN(Q)} J = ${gN(Q/1000)} kJ; t = Q / P = ${gN(Q)} / ${P} = ${gN(Q/P)} s.`)}
+  if(k==='el'){const [R1,R2]=MP([[2,4],[3,3],[4,8],[5,10],[6,6],[10,20]]),U=MP([12,24,30,60]);const R=R1+R2,I=U/R;if(Math.abs(gR(I,3)-I)>1e-9)return fizO('el');return gO(tn,`${R1} Ω va ${R2} Ω qarshiliklar ketma-ket ulanib, ${U} V kuchlanish manbaiga ulandi.`,"Umumiy qarshilikni toping (Ω).","Zanjirdagi tok kuchini toping (A).",R,I,`R = ${R1} + ${R2} = ${R} Ω; I = U / R = ${U} / ${R} = ${gN(I)} A.`)}
+  if(k==='opt'){const [d,f]=MP([[0.3,0.6],[0.2,0.2],[0.6,0.3],[0.4,0.4],[0.5,0.5]]);const F=d*f/(d+f);return gO(tn,`Buyum yig'uvchi linzadan ${gN(d)} m masofada turibdi, uning haqiqiy tasviri linzadan ${gN(f)} m masofada hosil bo'ldi.`,"Linzaning fokus masofasini toping (m).","Linzaning optik kuchini toping (dptr).",F,1/F,`F = d·f / (d + f) = ${gN(gR(F,3))} m; D = 1 / F = ${gN(gR(1/F,3))} dptr.`)}
+  const T=MP([3,5,10]),k2=MP([2,3]),N0=MP([1600,3200,6400]);return gO(tn,`Yarim yemirilish davri ${T} kun bo'lgan namunada dastlab ${N0} ta radioaktiv yadro bor.`,`${T} kundan keyin nechta yadro qoladi?`,`${T*k2} kundan keyin nechta yadro qoladi?`,N0/2,N0/2**k2,`Har ${T} kunda yadrolar soni ikki marta kamayadi: ${N0/2} ta va ${N0/2**k2} ta.`);
+}
+SR_GEN.fiz={topics:FIZ_T,y1:fizY,o:()=>fizO()};
+
+/* ---------- INGLIZ TILI (CEFR / Multilevel) ---------- */
+const ENG_GR=[[65,'C1'],[51,'B2'],[38,'B1'],[0,'A2']];
+let srVoices=[],spTimer=null;
+try{const lv=()=>{srVoices=window.speechSynthesis?speechSynthesis.getVoices():[]};lv();if(window.speechSynthesis)speechSynthesis.onvoiceschanged=lv}catch(e){}
+function srHush(){try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}}
+function srSay(text){
+  if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){toast("Bu qurilmada ovozli o'qish ishlamaydi — «Matnni ko'rish» orqali o'qing");return false}
+  srHush();const en=srVoices.filter(v=>/^en/i.test(v.lang)),spk={};let k=0;
+  String(text).split(/\n+/).forEach(l=>{const m=l.match(/^([A-Z][a-z]+):\s*(.*)$/);let who='',t=l;if(m){who=m[1];t=m[2]}if(who&&!(who in spk))spk[who]=k++;
+    const u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=0.9;const vi=who?spk[who]:0;if(en.length)u.voice=en[vi%en.length];u.pitch=who?(vi%2?1.15:0.9):1;speechSynthesis.speak(u)});
+  return true}
+function viewCefr(S){
+  $('#screen').innerHTML=`${srPicker(S)}<section class="card"><p class="note">Yuklanmoqda…</p></section>`;srBindPicker();
+  srBank('eng').then(B=>{if(current!=='sert'||srView!=='menu'||srSub!=='eng')return;
+    const cnt=k=>B.q.filter(q=>q.t===k).length,pc=k=>new Set(B.q.filter(q=>q.t===k&&q.p).map(q=>q.p)).size;
+    const SK=[['lis','🎧','Listening',`${pc('lis')} ta audio · ${cnt('lis')} savol`],['rea','📖','Reading',`${pc('rea')} ta matn · ${cnt('rea')} savol`],['gra','Aa','Grammar',`${cnt('gra')} savol`],['voc','✦','Vocabulary',`${cnt('voc')} savol`],['mix','⇄','Matching',`${cnt('mix')} topshiriq`]];
+    $('#screen').innerHTML=`${srPicker(S)}${srReady(S)}
+      <button class="card pv-main sr-main" id="srexam"><span class="pv-ic">🇬🇧</span><span><b>Mock test: Listening + Reading</b><small>30 savol · 45 daqiqa · taxminiy daraja</small></span><span class="pv-go">→</span></button>
+      <div class="qtopics">
+        <button class="qtopic" id="srquick"><span class="kic" style="background:linear-gradient(135deg,#35217a,#7a4fd6)">⚡</span><b>Tezkor mashq</b><small>10 ta grammatika va lug'at</small></button>
+        <button class="qtopic" id="srmis"><span class="kic" style="background:linear-gradient(135deg,#8a1f1f,#e0524a)">✕</span><b>Xatolar ustida ishlash</b><small>${srs.mis.length?srs.mis.length+' ta savol':"Hozircha xato yo'q"}</small></button>
+      </div>
+      <div class="sec-title"><b>Ko'nikmalar bo'yicha mashq</b></div>
+      <div class="sr-topics">${SK.map(([k,ic,n,sub])=>`<button class="card sr-top" data-sk="${k}"><span class="sr-n">${ic}</span><span>${n}<small class="note" style="display:block;font-weight:500">${sub}</small></span><span class="pv-go">→</span></button>`).join('')}</div>
+      <div class="sec-title"><b>Writing</b><span class="note">namuna javoblar bilan</span></div>
+      <div class="sr-topics">${B.wr.map((w,i)=>`<button class="card sr-top" data-wr="${i}"><span class="sr-n">✎</span><span data-noi18n>${esc(w.title)}<small class="note" style="display:block;font-weight:500">${esc(w.t)} · ~${w.w} so'z</small></span><span class="pv-go">→</span></button>`).join('')}</div>
+      <div class="sec-title"><b>Speaking</b><span class="note">taymer bilan</span></div>
+      <div class="sr-topics">${B.sp.map((s,i)=>`<button class="card sr-top" data-sp="${i}"><span class="sr-n">🎙</span><span data-noi18n>${esc(s.q[0].length>70?s.q[0].slice(0,68)+'…':s.q[0])}<small class="note" style="display:block;font-weight:500">${esc(s.t)}</small></span><span class="pv-go">→</span></button>`).join('')}</div>
+      <p class="note" style="margin:0 4px">Multilevel (CEFR) formatiga yaqin: rasmiy imtihonda Listening va Reading – 35 tadan savol, Writing va Speaking – alohida topshiriqlar. Bu rasmiy imtihon materiali emas, matn va savollar ilova uchun yozilgan. Listening qurilmaning ovozli o'qish funksiyasi orqali eshittiriladi. Daraja 75 ballik shkalada taxminan baholanadi: B1 – 38+, B2 – 51+, C1 – 65+.</p>`;
+    srBindPicker();
+    $('#srexam').onclick=()=>cefrMock(B);
+    const quick=()=>srStart(pvShuffle(B.q.filter(q=>q.t==='gra'||q.t==='voc')).slice(0,10),'Tezkor mashq','practice',quick);
+    const skill=k=>{let qs=B.q.filter(q=>q.t===k);const ps=[...new Set(qs.filter(q=>q.p).map(q=>q.p))];
+      if(ps.length){const p=MP(ps);qs=qs.filter(q=>q.p===p)}else qs=pvShuffle(qs).slice(0,10);srStart(qs,SK.find(x=>x[0]===k)[2],'practice',()=>skill(k))};
+    $('#srquick').onclick=quick;$('#srmis').onclick=srMistakes;
+    $('#screen').querySelectorAll('[data-sk]').forEach(b=>b.onclick=()=>skill(b.dataset.sk));
+    $('#screen').querySelectorAll('[data-wr]').forEach(b=>b.onclick=()=>viewWr(B,+b.dataset.wr));
+    $('#screen').querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>viewSp(B,+b.dataset.sp));
+  }).catch(()=>{if(current!=='sert')return;$('#screen').innerHTML=`${srPicker(S)}<section class="card"><b>Savollarni yuklab bo'lmadi</b><p class="note" style="margin-top:6px">Internetni tekshirib, qayta oching.</p><button class="btn" id="srretry" style="margin-top:10px">Qayta urinish</button></section>`;srBindPicker();$('#srretry').onclick=()=>viewCefr(S)});
+}
+function cefrMock(B){statSec('sr_exam');
+  const pick=(k,n)=>pvShuffle([...new Set(B.q.filter(q=>q.t===k&&q.p).map(q=>q.p))]).slice(0,n);
+  const qs=[];pick('lis',2).forEach(p=>qs.push(...B.q.filter(q=>q.p===p)));pick('rea',2).forEach(p=>qs.push(...B.q.filter(q=>q.p===p)));
+  qs.push(...pvShuffle(B.q.filter(q=>q.t==='gra'||q.t==='voc')).slice(0,30-qs.length));
+  srStart(qs,'Mock test','exam');
+}
+function viewWr(B,i){
+  srStop();srView='wr';const w=B.wr[i],key='engw_'+i;$('#hero').hidden=true;window.scrollTo(0,0);
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="wrback">← Ingliz tili</button><b>Writing</b><span class="badge old" id="wrcnt">0 so'z</span></div>
+    <section class="card" data-noi18n><div class="label">${esc(w.t)} · ~${w.w} words</div><h3>${esc(w.title)}</h3><p>${esc(w.sit)}</p><p><b>${esc(w.ins)}</b></p></section>
+    <textarea class="csearch sr-wr" id="wrtxt" rows="9" placeholder="${esc(trText("Javobingizni shu yerga yozing…"))}">${esc(store.get(key,''))}</textarea>
+    <section class="card"><div class="label">O'zingizni tekshiring</div><ul class="sr-tips" data-noi18n>${w.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul></section>
+    <button class="btn alt" id="wrsample">Namuna javobni ko'rish</button><div id="wrs"></div>`;
+  const ta=$('#wrtxt'),cnt=()=>{const n=(ta.value.trim().match(/\S+/g)||[]).length;$('#wrcnt').textContent=`${n} / ${w.w} so'z`};cnt();
+  ta.oninput=()=>{cnt();store.set(key,ta.value)};
+  $('#wrsample').onclick=()=>{$('#wrs').innerHTML=`<section class="card sr-sample" data-noi18n><div class="label">Sample answer</div>${w.sample.split('\n').map(x=>`<p>${esc(x)}</p>`).join('')}</section>`;$('#wrsample').remove()};
+  $('#wrback').onclick=()=>{srView='menu';viewSert()};
+}
+function viewSp(B,i){
+  srStop();srView='sp';const s=B.sp[i];$('#hero').hidden=true;window.scrollTo(0,0);
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="spback">← Ingliz tili</button><b>Speaking</b><span></span></div>
+    <section class="card" data-noi18n><div class="label">${esc(s.t)}</div>${s.q.map(x=>`<h3 style="margin:6px 0">${esc(x)}</h3>`).join('')}<button class="chip" id="spsay" style="margin-top:6px">🔊 Savolni tinglash</button></section>
+    <section class="card sr-timer"><div class="label" id="spstage">${s.prep?'Tayyorlanish':'Gapirish'}</div><div class="big" id="sptime">${s.prep||s.talk}<small> s</small></div>
+      <div class="note">${s.prep?`Avval ${s.prep} soniya tayyorlanasiz, keyin ${s.talk} soniya gapirasiz.`:`Gapirish uchun ${s.talk} soniya.`} Ovoz chiqarib gapiring, xohlasangiz telefonda yozib oling.</div>
+      <button class="btn" id="spgo" style="margin-top:10px">Boshlash</button></section>
+    <section class="card"><div class="label">Maslahatlar</div><ul class="sr-tips" data-noi18n>${s.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul></section>
+    <button class="btn alt" id="spsample">Namuna javobni ko'rish</button><div id="sps"></div>`;
+  $('#spsay').onclick=()=>srSay(s.q.join('\n'));
+  $('#spgo').onclick=()=>{clearInterval(spTimer);let stage=s.prep?'prep':'talk',left=s.prep||s.talk;const go=$('#spgo');go.textContent='Qaytadan';
+    const draw=()=>{const t=$('#sptime'),st=$('#spstage');if(!t){clearInterval(spTimer);return}t.innerHTML=`${left}<small> s</small>`;st.textContent=stage==='prep'?'Tayyorlanish':stage==='talk'?'Gapiring!':'Vaqt tugadi'};draw();
+    spTimer=setInterval(()=>{if(current!=='sert'||srView!=='sp'){clearInterval(spTimer);return}left--;
+      if(left<=0){if(stage==='prep'){stage='talk';left=s.talk;haptic('medium')}else{stage='done';left=0;clearInterval(spTimer);haptic('done')}}draw()},1000)};
+  $('#spsample').onclick=()=>{$('#sps').innerHTML=`<section class="card sr-sample" data-noi18n><div class="label">Sample answer</div><p>${esc(s.sample)}</p><button class="chip" id="spsay2">🔊 Tinglash</button></section>`;$('#spsample').remove();$('#spsay2').onclick=()=>srSay(s.sample)};
+  $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261021l';
+const APP_VER='20261021p';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava,sert:viewSert};
@@ -3468,7 +3732,7 @@ function viewHome(){
     </section>
     <div class="tiles">${tiles.map(([k,l,s])=>`<button class="tile" data-go="${k==='qibla'||k==='tasbeh'?'namoz':k}" ${k==='qibla'||k==='tasbeh'?`data-pv="${k}"`:''}><span class="t-ic" style="background:linear-gradient(135deg,${TILE_COL[k][0]},${TILE_COL[k][1]})">${ICONS[k]||TOOLIC[k]}</span><span><b>${l}</b><small>${s}</small></span></button>`).join('')}</div>
     <button class="card pv-main" data-go="prava" style="margin:0;background:linear-gradient(135deg,#4a3200,#d99a00)"><span class="pv-ic">${ICONS.prava}</span><span><b>Prava imtihoniga tayyorlaning</b><small>Imtihon rejimi · xatolar ustida ishlash · yo'l belgilari</small></span><span class="pv-go">→</span></button>
-    <button class="card pv-main" data-go="sert" style="margin:0;background:linear-gradient(135deg,#2a1a6e,#6a4fd6)"><span class="pv-ic">∑</span><span><b>Milliy sertifikatga tayyorlaning</b><small>Matematika · 45 topshiriq · cheksiz savollar</small></span><span class="pv-go">→</span></button>
+    <button class="card pv-main" data-go="sert" style="margin:0;background:linear-gradient(135deg,#2a1a6e,#6a4fd6)"><span class="pv-ic">∑</span><span><b>Milliy sertifikatga tayyorlaning</b><small>8 fan · imtihon rejimi · izohli savollar</small></span><span class="pv-go">→</span></button>
     ${STAT.admin?`<button class="card pv-main" data-go="admin" data-noi18n style="margin:0;background:linear-gradient(135deg,#14224d,#3563d4)"><span class="pv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg></span><span><b>Statistika</b><small>Admin panel · faqat siz ko'rasiz</small></span><span class="pv-go">→</span></button>`:''}
     ${weatherCard()}
     <div class="sec-title"><b>Bugun nima pishiramiz?</b><button data-go="food">Barchasi</button></div>
