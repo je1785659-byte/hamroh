@@ -1,0 +1,262 @@
+[
+{
+"id": "m6-1",
+"q": "Ko'rlik belgisi — oq hassa bilan harakatlanayotgan piyodaga qayerda yo'l berish kerak?",
+"o": [
+"Faqat piyodalar o'tish joyida",
+"Faqat aholi punktlarida",
+"Faqat chorrahalarda",
+"Barcha hollarda, shu jumladan o'tish joylaridan tashqarida ham"
+],
+"a": 3,
+"iz": "Haydovchi barcha hollarda, shu jumladan piyodalar o'tish joylaridan tashqarida ham, oq hassa bilan ishora berayotgan ko'zi ojiz piyodalarga yo'l berishi kerak.",
+"src": "YHQ, 113-band"
+},
+{
+"id": "m6-2",
+"q": "Qattiq bog'lovchida shatakka olishda transport vositalari orasidagi masofa qancha bo'lishi kerak?",
+"o": [
+"4 m dan oshmasligi kerak",
+"Kamida 2 m",
+"4 m dan 6 m gacha",
+"Kamida 6 m"
+],
+"a": 0,
+"iz": "Qattiq bog'lovchida shatakka olishda transport vositalari orasidagi masofa 4 m dan oshmasligi kerak.",
+"src": "YHQ, 144-band"
+},
+{
+"id": "m6-3",
+"q": "Avtomagistralda qanday transport vositalarining harakatlanishi taqiqlanadi?",
+"o": [
+"Tirkamali yengil avtomobillar",
+"Avtobuslar",
+"Texnik tavsifi yoki holatiga ko'ra soatiga 40 km dan ortiq tezlikda yura olmaydiganlar",
+"Soatiga 100 km dan ortiq yura oladiganlar"
+],
+"a": 2,
+"iz": "Avtomagistralda piyodalar, velosiped, moped, traktorlar va soatiga 40 km dan ortiq tezlikda harakatlana olmaydigan transport vositalarining harakatlanishi taqiqlanadi.",
+"src": "YHQ, 121-band"
+},
+{
+"id": "m6-4",
+"q": "Turar joy dahasidan chiqayotgan haydovchi kimga yo'l beradi?",
+"o": [
+"Hech kimga",
+"Faqat o'ng tomondagilarga",
+"Boshqa yo'l harakati qatnashchilariga",
+"Faqat piyodalarga"
+],
+"a": 2,
+"iz": "Turar joy dahasidan chiqayotgan haydovchi boshqa yo'l harakati qatnashchilariga yo'l berishi kerak.",
+"src": "YHQ, 126-band"
+},
+{
+"id": "m6-5",
+"q": "Ajratuvchi bo'lagi yo'q ikki tomonlama yo'lda xavfsizlik orolchalari va ustunlarni qaysi tomondan aylanib o'tish kerak?",
+"o": [
+"Aylanib o'tish taqiqlanadi",
+"Istalgan tomondan",
+"Chap tomondan",
+"O'ng tomondan"
+],
+"a": 3,
+"iz": "Belgilar va chiziqlar boshqacha ko'rsatmagan bo'lsa, xavfsizlik orolchalari, ustunlar va yo'l inshootlari o'ng tomondan aylanib o'tiladi.",
+"src": "YHQ, 76-band"
+},
+{
+"id": "m6-6",
+"q": "Tartibga solinmagan piyodalar o'tish joyiga yaqinlashayotgan haydovchi nima qilishi kerak?",
+"o": [
+"Piyoda to'xtaguncha kutmasdan o'tishi",
+"Faqat kechasi tezlikni kamaytirishi",
+"Ovozli signal berib, tezlikni saqlashi",
+"O'tayotgan piyodalarga yo'l berish uchun tezlikni kamaytirishi yoki to'xtashi"
+],
+"a": 3,
+"iz": "Tartibga solinmagan piyodalar o'tish joyiga yaqinlashayotgan haydovchi o'tish joyidan o'tayotgan piyodalarga yo'l berish uchun tezlikni kamaytirishi yoki to'xtashi shart.",
+"src": "YHQ, 109-band"
+},
+{
+"id": "m6-7",
+"q": "Chorrahadan tashqarida chapga burilayotgan yoki qayrilib olayotgan relssiz transport vositasi kimga yo'l berishi kerak?",
+"o": [
+"Faqat piyodalarga",
+"Qarama-qarshi harakatlanayotgan transport vositalariga va bir yo'nalishdagi tramvayga",
+"Hech kimga",
+"Faqat orqadan kelayotganlarga"
+],
+"a": 1,
+"iz": "Chorrahadan tashqarida chapga burilishda yoki qayrilib olishda relssiz transport vositasi haydovchisi qarama-qarshi harakatlanayotgan transport vositalariga va bir yo'nalishdagi tramvayga yo'l berishi shart.",
+"src": "YHQ, 59-band"
+},
+{
+"id": "m6-8",
+"q": "Temir yo'l kesishmasi oldida to'xtash chizig'i bo'lmasa, shlagbaumdan qancha masofada to'xtash kerak?",
+"o": [
+"Kamida 15 m",
+"Kamida 10 m",
+"Kamida 3 m",
+"Kamida 5 m"
+],
+"a": 3,
+"iz": "To'xtash chizig'i, 2.5 belgisi yoki svetofor bo'lmasa, haydovchi shlagbaumdan kamida 5 m oldin to'xtashi kerak.",
+"src": "YHQ, 119-band"
+},
+{
+"id": "m6-9",
+"q": "Poezd mashinistiga to'xtash ishorasi qanday beriladi?",
+"o": [
+"Ovozli signal berib",
+"Qo'lni yuqoriga ko'tarib",
+"Qo'lni aylana shaklida harakatlantirib (kunduzi yorqin mato, kechasi mash'ala yoki fonar bilan)",
+"Faralarni miltillatib"
+],
+"a": 2,
+"iz": "To'xtash ishorasi qo'lni aylana shaklida harakatlantirish bilan beriladi: kunduzi yorqin mato yoki yaxshi ko'rinadigan buyum, kechasi mash'ala yoki fonar bilan.",
+"src": "YHQ, 120-band"
+},
+{
+"id": "m6-10",
+"q": "Qayerda qayrilib olish taqiqlanadi?",
+"o": [
+"Piyodalar o'tish joylarida va tunnellarda",
+"Har yo'nalishda ikkita qatorli yo'llarda",
+"Yaxshi yoritilgan yo'llarda",
+"Uzuq chiziq bor joylarda"
+],
+"a": 0,
+"iz": "Piyodalar o'tish joylarida, tunnellarda, ko'priklar va estakadalarda (belgilar ruxsat bermasa), temir yo'l kesishmalarida va ko'rinish kamida bir tomonga 100 m dan kam bo'lgan joylarda qayrilib olish taqiqlanadi.",
+"src": "YHQ, 62-band"
+},
+{
+"id": "m6-11",
+"q": "Bir yo'nalishda harakatlanayotgan transport vositalari bir vaqtda qatorni o'zgartirsa, kim yo'l beradi?",
+"o": [
+"O'ng tomondagi haydovchi chap tomondagiga yo'l beradi",
+"Chap tomondagi haydovchi o'ng tomondagiga yo'l beradi",
+"Hajmi kichikroq transport yo'l beradi",
+"Tezroq harakatlanayotgan yo'l beradi"
+],
+"a": 1,
+"iz": "Bir yo'nalishda harakatlanayotgan transport vositalari bir vaqtda qatorni o'zgartirganda o'ng tomondagi transport vositasiga yo'l beriladi.",
+"src": "YHQ, 55-band"
+},
+{
+"id": "m6-12",
+"q": "To'rt va undan ortiq qatorli ikki tomonlama yo'lda qarama-qarshi harakat qatorlariga chiqishga ruxsat etiladimi?",
+"o": [
+"Ha, tirbandlik bo'lsa ruxsat etiladi",
+"Ha, quvib o'tish uchun ruxsat etiladi",
+"Yo'q, taqiqlanadi",
+"Faqat kechasi ruxsat etiladi"
+],
+"a": 2,
+"iz": "To'rt va undan ortiq qatorli ikki tomonlama yo'llarda qarama-qarshi harakat uchun mo'ljallangan qatorlarga chiqish taqiqlanadi.",
+"src": "YHQ, 65-band"
+},
+{
+"id": "m6-13",
+"q": "Tik qiyalikda tormoz tizimi ishdan chiqsa, haydovchi nima qilishi kerak?",
+"o": [
+"Ovozli signal berib, tezlikni saqlashi",
+"Uzatmani ajratishi",
+"Qarama-qarshi qatorga chiqishi",
+"Transport vositasini 5.40 belgisi bilan belgilangan avariya to'xtash yo'lagiga yo'naltirishi"
+],
+"a": 3,
+"iz": "Tik qiyalikda yoki dovonda tormoz tizimi ishdan chiqsa, haydovchi transport vositasini 5.40 belgisi bilan belgilangan avariya to'xtash yo'lagiga yo'naltirishi kerak.",
+"src": "YHQ, 129-band"
+},
+{
+"id": "m6-14",
+"q": "Ko'rinish kamida bir yo'nalishda qancha masofadan kam bo'lsa, qayrilib olish taqiqlanadi?",
+"o": [
+"100 m",
+"300 m",
+"50 m",
+"150 m"
+],
+"a": 0,
+"iz": "Yo'lning ko'rinish kamida bir yo'nalishda 100 m dan kam bo'lgan joylarida qayrilib olish taqiqlanadi.",
+"src": "YHQ, 62-band"
+},
+{
+"id": "m6-15",
+"q": "Kunduzi qaysi hollarda yaqin chiroq yoqilishi shart?",
+"o": [
+"Mototsikl, moped va skuterlarda harakatlanganda",
+"Aholi punktida yengil avtomobilda harakatlanganda",
+"Quvib o'tishda",
+"Faqat kechasi"
+],
+"a": 0,
+"iz": "Kunduzi yaqin chiroq kolonnada harakatlanganda, yo'nalishli transportda, bolalar guruhini tashishda, kuchli yomg'ir yoki qorda, shuningdek mototsikl, moped va skuterlarda yoqilishi shart.",
+"src": "YHQ, 138-band"
+},
+{
+"id": "m6-16",
+"q": "Piyodalar o'tish joyidan keyin tirbandlik bo'lsa va siz o'tish joyida to'xtab qolishingiz mumkin bo'lsa, nima qilasiz?",
+"o": [
+"Avariya chirog'ini yoqib kiraman",
+"O'tish joyiga kirmayman",
+"Ovozli signal berib kiraman",
+"Piyodalar bo'lmasa, o'tish joyida to'xtayman"
+],
+"a": 1,
+"iz": "O'tish joyidan keyin hosil bo'lgan tirbandlik haydovchini o'tish joyida to'xtashga majbur qilsa, unga kirish taqiqlanadi.",
+"src": "YHQ, 112-band"
+},
+{
+"id": "m6-17",
+"q": "Shatakka olinayotgan transport vositalari tarkibining umumiy uzunligi qanchadan oshsa, shatakka olish taqiqlanadi?",
+"o": [
+"25 m",
+"15 m",
+"30 m",
+"20 m"
+],
+"a": 3,
+"iz": "Shatakka oluvchi tarkibning umumiy uzunligi 20 m dan oshsa, shatakka olish taqiqlanadi.",
+"src": "YHQ, 145-band"
+},
+{
+"id": "m6-18",
+"q": "Turar joy dahasida (5.38 belgisi) kim imtiyozga ega?",
+"o": [
+"Yuk avtomobillari",
+"Velosipedchilar",
+"Transport vositalari",
+"Piyodalar"
+],
+"a": 3,
+"iz": "Turar joy dahalarida piyodalar yo'lkalarda ham, qatnov qismida ham harakatlanishi mumkin va imtiyozga ega, lekin transport harakatiga asossiz to'sqinlik qilmasligi kerak.",
+"src": "YHQ, 123-band"
+},
+{
+"id": "m6-19",
+"q": "Soatiga 40 km dan ortiq tezlikda harakatlana olmaydigan transport vositalari qaysi qatorda harakatlanishi kerak?",
+"o": [
+"Istalgan qatorda",
+"Faqat chetki o'ng qatorda",
+"Chetki chap qatorda",
+"O'rta qatorda"
+],
+"a": 1,
+"iz": "Texnik tavsifi yoki holatiga ko'ra soatiga 40 km dan ortiq tezlikda harakatlana olmaydigan transport vositalari faqat chetki o'ng qatorda harakatlanadi.",
+"src": "YHQ, 68-band"
+},
+{
+"id": "m6-20",
+"q": "\"Bolalar guruhini tashish\" taniqlik belgisi bo'lgan va avariya chirog'i yoqilgan to'xtab turgan transport vositasiga yaqinlashganda nima qilish kerak?",
+"o": [
+"Ovozli signal berib o'tib ketish",
+"Tezlikni oshirib, tezroq o'tib ketish",
+"Chap qatorga o'tib, tezlikni saqlash",
+"Tezlikni kamaytirish, zarur bo'lsa to'xtab, bolalarni o'tkazib yuborish"
+],
+"a": 3,
+"iz": "\"Bolalar guruhini tashish\" belgisi bo'lgan va avariya chirog'i yoqilgan to'xtab turgan transport vositasiga yaqinlashayotgan haydovchi tezlikni kamaytirishi, zarur bo'lsa to'xtab, bolalarni o'tkazib yuborishi kerak.",
+"src": "YHQ, 115-band"
+}
+]
