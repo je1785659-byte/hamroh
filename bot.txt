@@ -133,6 +133,9 @@ export default {
     if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
     const u=await req.json().catch(()=>({}));
     try{ if(u.message) await onMessage(env,u.message); else if(u.callback_query) await onCallback(env,u.callback_query); }catch(e){console.log(e)}
+    try{ const m=u.message||(u.callback_query&&u.callback_query.message); const cid=m&&m.chat&&m.chat.type==='private'&&m.chat.id;
+      const isStart=u.message&&/^\/start/.test(u.message.text||'');
+      if(cid&&!isStart){const C=await cfg();if(C.pinStart!==false){const ch=await tg(env,'getChat',{chat_id:cid});if(ch.ok&&!ch.result.pinned_message)await sendStart(env,cid,C,true)}} }catch(e){console.log(e)}
     return new Response('ok');
   }
 };
