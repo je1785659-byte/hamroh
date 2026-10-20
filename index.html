@@ -555,6 +555,7 @@ body[data-sec="sert"]{--sec-a:#2a1a6e;--sec-b:#6a4fd6;--sec:#5a3fc8}
 .sr-open{display:flex;flex-direction:column;gap:12px}.sr-open label{display:flex;flex-direction:column;gap:6px;font-size:14.5px}
 .csearch.okin{border-color:var(--good)!important;background:color-mix(in srgb,var(--good) 10%,var(--surface))}.csearch.badin{border-color:var(--bad)!important;background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
 .sr-grades{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}.sr-grades span{text-align:center;border:1px solid var(--line);border-radius:10px;padding:6px 2px;font-size:11px;color:var(--muted)}.sr-grades b{display:block;font-size:15px;color:var(--ink)}.sr-grades .on{border-color:var(--sec);background:color-mix(in srgb,var(--sec) 12%,var(--surface))}
+html[lang="ru"] .prow.next span::after{content:"следующий"}html[lang="en"] .prow.next span::after{content:"next"}html[lang="uz-Cyrl"] .prow.next span::after{content:"кейинги"}
 </style>
 </head>
 <body>
@@ -1898,6 +1899,7 @@ function viewSaved(){
 const TOOLIC={qibla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
  tasbeh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="17.5" cy="15" r="2"/><circle cx="12" cy="18.5" r="2"/><circle cx="6.5" cy="15" r="2"/><circle cx="6.5" cy="8.5" r="2"/></svg>',
  taqvim:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M14.5 13.2a2.6 2.6 0 1 0 0 4.6 3 3 0 1 1 0-4.6z" fill="currentColor" stroke="none"/></svg>'};
+if(!TOOLIC.tilovat)TOOLIC.tilovat='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="5" height="7" rx="2"/><rect x="16" y="14" width="5" height="7" rx="2"/></svg>';
 const toolBack=()=>`<button class="chip" data-back="1" style="align-self:flex-start">← Namoz vaqtlari</button>`;
 
 /* ---------- TANGALAR VA "MENING KUCHUKCHAM" ---------- */
@@ -1955,6 +1957,9 @@ function viewPet(){
 
 /* ---------- AUDIO: PLEYER, TILOVAT, SHE'RIYAT, QO'SHIQLAR ---------- */
 const SURAHS="Fotiha|Baqara|Oli Imron|Niso|Moida|An'om|A'rof|Anfol|Tavba|Yunus|Hud|Yusuf|Ra'd|Ibrohim|Hijr|Nahl|Isro|Kahf|Maryam|Toho|Anbiyo|Haj|Mu'minun|Nur|Furqon|Shuaro|Naml|Qasas|Ankabut|Rum|Luqmon|Sajda|Ahzob|Saba'|Fotir|Yosin|Soffot|Sod|Zumar|G'ofir|Fussilat|Sho'ro|Zuxruf|Duxon|Josiya|Ahqof|Muhammad|Fath|Hujurot|Qof|Zoriyot|Tur|Najm|Qamar|Rohman|Voqi'a|Hadid|Mujodala|Hashr|Mumtahana|Soff|Juma|Munofiqun|Tag'obun|Taloq|Tahrim|Mulk|Qalam|Hoqqa|Ma'orij|Nuh|Jin|Muzzammil|Muddassir|Qiyoma|Inson|Mursalot|Naba'|Nozi'ot|Abasa|Takvir|Infitor|Mutaffifin|Inshiqoq|Buruj|Toriq|A'lo|G'oshiya|Fajr|Balad|Shams|Layl|Zuho|Sharh|Tin|Alaq|Qadr|Bayyina|Zalzala|Odiyot|Qori'a|Takosur|Asr|Humaza|Fil|Quraysh|Mo'un|Kavsar|Kofirun|Nasr|Masad|Ixlos|Falaq|Nos".split('|');
+const SURA_T={ru:"Аль-Фатиха|Аль-Бакара|Аль Имран|Ан-Ниса|Аль-Маида|Аль-Анам|Аль-Араф|Аль-Анфаль|Ат-Тауба|Юнус|Худ|Юсуф|Ар-Рад|Ибрахим|Аль-Хиджр|Ан-Нахль|Аль-Исра|Аль-Кахф|Марьям|Та Ха|Аль-Анбия|Аль-Хадж|Аль-Муминун|Ан-Нур|Аль-Фуркан|Аш-Шуара|Ан-Намль|Аль-Касас|Аль-Анкабут|Ар-Рум|Лукман|Ас-Сажда|Аль-Ахзаб|Саба|Фатыр|Ясин|Ас-Саффат|Сад|Аз-Зумар|Гафир|Фуссилят|Аш-Шура|Аз-Зухруф|Ад-Духан|Аль-Джасия|Аль-Ахкаф|Мухаммад|Аль-Фатх|Аль-Худжурат|Каф|Аз-Зарият|Ат-Тур|Ан-Наджм|Аль-Камар|Ар-Рахман|Аль-Вакиа|Аль-Хадид|Аль-Муджадиля|Аль-Хашр|Аль-Мумтахана|Ас-Сафф|Аль-Джумуа|Аль-Мунафикун|Ат-Тагабун|Ат-Таляк|Ат-Тахрим|Аль-Мульк|Аль-Калям|Аль-Хакка|Аль-Мааридж|Нух|Аль-Джинн|Аль-Муззаммиль|Аль-Муддассир|Аль-Кияма|Аль-Инсан|Аль-Мурсалят|Ан-Наба|Ан-Назиат|Абаса|Ат-Таквир|Аль-Инфитар|Аль-Мутаффифин|Аль-Иншикак|Аль-Бурудж|Ат-Тарик|Аль-Аля|Аль-Гашия|Аль-Фаджр|Аль-Балад|Аш-Шамс|Аль-Ляйль|Ад-Духа|Аш-Шарх|Ат-Тин|Аль-Аляк|Аль-Кадр|Аль-Баййина|Аз-Залзаля|Аль-Адият|Аль-Кариа|Ат-Такасур|Аль-Аср|Аль-Хумаза|Аль-Филь|Курайш|Аль-Маун|Аль-Каусар|Аль-Кафирун|Ан-Наср|Аль-Масад|Аль-Ихлас|Аль-Фаляк|Ан-Нас".split('|'),en:"Al-Fatihah|Al-Baqarah|Aal-Imran|An-Nisa|Al-Ma'idah|Al-An'am|Al-A'raf|Al-Anfal|At-Tawbah|Yunus|Hud|Yusuf|Ar-Ra'd|Ibrahim|Al-Hijr|An-Nahl|Al-Isra|Al-Kahf|Maryam|Ta-Ha|Al-Anbiya|Al-Hajj|Al-Mu'minun|An-Nur|Al-Furqan|Ash-Shu'ara|An-Naml|Al-Qasas|Al-Ankabut|Ar-Rum|Luqman|As-Sajdah|Al-Ahzab|Saba|Fatir|Ya-Sin|As-Saffat|Sad|Az-Zumar|Ghafir|Fussilat|Ash-Shura|Az-Zukhruf|Ad-Dukhan|Al-Jathiyah|Al-Ahqaf|Muhammad|Al-Fath|Al-Hujurat|Qaf|Adh-Dhariyat|At-Tur|An-Najm|Al-Qamar|Ar-Rahman|Al-Waqi'ah|Al-Hadid|Al-Mujadilah|Al-Hashr|Al-Mumtahanah|As-Saff|Al-Jumu'ah|Al-Munafiqun|At-Taghabun|At-Talaq|At-Tahrim|Al-Mulk|Al-Qalam|Al-Haqqah|Al-Ma'arij|Nuh|Al-Jinn|Al-Muzzammil|Al-Muddaththir|Al-Qiyamah|Al-Insan|Al-Mursalat|An-Naba|An-Nazi'at|Abasa|At-Takwir|Al-Infitar|Al-Mutaffifin|Al-Inshiqaq|Al-Buruj|At-Tariq|Al-A'la|Al-Ghashiyah|Al-Fajr|Al-Balad|Ash-Shams|Al-Layl|Ad-Duha|Ash-Sharh|At-Tin|Al-Alaq|Al-Qadr|Al-Bayyinah|Az-Zalzalah|Al-Adiyat|Al-Qari'ah|At-Takathur|Al-Asr|Al-Humazah|Al-Fil|Quraysh|Al-Ma'un|Al-Kawthar|Al-Kafirun|An-Nasr|Al-Masad|Al-Ikhlas|Al-Falaq|An-Nas".split('|')};
+const suraName=i=>(typeof LANG!=='undefined'&&SURA_T[LANG])?SURA_T[LANG][i]:SURAHS[i];
+const suraLabel=i=>{const n=suraName(i);return typeof LANG!=='undefined'&&LANG==='ru'?`${i+1}. Сура ${n}`:typeof LANG!=='undefined'&&LANG==='en'?`${i+1}. Surah ${n}`:`${i+1}. ${n} surasi`};
 // Verified against mp3quran.net API v3 (Hafs, Murattal, 114 suras)
 const QORILAR=[
   {id:'alafasy',n:'Mishari Rashid Alafasi',s:'https://cdn.mp3quran.net/audio/mishary-alafasy/r1/'},
@@ -2007,16 +2012,16 @@ function drawMini(){
 function refreshList(){document.querySelectorAll('[data-sura]').forEach(r=>{const on=qi>=0&&queue[qi]&&queue[qi].kind==='sura'&&queue[qi].no===+r.dataset.sura&&queue[qi].qori===aud.qori;r.classList.toggle('playing',on);
   const b=r.querySelector('.sp');if(b)b.innerHTML=on&&au&&!au.paused?PI.pause:PI.play})}
 let suraQ='';
-function suraQueue(){const q=QORILAR.find(x=>x.id===aud.qori)||QORILAR[0];return SURAHS.map((n,i)=>({kind:'sura',no:i+1,qori:q.id,t:`${i+1}. ${n} surasi`,a:q.n,src:q.s+String(i+1).padStart(3,'0')+'.mp3'}))}
+function suraQueue(){const q=QORILAR.find(x=>x.id===aud.qori)||QORILAR[0];return SURAHS.map((n,i)=>({kind:'sura',no:i+1,qori:q.id,t:suraLabel(i),a:q.n,src:q.s+String(i+1).padStart(3,'0')+'.mp3'}))}
 function viewAudio(){
   const tabs=`<div class="swap" id="atab">${[['tilovat','Tilovat'],['sher',"She'riyat"],['qoshiq',"Qo'shiqlar"]].map(([k,l])=>`<button class="chip" data-at="${k}" aria-pressed="${aud.tab===k}">${l}</button>`).join('')}</div>`;
   let body='';
   if(aud.tab==='tilovat'){
     const q=suraQ.toLowerCase();
     body=`<section class="card"><div class="label">Qori</div><div class="chips" style="margin-top:8px" id="qori">${QORILAR.map(x=>`<button class="chip" data-q="${x.id}" aria-pressed="${x.id===aud.qori}">${x.n}</button>`).join('')}</div></section>
-      ${aud.last?`<button class="card resume" id="aresume"><span class="pt-ic">${PI.play}</span><span><span class="label">Davom ettirish</span><b>${aud.last}. ${SURAHS[aud.last-1]} surasi</b></span></button>`:''}
+      ${aud.last?`<button class="card resume" id="aresume"><span class="pt-ic">${PI.play}</span><span><span class="label">Davom ettirish</span><b data-noi18n>${suraLabel(aud.last-1)}</b></span></button>`:''}
       <section class="card" style="padding:12px 12px 4px"><input id="asearch" class="csearch" placeholder="Sura nomi yoki raqami" value="${esc(suraQ)}" aria-label="Sura qidirish" autocomplete="off">
-      <div class="slist">${SURAHS.map((n,i)=>({n,i})).filter(({n,i})=>!q||n.toLowerCase().includes(q)||String(i+1)===q).map(({n,i})=>`<button class="srow" data-sura="${i+1}"><span class="sno">${i+1}</span><span class="sn">${n}</span><span class="sp">${PI.play}</span></button>`).join('')||'<p class="note">Topilmadi</p>'}</div></section>
+      <div class="slist">${SURAHS.map((n,i)=>({n,i})).filter(({n,i})=>!q||n.toLowerCase().includes(q)||suraName(i).toLowerCase().includes(q)||String(i+1)===q).map(({n,i})=>`<button class="srow" data-sura="${i+1}"><span class="sno">${i+1}</span><span class="sn" data-noi18n>${esc(suraName(i))}</span><span class="sp">${PI.play}</span></button>`).join('')||'<p class="note">Topilmadi</p>'}</div></section>
       <p class="note" style="margin:0 4px">Tilovatlar manbasi: mp3quran.net. Tinglash uchun internet kerak; telefon ekrani o'chganda ham davom etadi.</p>`;
   } else {
     const list=aud.tab==='sher'?SHERLAR:QOSHIQLAR;
@@ -2293,7 +2298,7 @@ function viewPrava(){
   $('#pvmis').onclick=()=>{const l=Object.values(pvs.mis);if(!l.length){toast("Xato qilingan savollar shu yerga yig'iladi");return}pvStart(pvShuffle(l).slice(0,PV_CFG.n),'Xatolar ustida ishlash','practice')};
   $('#pvsignq').onclick=()=>pvStart(pvShuffle(SIGNS).slice(0,PV_CFG.n).map(signQuestion),'Belgilar mashqi','practice');
   $('#pvsigns').onclick=()=>{pvView='signs';pvSigns()};
-  pvLoadDb().then(db=>{if(current!=='prava'||pvView!=='menu')return;
+  pvLoadDb().then(db=>{if(current!=='prava'||pvView!=='menu'||!$('#pvtsub'))return;
     $('#pvtsub').textContent=db?db.tickets+(db.kind==='mashq'?' ta mashq bileti':' ta bilet'):'Tez orada';
     $('#pvdbnote').innerHTML=db?(db.kind==='mashq'?`<div class="label">Mashq biletlari</div><p class="sub" style="margin:6px 0 0">Savollar <a href="${esc(db.source.url)}" target="_blank" rel="noopener">${esc(db.source.name)}</a> matni asosida tuzilgan, har bir izohda qoidaning bandi ko'rsatilgan. Bu rasmiy imtihon biletlari emas — ular ruxsat bilan keyinroq qo'shiladi.</p>`:`<p class="note" style="margin:0">Biletlar manbasi: <a href="${esc(db.source.url)}" target="_blank" rel="noopener">${esc(db.source.name)}</a></p>`)
       :`<div class="label">Biletlar tez orada</div><p class="sub" style="margin:6px 0 0">Rasmiy imtihon biletlari mualliflik huquqi egasining ruxsati bilan qo'shiladi. Hozircha imtihon rejimi yo'l belgilari bo'yicha ishlaydi.</p>`;
@@ -3038,6 +3043,17 @@ O'qib bo'ldik · +3 tanga|Прочитали · +3 монеты|Finished · +3 c
 Shu bilan ertagimiz tugadi. Shirin tushlar ko'r! 🌙|Вот и сказке конец. Сладких снов! 🌙|And that's the end of our story. Sweet dreams! 🌙`;
 const D={ru:{},en:{}};
 I18N_SRC.split('\n').forEach(l=>{const p=l.split('|');if(p.length===3){D.ru[p[0]]=p[1];D.en[p[0]]=p[2]}});
+const PATS={ru:[],en:[]};
+const patRe=k=>new RegExp('^'+k.replace(/[.*+?^$()[\]\\|]/g,'\\$&').replace(/\\?\{(\d+)\}/g,'(.+?)').replace(/¦/g,'\\|')+'$');
+function i18nMerge(lang,j){if(!j)return;const d=j.d||{};for(const k in d){if(D[lang][k]==null)D[lang][k]=d[k]}
+  (j.p||[]).forEach(([k,v])=>{try{PATS[lang].push([patRe(k),v.replace(/¦/g,'|')])}catch(e){}});
+  PATS[lang].sort((x,y)=>y[0].source.length-x[0].source.length)}
+let i18nDepth=0;function trSegLite(g){if(i18nDepth>1)return null;i18nDepth++;try{return trSeg(g)}finally{i18nDepth--}}
+function i18nLoad(){if(LANG!=='ru'&&LANG!=='en')return;
+  let cached=null;try{cached=JSON.parse(localStorage.getItem('i18n_'+LANG)||'null')}catch(e){}
+  if(cached&&cached.v===APP_VER){i18nMerge(LANG,cached);return Promise.resolve()}
+  return fetch(`lang/${LANG}.json?v=${APP_VER}`).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;i18nMerge(LANG,j);try{localStorage.setItem('i18n_'+LANG,JSON.stringify({...j,v:APP_VER}))}catch(e){}if(document.body)i18nApply(document.body)}).catch(()=>{});
+}
 const MON_UZ=['yanvar','fevral','mart','aprel','may','iyun','iyul','avgust','sentabr','oktabr','noyabr','dekabr'];
 const MON={ru:['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'],en:['January','February','March','April','May','June','July','August','September','October','November','December']};
 const MAB_UZ=['yan','fev','mar','apr','may','iyn','iyl','avg','sen','okt','noy','dek'];
@@ -3068,6 +3084,16 @@ function trSeg(s){
   if(m=s.match(/^([A-Za-z]+), (.+)$/)){const i=WD_UZ.indexOf(m[1]);if(i>=0)return WD[LANG][i]+', '+(trDate(m[2])||m[2])}
   if((r=WA_UZ.indexOf(s))>=0)return WA[LANG][r];
   if((r=WD_UZ.indexOf(s))>=0)return WD[LANG][r];
+  if(m=s.match(/^(\d+) ta$/))return m[1];
+  if(/^[A-Z'ʻ‘’]{3,}$/.test(s)){const lc=s[0]+s.slice(1).toLowerCase();if(["Qizil","Ko'k","Yashil","Sariq","Binafsha","Jigarrang","Pushti","To'q sariq","Oq","Qora"].includes(lc)){const x=T(lc);if(x)return x.toUpperCase()}}
+  if(m=s.match(/^(\d+) (ball|yurish)$/))return L?(m[2]==='ball'?`${m[1]} баллов`:`ходов: ${m[1]}`):(m[2]==='ball'?`${m[1]} pts`:`${m[1]} moves`);
+  if(m=s.match(/^(\d+)–(\d+)-([a-z]+)$/)){const i=MON_UZ.indexOf(m[3]);if(i>=0)return L?`${m[1]}–${m[2]} ${MON.ru[i]}`:`${MON.en[i]} ${m[1]}–${m[2]}`}
+  if(m=s.match(/^([^A-Za-z\s]+) (.+)$/u)){const x=T(m[2])||trSegLite(m[2]);if(x)return m[1]+' '+x}
+  if(m=s.match(/^(.+), (.+?)(?: · (\d+) km)?$/)){const a=T(m[1])||trSegLite(m[1]),b2=T(m[2]);if(((a&&b2)||(m[3]&&(a||b2)))&&!/[.!?]$/.test(s))return `${a||m[1]}, ${b2||m[2]}${m[3]?` · ${m[3]} ${L?'км':'km'}`:''}`}
+  if(m=s.match(/^(\d{3,4})-yil$/))return LANG==='ru'?`${m[1]} год`:m[1];
+  if(m=s.match(/^(.+) —$/)){const x=T(m[1]);if(x)return x+' —'}
+  if(m=s.match(/^([\d,½¼¾–.]+) (dona|donadan|osh qoshiq|choy qoshiq|stakan|tishcha|bo'lak|bosh|kg|g|ml|l)$/)){const U={dona:['шт.','pcs'],donadan:['шт. каждого','each'],"osh qoshiq":['ст. л.','tbsp'],"choy qoshiq":['ч. л.','tsp'],stakan:['стак.','cups'],tishcha:['зуб.','cloves'],"bo'lak":['кус.','pieces'],bosh:['кочана','head'],kg:['кг','kg'],g:['г','g'],ml:['мл','ml'],l:['л','l']}[m[2]];return m[1]+' '+U[L?0:1]}
+  {const pm=patMatch(s);if(pm!=null)return pm}
   if(m=s.match(/^Assalomu alaykum, (.+)!$/))return (LANG==='ru'?'Здравствуйте, ':'Hello, ')+m[1]+'!';
   if(m=s.match(/^(\d+) (retsept|o'yin|savol|taom)$/))return nounT(m[1],m[2]);
   if(m=s.match(/^(\d+)-([a-z]{3})$/)){const i=MAB_UZ.indexOf(m[2]);if(i>=0)return LANG==='ru'?`${m[1]} ${MAB.ru[i]}`:`${MAB.en[i]} ${m[1]}`}
@@ -3112,17 +3138,20 @@ function trSeg(s){
   if(m=s.match(/^(\d+)-bilet$/))return L?`Билет ${m[1]}`:`Ticket ${m[1]}`;
   return null;
 }
+function patMatch(s){for(const [re,tpl] of (PATS[LANG]||[])){const mm=s.match(re);if(mm)return tpl.replace(/\{(\d+)\}/g,(_,k)=>{const g=mm[+k+1]||'';return trGroup(g)})}return null}
+function trGroup(g){if(!g)return g;const t=T(g);if(t!=null)return t;if(g.length>80||/\{/.test(g))return g;if(g.includes(' · '))return g.split(' · ').map(x=>T(x)||trSegLite(x)||x).join(' · ');return trSegLite(g)||g}
 function trText(t){
   if(LANG==='uzc')return cyrSafe(t);
   const lead=t.match(/^\s*/)[0],trail=t.match(/\s*$/)[0],s=t.trim();if(!s)return t;
   let r=T(s);
+  if(r==null)r=patMatch(s);
   if(r==null&&!s.includes(' · '))r=trSeg(s);
   if(r==null&&s.includes(' · ')){const parts=s.split(' · ').map(x=>{const y=trSeg(x);return y==null?null:y});if(parts.some(x=>x!=null))r=s.split(' · ').map((x,i)=>parts[i]!=null?parts[i]:x).join(' · ')}
   return r==null?t:lead+r+trail;
 }
 const CYR_KEEP=/(@[\w.]+|https?:\/\/\S+|\b[\w-]+\.(?:uz|net|com|org|ru|io)\b\S*|\b[A-Z]{2,6}\d*\b|\b[A-Z]\d+\b|\b[FU]\d\b)/;
 function cyrSafe(t){return t.split(CYR_KEEP).map((x,i)=>i%2?x:lat2cyr(x)).join('')}
-const I18N_SKIP='script,style,textarea,input,select,[data-noi18n],#dst,.sign text';
+const I18N_SKIP='script,style,textarea,input,[data-noi18n],#dst,.sign text';
 function i18nApply(root){
   if(!LANG||LANG==='uz'||!root)return;
   if(root.nodeType===3){const p=root.parentElement;if(p&&!p.closest(I18N_SKIP)){const v=trText(root.data);if(v!==root.data)root.data=v}return}
@@ -3136,6 +3165,7 @@ let i18nObs=null;
 function i18nStart(){
   if(!LANG||LANG==='uz')return;
   document.documentElement.lang=LANG==='uzc'?'uz-Cyrl':LANG;
+  i18nLoad();
   i18nApply(document.body);
   i18nObs=new MutationObserver(ms=>{for(const m of ms){m.addedNodes.forEach(n=>i18nApply(n));if(m.type==='attributes')i18nApply(m.target)}});
   i18nObs.observe(document.body,{childList:true,subtree:true});
@@ -3370,7 +3400,7 @@ function srResult(){
     return `<section class="card pv-wr"><div><b>${i+1}. ${esc(q.q)}</b><p class="note" style="margin:4px 0 0">${good?'✓':'✕'} To'g'ri javob: <b style="color:var(--good)">${esc(right)}</b><br>${esc(q.iz||'')}</p></div></section>`}).join('');$('#srreview').disabled=true};
 }
 
-const APP_VER='20261021d';
+const APP_VER='20261021h';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava,sert:viewSert};
