@@ -3122,7 +3122,7 @@ function trSeg(s){
   if(m=s.match(/^Qiyinlik: (.+)$/))return (L?'Сложность: ':'Difficulty: ')+(T(m[1])||m[1]);
   if(m=s.match(/^(\d+) kishilik$/))return L?`на ${m[1]} чел.`:`${m[1]} servings`;
   if(m=s.match(/^Avval tayyorlab oling$/))return L?'Сначала подготовьте':'Get ready first';
-  if(m=s.match(/^Manba: (.+)$/))return (L?'Источник: ':'Source: ')+m[1];
+  if(m=s.match(/^Manba: (.+)$/))return (L?'Источник: ':'Source: ')+(T(m[1])??patMatch(m[1])??m[1]);
   if(m=s.match(/^Rekord: (.+)$/))return (L?'Рекорд: ':'Best: ')+m[1];
   if(m=s.match(/^(\d+) soat (\d+) daqiqa (\d+) soniya qoldi$/))return L?`осталось ${m[1]} ч ${m[2]} мин ${m[3]} с`:`${m[1]} h ${m[2]} min ${m[3]} s left`;
   if(m=s.match(/^(\d+) daqiqa (\d+) soniya qoldi$/))return L?`осталось ${m[1]} мин ${m[2]} с`:`${m[1]} min ${m[2]} s left`;
@@ -3175,7 +3175,7 @@ function langSheet(first){
   el=document.createElement('div');el.id='langsheet';el.className='lang-sheet';
   el.innerHTML=`<div class="lang-box" role="dialog" aria-label="Til / Язык / Language"><b>Til · Язык · Language</b>
     ${LANGS.map(([k,n,s])=>`<button class="lang-opt ${k===(LANG||'uz')?'on':''}" data-l="${k}"><span>${n}</span><small>${s}</small></button>`).join('')}
-    <p class="note" style="margin:6px 2px 0" data-noi18n>${LANG==='ru'||LANG==='en'||first?"Retseptlar, savollar va ertaklar hozircha o'zbek tilida · Рецепты, вопросы и сказки пока на узбекском · Recipes, questions and stories are in Uzbek for now":''}</p></div>`;
+</div>`;
   el.setAttribute('data-noi18n','');document.body.appendChild(el);
   el.onclick=e=>{const b=e.target.closest('[data-l]');if(b){const v=b.dataset.l;store.set('lang',v);if(v!==(LANG||'uz')){location.reload()}else el.remove();return}if(e.target===el)el.remove()};
 }
@@ -3400,7 +3400,7 @@ function srResult(){
     return `<section class="card pv-wr"><div><b>${i+1}. ${esc(q.q)}</b><p class="note" style="margin:4px 0 0">${good?'✓':'✕'} To'g'ri javob: <b style="color:var(--good)">${esc(right)}</b><br>${esc(q.iz||'')}</p></div></section>`}).join('');$('#srreview').disabled=true};
 }
 
-const APP_VER='20261021h';
+const APP_VER='20261021i';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava,sert:viewSert};
