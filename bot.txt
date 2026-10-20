@@ -66,7 +66,12 @@ async function onMessage(env,msg){
   if(msg.chat.type!=='private'&&!text.startsWith('/'))return;
   if(cmd==='/start'){
     const r=await tg(env,'sendPhoto',{chat_id:chat,photo:COVER,caption:ST,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn],...((C.extraButtons||[]).map(x=>[x.webapp?appBtn(x.text,x.webapp):{text:x.text,url:x.url}]))]}});
-    if(!r.ok) await tg(env,'sendMessage',{chat_id:chat,text:ST,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn],...((C.extraButtons||[]).map(x=>[x.webapp?appBtn(x.text,x.webapp):{text:x.text,url:x.url}]))]}});
+    let sent=r;
+    if(!r.ok) sent=await tg(env,'sendMessage',{chat_id:chat,text:ST,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn],...((C.extraButtons||[]).map(x=>[x.webapp?appBtn(x.text,x.webapp):{text:x.text,url:x.url}]))]}});
+    if(C.pinStart!==false&&msg.chat.type==='private'&&sent&&sent.ok&&sent.result){
+      await tg(env,'unpinAllChatMessages',{chat_id:chat});
+      await tg(env,'pinChatMessage',{chat_id:chat,message_id:sent.result.message_id,disable_notification:true});
+    }
     return;
   }
   if(cmd==='/namoz') return tg(env,'sendMessage',{chat_id:chat,text:namozText(0)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()});
