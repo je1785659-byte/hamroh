@@ -2509,7 +2509,7 @@ Xayrli tong|Доброе утро|Good morning
 Xayrli kun|Добрый день|Good afternoon
 Xayrli kech|Добрый вечер|Good evening
 Xayrli tun|Доброй ночи|Good night
-Assalomu alaykum!|Ассаляму алейкум!|Assalamu alaikum!
+Assalomu alaykum!|Здравствуйте!|Hello!
 Namoz vaqtlari|Время намаза|Prayer times
 Joylashuvni sozlang|Укажите местоположение|Set your location
 Namoz|Намаз|Prayer
@@ -3028,7 +3028,7 @@ function trSeg(s){
   if(m=s.match(/^([A-Za-z]+), (.+)$/)){const i=WD_UZ.indexOf(m[1]);if(i>=0)return WD[LANG][i]+', '+(trDate(m[2])||m[2])}
   if((r=WA_UZ.indexOf(s))>=0)return WA[LANG][r];
   if((r=WD_UZ.indexOf(s))>=0)return WD[LANG][r];
-  if(m=s.match(/^Assalomu alaykum, (.+)!$/))return (LANG==='ru'?'Ассаляму алейкум, ':'Assalamu alaikum, ')+m[1]+'!';
+  if(m=s.match(/^Assalomu alaykum, (.+)!$/))return (LANG==='ru'?'Здравствуйте, ':'Hello, ')+m[1]+'!';
   if(m=s.match(/^(\d+) (retsept|o'yin|savol|taom)$/))return nounT(m[1],m[2]);
   if(m=s.match(/^(\d+)-([a-z]{3})$/)){const i=MAB_UZ.indexOf(m[2]);if(i>=0)return LANG==='ru'?`${m[1]} ${MAB.ru[i]}`:`${MAB.en[i]} ${m[1]}`}
   if(m=s.match(/^(\d+)-(Muharram|Safar|Rabiul avval|Rabiul oxir|Jumodul avval|Jumodul oxir|Rajab|Sha'bon|Ramazon|Shavvol|Zulqa'da|Zulhijja)(?: (\d{4}))?$/)){
@@ -3116,7 +3116,7 @@ function langSheet(first){
     if(lc==='ru'||lc==='en')setTimeout(()=>langSheet(true),600); else store.set('lang','uz');}
 })();
 
-const APP_VER='20261021b';
+const APP_VER='20261021c';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava};
