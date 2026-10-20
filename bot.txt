@@ -60,20 +60,26 @@ Oilangiz uchun kundalik yordamchi:
 Boshlash uchun pastdagi tugmani bosing 👇
 
 Buyruqlar: /namoz · /kurs · /taom · /yordam`;
+async function sendStart(env,chat,C,pin){
+  const ST=C.start||START, kb={inline_keyboard:[[appBtn()],[shareBtn],...((C.extraButtons||[]).map(x=>[x.webapp?appBtn(x.text,x.webapp):{text:x.text,url:x.url}]))]};
+  let sent=await tg(env,'sendPhoto',{chat_id:chat,photo:COVER,caption:ST,parse_mode:'HTML',reply_markup:kb});
+  if(!sent.ok) sent=await tg(env,'sendMessage',{chat_id:chat,text:ST,parse_mode:'HTML',reply_markup:kb});
+  if(pin&&C.pinStart!==false&&sent.ok&&sent.result){
+    await tg(env,'unpinAllChatMessages',{chat_id:chat});
+    await tg(env,'pinChatMessage',{chat_id:chat,message_id:sent.result.message_id,disable_notification:true});
+  }
+  return sent;
+}
+async function handleHello(req,env){
+  let form;try{form=await req.formData()}catch(e){return J({ok:false,error:'form'},400)}
+  const user=await verifyInit(form.get('initData')||'',env.BOT_TOKEN);if(!user||!user.id)return J({ok:false,error:'auth'},403);
+  const r=await sendStart(env,user.id,await cfg(),true);return J({ok:!!r.ok,error:r.description},r.ok?200:502);
+}
 async function onMessage(env,msg){
   const C=await cfg(); const ST=C.start||START, DL=(C.dishes&&C.dishes.length)?C.dishes:DISHES;
   const chat=msg.chat.id, text=(msg.text||'').trim(), cmd=text.split(/[\s@]/)[0].toLowerCase();
   if(msg.chat.type!=='private'&&!text.startsWith('/'))return;
-  if(cmd==='/start'){
-    const r=await tg(env,'sendPhoto',{chat_id:chat,photo:COVER,caption:ST,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn],...((C.extraButtons||[]).map(x=>[x.webapp?appBtn(x.text,x.webapp):{text:x.text,url:x.url}]))]}});
-    let sent=r;
-    if(!r.ok) sent=await tg(env,'sendMessage',{chat_id:chat,text:ST,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()],[shareBtn],...((C.extraButtons||[]).map(x=>[x.webapp?appBtn(x.text,x.webapp):{text:x.text,url:x.url}]))]}});
-    if(C.pinStart!==false&&msg.chat.type==='private'&&sent&&sent.ok&&sent.result){
-      await tg(env,'unpinAllChatMessages',{chat_id:chat});
-      await tg(env,'pinChatMessage',{chat_id:chat,message_id:sent.result.message_id,disable_notification:true});
-    }
-    return;
-  }
+  if(cmd==='/start'){await sendStart(env,chat,C,msg.chat.type==='private');return}
   if(cmd==='/namoz') return tg(env,'sendMessage',{chat_id:chat,text:namozText(0)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()});
   if(cmd==='/kurs') return tg(env,'sendMessage',{chat_id:chat,text:await kursText(),parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('💱 Konvertorni ochish')]]}});
   if(cmd==='/taom'){const n=DL[Math.floor(Math.random()*DL.length)];
@@ -122,6 +128,7 @@ export default {
     const path=new URL(req.url).pathname;
     if(req.method==='OPTIONS')return new Response(null,{headers:CORS});
     if(path==='/send'&&req.method==='POST')return handleSend(req,env);
+    if(path==='/hello'&&req.method==='POST')return handleHello(req,env);
     if(req.method!=='POST') return new Response('Hamroh bot ishlayapti ✅');
     if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
     const u=await req.json().catch(()=>({}));

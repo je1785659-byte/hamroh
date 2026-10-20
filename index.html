@@ -2479,7 +2479,9 @@ function viewErtak(id){
   $('#ershare').onclick=()=>{const u=`https://t.me/share/url?url=${encodeURIComponent(BOT_LINK+'?startapp=ertak_'+e.id)}&text=${encodeURIComponent(`🌙 Uyqu oldidan ertak: «${e.t}». Farzandingizga o'qib bering!`)}`;tg&&tg.openTelegramLink?tg.openTelegramLink(u):window.open(u,'_blank')};
 }
 
-const APP_VER='20261020d';
+(function(){try{if(!(tg&&tg.initData)||store.get('pinv1',false))return;setTimeout(()=>{const fd=new FormData();fd.append('initData',tg.initData);
+  fetch(BOT_API+'/hello',{method:'POST',body:fd}).then(r=>r.json()).then(j=>{if(j&&j.ok)store.set('pinv1',true)}).catch(()=>{})},2500)}catch(e){}})();
+const APP_VER='20261020e';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava};
