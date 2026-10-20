@@ -1,0 +1,284 @@
+[
+{
+"id": "m15-1",
+"q": "Turar joy dahasida to'liq massasi 3,5 t dan ortiq yuk avtomobilini qayerda to'xtatib qo'yish mumkin?",
+"o": [
+"Yo'lka ustida",
+"Faqat belgilar va (yoki) chiziqlar bilan belgilangan joylarda",
+"Istalgan joyda",
+"Hech qayerda, faqat yuk tushirish paytida"
+],
+"a": 1,
+"iz": "Turar joy dahalarida to'liq massasi 3,5 t dan ortiq yuk avtomobillarini belgilar va (yoki) chiziqlar bilan belgilangan joylardan tashqarida to'xtatib qo'yish taqiqlanadi.",
+"src": "YHQ, 124-band"
+},
+{
+"id": "m15-2",
+"q": "Qaysi nosozlikda transport vositasini boshqarish taqiqlanadi?",
+"o": [
+"Salon chirog'i ishlamasa",
+"Ishchi tormoz tizimi yoki rul boshqaruvi nosoz bo'lsa",
+"Konditsioner ishlamasa",
+"Radio ishlamasa"
+],
+"a": 1,
+"iz": "Ishchi tormoz tizimi, rul boshqaruvi yoki shatakka olish moslamasi nosoz transport vositasini boshqarish taqiqlanadi.",
+"src": "YHQ, 12-band"
+},
+{
+"id": "m15-3",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"To'xtash taqiqlangan",
+"Eng yuqori tezlik cheklangan (40)",
+"Svetofor bilan tartibga solinadigan chorraha",
+"Quvib o'tish taqiqlangan"
+],
+"a": 0,
+"iz": "Transport vositalarining to'xtashi ham, to'xtab turishi ham taqiqlanadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "toxtash_taq"
+},
+{
+"id": "m15-4",
+"q": "Yo'lga to'siq yuzaga keltirgan shaxs nima qilishi kerak?",
+"o": [
+"Uni darhol bartaraf etishi, imkoni bo'lmasa boshqalarni ogohlantirib, IIOga xabar berishi",
+"Faqat suratga olishi",
+"Yo'ldan tezroq ketishi",
+"Hech narsa qilmasligi"
+],
+"a": 0,
+"iz": "Harakatga to'siq yuzaga keltirgan shaxs uni darhol bartaraf etishi, imkoni bo'lmasa boshqa qatnashchilarni ogohlantirishi va ichki ishlar organlariga xabar berishi shart.",
+"src": "YHQ, 4-band"
+},
+{
+"id": "m15-5",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Aylanma harakatlanish",
+"Teng ahamiyatli yo'llar kesishmasi",
+"O'ngga harakatlanish",
+"To'siqni o'ng tomondan aylanib o'tish"
+],
+"a": 0,
+"iz": "Strelkalar ko'rsatgan yo'nalishda aylanma harakatlanishga ruxsat beriladi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "aylanma"
+},
+{
+"id": "m15-6",
+"q": "Tezlanish qatori bo'lgan yo'lga chiqishda haydovchi nima qiladi?",
+"o": [
+"To'g'ridan-to'g'ri chap qatorga chiqadi",
+"Ovozli signal berib qo'shiladi",
+"Tezlanish qatori bo'ylab harakatlanib, qo'shni qatordagilarga yo'l berib oqimga qo'shiladi",
+"Tezlanish qatorida to'xtaydi"
+],
+"a": 2,
+"iz": "Chiqish joyida tezlanish qatori bo'lsa, haydovchi u bo'ylab harakatlanishi va qo'shni qatordagi transport vositalariga yo'l berib, oqimga qo'shilishi kerak.",
+"src": "YHQ, 61-band"
+},
+{
+"id": "m15-7",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Avtobus va (yoki) trolleybus bekati",
+"Bolalar",
+"Boshqa xavflar",
+"Teng ahamiyatli yo'llar kesishmasi"
+],
+"a": 3,
+"iz": "Oldinda teng ahamiyatli yo'llar kesishmasi: o'ng tomondan kelayotgan transportga yo'l bering.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "teng_kesishma"
+},
+{
+"id": "m15-8",
+"q": "Qayerda transport vositalarini yo'lka chetiga qo'yib to'xtab turishga ruxsat etiladi?",
+"o": [
+"Har qanday yo'lkada, barcha transport vositalariga",
+"Hech qayerda",
+"5.15 belgisi tegishli qo'shimcha belgilar bilan o'rnatilgan joylarda, faqat yengil avtomobil va mototsikllarga",
+"Faqat yuk avtomobillariga"
+],
+"a": 2,
+"iz": "Yo'lkaning qatnov qismiga tutash chetida faqat 5.15 belgisi tegishli qo'shimcha belgilar bilan o'rnatilgan joylarda yengil avtomobillar, mototsikllar, mopedlar va velosipedlar to'xtab turishi mumkin.",
+"src": "YHQ, 89-band"
+},
+{
+"id": "m15-9",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"To'xtab turish taqiqlangan",
+"Piyodalar o'tish joyi (ogohlantiruvchi)",
+"Yo'lning torayishi",
+"Ikki tomonlama harakat"
+],
+"a": 3,
+"iz": "Bir tomonlama harakatli yo'ldan (qatnov qismidan) qarama-qarshi harakatli yo'l qismi boshlanadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "ikki_tomon"
+},
+{
+"id": "m15-10",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"O'ngga burilish taqiqlangan",
+"To'g'riga yoki o'ngga harakatlanish",
+"To'siqni o'ng tomondan aylanib o'tish",
+"Chapga harakatlanish"
+],
+"a": 1,
+"iz": "Faqat to'g'riga yoki o'ngga harakatlanishga ruxsat beriladi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "togri_ong"
+},
+{
+"id": "m15-11",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Asosiy yo'l",
+"To'g'riga yoki o'ngga harakatlanish",
+"O'ngga harakatlanish",
+"Aylanma harakatlanish"
+],
+"a": 2,
+"iz": "Faqat o'ngga burilishga ruxsat beriladi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "ongga"
+},
+{
+"id": "m15-12",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"To'xtab turish taqiqlangan",
+"Quvib o'tish taqiqlangan",
+"Sun'iy notekislik",
+"Barcha cheklovlar ta'sir oralig'ining oxiri"
+],
+"a": 0,
+"iz": "To'xtab turish taqiqlanadi. Yo'lovchini chiqarish yoki tushirish uchun qisqa to'xtashga ruxsat beriladi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "turish_taq"
+},
+{
+"id": "m15-13",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Berk ko'cha",
+"Aholi punktining boshlanishi",
+"Piyodalar harakatlanishi taqiqlangan",
+"To'xtab turish joyi"
+],
+"a": 0,
+"iz": "Oldindagi yo'lda o'tish joyi yo'q (berk ko'cha).",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "berk"
+},
+{
+"id": "m15-14",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Xavfli burilish (o'ngga)",
+"Chapga burilish taqiqlangan",
+"Kirish taqiqlangan",
+"To'xtash taqiqlangan"
+],
+"a": 1,
+"iz": "Belgi o'rnatilgan chorrahada chapga burilish taqiqlanadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "chap_taq"
+},
+{
+"id": "m15-15",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Aholi punktining boshlanishi",
+"Harakatlanish taqiqlangan",
+"Piyodalar o'tish joyi",
+"To'xtab turish joyi"
+],
+"a": 2,
+"iz": "Shu yerda piyodalar o'tish joyi joylashgan: piyodalarga yo'l berish shart.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "piyoda_otish"
+},
+{
+"id": "m15-16",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Piyodalar o'tish joyi",
+"Avtobus va (yoki) trolleybus bekati",
+"Qayrilib olish taqiqlangan",
+"To'xtab turish joyi"
+],
+"a": 3,
+"iz": "Transport vositalari to'xtab turishi uchun ajratilgan joy.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "parking"
+},
+{
+"id": "m15-17",
+"q": "Yo'nalishli transport vositalari uchun ajratilgan qatorda (5.9 belgisi) boshqa transport vositalariga nima taqiqlanadi?",
+"o": [
+"Harakatlanish va to'xtash",
+"Faqat kechasi harakatlanish",
+"Faqat yo'lovchi tushirish",
+"Hech narsa taqiqlanmaydi"
+],
+"a": 0,
+"iz": "5.9 yoki 5.10.1–5.10.3 belgilari bilan belgilangan yo'nalishli transport vositalari qatorida boshqa transport vositalarining harakatlanishi va to'xtashi taqiqlanadi.",
+"src": "YHQ, 132-band"
+},
+{
+"id": "m15-18",
+"q": "Burilish ko'rsatkichini yoqishdan oldin haydovchi nimaga ishonch hosil qilishi kerak?",
+"o": [
+"Ishora orqadan kelayotgan va quvib o'tayotgan transport vositalariga xalal bermasligiga",
+"Yo'lda piyodalar yo'qligiga",
+"Radio o'chiqligiga",
+"Hech narsaga"
+],
+"a": 0,
+"iz": "Yo'nalishni o'zgartirish ishorasini berishdan oldin haydovchi u orqadan kelayotgan, quvib o'tayotgan transport vositalari va boshqa qatnashchilarga xalal bermasligiga ishonch hosil qilishi kerak.",
+"src": "YHQ, 47-band"
+},
+{
+"id": "m15-19",
+"q": "Avariya yorug'lik signalizatsiyasi ishlamasa, to'satdan to'xtaganda nima qilish kerak?",
+"o": [
+"Faqat gabarit chiroqlarni yoqish",
+"Ovozli signal berib turish",
+"Hech narsa qilmaslik",
+"Darhol avariya to'xtash belgisini qo'yish"
+],
+"a": 3,
+"iz": "Avariya yorug'lik signalizatsiyasi nosoz yoki yo'q bo'lsa, haydovchi darhol avariya to'xtash belgisini qo'yishi kerak.",
+"src": "YHQ, 51-band"
+},
+{
+"id": "m15-20",
+"q": "Qanday holatda haydovchi o'ziga tegishli bo'lmagan transport vositasini uning egasi yo'qligida boshqarishi mumkin?",
+"o": [
+"Hech qachon",
+"Egasining og'zaki ruxsati bilan har doim",
+"Notarial ishonchnoma bo'lsa yoki u sug'urta polisiga kiritilgan bo'lsa",
+"Faqat aholi punktidan tashqarida"
+],
+"a": 2,
+"iz": "Boshqa shaxsning transport vositasini egasining ishtirokisiz boshqarish uchun notarial ishonchnoma kerak, sug'urta polisi cheklanmagan haydovchilar uchun bo'lsa yoki haydovchi unga kiritilgan bo'lsa bundan mustasno.",
+"src": "YHQ, 8-band"
+}
+]

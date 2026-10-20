@@ -1,0 +1,292 @@
+[
+{
+"id": "m13-1",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Barcha cheklovlar ta'sir oralig'ining oxiri",
+"Harakatlanish taqiqlangan",
+"To'g'riga yoki chapga harakatlanish",
+"Chapga burilish taqiqlangan"
+],
+"a": 1,
+"iz": "Barcha transport vositalarining harakatlanishi taqiqlanadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "harakat_taq"
+},
+{
+"id": "m13-2",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Harakatlanish taqiqlangan",
+"Eng yuqori tezlik cheklangan (40)",
+"Piyodalar yo'lkasi",
+"Piyodalar harakatlanishi taqiqlangan"
+],
+"a": 1,
+"iz": "Belgida ko'rsatilgan tezlikdan — soatiga 40 km dan oshiq tezlikda harakatlanish taqiqlanadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "tezlik40"
+},
+{
+"id": "m13-3",
+"q": "Burilish ko'rsatkichi ishorasi qachon berilishi va to'xtatilishi kerak?",
+"o": [
+"Faqat chorraha o'rtasida beriladi",
+"Manyovr paytida berilib, 10 soniyadan keyin to'xtatiladi",
+"Manyovrdan keyin beriladi",
+"Manyovrdan oldin o'z vaqtida berilib, u tugashi bilan darhol to'xtatiladi"
+],
+"a": 3,
+"iz": "Ishora harakat boshlanishidan oldin o'z vaqtida berilishi va manyovr tugashi bilan darhol to'xtatilishi kerak. Qo'l bilan berilgan ishora manyovr oldidan to'xtatilishi mumkin.",
+"src": "YHQ, 46-band"
+},
+{
+"id": "m13-4",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Asosiy yo'lning oxiri",
+"To'xtamasdan harakatlanish taqiqlanadi",
+"Asosiy yo'l",
+"Piyodalar o'tish joyi"
+],
+"a": 2,
+"iz": "Siz asosiy yo'ldasiz: tartibga solinmagan chorrahalardan birinchi bo'lib o'tish huquqiga egasiz.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "asosiy"
+},
+{
+"id": "m13-5",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Asosiy yo'lning oxiri",
+"Asosiy yo'l",
+"To'xtamasdan harakatlanish taqiqlanadi",
+"O'ngga harakatlanish"
+],
+"a": 0,
+"iz": "Asosiy yo'l tugaydi: bundan keyin imtiyoz huquqi bekor bo'ladi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "asosiy_oxiri"
+},
+{
+"id": "m13-6",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Kirish taqiqlangan",
+"Qayrilib olish taqiqlangan",
+"O'ngga harakatlanish",
+"Eng yuqori tezlik cheklangan (60)"
+],
+"a": 0,
+"iz": "Shu yo'nalishda barcha transport vositalarining kirishi taqiqlanadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "kirish_taq"
+},
+{
+"id": "m13-7",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Ikkinchi darajali yo'l bilan kesishma",
+"Asosiy yo'l",
+"Harakatlanish taqiqlangan",
+"Yo'l bering"
+],
+"a": 3,
+"iz": "Kesib o'tilayotgan yo'ldagi transport vositalariga, asosiy yo'l bo'lsa — unda harakatlanayotganlarga yo'l berish kerak.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "yol_ber"
+},
+{
+"id": "m13-8",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Aylanma harakatli chorraha",
+"Xavfli burilish (chapga)",
+"Piyodalar o'tish joyi",
+"Xavfli burilish (o'ngga)"
+],
+"a": 3,
+"iz": "Oldinda ko'rinish cheklangan, o'ngga xavfli burilish bor.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "burilish_ong"
+},
+{
+"id": "m13-9",
+"q": "Old o'rindiqda bolani qanday tashish mumkin?",
+"o": [
+"Faqat maxsus ushlab turuvchi qurilmalardan foydalanib",
+"Xavfsizlik kamarisiz, agar u 10 yoshdan katta bo'lsa",
+"Kattalar tizzasida",
+"Har qanday holatda tashish mumkin"
+],
+"a": 0,
+"iz": "Yengil avtomobilning old o'rindig'ida bolalarni maxsus ushlab turuvchi qurilmalarsiz tashish taqiqlanadi.",
+"src": "YHQ, 159-band"
+},
+{
+"id": "m13-10",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Piyodalar o'tish joyi (ogohlantiruvchi)",
+"Eng yuqori tezlik cheklangan (60)",
+"Piyodalar harakatlanishi taqiqlangan",
+"Qayrilib olish taqiqlangan"
+],
+"a": 3,
+"iz": "Belgi ta'sir oralig'ida qayrilib olish taqiqlanadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "qayrilish_taq"
+},
+{
+"id": "m13-11",
+"q": "Yo'l harakati qatnashchilariga nima taqiqlanadi?",
+"o": [
+"Tartibga soluvchi ishoralariga amal qilish",
+"Yo'lga to'siq qo'yish va yo'l belgilarini o'zboshimchalik bilan o'zgartirish",
+"Yo'l belgilariga amal qilish",
+"Svetofor ishoralariga amal qilish"
+],
+"a": 1,
+"iz": "Yo'l harakati qatnashchilari boshqalarga to'sqinlik qilmasligi va xavf tug'dirmasligi kerak. Yo'lga to'siq qo'yish, yo'l belgilari va texnik vositalarni o'zboshimchalik bilan o'zgartirish taqiqlanadi.",
+"src": "YHQ, 4-band"
+},
+{
+"id": "m13-12",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Chapga harakatlanish",
+"To'g'riga harakatlanish",
+"To'siqni o'ng tomondan aylanib o'tish",
+"Avtobus va (yoki) trolleybus bekati"
+],
+"a": 1,
+"iz": "Faqat to'g'riga harakatlanishga ruxsat beriladi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "togri"
+},
+{
+"id": "m13-13",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Asosiy yo'lning oxiri",
+"Ovozli signal berish taqiqlangan",
+"Qayrilib olish taqiqlangan",
+"Barcha cheklovlar ta'sir oralig'ining oxiri"
+],
+"a": 3,
+"iz": "Bir nechta taqiqlovchi belgilar (tezlik, quvib o'tish va boshqalar) ta'siri shu yerda tugaydi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "cheklov_oxiri"
+},
+{
+"id": "m13-14",
+"q": "Turar joy dahasidagi qoidalar yana qayerda amal qiladi?",
+"o": [
+"Shaharlararo yo'llarda",
+"Temir yo'l kesishmalarida",
+"Turar joy binolari orasidagi hovlilarda",
+"Avtomagistrallarda"
+],
+"a": 2,
+"iz": "Turar joy dahalari bo'yicha talablar turar joy binolari hovlilariga, ya'ni binolar orasidagi hududlarga ham tatbiq etiladi.",
+"src": "YHQ, 127-band"
+},
+{
+"id": "m13-15",
+"q": "Ko'priklar, estakadalar ostida qayrilib olishga ruxsat etiladimi?",
+"o": [
+"Ha, kechasi",
+"Ha, uch qatorli yo'lda",
+"Ha, har doim ruxsat etiladi",
+"Yo'q, belgilar ruxsat bermasa taqiqlanadi"
+],
+"a": 3,
+"iz": "Ko'priklar, yo'l o'tkazgichlar, estakadalarda va ularning ostida (belgilar ruxsat bermasa) qayrilib olish taqiqlanadi.",
+"src": "YHQ, 62-band"
+},
+{
+"id": "m13-16",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Ikkinchi darajali yo'l bilan kesishma",
+"Ikki tomonlama harakat",
+"Boshqa xavflar",
+"Sun'iy notekislik"
+],
+"a": 3,
+"iz": "Oldinda tezlikni majburan kamaytirish uchun qilingan sun'iy notekislik (\"lejachiy\") bor.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "notekislik"
+},
+{
+"id": "m13-17",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Harakatlanish taqiqlangan",
+"Yo'l bering",
+"Ovozli signal berish taqiqlangan",
+"Quvib o'tish taqiqlangan"
+],
+"a": 3,
+"iz": "Belgi ta'sir oralig'ida transport vositalarini quvib o'tish taqiqlanadi (istisnolar qoidalarda ko'rsatilgan).",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "quvib_taq"
+},
+{
+"id": "m13-18",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"To'xtab turish taqiqlangan",
+"Yo'lning torayishi",
+"Aylanma harakatli chorraha",
+"Xavfli burilish (o'ngga)"
+],
+"a": 2,
+"iz": "Oldinda aylanma harakat tashkil etilgan chorraha bor.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "aylanma_ogoh"
+},
+{
+"id": "m13-19",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Piyodalar yo'lkasi",
+"Chapga harakatlanish",
+"To'siqni o'ng tomondan aylanib o'tish",
+"Asosiy yo'l"
+],
+"a": 1,
+"iz": "Faqat chapga burilishga ruxsat beriladi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "chapga"
+},
+{
+"id": "m13-20",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"To'g'riga harakatlanish",
+"Shlagbaumli temir yo'l kesishmasi",
+"Piyodalar o'tish joyi (ogohlantiruvchi)",
+"Sun'iy notekislik"
+],
+"a": 2,
+"iz": "Oldinda piyodalar o'tish joyi bor. Tezlikni kamaytiring va piyodalarga yo'l berishga tayyor turing.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "piyoda_ogoh"
+}
+]

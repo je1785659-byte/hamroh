@@ -1,0 +1,262 @@
+[
+{
+"id": "m12-1",
+"q": "Qorong'ida yo'l chetida nosozlikni tuzatish uchun qatnov qismiga chiqayotgan haydovchi nima kiyishi kerak?",
+"o": [
+"Maxsus kiyim talab etilmaydi",
+"Qizil kiyim",
+"Yorituvchi (nur qaytaruvchi) nimcha",
+"Dubulg'a"
+],
+"a": 2,
+"iz": "Qorong'ida yoki yetarlicha ko'rinmaslik sharoitida yo'l chetida ta'mirlash uchun qatnov qismiga chiqishdan oldin haydovchi yorituvchi nimcha kiyishi kerak.",
+"src": "YHQ, 11-band"
+},
+{
+"id": "m12-2",
+"q": "Tunnellarda to'xtashga ruxsat etiladimi?",
+"o": [
+"Ha, o'ng chetda",
+"Ha, 10 daqiqagacha",
+"Ha, avariya chirog'i bilan",
+"Yo'q, taqiqlanadi"
+],
+"a": 3,
+"iz": "Tunnellarda to'xtash taqiqlanadi.",
+"src": "YHQ, 91-band"
+},
+{
+"id": "m12-3",
+"q": "Aholi punktlarida haydovchilar kimga yo'l berishi shart?",
+"o": [
+"Hech kimga",
+"Orqadan kelayotgan mototsikllarga",
+"To'xtab turgan yuk avtomobillariga",
+"Belgilangan to'xtash joyidan harakatlanishni boshlayotgan avtobus va trolleybuslarga"
+],
+"a": 3,
+"iz": "Aholi punktlarida haydovchilar belgilangan to'xtash joyidan harakatlanishni boshlayotgan avtobus va trolleybuslarga yo'l berishi shart.",
+"src": "YHQ, 133-band"
+},
+{
+"id": "m12-4",
+"q": "Yo'lovchilar transport vositasiga qanday chiqishi va tushishi kerak?",
+"o": [
+"Harakat sekinlashganda, istalgan tomondan",
+"Faqat qatnov qismi tomonidan",
+"Svetoforda to'xtaganda, istalgan tomondan",
+"U to'liq to'xtagandan keyin, yo'lka yoki yo'l yoqasi tomonidan"
+],
+"a": 3,
+"iz": "Yo'lovchilar transport vositasiga faqat u to'liq to'xtagandan keyin, yo'lka yoki yo'l yoqasi tomonidan chiqishi va tushishi kerak.",
+"src": "YHQ, 23-band"
+},
+{
+"id": "m12-5",
+"q": "Qorong'ida yoritilmagan yo'lda to'xtagan yoki to'xtab turgan transport vositasida qaysi chiroqlar yoqilishi kerak?",
+"o": [
+"Uzoq chiroq",
+"Hech qanday chiroq kerak emas",
+"Faqat ichki chiroq",
+"Gabarit chiroqlar"
+],
+"a": 3,
+"iz": "Qorong'ida yoritilmagan yo'l qismlarida va yetarlicha ko'rinmaslik sharoitida to'xtagan yoki to'xtab turgan transport vositasida gabarit chiroqlar yoqilishi kerak.",
+"src": "YHQ, 136-band"
+},
+{
+"id": "m12-6",
+"q": "Shatakka olayotgan transport vositasida kunduzi qaysi chiroq yoqilishi kerak?",
+"o": [
+"Yaqin chiroq",
+"Hech qanday chiroq",
+"Orqa tumanga qarshi chiroq",
+"Uzoq chiroq"
+],
+"a": 0,
+"iz": "Mexanik transport vositasini shatakka olayotgan transport vositasida kunduzi ham yaqin chiroq yoqilishi kerak.",
+"src": "YHQ, 138-band"
+},
+{
+"id": "m12-7",
+"q": "Qanday holatda yuk tashishga ruxsat etilmaydi?",
+"o": [
+"Yuk tashqi yoritish asboblari va davlat raqam belgilarini to'sib qo'ysa",
+"Yuk kabinadan past bo'lsa",
+"Yuk brezent bilan yopilgan bo'lsa",
+"Yuk ishonchli mahkamlangan bo'lsa"
+],
+"a": 0,
+"iz": "Yuk haydovchining ko'rishini cheklasa, boshqarishni qiyinlashtirsa, tashqi yoritish asboblari, nur qaytargichlar, raqam va taniqlik belgilarini to'sib qo'ysa, shovqin yoki chang chiqarsa, tashishga ruxsat etilmaydi.",
+"src": "YHQ, 162-band"
+},
+{
+"id": "m12-8",
+"q": "Temir yo'l kesishmasiga yaqinlashganda haydovchi nimalarga amal qilishi kerak?",
+"o": [
+"Navbatchi ko'rsatmalari, svetofor, belgilar, chiziqlar va shlagbaum holatiga",
+"Faqat svetofor ishorasiga",
+"Faqat o'z tajribasiga",
+"Faqat poezd ovoziga"
+],
+"a": 0,
+"iz": "Kesishmaga yaqinlashgan haydovchi kesishma navbatchisining ko'rsatmalari, svetofor ishoralari, belgilar, chiziqlar va shlagbaum holatiga amal qilishi, poezd yaqinlashmayotganiga ishonch hosil qilishi kerak.",
+"src": "YHQ, 117-band"
+},
+{
+"id": "m12-9",
+"q": "\"A\" toifasidagi transport vositasini boshqarish huquqini necha yoshdan olish mumkin?",
+"o": [
+"18 yoshdan",
+"14 yoshdan",
+"17 yoshdan",
+"16 yoshdan"
+],
+"a": 3,
+"iz": "\"A\" toifasi bo'yicha boshqarish huquqi 16 yoshdan beriladi.",
+"src": "YHQ, 149-band"
+},
+{
+"id": "m12-10",
+"q": "Yo'nalishli transport vositalariga belgilangan to'xtash joylaridan tashqarida yo'lovchi chiqarish-tushirishga ruxsat etiladimi?",
+"o": [
+"Ha, faqat aholi punktidan tashqarida",
+"Ha, faqat kechasi",
+"Ha, istalgan joyda",
+"Yo'q, yo'nalishli taksilar bundan mustasno"
+],
+"a": 3,
+"iz": "Yo'nalishli transport vositalariga belgilangan to'xtash joylaridan tashqarida yo'lovchi chiqarish va tushirish taqiqlanadi (yo'nalishli taksilar bundan mustasno).",
+"src": "YHQ, 133-band"
+},
+{
+"id": "m12-11",
+"q": "Haydovchi militsiya xodimi talabiga ko'ra qanday tekshiruvdan o'tishi shart?",
+"o": [
+"Alkogol va giyohvandlik holatiga tekshiruvdan",
+"Faqat guvohnoma tekshiruvidan",
+"Hech qanday tekshiruvdan o'tishi shart emas",
+"Faqat ko'rish qobiliyatini tekshiruvdan"
+],
+"a": 0,
+"iz": "Haydovchi ichki ishlar organlari xodimlarining talabiga ko'ra alkogol va giyohvandlik holatiga, shuningdek tibbiy tekshiruvdan o'tishi shart.",
+"src": "YHQ, 11-band"
+},
+{
+"id": "m12-12",
+"q": "Necha yoshdan boshlab yo'llarda velosiped haydashga ruxsat etiladi?",
+"o": [
+"10 yoshdan",
+"14 yoshdan",
+"16 yoshdan",
+"12 yoshdan"
+],
+"a": 1,
+"iz": "Yo'llarda velosiped, shaxsiy harakatlanish vositasi, arava boshqarish va hayvonlarni yetaklash 14 yoshdan ruxsat etiladi.",
+"src": "YHQ, 165-band"
+},
+{
+"id": "m12-13",
+"q": "Yo'lovchilarga nima taqiqlanadi?",
+"o": [
+"Haydovchidan to'xtashni so'rash",
+"Xavfsizlik kamarini taqish",
+"To'xtagandan keyin yo'lka tomondan tushish",
+"Harakat paytida eshiklarni ochish"
+],
+"a": 3,
+"iz": "Yo'lovchilarga haydovchini chalg'itish, harakatlanayotgan yuk avtomobili kuzovida tik turish, harakat paytida eshiklarni ochish taqiqlanadi.",
+"src": "YHQ, 24-band"
+},
+{
+"id": "m12-14",
+"q": "O'quv transport vositasida nima bo'lishi shart?",
+"o": [
+"Faqat \"O'quv transport vositasi\" yozuvi",
+"Maxsus rangdagi kuzov",
+"Instruktor uchun qo'shimcha tormoz va ilashish pedallari",
+"Qo'shimcha rul"
+],
+"a": 2,
+"iz": "O'quv transport vositasida \"O'quv transport vositasi\" taniqlik belgisi, instruktor uchun qo'shimcha tormoz va ilashish pedallari, qo'shimcha ko'zgu va GPS-monitoring bo'lishi shart.",
+"src": "YHQ, 150-band"
+},
+{
+"id": "m12-15",
+"q": "Ko'k miltillovchi chiroq va maxsus ovozli ishora yoqilgan tezkor xizmat transport vositasining haydovchisi baribir nimaga amal qilishi shart?",
+"o": [
+"Yo'l belgilariga",
+"Tartibga soluvchining ishoralariga",
+"Quvib o'tish qoidalariga",
+"Tezlik cheklovlariga"
+],
+"a": 1,
+"iz": "Tezkor va maxsus xizmat transport vositalari xavfsizlikni ta'minlagan holda ko'plab qoidalardan chetga chiqishi mumkin, lekin tartibga soluvchining ishoralariga amal qilishi shart.",
+"src": "YHQ, 25-band"
+},
+{
+"id": "m12-16",
+"q": "Yo'lda haydashni o'rgatishga qachon ruxsat etiladi?",
+"o": [
+"Faqat 18 yoshdan keyin, instruktorsiz",
+"Faqat kechasi",
+"O'quvchi xohlagan vaqtda, yolg'iz",
+"O'quvchida dastlabki boshqarish ko'nikmalari bo'lsa va instruktor ishtirokida"
+],
+"a": 3,
+"iz": "Yo'lda haydashni o'rgatish faqat dastlabki boshqarish ko'nikmalariga ega o'quvchi bilan va haydovchilik instruktori ishtirokida ruxsat etiladi.",
+"src": "YHQ, 147-band"
+},
+{
+"id": "m12-17",
+"q": "Hayvonlarni haydashda nima taqiqlanadi?",
+"o": [
+"Hayvonlarni yo'l yoqasi bo'ylab haydash",
+"Hayvonlarni kunduzi haydash",
+"Hayvonlarni guruhlarga bo'lish",
+"Hayvonlarni yo'lda nazoratsiz qoldirish"
+],
+"a": 3,
+"iz": "Hayvonlarni yo'lda nazoratsiz qoldirish, ruxsat etilmagan joylarda va kechasi yo'l orqali haydash taqiqlanadi.",
+"src": "YHQ, 173-band"
+},
+{
+"id": "m12-18",
+"q": "Velosipedchiga qayerda chapga burilish yoki qayrilib olish taqiqlanadi?",
+"o": [
+"Faqat bir tomonlama yo'llarda",
+"Tramvay harakatlanadigan va shu yo'nalishda bittadan ortiq qatorli yo'llarda",
+"Faqat hovlilarda",
+"Har qanday chorrahada"
+],
+"a": 1,
+"iz": "Velosipedchilarga tramvay harakatlanadigan yo'llarda va shu yo'nalishda bittadan ortiq qatori bo'lgan yo'llarda chapga burilish va qayrilib olish taqiqlanadi.",
+"src": "YHQ, 168-band"
+},
+{
+"id": "m12-19",
+"q": "Temir yo'l kesishmalarida to'xtashga ruxsat etiladimi?",
+"o": [
+"Ha, poezd bo'lmasa",
+"Yo'q, taqiqlanadi",
+"Ha, 5 daqiqagacha",
+"Ha, shlagbaum ochiq bo'lsa"
+],
+"a": 1,
+"iz": "Temir yo'l kesishmalarida to'xtash taqiqlanadi.",
+"src": "YHQ, 91-band"
+},
+{
+"id": "m12-20",
+"q": "Qatnov qismi qayrilib olish uchun tor bo'lsa, haydovchi qanday qayrilib olishi mumkin?",
+"o": [
+"Orqaga harakatlanib, chorrahada",
+"O'ng chetdan yoki yo'l yoqasidan, ikkala yo'nalishdagi transportga yo'l berib",
+"Chap chetdan, hech kimga yo'l bermasdan",
+"Qayrilib olish taqiqlanadi"
+],
+"a": 1,
+"iz": "Qatnov qismi chetki chap holatdan qayrilib olish uchun tor bo'lsa, uni o'ng chetdan yoki yo'l yoqasidan bajarish mumkin. Bunda bir yo'nalishdagi va qarama-qarshi yo'nalishdagi transportga yo'l beriladi.",
+"src": "YHQ, 59-band"
+}
+]

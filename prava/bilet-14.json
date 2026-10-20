@@ -1,0 +1,290 @@
+[
+{
+"id": "m14-1",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Piyodalar harakatlanishi taqiqlangan",
+"O'ngga burilish taqiqlangan",
+"Xavfli burilish (o'ngga)",
+"Qayrilib olish taqiqlangan"
+],
+"a": 0,
+"iz": "Piyodalarning harakatlanishi taqiqlanadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "piyoda_taq"
+},
+{
+"id": "m14-2",
+"q": "Avtomagistralda qayerda to'xtashga ruxsat etiladi?",
+"o": [
+"Chetki chap qatorda",
+"Ajratuvchi bo'lakdagi uzilishlarda",
+"Faqat 5.15 yoki 6.11 belgilari bilan belgilangan joylarda",
+"Yo'l yoqasining istalgan joyida"
+],
+"a": 2,
+"iz": "Avtomagistralda 5.15 yoki 6.11 belgilari bilan belgilangan maxsus joylardan tashqarida to'xtash taqiqlanadi.",
+"src": "YHQ, 121-band"
+},
+{
+"id": "m14-3",
+"q": "Shatakka olinayotgan, avariya signalizatsiyasi ishlamaydigan mexanik transport vositasining qayeriga avariya to'xtash belgisi o'rnatiladi?",
+"o": [
+"Orqa tomoniga",
+"Tomiga",
+"Old tomoniga",
+"Belgi o'rnatilmaydi"
+],
+"a": 0,
+"iz": "Avariya yorug'lik signalizatsiyasi yo'q yoki nosoz shatakka olinayotgan mexanik transport vositasining orqa tomoniga avariya to'xtash belgisi o'rnatiladi.",
+"src": "YHQ, 52-band"
+},
+{
+"id": "m14-4",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"To'xtash taqiqlangan",
+"Xavfli burilish (chapga)",
+"Sun'iy notekislik",
+"Shlagbaumli temir yo'l kesishmasi"
+],
+"a": 1,
+"iz": "Oldinda ko'rinish cheklangan, chapga xavfli burilish bor.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "burilish_chap"
+},
+{
+"id": "m14-5",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Piyodalar o'tish joyi",
+"Bir tomonlama harakatli yo'l",
+"To'xtab turish joyi",
+"To'xtab turish taqiqlangan"
+],
+"a": 1,
+"iz": "Yo'lning butun kengligi bo'ylab transport bir yo'nalishda harakatlanadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "bir_tomon"
+},
+{
+"id": "m14-6",
+"q": "O'zbekistonda transport vositalari yo'lning qaysi tomonidan harakatlanadi?",
+"o": [
+"Belgilarga qarab istalgan tomondan",
+"O'ng tomonidan",
+"Yo'lning o'rtasidan",
+"Chap tomonidan"
+],
+"a": 1,
+"iz": "O'zbekiston Respublikasi yo'llarida transport vositalarining o'ng tomonlama harakatlanish tartibi belgilangan.",
+"src": "YHQ, 2-band"
+},
+{
+"id": "m14-7",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"To'siqni o'ng tomondan aylanib o'tish",
+"Chapga harakatlanish",
+"Piyodalar yo'lkasi",
+"Piyodalar harakatlanishi taqiqlangan"
+],
+"a": 2,
+"iz": "Faqat piyodalar harakatlanishiga ruxsat beriladi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "piyoda_yolka"
+},
+{
+"id": "m14-8",
+"q": "Ovozli signal o'rniga qanday ogohlantiruvchi ishora berish mumkin?",
+"o": [
+"Qo'l silkitish",
+"Avariya chirog'ini yoqish",
+"Tormoz chirog'ini yoqish",
+"Faralarni miltillatish"
+],
+"a": 3,
+"iz": "Ovozli signal o'rniga yoki u bilan birga faralarni miltillatib ogohlantiruvchi ishora berish mumkin.",
+"src": "YHQ, 49-band"
+},
+{
+"id": "m14-9",
+"q": "Avtomagistralda haydashni o'rgatishga ruxsat etiladimi?",
+"o": [
+"Yo'q, taqiqlanadi",
+"Ha, instruktor bo'lsa",
+"Ha, o'ng qatorda",
+"Ha, kunduzi"
+],
+"a": 0,
+"iz": "Avtomagistralda haydashni o'rgatish taqiqlanadi.",
+"src": "YHQ, 121-band"
+},
+{
+"id": "m14-10",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Berk ko'cha",
+"Shlagbaumli temir yo'l kesishmasi",
+"Yo'lning torayishi",
+"Ikki tomonlama harakat"
+],
+"a": 1,
+"iz": "Oldinda shlagbaum bilan jihozlangan temir yo'l kesishmasi bor.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "shlagbaum"
+},
+{
+"id": "m14-11",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Harakatlanish taqiqlangan",
+"Boshqa xavflar",
+"Xavfli burilish (chapga)",
+"Bolalar"
+],
+"a": 3,
+"iz": "Bolalar muassasalari (maktab, bog'cha, oromgoh) yaqinidagi yo'l qismi: bolalar yo'lga to'satdan chiqib qolishi mumkin.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "bolalar"
+},
+{
+"id": "m14-12",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"To'g'riga yoki chapga harakatlanish",
+"To'siqni o'ng tomondan aylanib o'tish",
+"Piyodalar yo'lkasi",
+"Ovozli signal berish taqiqlangan"
+],
+"a": 1,
+"iz": "To'siqni (orolcha, ajratuvchi bo'lak) faqat o'ng tomondan aylanib o'tishga ruxsat beriladi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "aylanib_ong"
+},
+{
+"id": "m14-13",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Svetofor bilan tartibga solinadigan chorraha",
+"Boshqa xavflar",
+"Ovozli signal berish taqiqlangan",
+"Bolalar"
+],
+"a": 0,
+"iz": "Oldinda harakat svetofor bilan boshqariladigan chorraha, piyodalar o'tish joyi yoki yo'l qismi bor.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "svetofor"
+},
+{
+"id": "m14-14",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Bolalar",
+"Ovozli signal berish taqiqlangan",
+"Yo'lning torayishi",
+"Boshqa xavflar"
+],
+"a": 2,
+"iz": "Oldinda yo'l ikki tomondan torayadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "torayish"
+},
+{
+"id": "m14-15",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Yo'l bering",
+"To'g'riga harakatlanish",
+"Asosiy yo'lning oxiri",
+"To'xtamasdan harakatlanish taqiqlanadi"
+],
+"a": 3,
+"iz": "To'xtash chizig'i oldida, u bo'lmasa — kesishma chegarasida albatta to'xtab, kesib o'tilayotgan yo'ldagi transportga yo'l berish shart.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "stop"
+},
+{
+"id": "m14-16",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"O'ngga burilish taqiqlangan",
+"Eng yuqori tezlik cheklangan (60)",
+"Yo'l bering",
+"Piyodalar harakatlanishi taqiqlangan"
+],
+"a": 0,
+"iz": "Belgi o'rnatilgan chorrahada o'ngga burilish taqiqlanadi.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "ong_taq"
+},
+{
+"id": "m14-17",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Boshqa xavflar",
+"Svetofor bilan tartibga solinadigan chorraha",
+"Sun'iy notekislik",
+"Piyodalar yo'lkasi"
+],
+"a": 0,
+"iz": "Boshqa ogohlantiruvchi belgilar bilan ko'rsatilmagan xavfli yo'l qismi bor.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "boshqa_xavf"
+},
+{
+"id": "m14-18",
+"q": "Orqaga harakatlanishda haydovchi nima qilishi kerak?",
+"o": [
+"Tezlikni oshirishi",
+"Ko'zgularga qaramasligi",
+"Xavfsiz va boshqalarga xalal bermasdan bajarishi, zarur bo'lsa boshqa shaxslar yordamidan foydalanishi",
+"Faqat ovozli signal berib harakatlanishi"
+],
+"a": 2,
+"iz": "Orqaga harakatlanish xavfsiz va boshqa qatnashchilarga xalal bermasdan, zarur bo'lsa boshqa shaxslar yordamida bajarilishi kerak.",
+"src": "YHQ, 63-band"
+},
+{
+"id": "m14-19",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Quvib o'tish taqiqlangan",
+"Ovozli signal berish taqiqlangan",
+"Avtobus va (yoki) trolleybus bekati",
+"O'ngga burilish taqiqlangan"
+],
+"a": 1,
+"iz": "Ovozli signal berish taqiqlanadi (yo'l-transport hodisasining oldini olish holati bundan mustasno).",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "signal_taq"
+},
+{
+"id": "m14-20",
+"q": "Bu belgi nimani bildiradi?",
+"o": [
+"Asosiy yo'l",
+"Ikkinchi darajali yo'l bilan kesishma",
+"Xavfli burilish (chapga)",
+"To'xtamasdan harakatlanish taqiqlanadi"
+],
+"a": 1,
+"iz": "Oldinda ikkinchi darajali yo'l bilan kesishma: siz asosiy yo'ldasiz.",
+"src": "YHQ, 1-ilova (yo'l belgilari)",
+"kind": "sign",
+"sign": "ikkinchi_daraja"
+}
+]
