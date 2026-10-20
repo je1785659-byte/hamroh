@@ -510,6 +510,23 @@ body[data-sec="prava"]{--sec-a:#4a3200;--sec-b:#d99a00;--sec:#b07c00}
 .pv-wr,.pv-sign{display:flex;gap:12px;align-items:flex-start}.pv-ws{width:44px;height:44px;flex:none}.pv-sp{width:58px;height:58px;flex:none}
 .pv-signs{display:flex;flex-direction:column;gap:10px}.pv-sign b{font-size:14.5px}
 .pv-tgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.pv-tgrid .chip{justify-content:center}
+.er-card{display:flex;align-items:center;gap:12px;width:100%;text-align:left;color:#fff;border:0}
+.er-card b{display:block;font-family:var(--display);font-size:18px;margin:2px 0}.er-card small{opacity:.85;font-size:12.5px}.er-card>span:nth-child(2){flex:1}
+.er-moon{font-size:30px;width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.16);display:grid;place-items:center;flex:none}.er-go{font-size:20px}
+.er-list{display:flex;flex-direction:column;gap:8px}
+.er-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px}
+.er-row b{display:block;font-size:15px}.er-row small{color:var(--muted);font-size:12px}.er-row>span:nth-child(2){flex:1}
+.er-sc{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:24px;flex:none}
+.er-ok{color:var(--good);font-weight:700}
+.er-tools{display:flex;gap:4px}.er-tools .chip{padding:6px 9px}
+.er-book{padding:0 0 18px;overflow:hidden}.er-book>*:not(.er-hero){margin-left:18px;margin-right:18px}
+.er-hero{height:150px;display:grid;place-items:center;margin-bottom:14px}.er-hero span{font-size:46px;letter-spacing:6px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25))}
+.er-book h2{font-family:var(--display);font-size:24px;margin:0 18px 2px}
+.er-p{font-size:var(--fs);line-height:1.65;margin:0 18px 12px}
+.er-moral{margin-top:16px!important;padding:14px;border-radius:14px;background:color-mix(in srgb,var(--sec) 12%,var(--surface));font-size:calc(var(--fs) - 2px);line-height:1.5}
+.er-moral b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--sec);margin-bottom:4px}
+.er-end{text-align:center;color:var(--muted);font-size:14px;margin-top:14px!important}
+.er-book.night{background:#1d1a16;color:#e9dcc4}.er-book.night .note,.er-book.night .er-end{color:#a8997f}.er-book.night .er-moral{background:#2a251e}
 </style>
 </head>
 <body>
@@ -1613,7 +1630,7 @@ function viewKids(){
   const ag=AGES.find(x=>x[0]===kAge);
   const list=GAMES.filter(g=>(kCat==='all'||g.cat===kCat)&&(kAge==='all'||(g.a[0]<=ag[3]&&g.a[1]>=ag[2])));
   const best=store.get('kbest',{});
-  $('#screen').innerHTML=`${petCardMini()}
+  $('#screen').innerHTML=`${petCardMini()}${ertakCard()}
     <section class="card kfilter"><div class="label">Yosh</div><div class="chips">${AGES.map(([k,l])=>`<button class="chip" data-age="${k}" aria-pressed="${k===kAge}">${l}</button>`).join('')}</div>
       <div class="label" style="margin-top:12px">Kategoriya</div><div class="chips">${KCATS.map(([k,l])=>`<button class="chip" data-cat="${k}" aria-pressed="${k===kCat}">${l}</button>`).join('')}</div></section>
     <div class="sec-title"><b>${list.length} ta o'yin</b><span class="note">${kAge==='all'?'Barcha yoshlar':ag[1]}</span></div>
@@ -1623,6 +1640,7 @@ function viewKids(){
   $('#screen').querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{kCat=b.dataset.cat;viewKids()});
   $('#screen').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>openGame(GAMES.find(g=>g.id===b.dataset.g)));
   $('#petopen').onclick=viewPet;
+  $('#ertoday').onclick=viewErtaklar;
 }
 function saveStars(id,s){const b=store.get('kbest',{});if(s>(b[id]||0)){b[id]=s;store.set('kbest',b)}}
 function endScreen(g,stars,text){
@@ -1845,7 +1863,7 @@ function viewSaved(){
 }
 // open a shared recipe: t.me/bot/app?startapp=r_osh
 (function(){try{const tq=new URLSearchParams(location.search).get('t');if(tq){current=tq;store.set('tab',tq)}}catch(e){}})();
-(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
+(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
 
 const TOOLIC={qibla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
  tasbeh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="17.5" cy="15" r="2"/><circle cx="12" cy="18.5" r="2"/><circle cx="6.5" cy="15" r="2"/><circle cx="6.5" cy="8.5" r="2"/></svg>',
@@ -2341,7 +2359,127 @@ function pvSigns(){
   $('#pvsgq').onclick=()=>pvStart(pvShuffle(l).map(signQuestion),SGROUPS.find(x=>x[0]===pvSignG)[1]+' belgilar','practice');
 }
 
-const APP_VER='20261020c';
+/* ---------- UYQU OLDIDAN ERTAK ---------- */
+// O'zbek xalq ertaklari va Ezop masallari asosida, o'z so'zlarimiz bilan qayta hikoya qilingan.
+const ERTAKLAR=[
+ {id:'zumrad',t:"Zumrad va Qimmat",sc:'🌳🏡👵',bg:['#1f3a5f','#4f7cac'],yosh:'4–10',kim:"O'zbek xalq ertagi",p:[
+  "Qadim zamonda bir chol yashar ekan. Uning Zumrad ismli qizi bor ekan. Zumrad mehnatkash, odobli va mehribon qiz ekan. Cholning ikkinchi xotini va uning Qimmat degan qizi esa dangasa va injiq ekan.",
+  "Bir kuni o'gay ona cholga: \"Zumradni o'rmonga olib borib qo'yib kel\", debdi. Chol qizini o'rmon chetiga olib boribdi-yu, yig'lab qaytibdi. Zumrad qo'rqmabdi. U yo'l topib yurib, bir kichkina kulbaga duch kelibdi.",
+  "Kulbada bir mehribon kampir yashar ekan. \"Bolam, charchagandirsan, kir\", debdi u. Zumrad kampirga salom berib, uyini supuribdi, suv tashibdi, ovqat pishiribdi. Kampirning sochlarini tarab qo'yibdi.",
+  "Ertasi kuni kampir: \"Odobing va mehnating uchun rahmat. Mana bu sandiqlardan birini tanla\", debdi. Zumrad eng kichkina, oddiy sandiqni olibdi. Uyga kelib ochsa, ichi oltin va qimmatbaho toshlarga to'la ekan!",
+  "Buni ko'rgan o'gay ona Qimmatni ham o'rmonga jo'natibdi. Qimmat kulbaga kirib, salom ham bermabdi. Kampirga yordam berish o'rniga, \"Menga ovqat ber!\" deb buyuribdi. Ertasi kuni u eng katta va chiroyli sandiqni tortib olibdi.",
+  "Uyga kelib sandiqni ochsa, ichi tosh va kesakka to'la ekan. Qimmat va onasi uyalib qolibdi. O'shandan beri Qimmat ham ishlashni va odob bilan gapirishni o'rganibdi, deyishadi."],
+  s:"Mehnat va odob insonni baxtli qiladi. Ochko'zlik va dangasalik esa uyatga qoldiradi."},
+ {id:'bogirsoq',t:"Bo'g'irsoq",sc:'🥯🐰🐻🦊',bg:['#5b3a1a','#c08a3e'],yosh:'2–6',kim:"Xalq ertagi",p:[
+  "Bir bor ekan, bir yo'q ekan, bir chol bilan kampir yashar ekan. Bir kuni kampir xamir qorib, yumaloq, sariq bo'g'irsoq pishiribdi va sovusin deb deraza tokchasiga qo'yibdi.",
+  "Bo'g'irsoq bir oz yotibdi-yu, zerikibdi. Dumalab-dumalab tokchadan tushibdi, eshikdan chiqibdi, yo'lga tushib ketaveribdi.",
+  "Yo'lda unga quyoncha uchrabdi: \"Bo'g'irsoq, seni yeyman!\" Bo'g'irsoq qo'shiq aytibdi: \"Men cholning bo'g'irsog'iman, kampir yopgan, sariq-sariq! Choldan qochdim, kampirdan qochdim, sendan ham qochaman!\" Va dumalab ketibdi.",
+  "Keyin unga bo'ri, so'ng katta ayiq uchrabdi. Bo'g'irsoq ularga ham qo'shig'ini aytib, dumalab qochib ketibdi.",
+  "Nihoyat, unga ayyor tulki uchrabdi. \"Voy, qanday chiroyli qo'shiq! Lekin men yaxshi eshitmayapman. Burnimga chiqib, yana bir bor aytib ber\", debdi tulki.",
+  "Maqtovdan boshi aylangan bo'g'irsoq tulkining burniga sakrab chiqibdi. Tulki esa uni \"hap\" etib yutib yuboribdi. Shunday qilib, maqtanchoq bo'g'irsoqning sayohati tugabdi."],
+  s:"Maqtovga uchib, ehtiyotkorlikni unutma. Uydan so'roqsiz chiqib ketish xavfli."},
+ {id:'urtoqmoq',t:"Ur to'qmoq",sc:'🧺🍲🪵',bg:['#3a2a5c','#7a5fae'],yosh:'5–11',kim:"O'zbek xalq ertagi",p:[
+  "Qadim zamonda bir kambag'al dehqon yashar ekan. Bir kuni dalada ishlayotganida, uning oldiga oq soqolli bir qariya kelib, suv so'rabdi. Dehqon bor suvini va oxirgi nonini qariya bilan baham ko'ribdi.",
+  "Qariya: \"Saxovating uchun rahmat\", deb unga bir dasturxon beribdi. \"Yoz, dasturxon!\" desang, ustiga turli taomlar paydo bo'larkan.",
+  "Dehqon uyga qaytayotib, yo'lda bir boyning uyida tunab qolibdi. Ochko'z boy sehrli dasturxonni ko'rib qolibdi va kechasi uni oddiy dasturxonga almashtirib qo'yibdi.",
+  "Dehqon uyga kelib, \"Yoz, dasturxon!\" desa, hech narsa chiqmabdi. U yana qariyani izlab topibdi. Qariya bu safar unga bir to'qmoq berib: \"Kim seni aldasa, 'Ur, to'qmoq!' de\", debdi.",
+  "Dehqon yana o'sha boyning uyiga boribdi. Kechasi boy to'qmoqni ham o'g'irlamoqchi bo'lganida, dehqon: \"Ur, to'qmoq!\" debdi. To'qmoq boyni quvlab, aylanib yuribdi.",
+  "Boy kechirim so'rab, sehrli dasturxonni qaytarib beribdi. Dehqon dasturxonni oilasiga olib ketibdi va endi qo'shnilarini ham mehmon qiladigan bo'libdi."],
+  s:"Saxovatli odamga yaxshilik qaytadi. Boshqaning narsasiga ko'z olaytirgan oxir-oqibat uyaladi."},
+ {id:'turna',t:"Tulki bilan turna",sc:'🦊🍽️🦩',bg:['#0f5b3a','#2e9e6a'],yosh:'3–8',kim:"Xalq masali",p:[
+  "Bir kuni tulki turnani mehmonga chaqiribdi: \"Do'stim, kel, seni mazali bo'tqa bilan siylayman.\"",
+  "Turna xursand bo'lib kelibdi. Tulki bo'tqani yassi likopchaga yoyib qo'yibdi. Turna uzun tumshug'i bilan likopchani taqillatib urinibdi-yu, hech narsa yeya olmabdi. Tulki esa bo'tqani yalab-yalab tugatibdi.",
+  "\"Kechirasan, boshqa ovqatim yo'q\", debdi tulki ayyorona jilmayib. Turna och qolib, uyiga qaytibdi.",
+  "Bir necha kundan keyin turna ham tulkini mehmonga chaqiribdi. U mazali sho'rvani bo'yni uzun, tor ko'zaga solib qo'yibdi.",
+  "Turna uzun tumshug'ini ko'zaga tiqib, maza qilib ovqatlanibdi. Tulki esa ko'za atrofida aylanib, uni yalabdi-yu, ichidagi ovqatga yeta olmabdi.",
+  "Shunda tulki tushunibdi: do'stini mazax qilgani yaxshi ish emas ekan. Ikkalasi kulishib yarashib olishibdi va keyingi safar hammaga mos idishda ovqat qilishga kelishibdi."],
+  s:"Boshqalarga qanday munosabatda bo'lsang, ular ham senga shunday munosabatda bo'ladi."},
+ {id:'echki',t:"Echki va bo'ri",sc:'🐐🏠🐺',bg:['#5c2a2a','#b05050'],yosh:'2–7',kim:"Xalq ertagi",p:[
+  "Bir echki o'zining uchta echkichasi bilan kichkina uyda yashar ekan. Har kuni u o'tlagani ketar ekan va bolalariga: \"Men qaytgunimcha eshikni hech kimga ochmanglar\", deb tayinlar ekan.",
+  "Qaytganda u mayin ovoz bilan qo'shiq aytar ekan: \"Echkichalarim, bolalarim, eshikni oching, onangiz keldi, sut olib keldi!\" Echkichalar onasining ovozini tanib, eshikni ochishar ekan.",
+  "Buni bir och bo'ri eshitib qolibdi. Echki ketgach, u eshik oldiga kelib, qo'pol ovoz bilan qo'shiqni aytibdi.",
+  "Echkichalar quloq solishibdi: \"Bu bizning onamizning ovozi emas! Onamizning ovozi mayin, seniki esa qo'pol. Ochmaymiz!\" Bo'ri qancha urinsa ham, eshik ochilmabdi.",
+  "Shu payt ona echki qaytib kelibdi. U shoxlari bilan bo'rini shunday quvibdiki, bo'ri o'rmonga qochib ketibdi va qaytib kelmabdi.",
+  "Ona echki bolalarini quchoqlab, ularni maqtabdi: \"Aqlli bolalarim! Begona odamga eshikni ochmaganingiz juda to'g'ri bo'ldi.\""],
+  s:"Kattalarning gapiga quloq sol. Begonalarga eshikni ochma."},
+ {id:'sholgom',t:"Sholg'om",sc:'🥬👴👵👧🐶🐱🐭',bg:['#3a5c1f','#7ab04a'],yosh:'2–6',kim:"Xalq ertagi",p:[
+  "Bobo bahorda bog'iga sholg'om ekibdi. Sholg'om o'sib-o'sib, juda katta bo'lib ketibdi.",
+  "Bobo sholg'omni tortibdi, tortibdi — sug'urib ololmabdi. Buvini chaqiribdi. Buvi boboni ushlabdi, bobo sholg'omni. Tortishibdi, tortishibdi — sug'urib olisholmabdi.",
+  "Buvi nevarasini chaqiribdi. Nevara buvini ushlabdi, buvi boboni, bobo sholg'omni. Tortishibdi — yana chiqmabdi.",
+  "Nevara kuchukchani chaqiribdi, kuchukcha mushukchani, mushukcha esa kichkina sichqonchani chaqiribdi.",
+  "Sichqoncha mushukchani ushlabdi, mushukcha kuchukchani, kuchukcha nevarani, nevara buvini, buvi boboni, bobo sholg'omni. Bir, ikki, uch — tortishibdi va... sholg'om sug'urilib chiqibdi!",
+  "Hammalari kulishib, sholg'omdan mazali ovqat pishirishibdi. Eng kichkina sichqonchaga esa eng shirin bo'lagini berishibdi."],
+  s:"Birlikda kuch bor. Eng kichkina yordam ham katta ishni bitiradi."},
+ {id:'qarga',t:"Qarg'a va tulki",sc:'🐦🧀🦊',bg:['#25304a','#4a5d86'],yosh:'3–9',kim:"Ezop masali asosida",p:[
+  "Bir qarg'a qayerdandir bir bo'lak pishloq topib olibdi va uni tumshug'ida ushlab, baland daraxt shoxiga qo'nibdi.",
+  "Daraxt tagidan o'tib ketayotgan tulki pishloqning hidini sezibdi. \"Uni qanday qilib olsam ekan?\" deb o'ylabdi u.",
+  "Tulki shirin so'zlar bilan gap boshlabdi: \"Voy, qarg'ajon, sen qanday chiroylisan! Patlaring yaltiraydi, ko'zlaring porlaydi. Ovozing ham, ehtimol, bulbulnikidan yoqimliroqdir. Bir qo'shiq aytib bersang-chi!\"",
+  "Maqtovdan qarg'aning boshi aylanib ketibdi. U qo'shiq aytmoqchi bo'lib, tumshug'ini katta ochibdi: \"Qarr!\"",
+  "Pishloq shu zahoti pastga tushibdi. Tulki uni ilib olib, \"Rahmat, qarg'ajon! Ovozing yaxshi, lekin aqling sal kamroq ekan\", deb yugurib ketibdi.",
+  "Qarg'a shoxda o'tirib qolibdi va bundan keyin har bir maqtovga ishonavermaslikka qaror qilibdi."],
+  s:"Haddan tashqari maqtaydiganlardan ehtiyot bo'l — ularning maqsadi boshqa bo'lishi mumkin."},
+ {id:'toshbaqa',t:"Toshbaqa va quyon",sc:'🐢🏁🐇',bg:['#0f6aa6','#33b2df'],yosh:'3–9',kim:"Ezop masali asosida",p:[
+  "O'rmonda bir maqtanchoq quyon yashar ekan. U hammaga: \"Men o'rmondagi eng tez hayvonman!\" deb maqtanar va sekin yuradigan toshbaqani mazax qilar ekan.",
+  "Bir kuni toshbaqa xotirjamlik bilan: \"Kel, poyga o'ynaymiz\", debdi. Quyon qah-qah urib kulibdi, lekin rozi bo'libdi.",
+  "Poyga boshlanibdi. Quyon bir zumda ko'zdan g'oyib bo'libdi. Yarim yo'lda orqasiga qarasa, toshbaqa ko'rinmaydi. \"Hali u kelguncha bir uxlab olay\", deb quyon daraxt soyasiga yotibdi.",
+  "Toshbaqa esa to'xtamasdan, sekin-sekin, lekin tinimsiz oldinga yuraveribdi. U uxlab yotgan quyonning yonidan o'tib ketibdi.",
+  "Quyon uyg'onganda, toshbaqa allaqachon marraga yetib kelayotgan ekan. Quyon bor kuchi bilan yuguribdi, lekin kech qolibdi. Toshbaqa birinchi bo'lib marraga yetibdi!",
+  "Hayvonlar toshbaqani olqishlashibdi. Quyon esa boshqa hech qachon maqtanmaslikka va hech kimni mazax qilmaslikka va'da beribdi."],
+  s:"Sekin, lekin to'xtamasdan harakat qilgan kishi maqsadiga yetadi. Maqtanchoqlik esa yutqazdiradi."},
+ {id:'chumoli',t:"Chumoli va ninachi",sc:'🐜🌾🦗❄️',bg:['#4a3200','#d99a00'],yosh:'4–10',kim:"Ezop masali asosida",p:[
+  "Yoz kunlari edi. Chumoli ertadan kechgacha tinmay ishlar, qishga don yig'ar ekan. Ninachi esa butun kun o'yin-kulgi qilib, qo'shiq aytib yurar ekan.",
+  "\"Chumolivoy, nega buncha qiynalasan? Kel, men bilan o'yna, quyoshda isin!\" debdi ninachi. \"Qish keladi, oldindan g'amlab qo'yish kerak\", deb javob beribdi chumoli va yana ishiga qaytibdi.",
+  "Kuz o'tib, qish kelibdi. Hamma yoqni qor bosibdi. Ninachi sovuqda qaltirab, och qolibdi. Uning na uyi, na ovqati bor ekan.",
+  "U chumolining eshigini taqillatibdi: \"Chumolijon, men och qoldim, menga yordam ber.\"",
+  "Mehribon chumoli uni ichkariga kiritib, issiq choy va don beribdi. \"Yozda nima qilding?\" deb so'rabdi u. \"Qo'shiq aytdim\", debdi ninachi uyalib.",
+  "\"Unda kelasi yozda qo'shiq ham aytamiz, ishlaymiz ham\", debdi chumoli. Ninachi shu kundan boshlab mehnatni qadrlashni o'rganibdi."],
+  s:"Bugungi mehnat — ertangi to'kinlik. Yordamga muhtojga mehr ko'rsatish ham ezgulikdir."},
+ {id:'sher',t:"Sher va sichqon",sc:'🦁🐭🕸️',bg:['#5b1f6e','#b0479a'],yosh:'3–9',kim:"Ezop masali asosida",p:[
+  "Bir kuni katta sher daraxt soyasida uxlab yotgan ekan. Kichkina sichqoncha o'ynab yurib, bilmasdan uning ustidan yugurib o'tibdi.",
+  "Sher uyg'onib, sichqonchani panjasi bilan bosib olibdi. \"Uyqumni buzganing uchun seni yeyman!\" deb bo'kiribdi.",
+  "Sichqoncha yalinibdi: \"Shoh hazratlari, meni qo'yib yuboring. Kim bilsin, bir kun men ham sizga yordam berarman.\" Sher kulib yuboribdi: \"Sen-a? Menga yordam?\" Lekin rahmi kelib, uni qo'yib yuboribdi.",
+  "Bir necha kundan keyin sher ovchilar to'riga ilinib qolibdi. U qancha urinsa ham, to'rdan chiqa olmabdi va g'amgin bo'kiribdi.",
+  "Bo'kiriqni sichqoncha eshitibdi va yugurib kelibdi. U o'tkir tishlari bilan to'rning arqonlarini birma-bir kemiribdi. Ko'p o'tmay, to'r yirtilib, sher ozod bo'libdi.",
+  "Sher sichqonchaga minnatdorchilik bildiribdi: \"Seni kichkina deb kulgan edim. Endi bilaman: kichkinalar ham katta yordam bera olar ekan.\" O'shandan beri ular do'st bo'lib qolishibdi."],
+  s:"Hech kimni kichik deb kamsitma. Qilgan yaxshiliging albatta o'zingga qaytadi."}
+];
+let erRead=store.get('erRead',{}), erSize=store.get('erSize',18), erNight=store.get('erNight',false), erOpen=null;
+const erToday=()=>ERTAKLAR[Math.floor(Date.now()/864e5+ (5/24))%ERTAKLAR.length];
+function ertakCard(){const e=erToday();
+  return `<button class="card er-card" id="ertoday" style="background:linear-gradient(135deg,${e.bg[0]},${e.bg[1]})"><span class="er-moon">🌙</span><span style="min-width:0"><span class="label" style="color:#fff;opacity:.8">Uyqu oldidan ertak · bugun</span><b>${esc(e.t)}</b><small>${esc(e.kim)} · ${e.yosh} yosh · ~${Math.max(2,Math.round(e.p.join(' ').split(' ').length/90))} daqiqa</small></span><span class="er-go">→</span></button>`}
+function viewErtaklar(){
+  erOpen=null;$('#hero').hidden=true;window.scrollTo(0,0);
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="kback">← Bolalar</button><b>Uyqu oldidan ertak</b><span></span></div>
+    ${ertakCard()}
+    <div class="sec-title"><b>Barcha ertaklar · ${ERTAKLAR.length}</b><span class="note">${Object.keys(erRead).length} tasi o'qilgan</span></div>
+    <div class="er-list">${ERTAKLAR.map(e=>`<button class="card er-row" data-er="${e.id}"><span class="er-sc" style="background:linear-gradient(135deg,${e.bg[0]},${e.bg[1]})">${e.sc.match(/\p{Extended_Pictographic}(‍\p{Extended_Pictographic})*/gu)[0]}</span><span style="min-width:0"><b>${esc(e.t)}</b><small>${esc(e.kim)} · ${e.yosh} yosh</small></span>${erRead[e.id]?'<span class="er-ok">✓</span>':''}</button>`).join('')}</div>
+    <p class="note" style="margin:0 4px">Xalq ertaklari va masallar bolalar uchun o'z so'zlarimiz bilan qayta hikoya qilingan.</p>`;
+  $('#kback').onclick=()=>{setHero('kids');viewKids()};
+  $('#ertoday').onclick=()=>viewErtak(erToday().id);
+  $('#screen').querySelectorAll('[data-er]').forEach(b=>b.onclick=()=>viewErtak(b.dataset.er));
+}
+function viewErtak(id){
+  const e=ERTAKLAR.find(x=>x.id===id);erOpen=id;$('#hero').hidden=true;window.scrollTo(0,0);
+  const i=ERTAKLAR.indexOf(e), nx=ERTAKLAR[(i+1)%ERTAKLAR.length];
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="erback">← Ertaklar</button><b>${esc(e.t)}</b><span class="er-tools"><button class="chip" id="erm" aria-label="Kichik shrift">A−</button><button class="chip" id="erp" aria-label="Katta shrift">A+</button><button class="chip" id="ern" aria-pressed="${erNight}" aria-label="Tungi rejim">🌙</button></span></div>
+    <article class="card er-book ${erNight?'night':''}" style="--fs:${erSize}px">
+      <div class="er-hero" style="background:linear-gradient(160deg,${e.bg[0]},${e.bg[1]})"><span>${e.sc}</span></div>
+      <h2>${esc(e.t)}</h2><p class="note" style="margin:0 18px 10px">${esc(e.kim)} · ${e.yosh} yosh</p>
+      ${e.p.map(x=>`<p class="er-p">${esc(x)}</p>`).join('')}
+      <div class="er-moral"><b>Ertak saboqi</b>${esc(e.s)}</div>
+      <p class="er-end">Shu bilan ertagimiz tugadi. Shirin tushlar ko'r! 🌙</p>
+    </article>
+    <button class="btn" id="erdone">${erRead[e.id]?'✓ O\'qilgan · Keyingi ertak':'O\'qib bo\'ldik · +3 tanga'}</button>
+    <button class="btn alt" id="ershare" style="margin-top:8px">Ertakni ulashish</button>`;
+  $('#erback').onclick=viewErtaklar;
+  const fs=d=>{erSize=Math.max(15,Math.min(26,erSize+d));store.set('erSize',erSize);$('.er-book').style.setProperty('--fs',erSize+'px')};
+  $('#erm').onclick=()=>fs(-2);$('#erp').onclick=()=>fs(2);
+  $('#ern').onclick=()=>{erNight=!erNight;store.set('erNight',erNight);$('.er-book').classList.toggle('night',erNight);$('#ern').setAttribute('aria-pressed',erNight)};
+  $('#erdone').onclick=()=>{if(!erRead[e.id]){erRead[e.id]=Date.now();store.set('erRead',erRead);addCoins(3);haptic('done')}viewErtak(nx.id)};
+  $('#ershare').onclick=()=>{const u=`https://t.me/share/url?url=${encodeURIComponent(BOT_LINK+'?startapp=ertak_'+e.id)}&text=${encodeURIComponent(`🌙 Uyqu oldidan ertak: «${e.t}». Farzandingizga o'qib bering!`)}`;tg&&tg.openTelegramLink?tg.openTelegramLink(u):window.open(u,'_blank')};
+}
+
+const APP_VER='20261020d';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava};
