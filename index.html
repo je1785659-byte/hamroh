@@ -3150,7 +3150,8 @@ function trText(t){
   return r==null?t:lead+r+trail;
 }
 const CYR_KEEP=/(@[\w.]+|https?:\/\/\S+|\b[\w-]+\.(?:uz|net|com|org|ru|io)\b\S*|\b[A-Z]{2,6}\d*\b|\b[A-Z]\d+\b|\b[FU]\d\b)/;
-function cyrSafe(t){return t.split(CYR_KEEP).map((x,i)=>i%2?x:lat2cyr(x)).join('')}
+const CYR_ACR={YHQ:'ЙҲҚ',YTH:'ЙТҲ',YHXX:'ЙҲХХ',IIO:'ИИО',IIB:'ИИБ',BMBA:'БМБА',DTM:'ДТМ',VM:'ВМ',AQSH:'АҚШ'};
+function cyrSafe(t){return t.split(CYR_KEEP).map((x,i)=>i%2?(CYR_ACR[x]||x):lat2cyr(x)).join('')}
 const I18N_SKIP='script,style,textarea,input,[data-noi18n],#dst,.sign text';
 function i18nApply(root){
   if(!LANG||LANG==='uz'||!root)return;
@@ -3400,7 +3401,7 @@ function srResult(){
     return `<section class="card pv-wr"><div><b>${i+1}. ${esc(q.q)}</b><p class="note" style="margin:4px 0 0">${good?'✓':'✕'} To'g'ri javob: <b style="color:var(--good)">${esc(right)}</b><br>${esc(q.iz||'')}</p></div></section>`}).join('');$('#srreview').disabled=true};
 }
 
-const APP_VER='20261021i';
+const APP_VER='20261021j';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava,sert:viewSert};
