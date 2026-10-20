@@ -216,7 +216,7 @@ async function computeStats(db,env){
   ]);
   const one=i=>r[i].results[0]||{}, all=i=>r[i].results||[];
   const meta=Object.fromEntries(all(10).map(x=>[x.k,x.v]));
-  let wh=null;try{const w=await tg(env,'getWebhookInfo',{});if(w.ok){wh={pending:w.result.pending_update_count||0,error:w.result.last_error_message||null};
+  let wh=null;try{const w=await tg(env,'getWebhookInfo',{});if(w.ok){wh={pending:w.result.pending_update_count||0,error:w.result.last_error_message||null,fixed:false};
     const au=w.result.allowed_updates;if(au&&au.length&&!au.includes('my_chat_member')&&w.result.url){await tg(env,'setWebhook',{url:w.result.url,allowed_updates:[...au,'my_chat_member'],...(env.WEBHOOK_SECRET?{secret_token:env.WEBHOOK_SECRET}:{})});wh.fixed=true}}}catch(e){}
   return {now,today,users:one(0),dau:one(1).n||0,wau:one(2).n||0,mau:one(3).n||0,days:all(4),newDays:all(5),sections:all(6),langs:all(7),platforms:all(8),sources:all(9),
     since:+meta.since||null,checked:+meta.checked||null,ret:one(11),avg7:one(12),wh};
@@ -226,7 +226,7 @@ async function adminReq(req,env){
   const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return [null,J({ok:false,error:'auth'},403)];
   const db=await D(env).catch(()=>null);if(!db)return [null,J({ok:false,error:'nodb'},503)];
   if(!await isAdmin(db,u.id))return [null,J({ok:false,error:'admin'},403)];
-  return [{f,u,db},null];
+  return [/** @type {any} */({f,u,db}),null];
 }
 async function handleStats(req,env){const [c,e]=await adminReq(req,env);if(e)return e;return J({ok:true,...await computeStats(c.db,env)})}
 async function handleCheck(req,env){
