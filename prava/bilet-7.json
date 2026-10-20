@@ -1,0 +1,262 @@
+[
+{
+"id": "m7-1",
+"q": "Qatorni o'zgartirayotgan haydovchi kimga yo'l berishi kerak?",
+"o": [
+"Yo'nalishini o'zgartirmasdan bir yo'nalishda harakatlanayotgan transport vositalariga",
+"Faqat orqadan kelayotgan yuk avtomobillariga",
+"Faqat qarama-qarshi harakatlanayotganlarga",
+"Hech kimga, agar burilish ko'rsatkichini yoqqan bo'lsa"
+],
+"a": 0,
+"iz": "Qatorni o'zgartirayotganda haydovchi yo'nalishini o'zgartirmasdan bir yo'nalishda harakatlanayotgan transport vositalariga yo'l berishi shart.",
+"src": "YHQ, 55-band"
+},
+{
+"id": "m7-2",
+"q": "O'tishni tugatishga ulgurmagan piyoda qayerda to'xtashi kerak?",
+"o": [
+"Tramvay yo'lida",
+"Xavfsizlik orolchasida, u bo'lmasa — qarama-qarshi oqimlarni ajratuvchi chiziqda",
+"Qatnov qismining o'rtasida istalgan joyda",
+"Ortga qaytib, yo'lkada"
+],
+"a": 1,
+"iz": "O'tishni tugatishga ulgurmagan piyoda xavfsizlik orolchasida, u bo'lmasa — qarama-qarshi yo'nalishdagi transport oqimlarini ajratuvchi chiziqda to'xtashi kerak.",
+"src": "YHQ, 20-band"
+},
+{
+"id": "m7-3",
+"q": "Qachon transport vositasining eshiklarini ochish mumkin?",
+"o": [
+"Transport vositasi to'liq to'xtagandan keyin",
+"Yo'lovchi so'raganda",
+"To'xtash joyiga yaqinlashganda",
+"Tezlik soatiga 5 km ga tushganda"
+],
+"a": 0,
+"iz": "Haydovchi eshiklar to'liq yopilmaguncha harakatni boshlamasligi va transport vositasi to'liq to'xtamaguncha ularni ochmasligi kerak.",
+"src": "YHQ, 158-band"
+},
+{
+"id": "m7-4",
+"q": "Taqiqlovchi ishorada to'xtash chizig'i bo'lsa, haydovchi qayerda to'xtaydi?",
+"o": [
+"Piyodalar o'tish joyining ustida",
+"Chorrahaning o'rtasida",
+"To'xtash chizig'ining ustida",
+"To'xtash chizig'i oldida, uni old qismi bilan bosib o'tmasdan"
+],
+"a": 3,
+"iz": "Taqiqlovchi ishorada haydovchi to'xtash chizig'i (5.33 belgisi) oldida, transport vositasining old qismi bilan uni kesib o'tmasdan to'xtashi kerak.",
+"src": "YHQ, 41-band"
+},
+{
+"id": "m7-5",
+"q": "Mototsikl, moped va skuterlar qaysi toifaga kiradi?",
+"o": [
+"\"D\" toifa",
+"\"C\" toifa",
+"\"B\" toifa",
+"\"A\" toifa"
+],
+"a": 3,
+"iz": "\"A\" toifasi mototsikllar, elektromototsikllar, mopedlar va skuterlarni boshqarish huquqini beradi.",
+"src": "YHQ, 8-band"
+},
+{
+"id": "m7-6",
+"q": "Maxsus xizmat transport vositasi harakatda imtiyozdan foydalanishi uchun nima qilishi kerak?",
+"o": [
+"Faqat miltillovchi chiroqni yoqishi",
+"Faqat yaqin chiroqni yoqishi",
+"Faqat burilish ko'rsatkichini yoqishi",
+"Miltillovchi chiroq bilan birga maxsus ovozli ishorani ham yoqishi"
+],
+"a": 3,
+"iz": "Imtiyozdan foydalanish uchun tezkor va maxsus xizmat transport vositalari miltillovchi chiroq bilan birga maxsus ovozli ishorani ham yoqishi kerak.",
+"src": "YHQ, 25-band"
+},
+{
+"id": "m7-7",
+"q": "Maxsus ovozli ishora va miltillovchi chiroq yoqilgan tezkor xizmat transport vositasi yaqinlashganda haydovchi nima qilishi kerak?",
+"o": [
+"Uni quvib o'tishi kerak",
+"Tezlikni oshirib, oldinda ketishi kerak",
+"Unga yo'l berishi kerak, quvib o'tish taqiqlanadi",
+"Faqat ovozli signal berishi kerak"
+],
+"a": 2,
+"iz": "Haydovchilar ko'k yoki qizil miltillovchi chiroq va maxsus ovozli ishora yoqilgan transport vositalariga yo'l berishi shart. Bunday transport vositalarini quvib o'tish taqiqlanadi.",
+"src": "YHQ, 26-band"
+},
+{
+"id": "m7-8",
+"q": "Elektr samokatda piyodalar yo'lkasida qanday tezlikdan oshmasdan harakatlanish kerak?",
+"o": [
+"Soatiga 25 km",
+"Soatiga 20 km",
+"Soatiga 5 km",
+"Soatiga 10 km"
+],
+"a": 3,
+"iz": "Piyodalar yo'lkalari va piyoda-velosiped yo'lkalarida elektr samokat soatiga 10 km dan oshmagan tezlikda harakatlanadi.",
+"src": "YHQ, 12-2-band"
+},
+{
+"id": "m7-9",
+"q": "Yengil avtomobillar (M1) shinalari protektorining qoldiq chuqurligi qanchadan kam bo'lsa, foydalanish taqiqlanadi?",
+"o": [
+"1,0 mm",
+"0,8 mm",
+"1,6 mm",
+"2,0 mm"
+],
+"a": 2,
+"iz": "Protektorning qoldiq chuqurligi M1, N1, O1, O2 toifalari uchun 1,6 mm dan kam bo'lsa, foydalanish taqiqlanadi.",
+"src": "YHQ, 3-ilova, 5.1"
+},
+{
+"id": "m7-10",
+"q": "Mopedning dvigatel hajmi qancha bo'ladi?",
+"o": [
+"125 sm³ dan ortiq",
+"25 sm³ dan 50 sm³ gacha",
+"50 sm³ dan 125 sm³ gacha",
+"25 sm³ gacha"
+],
+"a": 1,
+"iz": "Moped — dvigatel hajmi 25 sm³ dan 50 sm³ gacha, konstruktiv tezligi soatiga 25 km dan 50 km gacha bo'lgan transport vositasi.",
+"src": "YHQ, 6-band"
+},
+{
+"id": "m7-11",
+"q": "Ko'rinish chegarasida o'tish joyi va chorraha bo'lmasa, piyoda qatnov qismini qanday kesib o'tishi kerak?",
+"o": [
+"Istalgan joyda, qiyalab",
+"Faqat ajratuvchi to'siqdan oshib",
+"Faqat transport vositalari orasidan",
+"Ikkala tomonga yaxshi ko'rinadigan joyda, qatnov qismi chetiga to'g'ri burchak ostida"
+],
+"a": 3,
+"iz": "Ko'rinish chegarasida o'tish joyi yoki chorraha bo'lmasa, ajratuvchi bo'lagi va to'sig'i yo'q yo'llarda piyoda ikkala tomonga yaxshi ko'rinadigan joyda qatnov qismini to'g'ri burchak ostida kesib o'tadi.",
+"src": "YHQ, 17-band"
+},
+{
+"id": "m7-12",
+"q": "Sariq yoki to'q sariq miltillovchi chiroq transport vositasiga harakatda imtiyoz beradimi?",
+"o": [
+"Ha, faqat chorrahalarda",
+"Ha, unga hamma yo'l berishi shart",
+"Yo'q, faqat boshqalarni xavf haqida ogohlantiradi",
+"Ha, faqat aholi punktlarida"
+],
+"a": 2,
+"iz": "Sariq yoki to'q sariq miltillovchi chiroq imtiyoz bermaydi va boshqa yo'l harakati qatnashchilarini xavf haqida ogohlantirish uchun xizmat qiladi.",
+"src": "YHQ, 28-band"
+},
+{
+"id": "m7-13",
+"q": "Necha va undan ortiq bola tashilsa, \"bolalar guruhini tashkiliy tashish\" hisoblanadi?",
+"o": [
+"10 va undan ortiq",
+"3 va undan ortiq",
+"5 va undan ortiq",
+"8 va undan ortiq"
+],
+"a": 3,
+"iz": "Bolalar guruhini tashkiliy tashish deganda 8 va undan ortiq bolani tashish tushuniladi.",
+"src": "YHQ, 6-band"
+},
+{
+"id": "m7-14",
+"q": "Yuk avtomobilining kuzovida odam tashish uchun haydovchi qanday talabga javob berishi kerak (8 kishigacha)?",
+"o": [
+"\"B\" toifali guvohnoma va 1 yillik staj",
+"\"D\" toifali guvohnoma va 5 yillik staj",
+"\"C\" toifali guvohnoma va shu toifada kamida 3 yillik staj",
+"\"C\" toifali guvohnoma, staj talab qilinmaydi"
+],
+"a": 2,
+"iz": "Kuzovida odam tashishga moslashtirilgan yuk avtomobilida 8 kishigacha odam tashishga \"C\" toifali va shu toifada kamida 3 yillik stajga ega haydovchilarga ruxsat etiladi.",
+"src": "YHQ, 152-band"
+},
+{
+"id": "m7-15",
+"q": "Tartibga soluvchi o'ng qo'lini oldinga cho'zgan. Uning chap tomonidan kelayotgan relssiz transport vositalari qayerga harakatlanishi mumkin?",
+"o": [
+"Faqat to'g'riga",
+"Harakatlanish taqiqlanadi",
+"Barcha yo'nalishlarga",
+"Faqat o'ngga"
+],
+"a": 2,
+"iz": "O'ng qo'l oldinga cho'zilganda chap tomondan relssiz transport vositalari barcha yo'nalishlarda harakatlanishi mumkin.",
+"src": "YHQ, 38-band"
+},
+{
+"id": "m7-16",
+"q": "YTH harakatga to'sqinlik qilsa, haydovchi qatnov qismini bo'shatishdan oldin nima qilishi kerak?",
+"o": [
+"Hech narsa, darhol bo'shatishi kerak",
+"Faqat sug'urta polisini tekshirishi",
+"Faqat ovozli signal berishi",
+"Transport vositalarining joylashuvi, izlar va buyumlarni guvohlar ishtirokida foto yoki videoga olishi"
+],
+"a": 3,
+"iz": "YTH harakatga to'sqinlik qilsa, haydovchi transport vositalarining holati, izlar va buyumlarni guvohlar ishtirokida foto yoki videoga qayd etib, aylanib o'tishni tashkil qilishi va qatnov qismini bo'shatishi kerak.",
+"src": "YHQ, 13-band"
+},
+{
+"id": "m7-17",
+"q": "YTH haqida ichki ishlar organlariga xabar bermaslikka qachon ruxsat etiladi?",
+"o": [
+"Majburiy sug'urta qonunchiligiga muvofiq YTH haqida xabarnoma to'ldirilganda",
+"Faqat kechasi",
+"Har doim, agar zarar kichik bo'lsa",
+"Hech qachon"
+],
+"a": 0,
+"iz": "Majburiy sug'urta to'g'risidagi qonunchilikka muvofiq YTH haqida xabarnoma to'ldirilgan hollarda haydovchilar voqea haqida IIOga xabar bermasligi mumkin.",
+"src": "YHQ, 14-band"
+},
+{
+"id": "m7-18",
+"q": "Miltillovchi ko'k chirog'i yoqilgan to'xtab turgan tezkor xizmat transport vositasiga yaqinlashganda nima qilish kerak?",
+"o": [
+"Zarur bo'lsa to'xtay oladigan darajada tezlikni kamaytirish",
+"Tezlikni oshirish",
+"Ovozli signal berish",
+"Uzoq chiroqni yoqish"
+],
+"a": 0,
+"iz": "Ko'k, qizil yoki ko'k-qizil miltillovchi chirog'i yoqilgan to'xtab turgan transport vositasiga yaqinlashayotgan haydovchi zarur bo'lsa to'xtay oladigan darajada tezlikni kamaytirishi kerak.",
+"src": "YHQ, 27-band"
+},
+{
+"id": "m7-19",
+"q": "Bolalar guruhini avtobusda tashkiliy tashishda transport vositasida nima bo'lishi shart?",
+"o": [
+"Yon tomonlarida reklama yozuvi",
+"Hech qanday maxsus belgi talab etilmaydi",
+"Faqat orqa tomonida qizil bayroq",
+"Old va orqa tomonida \"Bolalar guruhini tashish\" taniqlik belgisi"
+],
+"a": 3,
+"iz": "Bolalar guruhini avtobus yoki mikroavtobusda tashkiliy tashishda transport vositasining old va orqa tomoniga \"Bolalar guruhini tashish\" taniqlik belgisi o'rnatiladi va kattalar kuzatib boradi.",
+"src": "YHQ, 156-band"
+},
+{
+"id": "m7-20",
+"q": "Svetofor ishlamay qolsa, haydovchi qachon harakatlanishi mumkin?",
+"o": [
+"Faqat ovozli signal bergach",
+"Boshqa yo'nalishlardagi ishoralar ham ishlamayotganiga va harakat xavfsiz ekaniga ishonch hosil qilgandan keyin",
+"Faqat tartibga soluvchi kelgach",
+"Darhol, chunki svetofor o'chiq"
+],
+"a": 1,
+"iz": "Svetofor ishlamasa, haydovchi boshqa yo'nalishlardagi svetofor ishoralari ham ishlamayotganiga va harakat xavfsiz ekaniga ishonch hosil qilgandan keyingina harakatlanishi mumkin.",
+"src": "YHQ, 43-band"
+}
+]

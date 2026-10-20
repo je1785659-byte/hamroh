@@ -1,0 +1,262 @@
+[
+{
+"id": "m8-1",
+"q": "Temir yo'l kesishmasidagi oq miltillovchi ishora nimani bildiradi?",
+"o": [
+"Harakatni taqiqlaydi",
+"Svetofor nosoz ekanini bildiradi",
+"Poezd yaqinlashayotganini bildiradi",
+"Transport vositalariga kesishmadan o'tishga ruxsat beradi"
+],
+"a": 3,
+"iz": "Temir yo'l kesishmasidagi oq-oy rangli miltillovchi ishora transport vositalariga kesishmadan o'tishga ruxsat beradi.",
+"src": "YHQ, 37-band"
+},
+{
+"id": "m8-2",
+"q": "Avtobuslar (M2, M3) shinalari protektorining qoldiq chuqurligi qanchadan kam bo'lsa, foydalanish taqiqlanadi?",
+"o": [
+"2,0 mm",
+"1,6 mm",
+"1,0 mm",
+"0,8 mm"
+],
+"a": 0,
+"iz": "M2 va M3 toifalari uchun protektorning qoldiq chuqurligi 2,0 mm dan kam bo'lsa, foydalanish taqiqlanadi.",
+"src": "YHQ, 3-ilova, 5.1"
+},
+{
+"id": "m8-3",
+"q": "Elektr samokatda yo'lka bo'lmasa, qatnov qismining o'ng chetida qanday tezlikdan oshmaslik kerak?",
+"o": [
+"Soatiga 25 km",
+"Soatiga 40 km",
+"Soatiga 20 km",
+"Soatiga 10 km"
+],
+"a": 2,
+"iz": "Yo'lkalar bo'lmasa, elektr samokat qatnov qismining chetki o'ng qismida soatiga 20 km dan oshmagan tezlikda harakatlanadi.",
+"src": "YHQ, 12-2-band"
+},
+{
+"id": "m8-4",
+"q": "Reversiv svetoforning qizil X shaklidagi ishorasi nimani bildiradi?",
+"o": [
+"Ehtiyotkorlik bilan harakatlanish mumkin",
+"Shu qatorda harakatlanishga ruxsat beriladi",
+"Shu qatorda harakatlanish taqiqlanadi",
+"Qatorni o'zgartirish kerak"
+],
+"a": 2,
+"iz": "Reversiv svetoforning qizil X shaklidagi ishorasi qatorda harakatni taqiqlaydi, pastga yo'nalgan yashil strelka esa ruxsat beradi.",
+"src": "YHQ, 35-band"
+},
+{
+"id": "m8-5",
+"q": "Qaysi holatda transport vositasini boshqarish taqiqlanadi?",
+"o": [
+"Kunduzi yaqin chiroq yoqilmagan holda shaharda",
+"Radio eshitganda",
+"Yo'lovchi bilan suhbatlashganda",
+"Charchagan yoki kasal holatda, bu xavfsizlikka tahdid solsa"
+],
+"a": 3,
+"iz": "Mast holatda, giyohvandlik yoki uyquni keltiruvchi dori ta'sirida, shuningdek xavfsizlikka tahdid soladigan darajada charchagan yoki kasal holatda transport vositasini boshqarish taqiqlanadi.",
+"src": "YHQ, 12-band"
+},
+{
+"id": "m8-6",
+"q": "Elektr samokatni necha yoshgacha bo'lgan shaxslarga yo'llarda boshqarish taqiqlanadi?",
+"o": [
+"18 yoshgacha",
+"16 yoshgacha",
+"12 yoshgacha",
+"14 yoshgacha"
+],
+"a": 3,
+"iz": "14 yoshga to'lmagan shaxslarga elektr samokat boshqarish taqiqlanadi (turar joy dahalari, bog'lar, o'yin maydonchalari va yopiq hududlar bundan mustasno).",
+"src": "YHQ, 12-1-band"
+},
+{
+"id": "m8-7",
+"q": "Yuk avtomobilining kuzovida bolalarni tashishga ruxsat etiladimi?",
+"o": [
+"Ha, kattalar kuzatuvida",
+"Ha, tezlik soatiga 40 km dan oshmasa",
+"Yo'q, taqiqlanadi",
+"Ha, bortlar 1,3 m bo'lsa"
+],
+"a": 2,
+"iz": "Yuk avtomobilining kuzovida bolalarni tashish taqiqlanadi.",
+"src": "YHQ, 159-band"
+},
+{
+"id": "m8-8",
+"q": "Kim xavfsizlik kamarini taqmasligi mumkin?",
+"o": [
+"Old o'rindiqdagi 14 yoshli bola",
+"Orqa o'rindiqdagi 12 yoshgacha bo'lgan bolalar",
+"Tunda harakatlanayotgan yo'lovchilar",
+"Aholi punktida harakatlanayotgan haydovchi"
+],
+"a": 1,
+"iz": "Orqa o'rindiqdagi 12 yoshgacha bo'lgan bolalar, o'quv avtomobilidagi instruktor, tibbiy ma'lumotnomasi bor homilador ayollar va ayrim boshqa shaxslar kamar taqmasligi mumkin.",
+"src": "YHQ, 9-band"
+},
+{
+"id": "m8-9",
+"q": "Bolalar guruhini kuzatib borish qachon ruxsat etiladi?",
+"o": [
+"Faqat avtomagistral yoqasida",
+"Istalgan vaqtda, qatnov qismi bo'ylab",
+"Faqat kechasi, fonar bilan",
+"Faqat kunduzi, yo'lka yoki piyodalar yo'lkasi bo'ylab, kattalar kuzatuvida"
+],
+"a": 3,
+"iz": "Bolalar guruhini faqat yo'lkalar va piyodalar yo'lkalari bo'ylab (ular bo'lmasa — yo'l yoqasida), faqat kunduzi va kattalar kuzatuvida olib borish mumkin.",
+"src": "YHQ, 16-band"
+},
+{
+"id": "m8-10",
+"q": "YTHda jabrlanganlar bo'lsa, haydovchi nima qilishi kerak?",
+"o": [
+"Faqat militsiya kelishini kutishi",
+"Faqat suratga olishi",
+"Jabrlanganni o'z holiga qoldirishi",
+"Birinchi yordam ko'rsatishi va tez tibbiy yordamni chaqirishi"
+],
+"a": 3,
+"iz": "Haydovchi jabrlanganlarga birinchi yordam ko'rsatishi, tez tibbiy yordam va boshqa xizmatlarni chaqirishi, zarur bo'lsa jabrlanganni yaqin tibbiyot muassasasiga yetkazishi kerak.",
+"src": "YHQ, 13-band"
+},
+{
+"id": "m8-11",
+"q": "Haydovchidan tashqari 8 tadan ortiq o'rindiqli avtobuslar qaysi toifaga kiradi?",
+"o": [
+"\"BE\" toifa",
+"\"C\" toifa",
+"\"D\" toifa",
+"\"B\" toifa"
+],
+"a": 2,
+"iz": "Haydovchi o'rindig'idan tashqari 8 tadan ortiq o'rindiqqa ega avtobuslar \"D\" toifasiga kiradi.",
+"src": "YHQ, 8-band"
+},
+{
+"id": "m8-12",
+"q": "Yo'l-transport hodisasi sodir bo'lganda haydovchi birinchi navbatda nima qilishi shart?",
+"o": [
+"Darhol to'xtab, avariya chirog'ini yoqishi va avariya to'xtash belgisini qo'yishi",
+"Faqat sug'urta kompaniyasiga qo'ng'iroq qilishi",
+"Transport vositasini darhol yo'l chetiga olib chiqishi",
+"Voqea joyidan uzoqlashishi"
+],
+"a": 0,
+"iz": "YTH sodir bo'lganda haydovchi darhol to'xtashi, avariya yorug'lik signalizatsiyasini yoqishi va 51-bandga muvofiq avariya to'xtash belgisini qo'yishi, transport vositasini joyidan qo'zg'atmasligi shart.",
+"src": "YHQ, 13-band"
+},
+{
+"id": "m8-13",
+"q": "Tartibga soluvchi o'ng qo'lini oldinga cho'zgan. Piyodalar qayerdan o'tishi mumkin?",
+"o": [
+"Tartibga soluvchining old tomonidan",
+"Tartibga soluvchining orqa tomonidan",
+"Istalgan joydan",
+"O'tish taqiqlanadi"
+],
+"a": 1,
+"iz": "O'ng qo'l oldinga cho'zilganda piyodalar qatnov qismini tartibga soluvchining orqa tomonidan kesib o'tishi mumkin.",
+"src": "YHQ, 38-band"
+},
+{
+"id": "m8-14",
+"q": "Haydovchi va old o'rindiqdagi yo'lovchi xavfsizlik kamarini qachon taqishi kerak?",
+"o": [
+"Faqat tezlik soatiga 60 km dan oshganda",
+"Faqat avtomagistralda",
+"Faqat aholi punktidan tashqarida",
+"Harakatni boshlashdan oldin"
+],
+"a": 3,
+"iz": "Haydovchi va old o'rindiqdagi yo'lovchilar harakatni boshlashdan oldin xavfsizlik kamarini taqishi shart.",
+"src": "YHQ, 9-band"
+},
+{
+"id": "m8-15",
+"q": "Ovozli signal ishlamasa, transport vositasidan foydalanish mumkinmi?",
+"o": [
+"Yo'q, taqiqlanadi",
+"Ha, agar faralar ishlasa",
+"Ha, aholi punktida",
+"Ha, kunduzi"
+],
+"a": 0,
+"iz": "Ovozli signal ishlamasa, transport vositasidan foydalanish taqiqlanadi.",
+"src": "YHQ, 3-ilova, 7.2"
+},
+{
+"id": "m8-16",
+"q": "Yengil avtomobilda (M1) qaysi jihozlar bo'lishi shart?",
+"o": [
+"Faqat o't o'chirgich",
+"Faqat zaxira g'ildirak",
+"Shatakka olish arqoni va domkrat",
+"Tibbiyot qutichasi, o't o'chirgich, avariya to'xtash belgisi va yorituvchi nimcha"
+],
+"a": 3,
+"iz": "M1, N1, N2, N3 toifalari va mikroavtobuslarda tibbiyot qutichasi, o't o'chirgich, avariya to'xtash belgisi (yoki miltillovchi qizil chiroq) va yorituvchi nimcha bo'lishi shart.",
+"src": "YHQ, 3-ilova, 7.10"
+},
+{
+"id": "m8-17",
+"q": "Haydovchiga transport vositasini boshqarish paytida telefondan qanday foydalanishga ruxsat etiladi?",
+"o": [
+"Faqat to'xtash chizig'i oldida qo'lda",
+"Faqat qo'llarni band qilmaydigan qurilma orqali",
+"Istalgan usulda",
+"Qisqa qo'ng'iroqlar uchun qo'lda"
+],
+"a": 1,
+"iz": "Haydovchiga harakatlanish paytida qo'llarni band qilmaydigan maxsus qurilmasiz telefondan foydalanish taqiqlanadi.",
+"src": "YHQ, 12-band"
+},
+{
+"id": "m8-18",
+"q": "Avtobuslarda (M2, M3) nechta o't o'chirgich bo'lishi kerak?",
+"o": [
+"O't o'chirgich talab etilmaydi",
+"Bitta, kabinada",
+"Ikkita: biri kabinada, biri salonda",
+"Uchta"
+],
+"a": 2,
+"iz": "M2 va M3 toifalarida oynani sindirish uchun bolg'acha, tibbiyot qutichasi, ikkita o't o'chirgich (biri kabinada, biri salonda), avariya to'xtash belgisi va yorituvchi nimcha bo'lishi kerak.",
+"src": "YHQ, 3-ilova, 7.10"
+},
+{
+"id": "m8-19",
+"q": "Ikki g'ildirakli mototsiklning orqa o'rindig'ida necha yoshgacha bo'lgan bolalarni tashish taqiqlanadi?",
+"o": [
+"7 yoshgacha",
+"12 yoshgacha",
+"10 yoshgacha",
+"14 yoshgacha"
+],
+"a": 1,
+"iz": "Ikki g'ildirakli mototransport vositalarining orqa o'rindig'ida 12 yoshgacha bo'lgan bolalarni tashish taqiqlanadi.",
+"src": "YHQ, 159-band"
+},
+{
+"id": "m8-20",
+"q": "To'xtab turgan tramvayni piyoda qaysi tomondan aylanib o'tishi kerak?",
+"o": [
+"Old tomondan",
+"Orqa tomondan",
+"Istalgan tomondan",
+"Aylanib o'tish taqiqlanadi"
+],
+"a": 0,
+"iz": "Piyodalar to'xtab turgan tramvayni old tomondan aylanib o'tadi.",
+"src": "YHQ, 19-band"
+}
+]
