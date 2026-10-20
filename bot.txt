@@ -1,5 +1,6 @@
 // Hamroh bot — Cloudflare Worker (Telegram webhook).
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
+// Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 const APP_URL='https://je1785659-byte.github.io/hamroh/';
 const SHARE_LINK='https://t.me/Hamronilovabot/app';
 const COVER=APP_URL+'cover.png';
@@ -80,6 +81,17 @@ async function onMessage(env,msg){
   const chat=msg.chat.id, text=(msg.text||'').trim(), cmd=text.split(/[\s@]/)[0].toLowerCase();
   if(msg.chat.type!=='private'&&!text.startsWith('/'))return;
   if(cmd==='/start'){await sendStart(env,chat,C,msg.chat.type==='private');return}
+  if((cmd==='/admin'||cmd==='/stats')&&msg.chat.type==='private'){
+    const db=await D(env).catch(()=>null);
+    if(!db) return tg(env,'sendMessage',{chat_id:chat,text:'Statistika bazasi hali ulanmagan (Cloudflare → Bindings → D1 → DB).'});
+    const code=cmd==='/admin'?(text.split(/\s+/)[1]||'').trim():'';
+    if(code){
+      try{await tg(env,'deleteMessage',{chat_id:chat,message_id:msg.message_id})}catch(e){}
+      if(await sha256hex(code)!==ADMIN_HASH) return tg(env,'sendMessage',{chat_id:chat,text:'Kod noto‘g‘ri.'});
+      await addAdmin(db,msg.from.id);
+    }
+    if(await isAdmin(db,msg.from.id)) return tg(env,'sendMessage',{chat_id:chat,parse_mode:'HTML',text:(code?'✅ Siz admin bo‘ldingiz.\n\n':'')+await statsText(env,db),reply_markup:{inline_keyboard:[[appBtn('📊 Admin panelni ochish',APP_URL+'?t=admin')]]}});
+  }
   if(cmd==='/namoz') return tg(env,'sendMessage',{chat_id:chat,text:namozText(0)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()});
   if(cmd==='/kurs') return tg(env,'sendMessage',{chat_id:chat,text:await kursText(),parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('💱 Konvertorni ochish')]]}});
   if(cmd==='/taom'){const n=DL[Math.floor(Math.random()*DL.length)];
@@ -123,16 +135,134 @@ async function handleSend(req,env){
   if(text){const t=String(text);for(let i=0;i<t.length&&i<40000;i+=4000){const j=await tg(env,'sendMessage',{chat_id:user.id,text:t.slice(i,i+4000)});if(!j.ok)return J({ok:false,error:j.description},502)}return J({ok:true})}
   return J({ok:false,error:'empty'},400);
 }
+
+// ---- Statistika (D1 binding: DB) ----
+const ADMIN_HASH='60d77ba2cd142ddb9fd953dac7446bacdd2c8bf561d793f4dc8fcd0169f6315c'; // bir martalik admin kodi xeshi (kodning o'zi bu yerda yo'q)
+const TZMS=5*3600e3, DAY=864e5;
+const dstr=t=>new Date(t+TZMS).toISOString().slice(0,10);
+let SCH=false;
+async function D(env){
+  if(!env.DB)return null;
+  if(!SCH){
+    await env.DB.batch([
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY,first_name TEXT,username TEXT,tg_lang TEXT,premium INTEGER DEFAULT 0,src TEXT,first_seen INTEGER,started_at INTEGER,last_seen INTEGER,blocked INTEGER DEFAULT 0,blocked_at INTEGER,app_lang TEXT,platform TEXT)'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS daily(day TEXT,uid INTEGER,secs INTEGER DEFAULT 0,opens INTEGER DEFAULT 0,msgs INTEGER DEFAULT 0,PRIMARY KEY(day,uid))'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS sections(day TEXT,sec TEXT,n INTEGER DEFAULT 0,PRIMARY KEY(day,sec))'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY,v TEXT)'),
+      env.DB.prepare("INSERT OR IGNORE INTO meta(k,v) VALUES('since',?1)").bind(String(Date.now()))
+    ]);
+    SCH=true;
+  }
+  return env.DB;
+}
+function userStmt(db,u,o={}){
+  const now=Date.now();
+  return db.prepare(`INSERT INTO users(id,first_name,username,tg_lang,premium,src,first_seen,started_at,last_seen,blocked,app_lang,platform)
+    VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?7,0,?9,?10)
+    ON CONFLICT(id) DO UPDATE SET first_name=excluded.first_name,username=excluded.username,tg_lang=COALESCE(excluded.tg_lang,users.tg_lang),premium=excluded.premium,
+    last_seen=excluded.last_seen,started_at=COALESCE(users.started_at,excluded.started_at),
+    blocked=CASE WHEN ?11=1 THEN 0 ELSE users.blocked END,app_lang=COALESCE(excluded.app_lang,users.app_lang),platform=COALESCE(excluded.platform,users.platform)`)
+    .bind(u.id,u.first_name||null,u.username||null,u.language_code||null,u.is_premium?1:0,o.src||null,now,o.started?now:null,o.app_lang||null,o.platform||null,o.bot?1:0);
+}
+async function getAdmins(db){const r=await db.prepare("SELECT v FROM meta WHERE k='admins'").first();return ((r&&r.v)||'').split(',').filter(Boolean)}
+async function isAdmin(db,id){return (await getAdmins(db)).includes(String(id))}
+async function addAdmin(db,id){const a=await getAdmins(db);if(!a.includes(String(id)))a.push(String(id));
+  await db.prepare("INSERT INTO meta(k,v) VALUES('admins',?1) ON CONFLICT(k) DO UPDATE SET v=excluded.v").bind(a.join(',')).run()}
+async function sha256hex(t){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function trackBot(env,u){
+  const db=await D(env);if(!db)return;
+  if(u.my_chat_member){const c=u.my_chat_member;if(c.chat.type!=='private')return;const blk=c.new_chat_member.status==='kicked'?1:0;
+    if(blk) await db.batch([userStmt(db,c.from,{started:true}),db.prepare('UPDATE users SET blocked=1,blocked_at=?2 WHERE id=?1').bind(c.from.id,Date.now())]);
+    else await db.prepare('UPDATE users SET blocked=0 WHERE id=?1').bind(c.from.id).run();
+    return}
+  const m=u.message||(u.callback_query&&u.callback_query.message), from=u.message?u.message.from:(u.callback_query&&u.callback_query.from);
+  if(!from||!m||m.chat.type!=='private'||from.is_bot)return;
+  const txt=(u.message&&u.message.text)||'', sp=/^\/start(?:@\w+)?\s+(\S+)/.exec(txt);
+  await db.batch([userStmt(db,from,{started:true,bot:true,src:sp?sp[1].slice(0,40):(/^\/start/.test(txt)?'bot':null)}),
+    db.prepare('INSERT INTO daily(day,uid,msgs) VALUES(?1,?2,1) ON CONFLICT(day,uid) DO UPDATE SET msgs=msgs+1').bind(dstr(Date.now()),from.id)]);
+}
+async function handlePing(req,env){
+  let f;try{f=await req.formData()}catch(e){return J({ok:false},400)}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false},403);
+  const db=await D(env).catch(()=>null);if(!db)return J({ok:true,admin:false,nodb:true});
+  const secs=Math.max(0,Math.min(900,parseInt(f.get('secs'))||0)), open=f.get('open')==='1'?1:0, day=dstr(Date.now());
+  let secList=[];try{secList=JSON.parse(f.get('sec')||'[]').filter(x=>typeof x==='string'&&/^[a-z0-9_:-]{1,30}$/.test(x)).slice(0,15)}catch(e){}
+  const sp=String(f.get('sp')||'').replace(/[^\w-]/g,'').slice(0,40);
+  const st=[userStmt(db,u,{src:sp||'app',app_lang:String(f.get('lang')||'').slice(0,5)||null,platform:String(f.get('pf')||'').slice(0,12)||null}),
+    db.prepare('INSERT INTO daily(day,uid,secs,opens) VALUES(?1,?2,?3,?4) ON CONFLICT(day,uid) DO UPDATE SET secs=secs+?3,opens=opens+?4').bind(day,u.id,secs,open),
+    ...secList.map(x=>db.prepare('INSERT INTO sections(day,sec,n) VALUES(?1,?2,1) ON CONFLICT(day,sec) DO UPDATE SET n=n+1').bind(day,x)),
+    db.prepare("SELECT v FROM meta WHERE k='admins'")];
+  const r=await db.batch(st);const row=r[r.length-1].results[0];
+  return J({ok:true,admin:((row&&row.v)||'').split(',').includes(String(u.id))});
+}
+async function computeStats(db,env){
+  const now=Date.now(),today=dstr(now),d7=dstr(now-6*DAY),d30=dstr(now-29*DAY),d60=dstr(now-59*DAY);
+  const t0=Date.parse(today+'T00:00:00Z')-TZMS,t7=t0-6*DAY,t30=t0-29*DAY;
+  const q=(s,...b)=>b.length?db.prepare(s).bind(...b):db.prepare(s);
+  const r=await db.batch([
+    q('SELECT COUNT(*) total,SUM(started_at IS NOT NULL) started,SUM(started_at IS NOT NULL AND blocked=0) active,SUM(blocked=1) blocked,SUM(premium=1) premium,SUM(first_seen>=?1) n1,SUM(first_seen>=?2) n7,SUM(first_seen>=?3) n30 FROM users',t0,t7,t30),
+    q('SELECT COUNT(DISTINCT uid) n FROM daily WHERE day>=?1',today),
+    q('SELECT COUNT(DISTINCT uid) n FROM daily WHERE day>=?1',d7),
+    q('SELECT COUNT(DISTINCT uid) n FROM daily WHERE day>=?1',d30),
+    q('SELECT day,COUNT(*) u,SUM(secs) s,SUM(secs>0) au,SUM(opens) o,SUM(msgs) m FROM daily WHERE day>=?1 GROUP BY day ORDER BY day',d60),
+    q("SELECT strftime('%Y-%m-%d',(first_seen+?2)/1000,'unixepoch') day,COUNT(*) n FROM users WHERE first_seen>=?1 GROUP BY day",now-60*DAY,TZMS),
+    q('SELECT sec k,SUM(n) n FROM sections WHERE day>=?1 GROUP BY sec ORDER BY n DESC LIMIT 16',d30),
+    q("SELECT COALESCE(app_lang,tg_lang,'?') k,COUNT(*) n FROM users GROUP BY k ORDER BY n DESC LIMIT 8"),
+    q("SELECT COALESCE(platform,'?') k,COUNT(*) n FROM users GROUP BY k ORDER BY n DESC LIMIT 8"),
+    q("SELECT COALESCE(src,'?') k,COUNT(*) n FROM users GROUP BY k ORDER BY n DESC LIMIT 30"),
+    q("SELECT k,v FROM meta WHERE k IN ('since','checked')"),
+    q('SELECT COUNT(*) n,SUM(EXISTS(SELECT 1 FROM daily d WHERE d.uid=users.id AND d.day>=?3)) back FROM users WHERE first_seen<?1 AND first_seen>=?2',t7,t7-7*DAY,d7),
+    q('SELECT SUM(secs) s,SUM(secs>0) au FROM daily WHERE day>=?1',d7)
+  ]);
+  const one=i=>r[i].results[0]||{}, all=i=>r[i].results||[];
+  const meta=Object.fromEntries(all(10).map(x=>[x.k,x.v]));
+  let wh=null;try{const w=await tg(env,'getWebhookInfo',{});if(w.ok){wh={pending:w.result.pending_update_count||0,error:w.result.last_error_message||null};
+    const au=w.result.allowed_updates;if(au&&au.length&&!au.includes('my_chat_member')&&w.result.url){await tg(env,'setWebhook',{url:w.result.url,allowed_updates:[...au,'my_chat_member'],...(env.WEBHOOK_SECRET?{secret_token:env.WEBHOOK_SECRET}:{})});wh.fixed=true}}}catch(e){}
+  return {now,today,users:one(0),dau:one(1).n||0,wau:one(2).n||0,mau:one(3).n||0,days:all(4),newDays:all(5),sections:all(6),langs:all(7),platforms:all(8),sources:all(9),
+    since:+meta.since||null,checked:+meta.checked||null,ret:one(11),avg7:one(12),wh};
+}
+async function adminReq(req,env){
+  let f;try{f=await req.formData()}catch(e){return [null,J({ok:false,error:'form'},400)]}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return [null,J({ok:false,error:'auth'},403)];
+  const db=await D(env).catch(()=>null);if(!db)return [null,J({ok:false,error:'nodb'},503)];
+  if(!await isAdmin(db,u.id))return [null,J({ok:false,error:'admin'},403)];
+  return [{f,u,db},null];
+}
+async function handleStats(req,env){const [c,e]=await adminReq(req,env);if(e)return e;return J({ok:true,...await computeStats(c.db,env)})}
+async function handleCheck(req,env){
+  const [c,e]=await adminReq(req,env);if(e)return e;const {f,db}=c;
+  const after=parseInt(f.get('after'))||0, N=40;
+  const rows=(await db.prepare('SELECT id FROM users WHERE started_at IS NOT NULL AND id>?1 ORDER BY id LIMIT ?2').bind(after,N).all()).results||[];
+  let alive=0,blocked=0;const upd=[];
+  for(let i=0;i<rows.length;i+=20) await Promise.all(rows.slice(i,i+20).map(async x=>{
+    const j=await tg(env,'sendChatAction',{chat_id:x.id,action:'typing'}).catch(()=>null);if(!j)return;
+    if(j.ok){alive++;upd.push(db.prepare('UPDATE users SET blocked=0 WHERE id=?1').bind(x.id))}
+    else if(j.error_code===403){blocked++;upd.push(db.prepare('UPDATE users SET blocked=1,blocked_at=COALESCE(blocked_at,?2) WHERE id=?1').bind(x.id,Date.now()))}}));
+  const done=rows.length<N;
+  if(done)upd.push(db.prepare("INSERT INTO meta(k,v) VALUES('checked',?1) ON CONFLICT(k) DO UPDATE SET v=excluded.v").bind(String(Date.now())));
+  if(upd.length)await db.batch(upd);
+  return J({ok:true,next:rows.length?rows[rows.length-1].id:after,done,alive,blocked});
+}
+const fmtMin=s=>{s=Math.round(s||0);const m=Math.floor(s/60);return m?`${m} daq ${s%60} s`:`${s} s`};
+async function statsText(env,db){
+  const S=await computeStats(db,env),U=S.users;
+  return `📊 <b>Hamroh statistikasi</b>\n\n👥 Jami foydalanuvchi: <b>${U.total||0}</b>\n▶️ Botda start bosgan: <b>${U.started||0}</b>\n✅ Faol (bloklamagan): <b>${U.active||0}</b>\n⛔ Bloklagan: <b>${U.blocked||0}</b>\n\n📅 Bugun: <b>${S.dau}</b> · 7 kun: <b>${S.wau}</b> · 30 kun: <b>${S.mau}</b>\n🆕 Yangi: bugun <b>${U.n1||0}</b> · 7 kun <b>${U.n7||0}</b> · 30 kun <b>${U.n30||0}</b>\n⏱ O‘rtacha kunlik vaqt (7 kun): <b>${S.avg7.au?fmtMin(S.avg7.s/S.avg7.au):'—'}</b>\n\n<i>Batafsil — admin panelda.</i>`;
+}
 export default {
   async fetch(req,env){
     const path=new URL(req.url).pathname;
     if(req.method==='OPTIONS')return new Response(null,{headers:CORS});
     if(path==='/send'&&req.method==='POST')return handleSend(req,env);
     if(path==='/hello'&&req.method==='POST')return handleHello(req,env);
+    if(path==='/ping'&&req.method==='POST')return handlePing(req,env);
+    if(path==='/admin/stats'&&req.method==='POST')return handleStats(req,env);
+    if(path==='/admin/check'&&req.method==='POST')return handleCheck(req,env);
     if(req.method!=='POST') return new Response('Hamroh bot ishlayapti ✅');
     if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
     const u=await req.json().catch(()=>({}));
     try{ if(u.message) await onMessage(env,u.message); else if(u.callback_query) await onCallback(env,u.callback_query); }catch(e){console.log(e)}
+    try{ await trackBot(env,u) }catch(e){console.log('stats',e)}
+    if(u.my_chat_member) return new Response('ok');
     try{ const m=u.message||(u.callback_query&&u.callback_query.message); const cid=m&&m.chat&&m.chat.type==='private'&&m.chat.id;
       const isStart=u.message&&/^\/start/.test(u.message.text||'');
       if(cid&&!isStart){const C=await cfg();if(C.pinStart!==false){const ch=await tg(env,'getChat',{chat_id:cid});if(ch.ok&&!ch.result.pinned_message)await sendStart(env,cid,C,true)}} }catch(e){console.log(e)}
