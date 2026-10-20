@@ -1,0 +1,262 @@
+[
+{
+"id": "m11-1",
+"q": "Velosipedchiga qaysi yoshdagi bolani maxsus o'rindiqda tashishga ruxsat etiladi?",
+"o": [
+"10 yoshgacha bo'lgan bolani, rulda",
+"7 yoshgacha bo'lgan bolani, oyoq qo'yadigan joyi bor qo'shimcha o'rindiqda",
+"12 yoshgacha bo'lgan bolani, ramada",
+"Bola tashish butunlay taqiqlanadi"
+],
+"a": 1,
+"iz": "Velosipedchiga yo'lovchi tashish taqiqlanadi, oyoq qo'yadigan joyi bo'lgan qo'shimcha o'rindiqda 7 yoshgacha bo'lgan bolani tashish bundan mustasno.",
+"src": "YHQ, 168-band"
+},
+{
+"id": "m11-2",
+"q": "Velosiped yo'lkasi bilan kesishmada va undan oldin qancha masofada to'xtash taqiqlanadi?",
+"o": [
+"10 m dan kam masofada",
+"30 m dan kam masofada",
+"5 m dan kam masofada",
+"15 m dan kam masofada"
+],
+"a": 0,
+"iz": "Velosiped yo'lkasi bilan kesishmada va undan oldin 10 m dan kam masofada to'xtash taqiqlanadi.",
+"src": "YHQ, 91-band"
+},
+{
+"id": "m11-3",
+"q": "Tirbandlik (yuqori harakat jadalligi) sharoitida qatorni o'zgartirishga qachon ruxsat etiladi?",
+"o": [
+"Faqat burilish, qayrilib olish, to'xtash yoki to'siqni aylanib o'tish uchun",
+"Hech qachon",
+"Faqat quvib o'tish uchun",
+"Istalgan vaqtda"
+],
+"a": 0,
+"iz": "Yuqori harakat jadalligida barcha qatorlar band bo'lsa, qatorni o'zgartirishga faqat o'ngga, chapga burilish, qayrilib olish, to'xtash yoki to'siqni aylanib o'tish uchun ruxsat etiladi.",
+"src": "YHQ, 67-band"
+},
+{
+"id": "m11-4",
+"q": "\"D\" toifasi bo'yicha boshqarish huquqi necha yoshdan beriladi?",
+"o": [
+"18 yoshdan",
+"20 yoshdan",
+"19 yoshdan",
+"21 yoshdan"
+],
+"a": 3,
+"iz": "\"D\" va \"DE\" toifalari, shuningdek tramvay va trolleybus boshqarish huquqi 21 yoshdan beriladi.",
+"src": "YHQ, 149-band"
+},
+{
+"id": "m11-5",
+"q": "To'xtash taqiqlangan joyda majburan to'xtagan haydovchi nima qilishi kerak?",
+"o": [
+"Transport vositasini yo'l chetiga imkon qadar yaqin qo'yib, uni darhol olib chiqish choralarini ko'rishi",
+"Transport vositasini qoldirib ketishi",
+"Yo'lning o'rtasida turib yordam kutishi",
+"Hech narsa qilmasligi"
+],
+"a": 0,
+"iz": "To'xtash taqiqlangan joyda majburiy to'xtaganda haydovchi transport vositasini yo'l chetiga imkon qadar yaqin qo'yishi va uni darhol olib chiqish choralarini ko'rishi kerak.",
+"src": "YHQ, 93-band"
+},
+{
+"id": "m11-6",
+"q": "Velosipedchiga yuk tashishda nima taqiqlanadi?",
+"o": [
+"Ryukzak bilan harakatlanish",
+"Orqa yukxonada yuk tashish",
+"Eni yoki bo'yi bo'yicha 0,5 m dan ko'p chiqib turgan yukni tashish",
+"Savatda kichik yuk tashish"
+],
+"a": 2,
+"iz": "Velosipedchiga eni yoki bo'yi bo'yicha 0,5 m dan ko'p chiqib turgan yoki boshqarishga xalal beradigan yukni tashish taqiqlanadi.",
+"src": "YHQ, 168-band"
+},
+{
+"id": "m11-7",
+"q": "Kuchli yomg'ir yoki qor yog'ayotganda kunduzi qaysi chiroq yoqilishi kerak?",
+"o": [
+"Yaqin chiroq",
+"Hech qanday chiroq",
+"Faqat gabarit chiroqlar",
+"Uzoq chiroq"
+],
+"a": 0,
+"iz": "Kuchli yomg'ir yoki qor yog'ayotganda kunduzi ham yaqin chiroq yoqilishi kerak.",
+"src": "YHQ, 138-band"
+},
+{
+"id": "m11-8",
+"q": "Shlagbaum yopilayotgan bo'lsa, temir yo'l kesishmasiga kirish mumkinmi?",
+"o": [
+"Ha, tezlikni oshirib",
+"Ha, poezd ko'rinmasa",
+"Ha, svetofor yashil bo'lsa",
+"Yo'q, svetofor ishorasidan qat'i nazar taqiqlanadi"
+],
+"a": 3,
+"iz": "Shlagbaum yopiq bo'lsa yoki yopila boshlagan bo'lsa, svetofor ishorasidan qat'i nazar kesishmaga kirish taqiqlanadi.",
+"src": "YHQ, 118-band"
+},
+{
+"id": "m11-9",
+"q": "Qorong'ida chiqib turgan yukning orqa tomoniga qanday rangdagi chiroq yoki nur qaytargich o'rnatiladi?",
+"o": [
+"Oq",
+"Sariq",
+"Qizil",
+"Yashil"
+],
+"a": 2,
+"iz": "Qorong'ida va yetarlicha ko'rinmaslik sharoitida chiqib turgan yukning old tomoniga oq, orqa tomoniga qizil rangli chiroq yoki nur qaytargich o'rnatiladi.",
+"src": "YHQ, 163-band"
+},
+{
+"id": "m11-10",
+"q": "Mexanik transport vositalariga yo'lkalarda, piyodalar va velosiped yo'lkalarida harakatlanishga ruxsat etiladimi?",
+"o": [
+"Ha, kechasi",
+"Ha, tirbandlik bo'lsa",
+"Yo'q, yo'l ta'mirlash va kommunal transport, yuk yetkazishning boshqa imkoni bo'lmagan hollar bundan mustasno",
+"Ha, tezlik soatiga 20 km dan oshmasa"
+],
+"a": 2,
+"iz": "Mexanik transport vositalarining ajratuvchi bo'laklar, yo'l yoqalari, yo'lkalar, piyoda va velosiped yo'lkalari, yashil hududlarda harakatlanishi taqiqlanadi (yo'l ta'mirlash, kommunal va yuk yetkazishning boshqa imkoni yo'q transport bundan mustasno).",
+"src": "YHQ, 72-band"
+},
+{
+"id": "m11-11",
+"q": "Velosipedchi piyodalar o'tish joyidan qanday o'tishi kerak?",
+"o": [
+"Velosipeddan tushib, uni yetaklab",
+"Ovozli signal berib",
+"Velosipedda sekin harakatlanib",
+"Velosipedda tez harakatlanib"
+],
+"a": 0,
+"iz": "Velosipedchilarga qatnov qismini, shu jumladan piyodalar o'tish joylarini velosipedda kesib o'tish taqiqlanadi (velosiped o'tish joylari bundan mustasno).",
+"src": "YHQ, 168-band"
+},
+{
+"id": "m11-12",
+"q": "Temir yo'l kesishmasi oldida to'xtab turgan transport vositalarini qarama-qarshi qatordan aylanib o'tish mumkinmi?",
+"o": [
+"Ha, kunduzi",
+"Ha, poezd bo'lmasa",
+"Yo'q, taqiqlanadi",
+"Ha, ovozli signal berib"
+],
+"a": 2,
+"iz": "Temir yo'l kesishmasi oldida to'xtab turgan transport vositalarini qarama-qarshi harakat qatoriga chiqib aylanib o'tish taqiqlanadi.",
+"src": "YHQ, 118-band"
+},
+{
+"id": "m11-13",
+"q": "Chorrahadan tashqarida tramvay yo'li qatnov qismi bilan kesishgan joyda kim imtiyozga ega?",
+"o": [
+"Relssiz transport vositasi",
+"O'ng tomondagi transport vositasi",
+"Tezroq harakatlanayotgan transport",
+"Tramvay (depodan chiqish joylari bundan mustasno)"
+],
+"a": 3,
+"iz": "Chorrahadan tashqarida tramvay yo'li qatnov qismi bilan kesishgan joylarda tramvay relssiz transport vositalariga nisbatan imtiyozga ega (depodan chiqish joylari bundan mustasno).",
+"src": "YHQ, 131-band"
+},
+{
+"id": "m11-14",
+"q": "Chorrahadan tashqarida velosiped yo'lkasi yo'l bilan kesishgan tartibga solinmagan joyda kim yo'l beradi?",
+"o": [
+"Kattaroq transport",
+"Velosipedchi yo'lda harakatlanayotgan transport vositalariga",
+"Haydovchi velosipedchiga",
+"O'ng tomondagi"
+],
+"a": 1,
+"iz": "Velosiped yo'lkasi chorrahadan tashqarida yo'l bilan kesishgan tartibga solinmagan joyda velosipedchilar yo'lda harakatlanayotgan transport vositalariga yo'l berishi kerak.",
+"src": "YHQ, 169-band"
+},
+{
+"id": "m11-15",
+"q": "Svetofor bir vaqtda tramvay va relssiz transport vositalariga harakatlanishga ruxsat bersa, qaysi biri birinchi o'tadi?",
+"o": [
+"O'ng tomondagi",
+"Relssiz transport vositasi",
+"Tramvay, harakat yo'nalishidan qat'i nazar",
+"To'g'riga ketayotgan"
+],
+"a": 2,
+"iz": "Svetofor yoki tartibga soluvchi bir vaqtda ruxsat bersa, tramvay harakat yo'nalishidan qat'i nazar relssiz transport vositalariga nisbatan imtiyozga ega.",
+"src": "YHQ, 101-band"
+},
+{
+"id": "m11-16",
+"q": "Qorong'ida velosipedning old tomonida qanday chiroq yoki nur qaytargich bo'lishi kerak?",
+"o": [
+"Ko'k rangli",
+"Qizil rangli",
+"Sariq rangli",
+"Oq rangli"
+],
+"a": 3,
+"iz": "Qorong'ida velosipedning old tomonida oq rangli chiroq yoki nur qaytargich, orqa tomonida qizil rangli chiroq yoki nur qaytargich bo'lishi kerak.",
+"src": "YHQ, 167-band"
+},
+{
+"id": "m11-17",
+"q": "Asosiy yo'l chorrahada yo'nalishini o'zgartirsa, asosiy yo'ldagi haydovchilar o'zaro qanday harakatlanadi?",
+"o": [
+"Hech kimga yo'l bermasdan",
+"Faqat tramvayga yo'l berib",
+"Faqat chap tomondagiga yo'l berib",
+"Teng ahamiyatli yo'llar kesishmasidagi qoidalarga amal qilib"
+],
+"a": 3,
+"iz": "Asosiy yo'l chorrahada yo'nalishini o'zgartirsa, undagi haydovchilar o'zaro teng ahamiyatli yo'llar kesishmasidan o'tish qoidalariga amal qiladi.",
+"src": "YHQ, 106-band"
+},
+{
+"id": "m11-18",
+"q": "Yuk transport vositasining old yoki orqa chetidan qanchadan ko'p chiqib tursa, \"Yirik o'lchamli yuk\" belgisi qo'yiladi?",
+"o": [
+"0,5 m dan ko'p",
+"2 m dan ko'p",
+"1 m dan ko'p",
+"0,4 m dan ko'p"
+],
+"a": 2,
+"iz": "Yuk transport vositasining old yoki orqa chetidan 1 m dan, yon chetidan 0,4 m dan ko'p chiqib tursa, \"Yirik o'lchamli yuk\" taniqlik belgisi qo'yiladi.",
+"src": "YHQ, 163-band"
+},
+{
+"id": "m11-19",
+"q": "Yengil avtomobil tomidagi yukxonada yukning balandligi qanchadan oshmasligi kerak?",
+"o": [
+"1,5 m",
+"1 m",
+"0,5 m",
+"2 m"
+],
+"a": 1,
+"iz": "Yengil avtomobil tomidagi yukxonada yukning balandligi 1 m dan, transport vositasi chegarasidan uzunasiga chiqishi esa 0,5 m dan oshmasligi kerak (maxsus moslamada mahkamlangan velosipedlar bundan mustasno).",
+"src": "YHQ, 162-band"
+},
+{
+"id": "m11-20",
+"q": "Temir yo'l kesishmasida majburiy to'xtaganda haydovchi avvalo nima qilishi kerak?",
+"o": [
+"Faqat avariya chirog'ini yoqishi",
+"Darhol yo'lovchilarni tushirishi va kesishmani bo'shatish choralarini ko'rishi",
+"Yordam kelishini kabinada kutishi",
+"Poezd o'tib ketishini kutishi"
+],
+"a": 1,
+"iz": "Kesishmada majburiy to'xtaganda haydovchi darhol yo'lovchilarni tushirishi va kesishmani bo'shatish choralarini ko'rishi kerak.",
+"src": "YHQ, 120-band"
+}
+]

@@ -1,0 +1,262 @@
+[
+{
+"id": "m9-1",
+"q": "Yomg'ir yoki qor yog'ayotganda qaysi nosozlik bilan harakatlanish taqiqlanadi?",
+"o": [
+"Radio ishlamasa",
+"Oyna tozalagichlar ishlamasa",
+"Konditsioner ishlamasa",
+"Salon chirog'i ishlamasa"
+],
+"a": 1,
+"iz": "Yomg'ir yoki qor yog'ayotganda oyna tozalagichlari ishlamaydigan transport vositasini boshqarish taqiqlanadi.",
+"src": "YHQ, 12-band"
+},
+{
+"id": "m9-2",
+"q": "Old, yon va orqa oynalarning yorug'lik o'tkazuvchanligi qanchadan kam bo'lsa, foydalanish taqiqlanadi (ruxsatnomasiz)?",
+"o": [
+"50%",
+"70%",
+"60%",
+"80%"
+],
+"a": 1,
+"iz": "Oynalarning yorug'lik o'tkazuvchanligi 70% dan kam bo'lsa (ruxsatnoma bo'lmaganda) transport vositasidan foydalanish taqiqlanadi.",
+"src": "YHQ, 3-ilova, 7.4"
+},
+{
+"id": "m9-3",
+"q": "Yo'lka bo'lmasa, piyodalar qatnov qismi chetida qanday harakatlanishi kerak?",
+"o": [
+"Bir qator bo'lib, transport harakati yo'nalishida",
+"Bir qator bo'lib, transport vositalarining harakatiga qarama-qarshi yo'nalishda",
+"Qatnov qismining o'rtasida",
+"Ikki qator bo'lib, istalgan yo'nalishda"
+],
+"a": 1,
+"iz": "Yo'lka va yo'l yoqasi bo'lmasa, piyodalar qatnov qismi chetida bir qator bo'lib, transport vositalarining harakatiga qarama-qarshi yo'nalishda harakatlanadi.",
+"src": "YHQ, 15-band"
+},
+{
+"id": "m9-4",
+"q": "Odam tashiyotgan yuk avtomobili kuzovi bortlarining balandligi qancha bo'lishi kerak?",
+"o": [
+"Kamida 1,5 m",
+"Kamida 1,3 m",
+"Kamida 1,0 m",
+"Kamida 0,8 m"
+],
+"a": 1,
+"iz": "Odam tashiyotgan yuk avtomobili bortlarining balandligi kamida 1,3 m bo'lishi, o'rindiqlar poldan 0,3–0,5 m balandlikda mahkamlanishi kerak.",
+"src": "YHQ, 153-band"
+},
+{
+"id": "m9-5",
+"q": "Mototsikl haydovchisi va yo'lovchisi nima qilishi shart?",
+"o": [
+"Faqat haydovchi dubulg'a kiyishi",
+"Mototsikl dubulg'asini kiyib, uni mahkamlashi",
+"Faqat aholi punktidan tashqarida dubulg'a kiyishi",
+"Faqat yorituvchi nimcha kiyishi"
+],
+"a": 1,
+"iz": "Mototsikl, elektromototsikl, moped va skuterni boshqarayotgan haydovchi va yo'lovchilar mototsikl dubulg'asini kiyib, mahkamlab olishi shart.",
+"src": "YHQ, 9-band"
+},
+{
+"id": "m9-6",
+"q": "Yuk avtomobilining kuzovida 8 kishidan ortiq odam tashish uchun yana qanday toifa talab etiladi?",
+"o": [
+"\"BE\" toifa",
+"\"D\" toifa",
+"Qo'shimcha toifa talab etilmaydi",
+"\"A\" toifa"
+],
+"a": 1,
+"iz": "Kabinadagilar bilan birga 8 kishidan ortiq odam tashish uchun haydovchida \"D\" toifasi ham bo'lishi kerak.",
+"src": "YHQ, 152-band"
+},
+{
+"id": "m9-7",
+"q": "Bitta o'qqa turli o'lchamdagi yoki turli protektor naqshli shinalar o'rnatilgan bo'lsa, transport vositasidan foydalanish mumkinmi?",
+"o": [
+"Ha, faqat orqa o'qda",
+"Ha, agar o'lchamlar yaqin bo'lsa",
+"Yo'q, taqiqlanadi",
+"Ha, yozda"
+],
+"a": 2,
+"iz": "Bitta o'qqa turli o'lchamdagi, konstruksiyadagi, protektor naqshidagi, qishki va qishki bo'lmagan shinalar o'rnatilgan bo'lsa, foydalanish taqiqlanadi.",
+"src": "YHQ, 3-ilova, 5.5"
+},
+{
+"id": "m9-8",
+"q": "To'xtab turgan avtobusni piyoda qaysi tomondan aylanib o'tishi kerak?",
+"o": [
+"Orqa tomondan",
+"Istalgan tomondan",
+"Old tomondan",
+"Aylanib o'tish taqiqlanadi"
+],
+"a": 0,
+"iz": "Piyodalar to'xtab turgan avtobus va trolleybuslarni orqa tomondan, tramvaylarni esa old tomondan aylanib o'tadi.",
+"src": "YHQ, 19-band"
+},
+{
+"id": "m9-9",
+"q": "Piyodalarga qatnov qismida va o'tish joylarida nima taqiqlanadi?",
+"o": [
+"Telefondan foydalanish, video ko'rish va diqqatni chalg'itadigan qurilmalardan foydalanish",
+"Atrofga qarash",
+"Svetofor ishorasiga amal qilish",
+"Transport vositalarining tezligini baholash"
+],
+"a": 0,
+"iz": "Qatnov qismida va piyodalar o'tish joylarida telefondan foydalanish, video ko'rish, audio tinglash va diqqatni chalg'itadigan boshqa qurilmalardan foydalanish taqiqlanadi.",
+"src": "YHQ, 19-band"
+},
+{
+"id": "m9-10",
+"q": "Elektr samokatda yo'lovchi tashishga ruxsat etiladimi?",
+"o": [
+"Ha, bola bo'lsa",
+"Ha, kunduzi",
+"Ha, bitta yo'lovchi",
+"Yo'q, taqiqlanadi"
+],
+"a": 3,
+"iz": "Elektr samokatda yo'lovchi tashish taqiqlanadi.",
+"src": "YHQ, 12-1-band"
+},
+{
+"id": "m9-11",
+"q": "Tartibga soluvchi o'ng qo'lini oldinga cho'zgan. Uning ko'kragi tomonidan kelayotgan transport vositalari qayerga harakatlanishi mumkin?",
+"o": [
+"Harakatlanish taqiqlanadi",
+"Barcha yo'nalishlarga",
+"Faqat to'g'riga",
+"Faqat o'ngga"
+],
+"a": 3,
+"iz": "O'ng qo'l oldinga cho'zilganda tartibga soluvchining ko'kragi tomonidan barcha transport vositalari faqat o'ngga harakatlanishi mumkin.",
+"src": "YHQ, 38-band"
+},
+{
+"id": "m9-12",
+"q": "Mototsikl va mopedlar shinalari protektorining qoldiq chuqurligi qanchadan kam bo'lsa, foydalanish taqiqlanadi?",
+"o": [
+"1,0 mm",
+"0,8 mm",
+"0,5 mm",
+"1,6 mm"
+],
+"a": 1,
+"iz": "Mototsikllar va mopedlar (skuterlar va kvadrotsikllar ham) uchun protektor chuqurligi 0,8 mm dan kam bo'lsa, foydalanish taqiqlanadi.",
+"src": "YHQ, 3-ilova, 5.1"
+},
+{
+"id": "m9-13",
+"q": "\"Yetarlicha ko'rinmaslik\" deganda yo'lning ko'rinishi qanchadan kam bo'lishi tushuniladi?",
+"o": [
+"500 m dan kam",
+"100 m dan kam",
+"150 m dan kam",
+"300 m dan kam"
+],
+"a": 3,
+"iz": "Yetarlicha ko'rinmaslik — tuman, yomg'ir, qor va shu kabi sharoitlarda, shuningdek g'ira-shirada yo'lning ko'rinishi 300 m dan kam bo'lishi.",
+"src": "YHQ, 6-band"
+},
+{
+"id": "m9-14",
+"q": "Ko'k yoki qizil miltillovchi chiroq va maxsus ovozli ishora yoqilgan transport vositasi yaqinlashganda piyoda nima qilishi kerak?",
+"o": [
+"O'tishni tezlashtirishi",
+"Qatnov qismining o'rtasida to'xtashi",
+"Transport vositasini to'xtatishga urinishi",
+"Qatnov qismiga chiqmasligi, qatnov qismida bo'lsa — yo'l berib, uni darhol bo'shatishi"
+],
+"a": 3,
+"iz": "Ko'k yoki qizil miltillovchi chiroq va maxsus ovozli ishora yoqilgan tezkor va maxsus xizmat transport vositalari yaqinlashganda piyodalar qatnov qismiga chiqmasligi, unda bo'lsa — yo'l berib, darhol bo'shatishi kerak.",
+"src": "YHQ, 21-band"
+},
+{
+"id": "m9-15",
+"q": "M1 toifali avtomobillarda rul boshqaruvining umumiy lyufti qanchadan oshsa, foydalanish taqiqlanadi?",
+"o": [
+"10°",
+"20°",
+"5°",
+"25°"
+],
+"a": 0,
+"iz": "Rul boshqaruvidagi umumiy lyuft M1 toifasi uchun 10°, M2, M3, N1 uchun 20°, N2, N3 uchun 25° dan oshsa, transport vositasidan foydalanish taqiqlanadi.",
+"src": "YHQ, 3-ilova, 2.1"
+},
+{
+"id": "m9-16",
+"q": "Piyodalarning tashkiliy guruhi qatnov qismida qanday harakatlanishi mumkin?",
+"o": [
+"Transport harakati yo'nalishida, o'ng tomonda, to'rt kishidan oshmagan qator bilan",
+"Qatnov qismining o'rtasida, istalgancha qator bilan",
+"Faqat kechasi",
+"Transport harakatiga qarama-qarshi, chap tomonda"
+],
+"a": 0,
+"iz": "Piyodalarning tashkiliy guruhi transport harakati yo'nalishida, qatnov qismining faqat o'ng tomonida, to'rt kishidan oshmagan qator bo'lib harakatlanishi mumkin.",
+"src": "YHQ, 16-band"
+},
+{
+"id": "m9-17",
+"q": "\"B\" toifasi qanday transport vositalarini boshqarish huquqini beradi?",
+"o": [
+"Haydovchidan tashqari 8 tadan ortiq o'rindiqli avtobuslarni",
+"Ruxsat etilgan maksimal massasi 3500 kg gacha, haydovchidan tashqari o'rindiqlari 8 tadan oshmaydigan avtomobillarni",
+"Massasi 3500 kg dan ortiq yuk avtomobillarini",
+"Faqat mototsikllarni"
+],
+"a": 1,
+"iz": "\"B\" toifasi ruxsat etilgan maksimal massasi 3500 kg dan oshmaydigan va haydovchi o'rindig'idan tashqari o'rindiqlari 8 tadan ko'p bo'lmagan avtomobillarni boshqarish huquqini beradi.",
+"src": "YHQ, 8-band"
+},
+{
+"id": "m9-18",
+"q": "\"B\" va \"C\" toifalari bo'yicha boshqarish huquqi necha yoshdan beriladi?",
+"o": [
+"18 yoshdan",
+"19 yoshdan",
+"21 yoshdan",
+"16 yoshdan"
+],
+"a": 0,
+"iz": "\"B\" va \"C\" toifalari bo'yicha boshqarish huquqi 18 yoshdan beriladi.",
+"src": "YHQ, 149-band"
+},
+{
+"id": "m9-19",
+"q": "Aholi punktlarida projektor va qidiruv chiroqlaridan kim foydalanishi mumkin?",
+"o": [
+"Hech kim",
+"Faqat 25 va 28-bandlarda ko'rsatilgan maxsus transport vositalarining haydovchilari",
+"Barcha haydovchilar",
+"Faqat yuk avtomobili haydovchilari"
+],
+"a": 1,
+"iz": "Aholi punktlarida projektor va qidiruv chiroqlaridan faqat 25 va 28-bandlarda ko'rsatilgan transport vositalarining haydovchilari foydalanishi mumkin.",
+"src": "YHQ, 139-band"
+},
+{
+"id": "m9-20",
+"q": "Necha yoshdan boshlab yo'llarda moped va skuter boshqarishga ruxsat etiladi?",
+"o": [
+"16 yoshdan",
+"15 yoshdan",
+"14 yoshdan",
+"18 yoshdan"
+],
+"a": 0,
+"iz": "Moped va skuter boshqarishga 16 yoshdan ruxsat etiladi.",
+"src": "YHQ, 165-band"
+}
+]

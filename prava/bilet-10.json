@@ -1,0 +1,262 @@
+[
+{
+"id": "m10-1",
+"q": "Reversiv harakatli yo'lga chiqishda haydovchi chorrahadan qaysi qatorga chiqishi kerak?",
+"o": [
+"O'rta qatorga",
+"Istalgan qatorga",
+"Chetki o'ng qatorga",
+"Chetki chap qatorga"
+],
+"a": 2,
+"iz": "Reversiv harakatli yo'lga kirishda haydovchi chorrahadan chetki o'ng qatorga chiqishi kerak. Boshqa qatorlarga harakatga ruxsat ekaniga ishonch hosil qilgandan keyingina qatorni o'zgartirishi mumkin.",
+"src": "YHQ, 71-band"
+},
+{
+"id": "m10-2",
+"q": "Aholi punktidan tashqarida ikki qatorli ikki tomonlama yo'lda uzunligi 7 m dan ortiq transport vositasi haydovchisi nima qilishi kerak?",
+"o": [
+"Soatiga 40 km dan sekin harakatlanishi",
+"Har doim avariya chirog'ini yoqishi",
+"Quvib o'tayotgan transport vositasi oldinga xavfsiz kirib olishi uchun yetarli masofa saqlashi",
+"Chap qatorda harakatlanishi"
+],
+"a": 2,
+"iz": "Aholi punktidan tashqarida ikki qatorli ikki tomonlama yo'lda soatiga 50 km dan ortiq yura olmaydigan va uzunligi 7 m dan ortiq transport vositalari oldinda quvib o'tayotganlar kirib olishi uchun yetarli masofa saqlashi kerak.",
+"src": "YHQ, 74-band"
+},
+{
+"id": "m10-3",
+"q": "Avtobus va mikroavtobuslarning tomiga yukxona o'rnatishga ruxsat etiladimi?",
+"o": [
+"Ha, yuk 1 m dan oshmasa",
+"Ha, YHXX bilan kelishilsa",
+"Ha, faqat shaharlararo qatnovda",
+"Yo'q, taqiqlanadi"
+],
+"a": 3,
+"iz": "Avtobuslar va mikroavtobuslarning tomiga yuk tashish uchun yukxona o'rnatish taqiqlanadi.",
+"src": "YHQ, 164-band"
+},
+{
+"id": "m10-4",
+"q": "Haydovchi qanday hollarda transport vositasini tibbiyot xodimlariga yoki shoshilinch shifoxonaga yetkazish uchun berishi kerak?",
+"o": [
+"Hech qachon",
+"Har qanday so'rov bo'yicha",
+"Hayotiga xavf bo'lgan fuqarolarni shoshilinch tibbiy muassasaga olib borish uchun",
+"Faqat pul evaziga"
+],
+"a": 2,
+"iz": "Haydovchi tibbiyot xodimlariga va shoshilinch tibbiy yordamga muhtoj fuqarolarni tibbiyot muassasasiga yetkazish uchun transport vositasini berishi kerak (diplomatik va ayrim maxsus transportlar bundan mustasno).",
+"src": "YHQ, 11-band"
+},
+{
+"id": "m10-5",
+"q": "Haydovchi harakatni boshlashdan oldin yuk haqida nimaga ishonch hosil qilishi kerak?",
+"o": [
+"Hech narsaga, bu yuk egasining vazifasi",
+"Yuk to'g'ri joylashtirilgani va ishonchli mahkamlanganiga",
+"Yuk faqat yopilganiga",
+"Yuk bortlardan 0,5 m baland ekaniga"
+],
+"a": 1,
+"iz": "Harakatni boshlashdan oldin haydovchi yuk to'g'ri joylashtirilgani va ishonchli mahkamlanganiga ishonch hosil qilishi, yo'lda esa uning tushib ketmasligini kuzatib borishi kerak.",
+"src": "YHQ, 161-band"
+},
+{
+"id": "m10-6",
+"q": "Bir yo'nalishdagi qatorlar band bo'lsa, tramvay yo'li bo'ylab shu yo'nalishda harakatlanishga ruxsat etiladimi?",
+"o": [
+"Yo'q, hech qachon",
+"Faqat kechasi",
+"Ha, tramvaydan oldinda tez harakatlanib",
+"Ha, agar u tramvayga xalal bermasa"
+],
+"a": 3,
+"iz": "Shu yo'nalishdagi qatorlar band bo'lsa, qatnov qismi bilan bir sathda joylashgan tramvay yo'lidan tramvayga xalal bermagan holda shu yo'nalishda harakatlanishga ruxsat etiladi.",
+"src": "YHQ, 69-band"
+},
+{
+"id": "m10-7",
+"q": "Velosipedchilar qatnov qismida qanday harakatlanishi kerak?",
+"o": [
+"Qatnov qismining o'rtasida",
+"Istalgan qatorda",
+"Ikki qator bo'lib, chap chetda",
+"Imkon qadar o'ng chetda, bir qator bo'lib"
+],
+"a": 3,
+"iz": "Velosipedlar, mopedlar va aravalar imkon qadar chetki o'ng qatorda, bir qator bo'lib harakatlanishi kerak.",
+"src": "YHQ, 166-band"
+},
+{
+"id": "m10-8",
+"q": "Hayvonlarni temir yo'l orqali qanday o'tkazish kerak?",
+"o": [
+"Podani xavfsiz o'tkazish uchun guruhlarga bo'lib",
+"Temir yo'l bo'ylab yetaklab",
+"Butun podani bir vaqtda",
+"Faqat kechasi"
+],
+"a": 0,
+"iz": "Hayvonlarni temir yo'l kesishmasidan o'tkazishda poda haydovchilar soniga qarab xavfsiz o'tishni ta'minlaydigan guruhlarga bo'linishi kerak.",
+"src": "YHQ, 172-band"
+},
+{
+"id": "m10-9",
+"q": "\"BE\" va \"CE\" toifalari bo'yicha boshqarish huquqi necha yoshdan beriladi?",
+"o": [
+"19 yoshdan",
+"18 yoshdan",
+"21 yoshdan",
+"20 yoshdan"
+],
+"a": 0,
+"iz": "\"BE\" va \"CE\" toifalari bo'yicha boshqarish huquqi 19 yoshdan beriladi.",
+"src": "YHQ, 149-band"
+},
+{
+"id": "m10-10",
+"q": "Teng ahamiyatli yo'llar chorrahasida chapga burilayotgan relssiz transport vositasi kimga yo'l beradi?",
+"o": [
+"Faqat orqadan kelayotganlarga",
+"Qarama-qarshi tomondan to'g'riga va o'ngga ketayotganlarga",
+"Faqat chapga burilayotganlarga",
+"Hech kimga"
+],
+"a": 1,
+"iz": "Teng ahamiyatli yo'lda chapga burilishda yoki qayrilib olishda relssiz transport vositasi qarama-qarshi tomondan to'g'riga yoki o'ngga harakatlanayotgan transport vositalariga yo'l berishi shart.",
+"src": "YHQ, 107-band"
+},
+{
+"id": "m10-11",
+"q": "Haydovchi transport vositasini qachon tashlab ketishi mumkin?",
+"o": [
+"Faqat dvigatelni ishlatib qo'ygan holda",
+"Uning o'z-o'zidan harakatlanishi va ruxsatsiz foydalanilishining oldini oladigan choralarni ko'rgandan keyin",
+"Faqat avariya chirog'ini yoqib",
+"Istalgan vaqtda"
+],
+"a": 1,
+"iz": "Haydovchi transport vositasining o'z-o'zidan harakatlanishi yoki uning yo'qligida foydalanilishini istisno qiladigan choralarni ko'rgandan keyingina uni tashlab ketishi mumkin.",
+"src": "YHQ, 95-band"
+},
+{
+"id": "m10-12",
+"q": "Haydovchiga yo'lovchilarni tashishda nima qilish shart?",
+"o": [
+"Yo'lovchilarga deraza ochishga ruxsat berish",
+"Harakatni boshlashdan oldin yo'lovchilar o'tirganiga va eshiklar yopilganiga ishonch hosil qilish",
+"Hech narsa",
+"Faqat yo'lovchilarning hujjatlarini tekshirish"
+],
+"a": 1,
+"iz": "Harakatni boshlashdan oldin haydovchi yo'lovchilar o'tirganiga va eshiklar yopilganiga ishonch hosil qilishi kerak.",
+"src": "YHQ, 11-band"
+},
+{
+"id": "m10-13",
+"q": "Aholi punktidan tashqarida 2.1 \"Asosiy yo'l\" belgisi bilan belgilangan yo'llarning qatnov qismida nima taqiqlanadi?",
+"o": [
+"Soatiga 90 km tezlikda harakatlanish",
+"Quvib o'tish",
+"10 daqiqagacha to'xtash",
+"To'xtab turish"
+],
+"a": 3,
+"iz": "Aholi punktlaridan tashqarida 2.1 belgisi bilan belgilangan yo'llarning qatnov qismida to'xtab turish taqiqlanadi.",
+"src": "YHQ, 92-band"
+},
+{
+"id": "m10-14",
+"q": "Haydashni dastlabki o'rgatish qayerda o'tkazilishi kerak?",
+"o": [
+"Yopiq maydonchalarda yoki avtodromlarda",
+"Hovlilarda",
+"Avtomagistralda",
+"Aholi punktidagi istalgan yo'lda"
+],
+"a": 0,
+"iz": "Haydashni dastlabki o'rgatish umumiy foydalanishdagi yo'llardan tashqarida — yopiq maydonchalarda yoki avtodromlarda o'tkaziladi.",
+"src": "YHQ, 146-band"
+},
+{
+"id": "m10-15",
+"q": "Yuk transport vositasining yon chetidan qanchadan ko'p chiqib tursa, \"Yirik o'lchamli yuk\" belgisi qo'yiladi?",
+"o": [
+"0,5 m dan ko'p",
+"0,4 m dan ko'p",
+"0,2 m dan ko'p",
+"1 m dan ko'p"
+],
+"a": 1,
+"iz": "Yuk yon tomondan transport vositasining chetki nuqtasidan 0,4 m dan ko'p chiqib tursa, \"Yirik o'lchamli yuk\" belgisi qo'yiladi.",
+"src": "YHQ, 163-band"
+},
+{
+"id": "m10-16",
+"q": "Qizil yoki sariq ishora yonib turganda qo'shimcha seksiya strelkasi bo'yicha harakatlanayotgan haydovchi nima qilishi kerak?",
+"o": [
+"Hech kimga yo'l bermasligi",
+"Faqat tramvayga yo'l berishi",
+"Boshqa yo'nalishlardan harakatlanayotgan transport vositalariga yo'l berishi",
+"Faqat piyodalarga yo'l berishi"
+],
+"a": 2,
+"iz": "Qizil yoki sariq ishora bilan birga yoqilgan qo'shimcha seksiya strelkasi bo'yicha harakatlanayotgan haydovchi boshqa yo'nalishlardan harakatlanayotgan transport vositalariga yo'l berishi kerak.",
+"src": "YHQ, 100-band"
+},
+{
+"id": "m10-17",
+"q": "Mast holatdagi shaxsga transport vositasi boshqaruvini topshirish mumkinmi?",
+"o": [
+"Ha, aholi punktidan tashqarida",
+"Ha, qisqa masofaga",
+"Ha, agar u guvohnomaga ega bo'lsa",
+"Yo'q, taqiqlanadi"
+],
+"a": 3,
+"iz": "Mast, giyohvandlik ta'siridagi, charchagan yoki boshqarish huquqiga ega bo'lmagan shaxsga transport vositasi boshqaruvini topshirish taqiqlanadi.",
+"src": "YHQ, 12-band"
+},
+{
+"id": "m10-18",
+"q": "Kolonnada harakatlanayotgan transport vositalariga nisbatan nima taqiqlanadi?",
+"o": [
+"Kolonna o'tgach chorrahadan o'tish",
+"Kolonnadan keyin harakatlanish",
+"Kolonnani kesib o'tish va uning ichiga kirib olish",
+"Kolonnaga yo'l berish"
+],
+"a": 2,
+"iz": "Tashkiliy kolonnalarni kesib o'tish va ularning ichiga kirib olish taqiqlanadi.",
+"src": "YHQ, 12-band"
+},
+{
+"id": "m10-19",
+"q": "Aholi punktidan tashqarida haydovchi qaysi qatorda harakatlanishi kerak?",
+"o": [
+"Har doim chap qatorda",
+"Istalgan qatorda",
+"Imkon qadar qatnov qismining o'ng chetiga yaqin",
+"O'rta qatorda"
+],
+"a": 2,
+"iz": "Aholi punktlaridan tashqarida haydovchilar imkon qadar qatnov qismining o'ng chetiga yaqin harakatlanishi, o'ng qatorlar bo'sh bo'lsa chap qatorlarni egallamasligi kerak.",
+"src": "YHQ, 67-band"
+},
+{
+"id": "m10-20",
+"q": "Yuk bilan yoki yuksiz transport vositasining balandligi yo'l qoplamasidan qanchadan oshsa, harakatlanish YHXX bilan kelishiladi?",
+"o": [
+"4 m",
+"3,5 m",
+"4,5 m",
+"3 m"
+],
+"a": 0,
+"iz": "Transport vositasining yuk bilan yoki yuksiz balandligi yo'l qoplamasidan 4 m dan, kengligi 2,55 m dan oshsa, harakatlanish YHXX bilan kelishilishi kerak.",
+"src": "YHQ, 164-band"
+}
+]
