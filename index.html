@@ -538,6 +538,13 @@ body[data-sec="prava"]{--sec-a:#4a3200;--sec-b:#d99a00;--sec:#b07c00}
 .er-moral b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--sec);margin-bottom:4px}
 .er-end{text-align:center;color:var(--muted);font-size:14px;margin-top:14px!important}
 .er-book.night{background:#1d1a16;color:#e9dcc4}.er-book.night .note,.er-book.night .er-end{color:#a8997f}.er-book.night .er-moral{background:#2a251e}
+.lang-btn{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 10px;font-weight:700;font-size:12px;margin-right:6px;flex:none}
+.lang-btn+.today-chip{margin-left:0}
+.lang-sheet{position:fixed;inset:0;background:rgba(10,15,30,.45);z-index:80;display:flex;align-items:flex-end;justify-content:center;padding:12px}
+.lang-box{background:var(--surface);border-radius:22px;padding:16px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+.lang-box>b{font-family:var(--display);font-size:17px;margin:0 2px 4px}
+.lang-opt{display:flex;justify-content:space-between;align-items:center;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:13px 14px;font-size:15.5px;font-weight:600}
+.lang-opt small{color:var(--muted);font-weight:500}.lang-opt.on{border-color:var(--sec);background:color-mix(in srgb,var(--sec) 10%,var(--surface))}
 </style>
 </head>
 <body>
@@ -1220,7 +1227,7 @@ const L2C={a:'а',b:'б',d:'д',e:'е',f:'ф',g:'г',h:'ҳ',i:'и',j:'ж',k:'к'
 const L2C2={sh:'ш',ch:'ч',"o'":'ў',"g'":'ғ',ya:'я',yo:'ё',yu:'ю',ye:'е'};
 const C2L={а:'a',б:'b',в:'v',г:'g',д:'d',ё:'yo',ж:'j',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'x',ц:'ts',ч:'ch',ш:'sh',ъ:"'",ь:'',э:'e',ю:'yu',я:'ya',ў:"o'",қ:'q',ғ:"g'",ҳ:'h',ы:'i',щ:'sh'};
 const VOW='aeiouаеёиоуэюяў';
-function caseLike(src,out){ if(src===src.toUpperCase()&&src!==src.toLowerCase()) return src.length>1||out.length===1?out.toUpperCase():out[0].toUpperCase()+out.slice(1); return out; }
+function caseLike(src,out){ if(src===src.toUpperCase()&&src!==src.toLowerCase()) return src.length>1||out.length===1?out.toUpperCase():out[0].toUpperCase()+out.slice(1); if(src[0]!==src[0].toLowerCase()) return out[0].toUpperCase()+out.slice(1); return out; }
 function lat2cyr(s){
   s=s.replace(/[‘’ʻʼ`´]/g,"'"); let o='';
   for(let i=0;i<s.length;){
@@ -2492,7 +2499,623 @@ function viewErtak(id){
 
 (function(){try{if(!(tg&&tg.initData)||store.get('pinv1',false))return;setTimeout(()=>{const fd=new FormData();fd.append('initData',tg.initData);
   fetch(BOT_API+'/hello',{method:'POST',body:fd}).then(r=>r.json()).then(j=>{if(j&&j.ok)store.set('pinv1',true)}).catch(()=>{})},2500)}catch(e){}})();
-const APP_VER='20261020f';
+/* ---------- TILLAR: o'zbek (lotin), o'zbek (kirill), rus, ingliz ---------- */
+const LANGS=[['uz',"O'zbekcha",'Lotin'],['uzc','Ўзбекча','Кирилл'],['ru','Русский','RU'],['en','English','EN']];
+let LANG=store.get('lang',null);
+const I18N_SRC=`harflar, raqamlar, mantiq va xotira|буквы, цифры, логика и память|letters, numbers, logic and memory
+bir nechta tanlash mumkin|можно выбрать несколько|you can pick several
+Kerakli yoshni tanlang|Выберите возраст|Choose an age
+Xayrli tong|Доброе утро|Good morning
+Xayrli kun|Добрый день|Good afternoon
+Xayrli kech|Добрый вечер|Good evening
+Xayrli tun|Доброй ночи|Good night
+Assalomu alaykum!|Ассаляму алейкум!|Assalamu alaikum!
+Namoz vaqtlari|Время намаза|Prayer times
+Joylashuvni sozlang|Укажите местоположение|Set your location
+Namoz|Намаз|Prayer
+vaqtlar|время|times
+Taomlar|Блюда|Recipes
+Valyuta|Валюта|Currency
+kurs|курс|rates
+Viktorina|Викторина|Quiz
+kunlik savol|вопрос дня|daily question
+Bolalar|Детям|Kids
+Audio|Аудио|Audio
+tilovat|чтение Корана|recitation
+Qibla|Кибла|Qibla
+yo'nalish|направление|direction
+Tasbeh|Тасбих|Tasbih
+zikr|зикр|dhikr
+Hujjatlar|Документы|Documents
+PDF, matn|PDF, текст|PDF, text
+Prava imtihoniga tayyorlaning|Подготовка к экзамену на права|Prepare for your driving test
+Imtihon rejimi · xatolar ustida ishlash · yo'l belgilari|Режим экзамена · работа над ошибками · дорожные знаки|Exam mode · review mistakes · road signs
+Ob-havo|Погода|Weather
+Ma'lumot olinmadi. Internetni tekshiring — Telegram ichida avtomatik yangilanadi.|Нет данных. Проверьте интернет — в Telegram обновляется автоматически.|No data. Check your connection — it updates automatically in Telegram.
+Bugun nima pishiramiz?|Что приготовим сегодня?|What shall we cook today?
+Barchasi|Все|All
+Nonushta uchun|На завтрак|For breakfast
+Tushlik uchun|На обед|For lunch
+Kechki uchun|На ужин|For dinner
+Dollar kursi|Курс доллара|Dollar rate
+Konvertor|Конвертер|Converter
+1 AQSh dollari|1 доллар США|1 US dollar
+Asosiy|Главная|Home
+Bo'limlar|Разделы|Sections
+Joyingiz bo'yicha aniq hisob va masjid jamoat vaqtlari|Точный расчёт по вашему месту и время джамаата в мечетях|Accurate times for your location and mosque congregation times
+Vaqtlar joyingizga qarab hisoblanadi — qishlog'ingizgacha aniq.|Время рассчитывается по вашему местоположению — точно до вашего села.|Times are calculated for your exact location — down to your village.
+Joylashuvni aniqlash|Определить местоположение|Detect my location
+Joylashuv faqat telefoningizda ishlatiladi, hech qayerga yuborilmaydi.|Местоположение используется только на телефоне и никуда не отправляется.|Your location stays on your phone and is never sent anywhere.
+Yoki ro'yxatdan tanlang|Или выберите из списка|Or choose from the list
+Hudud|Регион|Region
+Toshkent shahri|г. Ташкент|Tashkent city
+Toshkent viloyati|Ташкентская обл.|Tashkent region
+Andijon|Андижан|Andijan
+Buxoro|Бухара|Bukhara
+Farg'ona|Фергана|Fergana
+Jizzax|Джизак|Jizzakh
+Xorazm|Хорезм|Khorezm
+Namangan|Наманган|Namangan
+Navoiy|Навои|Navoi
+Qashqadaryo|Кашкадарья|Kashkadarya
+Qoraqalpog'iston|Каракалпакстан|Karakalpakstan
+Samarqand|Самарканд|Samarkand
+Sirdaryo|Сырдарья|Syrdarya
+Surxondaryo|Сурхандарья|Surkhandarya
+Shahar / tuman|Город / район|City / district
+Toshkent|Ташкент|Tashkent
+Saqlash|Сохранить|Save
+O'zgartirish|Изменить|Change
+Bugun|Сегодня|Today
+Hafta|Неделя|Week
+Oy|Месяц|Month
+Masjidlar|Мечети|Mosques
+Bomdod|Фаджр|Fajr
+Quyosh|Восход|Sunrise
+Peshin|Зухр|Dhuhr
+Asr|Аср|Asr
+Shom|Магриб|Maghrib
+Xufton|Иша|Isha
+Ka'ba yo'nalishi|направление на Каабу|direction to the Kaaba
+zikr sanagich|счётчик зикра|dhikr counter
+Taqvim|Календарь|Calendar
+hijriy sana|дата по хиджре|Hijri date
+Qur'on audio|Коран аудио|Quran audio
+O'zbekiston musulmonlari idorasi taqvimi bilan tekshirildi (19.10.2026). Asr — Hanafiy mazhabi bo'yicha. Masjiddagi jamoat vaqti farq qilishi mumkin.|Сверено с календарём Управления мусульман Узбекистана (19.10.2026). Аср — по ханафитскому мазхабу. Время джамаата в мечети может отличаться.|Checked against the Muslim Board of Uzbekistan calendar (19.10.2026). Asr follows the Hanafi school. Mosque congregation times may differ.
+Joylashuvni qayta aniqlash|Определить заново|Detect location again
+Sana|Дата|Date
+Eskirgan|Устарело|Outdated
+Azon|Азан|Adhan
+Takbir|Такбир|Iqama
+Masjid kanalini qo'shish|Добавить канал мечети|Add a mosque channel
+Masjid yoki tuman kanali azon va takbir vaqtlarini e'lon qilsa, uni qo'shamiz va vaqtlar shu yerda o'zi yangilanib turadi.|Если канал мечети или района публикует время азана и такбира, мы добавим его, и время будет обновляться здесь автоматически.|If a mosque or district channel posts adhan and iqama times, we'll add it and the times will update here automatically.
+Yuborish|Отправить|Send
+Boshqa hududlar|Другие регионы|Other regions
+Kanal manzili|Адрес канала|Channel address
+← Namoz vaqtlari|← Время намаза|← Prayer times
+Qibla yo'nalishi|Направление киблы|Qibla direction
+shimoldan soat yo'nalishida|по часовой стрелке от севера|clockwise from north
+Makkagacha|до Мекки|to Makkah
+Telefonni gorizontal ushlang. Kompas ishlasa, siferblat o'zi aylanadi va qora belgi Ka'ba tomonni ko'rsatadi.|Держите телефон горизонтально. Если компас работает, циферблат повернётся, и чёрная метка укажет на Каабу.|Hold your phone flat. If the compass works, the dial rotates and the black mark points to the Kaaba.
+Kompasni yoqish|Включить компас|Turn on compass
+Qaytadan|Сначала|Reset
+Bugun jami:|Сегодня всего:|Today in total:
+Sanash|Считать|Count
+Yaqinlashayotgan sanalar|Ближайшие даты|Upcoming dates
+Konstitutsiya kuni|День Конституции|Constitution Day
+Yangi yil|Новый год|New Year
+Ramazon oyi boshlanishi|Начало Рамадана|Start of Ramadan
+Qadr kechasi (taxminan)|Ночь Кадр (примерно)|Laylat al-Qadr (approx.)
+Xotin-qizlar kuni|Международный женский день|Women's Day
+Ramazon hayiti|Рамазан хайит|Eid al-Fitr
+Navro'z|Навруз|Navruz
+Xotira va qadrlash kuni|День памяти и почестей|Day of Remembrance
+Arafa kuni|День Арафа|Day of Arafah
+Qurbon hayiti|Курбан хайит|Eid al-Adha
+Hijriy yangi yil|Новый год по хиджре|Islamic New Year
+Mavlid|Мавлид|Mawlid
+Mustaqillik kuni|День независимости|Independence Day
+O'qituvchi va murabbiylar kuni|День учителя|Teachers' Day
+Diniy sanalar Umm al-Quro taqvimi bo'yicha hisoblangan. Ramazon va hayit kunlarini O'zbekiston musulmonlari idorasi oy ko'rinishiga qarab e'lon qiladi, bir kunga farq qilishi mumkin.|Религиозные даты рассчитаны по календарю Умм аль-Кура. Даты Рамадана и праздников объявляет Управление мусульман Узбекистана по наблюдению луны — возможна разница в один день.|Religious dates follow the Umm al-Qura calendar. The Muslim Board of Uzbekistan announces Ramadan and Eid by moon sighting, so they may differ by a day.
+Azon va takbir vaqtini har bir masjid imomi belgilaydi, shuning uchun bu vaqtlar masjid kanallaridan olinadi. Namoz vaqti kirishi «Bugun» bo'limida.|Время азана и такбира определяет имам каждой мечети, поэтому оно берётся из каналов мечетей. Начало времени намаза — во вкладке «Сегодня».|Each mosque's imam sets its adhan and iqama times, so they come from mosque channels. Prayer start times are in the "Today" tab.
+Kanal hali yangi jadval chiqarmagan yoki yangilanmadi.|Канал ещё не опубликовал новое расписание.|The channel hasn't posted a new schedule yet.
+68 ta retsept, muzlatkichdagi mahsulotlardan tavsiya va qadamma-qadam pishirish|68 рецептов, подбор по продуктам из холодильника и пошаговая готовка|68 recipes, ideas from what's in your fridge and step-by-step cooking
+G'ildirak|Колесо|Wheel
+Muzlatkich|Холодильник|Fridge
+Saqlangan|Избранное|Saved
+Vaqtni tanlang, g'ildirakni aylantiring — taom va retsept tayyor.|Выберите время, крутите колесо — блюдо и рецепт готовы.|Pick a meal, spin the wheel — your dish and recipe are ready.
+Nonushta|Завтрак|Breakfast
+Tushlik|Обед|Lunch
+Kechki|Ужин|Dinner
+Aylantirish|Крутить|Spin
+Taom g'ildiragi|Колесо блюд|Dish wheel
+Muzlatkichda nima bor?|Что есть в холодильнике?|What's in your fridge?
+Uyingizdagi mahsulotlarni belgilang. Tuz, yog' va ziravorlar bor deb hisoblanadi.|Отметьте продукты, которые есть дома. Соль, масло и специи считаются в наличии.|Tick what you have at home. Salt, oil and spices are assumed.
+Go'sht|Мясо|Meat
+Qiyma|Фарш|Minced meat
+Tovuq|Курица|Chicken
+Sabzavot|Овощи|Vegetables
+Kartoshka|Картофель|Potatoes
+Piyoz|Лук|Onion
+Sabzi|Морковь|Carrot
+Pomidor|Помидоры|Tomatoes
+Bodring|Огурцы|Cucumbers
+Karam|Капуста|Cabbage
+Bulg'or qalampiri|Болгарский перец|Bell pepper
+Baqlajon|Баклажан|Eggplant
+Don va un|Крупы и мука|Grains and flour
+Guruch|Рис|Rice
+Un|Мука|Flour
+Makaron|Макароны|Pasta
+Mosh|Маш|Mung beans
+No'xat|Нут|Chickpeas
+Sut va tuxum|Молочное и яйца|Dairy and eggs
+Tuxum|Яйца|Eggs
+Sut|Молоко|Milk
+Qatiq|Катык|Yogurt
+Tvorog|Творог|Cottage cheese
+Pishloq|Сыр|Cheese
+Sariyog'|Сливочное масло|Butter
+Smetana|Сметана|Sour cream
+Boshqa|Другое|Other
+Baliq|Рыба|Fish
+Sosiska|Сосиски|Sausages
+Qo'ziqorin|Грибы|Mushrooms
+Loviya|Фасоль|Beans
+Grechka|Гречка|Buckwheat
+Qovoq|Тыква|Pumpkin
+Sarimsoq|Чеснок|Garlic
+Non|Хлеб|Bread
+Tozalash|Очистить|Clear
+Hammasi bor|Всё есть|You have everything
+Xarid ro'yxati|Список покупок|Shopping list
+Ro'yxat bo'sh. Retsept ichidagi «Xarid ro'yxatiga» tugmasi bilan qo'shing yoki pastda yozing.|Список пуст. Добавьте кнопкой «В список покупок» в рецепте или напишите ниже.|The list is empty. Add items with the "To shopping list" button in a recipe or type below.
+Hali taom saqlanmagan. Retsept ichidagi «♡ Saqlash» tugmasini bosing.|Пока ничего не сохранено. Нажмите «♡ Сохранить» в рецепте.|Nothing saved yet. Tap "♡ Save" in a recipe.
+Masalan: non, 2 kg kartoshka|Например: хлеб, 2 кг картофеля|E.g. bread, 2 kg potatoes
+Mahsulot qo'shish|Добавить продукт|Add item
+Bugungi taom|Блюдо дня|Dish of the day
+Necha kishilik?|На сколько человек?|How many servings?
+Masalliqlar|Ингредиенты|Ingredients
+Tayyorlash|Приготовление|Method
+Pishirishni boshlash|Начать готовить|Start cooking
+♡ Saqlash|♡ Сохранить|♡ Save
++ Xarid ro'yxatiga|+ В список покупок|+ To shopping list
+Ulashish|Поделиться|Share
+Kamaytirish|Уменьшить|Decrease
+Tuz, yog' va ziravorlarni ham qo'l ostiga qo'ying.|Держите под рукой соль, масло и специи.|Keep salt, oil and spices at hand.
+Orqaga|Назад|Back
+Boshlash|Начать|Start
+Yopish|Закрыть|Close
+ta'bga ko'ra|по вкусу|to taste
+Valyuta kurslari|Курсы валют|Exchange rates
+Markaziy bank kursi va so'mga konvertor|Курс ЦБ и конвертер в сумы|Central Bank rates and a sum converter
+O'zbek so'mi|Узбекский сум|Uzbek sum
+AQSh dollari|Доллар США|US dollar
+Yevro|Евро|Euro
+Rossiya rubli|Российский рубль|Russian ruble
+Angliya funt sterlingi|Фунт стерлингов|British pound
+Qozog'iston tengesi|Казахстанский тенге|Kazakh tenge
+Xitoy yuani|Китайский юань|Chinese yuan
+Turk lirasi|Турецкая лира|Turkish lira
+Namuna kurslar. Telegram ichida barcha valyutalar cbu.uz'dan avtomatik olinadi.|Пример курсов. В Telegram все валюты загружаются с cbu.uz автоматически.|Sample rates. In Telegram all currencies load from cbu.uz automatically.
+Yo'nalishni almashtirish|Поменять направление|Swap direction
+Qidirish: dollar, rubl, KZT…|Поиск: доллар, рубль, KZT…|Search: dollar, ruble, KZT…
+Valyuta qidirish|Поиск валюты|Search currency
+6 mavzu, kunlik savol va o'z viktorinangizni tuzish|6 тем, вопрос дня и свои викторины|6 topics, a daily question and your own quizzes
+Kunlik savol|Вопрос дня|Question of the day
+Har kuni yangi savol|Каждый день новый вопрос|A new question every day
+Mavzular|Темы|Topics
+O'zbekiston|Узбекистан|Uzbekistan
+Geografiya|География|Geography
+Fan|Наука|Science
+Tarix|История|History
+Ingliz tili|Английский язык|English
+cheksiz savollar|бесконечные вопросы|endless questions
+Matematika|Математика|Math
+Mening viktorinalarim|Мои викторины|My quizzes
++ Yangi|+ Новая|+ New
+O'zingiz savollar tuzing — oila, sinf yoki do'stlar uchun. Viktorina shu telefonda saqlanadi.|Составьте свои вопросы — для семьи, класса или друзей. Викторина хранится на этом телефоне.|Write your own questions — for family, class or friends. The quiz is saved on this phone.
+Viktorina tuzish|Создать викторину|Create a quiz
+Rekord: —|Рекорд: —|Best: —
+← Asosiy|← Главная|← Home
+Bolalar uchun|Для детей|For kids
+Mening kuchukcham · 1-daraja|Мой щенок · уровень 1|My puppy · level 1
+Kuchukcha|Щенок|Puppy
+Juda xursand!|Очень рад!|Very happy!
+Yosh|Возраст|Age
+Hammasi|Все|All
+Kategoriya|Категория|Category
+Harflar|Буквы|Letters
+Raqamlar|Цифры|Numbers
+Mantiq|Логика|Logic
+Xotira|Память|Memory
+Rang va shakl|Цвета и формы|Colours and shapes
+Barcha yoshlar|Все возрасты|All ages
+Uyqu oldidan ertak · bugun|Сказка на ночь · сегодня|Bedtime story · today
+Qur'on tilovati, she'rlar va qo'shiqlar|Чтение Корана, стихи и песни|Quran recitation, poems and songs
+Tilovat|Чтение Корана|Recitation
+She'riyat|Поэзия|Poetry
+Qo'shiqlar|Песни|Songs
+Qori|Чтец|Reciter
+Tilovatlar manbasi: mp3quran.net. Tinglash uchun internet kerak; telefon ekrani o'chganda ham davom etadi.|Источник: mp3quran.net. Нужен интернет; воспроизведение продолжается при выключенном экране.|Source: mp3quran.net. Needs internet; keeps playing with the screen off.
+Sura nomi yoki raqami|Название или номер суры|Surah name or number
+Sura qidirish|Поиск суры|Search surah
+Davom ettirish|Продолжить|Continue
+PDF, rasm va matn bilan ishlash — fayllar telefoningizdan chiqmaydi|PDF, фото и текст — файлы не покидают ваш телефон|Work with PDFs, photos and text — files never leave your phone
+Rasmlardan PDF|PDF из фото|Photos to PDF
+Bir nechta rasm → bitta PDF|Несколько фото → один PDF|Several photos → one PDF
+PDF birlashtirish|Объединить PDF|Merge PDFs
+Bir nechta PDF → bitta fayl|Несколько PDF → один файл|Several PDFs → one file
+Sahifalarni ajratish|Разделить страницы|Split pages
+Kerakli sahifalarni olish|Извлечь нужные страницы|Extract the pages you need
+PDF → rasm|PDF → фото|PDF → images
+Har sahifa JPG rasm bo'ladi|Каждая страница станет JPG|Each page becomes a JPG
+Rasmdan matn|Текст с фото|Text from photo
+Rasmdagi yozuvni matnga aylantirish|Распознать текст на фото|Turn text in a photo into editable text
+Rasmni siqish|Сжать фото|Compress photo
+Hajmini kichraytirish|Уменьшить размер|Make it smaller
+Lotin ↔ Kirill|Латиница ↔ Кириллица|Latin ↔ Cyrillic
+Matnni bir zumda o'girish|Мгновенная транслитерация|Convert text instantly
+Xavfsizlik|Безопасность|Privacy
+Fayllaringiz telefoningizning o'zida qayta ishlanadi. Tayyor fayl faqat sizning bot chatingizga yuboriladi va boshqa hech qayerda saqlanmaydi.|Файлы обрабатываются прямо на телефоне. Готовый файл отправляется только в ваш чат с ботом и больше нигде не хранится.|Files are processed on your phone. The result is sent only to your chat with the bot and stored nowhere else.
+← Hujjatlar|← Документы|← Documents
+Fayllarni tanlang|Выберите файлы|Choose files
+Faylni tanlang|Выберите файл|Choose a file
+Sahifa o'lchami|Размер страницы|Page size
+A4 qog'oz|Лист A4|A4 paper
+Rasm o'lchamida|По размеру фото|Fit to photo
+Qaysi sahifalar?|Какие страницы?|Which pages?
+Masalan: 1-3, 5|Например: 1-3, 5|E.g. 1-3, 5
+Matn tili|Язык текста|Text language
+O'zbek (lotin)|Узбекский (латиница)|Uzbek (Latin)
+O'zbek (kirill)|Узбекский (кириллица)|Uzbek (Cyrillic)
+Rus|Русский|Russian
+Ingliz|Английский|English
+Sifat|Качество|Quality
+Yaxshi|Хорошее|High
+O'rtacha|Среднее|Medium
+Kichik hajm|Малый размер|Small size
+Matn|Текст|Text
+Natija|Результат|Result
+Nusxa olish|Копировать|Copy
+Tayyorlash|Приготовление|Method
+Prava imtihoni|Экзамен на права|Driving test
+Imtihon rejimi, xatolar ustida ishlash va yo'l belgilari|Режим экзамена, работа над ошибками и дорожные знаки|Exam mode, mistake review and road signs
+Tayyorlik darajasi|Уровень готовности|Readiness
+Birinchi mashqni boshlang|Начните первую тренировку|Start your first practice
+o'tilgan|сдано|passed
+Haqiqiy imtihon rejimi|Режим настоящего экзамена|Real exam mode
+20 savol · 25 daqiqa · 2 tagacha xato|20 вопросов · 25 минут · до 2 ошибок|20 questions · 25 minutes · up to 2 mistakes
+Biletlar|Билеты|Tickets
+Xatolar ustida ishlash|Работа над ошибками|Review mistakes
+Hozircha xato yo'q|Ошибок пока нет|No mistakes yet
+Belgilar mashqi|Тренировка по знакам|Signs practice
+Yo'l belgilari|Дорожные знаки|Road signs
+Ma'lumotnoma|Справочник|Reference
+Mashq biletlari|Тренировочные билеты|Practice tickets
+← Prava|← Права|← Driving test
+← Bolalar|← Детям|← Kids
+← O'yinlar|← Игры|← Games
+← Ertaklar|← Сказки|← Stories
+Uyqu oldidan ertak|Сказка на ночь|Bedtime story
+Ertak saboqi|Мораль сказки|Moral of the story
+Ertakni ulashish|Поделиться сказкой|Share the story
+Kichik shrift|Мельче|Smaller text
+Katta shrift|Крупнее|Larger text
+Tungi rejim|Ночной режим|Night mode
+Xalq ertaklari va masallar bolalar uchun o'z so'zlarimiz bilan qayta hikoya qilingan.|Народные сказки и басни пересказаны для детей своими словами (на узбекском).|Folk tales and fables retold for children in our own words (in Uzbek).
+Ogohlantiruvchi|Предупреждающие|Warning
+Imtiyoz belgilari|Знаки приоритета|Priority signs
+Taqiqlovchi|Запрещающие|Prohibitory
+Buyuruvchi|Предписывающие|Mandatory
+Ko'rsatma va axborot|Особых предписаний и информационные|Regulatory and information
+Shu guruh bo'yicha mashq|Тренировка по этой группе|Practise this group
+Belgilar sxematik tarzda chizilgan. To'liq ro'yxat va ta'sir oralig'i: Yo'l harakati qoidalari, 1-ilova.|Знаки нарисованы схематично. Полный перечень и зона действия — ПДД, приложение 1.|Signs are drawn schematically. Full list and coverage: Traffic Rules, Annex 1.
+Bu belgi nimani bildiradi?|Что означает этот знак?|What does this sign mean?
+Noto'g'ri.|Неверно.|Wrong.
+To'g'ri!|Верно!|Correct!
+Keyingi savol →|Следующий вопрос →|Next question →
+Natijani ko'rish|Посмотреть результат|See result
+Mashq tugadi|Тренировка завершена|Practice finished
+Hammasi to'g'ri!|Всё верно!|All correct!
+Imtihondan o'tdingiz!|Экзамен сдан!|You passed!
+Imtihondan o'tmadingiz|Экзамен не сдан|You didn't pass
+Vaqt tugadi|Время вышло|Time's up
+Qayta boshlash|Начать заново|Start again
+Xatolarni qayta yechish|Перерешать ошибки|Retry mistakes
+Xato javoblar|Ошибочные ответы|Wrong answers
+Siz:|Вы:|You:
+Do'stlarga ulashish|Поделиться с друзьями|Share with friends
+✕ Yopish|✕ Закрыть|✕ Close
+Salom! Men bilan o'ynaysanmi?|Привет! Поиграешь со мной?|Hi! Will you play with me?
+Ovqat|Еда|Food
+Kayfiyat|Настроение|Mood
+Tozalik|Чистота|Clean
+Kuch|Энергия|Energy
+Ovqat berish|Покормить|Feed
+O'ynash|Играть|Play
+bepul|бесплатно|free
+Yuvintirish|Помыть|Bath
+Uxlatish|Уложить спать|Sleep
+Kuchukcha ismi|Имя щенка|Puppy's name
+O'yinni boshlash|Начать игру|Start game
+To'g'ri:|Верно:|Correct:
+Xato:|Ошибок:|Mistakes:
+Hisoblang|Посчитайте|Calculate
+Diqqat bilan qara…|Смотри внимательно…|Watch carefully…
+Yana o'ynash|Ещё раз|Play again
+Boshqa o'yin|Другая игра|Another game
+Ajoyib!|Отлично!|Awesome!
+Juda yaxshi!|Очень хорошо!|Great job!
+Yaxshi!|Хорошо!|Good!
+Yana urinib ko'r!|Попробуй ещё!|Try again!
+She'rlar tez orada|Стихи скоро|Poems coming soon
+Shoirlarning o'z ovozidagi she'rlari shu yerda tinglanadi.|Здесь можно будет слушать стихи в исполнении самих поэтов.|Poems read by the poets themselves will be here.
+Qo'shiqlar tez orada|Песни скоро|Songs coming soon
+O'zbek ijrochilarining qo'shiqlari ularning roziligi bilan qo'shiladi.|Песни узбекских исполнителей появятся с их согласия.|Songs by Uzbek artists will be added with their permission.
+Siz ijrochi yoki shoirmisiz? Asaringizni Hamroh'da taqdim etish uchun botga yozing.|Вы исполнитель или поэт? Напишите боту, чтобы представить своё творчество в Hamroh.|Are you an artist or poet? Message the bot to feature your work on Hamroh.
+Til|Язык|Language
+Ilova tili|Язык приложения|App language
+Ba'zi matnlar (retseptlar, savollar, ertaklar) hozircha o'zbek tilida.|Часть контента (рецепты, вопросы, сказки) пока на узбекском.|Some content (recipes, questions, stories) is in Uzbek for now.
+Kechki|Ужин|Dinner
+oson|легко|easy
+o'rta|средне|medium
+qiyin|сложно|hard
+Ezop masali asosida|По басне Эзопа|Based on Aesop
+O'zbek xalq ertagi|Узбекская народная сказка|Uzbek folk tale
+Xalq ertagi|Народная сказка|Folk tale
+Xalq masali|Народная басня|Folk fable
+Zumrad va Qimmat|Зумрад и Киммат|Zumrad and Qimmat
+Bo'g'irsoq|Колобок|The Little Bun
+Ur to'qmoq|Бей, дубинка!|Strike, Club!
+Tulki bilan turna|Лиса и журавль|The Fox and the Crane
+Echki va bo'ri|Коза и волк|The Goat and the Wolf
+Sholg'om|Репка|The Turnip
+Qarg'a va tulki|Ворона и лисица|The Crow and the Fox
+Toshbaqa va quyon|Черепаха и заяц|The Tortoise and the Hare
+Chumoli va ninachi|Муравей и стрекоза|The Ant and the Dragonfly
+Sher va sichqon|Лев и мышь|The Lion and the Mouse
+Manti|Манты|Manti
+Chuchvara|Чучвара|Chuchvara dumplings
+Tovuq sho'rva|Куриный суп|Chicken soup
+Moshxo'rda|Машхурда|Mung bean soup
+Kartoshka qovurma|Жареный картофель|Fried potatoes
+Achchiq-chuchuk|Аччик-чучук|Achchiq-chuchuk salad
+Tovuq qovurma|Жареная курица|Fried chicken
+Pishloqli makaron|Макароны с сыром|Pasta with cheese
+Kotlet|Котлеты|Cutlets
+Baqlajon dimlama|Тушёные баклажаны|Braised eggplant
+Karam salati|Салат из капусты|Cabbage salad
+Qo'ziqorinli kartoshka|Картофель с грибами|Potatoes with mushrooms
+Smetanali tovuq|Курица в сметане|Chicken in sour cream
+Sarimsoqli baqlajon|Баклажаны с чесноком|Garlic eggplant
+Kartoshka pyuresi|Картофельное пюре|Mashed potatoes
+Kartoshka quymoq|Драники|Potato pancakes
+Sosiskali makaron|Макароны с сосисками|Pasta with sausages
+Loviya salati|Салат из фасоли|Bean salad
+Qo'ziqorinli grechka|Гречка с грибами|Buckwheat with mushrooms
+Pishloqli tovuq|Курица с сыром|Cheesy chicken
+Sabzavot ragu|Овощное рагу|Vegetable stew
+Tuxumli kartoshka|Картофель с яйцом|Potatoes with egg
+Tvorogli zapekanka|Творожная запеканка|Cottage cheese bake
+Okroshka|Окрошка|Okroshka
+Sarimsoqli non|Чесночный хлеб|Garlic bread
+Qovoq sho'rva-pyure|Тыквенный суп-пюре|Pumpkin cream soup
+Pomidorli makaron|Макароны с томатами|Tomato pasta
+Tovuqli salat|Салат с курицей|Chicken salad
+Bodring-pomidor salati|Салат из огурцов и помидоров|Cucumber and tomato salad
+Sabzavotli guruch|Рис с овощами|Rice with vegetables
+Sosiska kartoshka bilan|Сосиски с картофелем|Sausages with potatoes
+Qo'ziqorinli makaron|Макароны с грибами|Mushroom pasta
+Pomidorli tuxum|Яичница с помидорами|Eggs with tomatoes
+Shakshuka|Шакшука|Shakshuka
+Qozon kabob|Казан-кабоб|Qozon kabob
+Kartoshkali xonim|Ханум с картофелем|Potato khanum
+Sutli omlet|Омлет на молоке|Milk omelette
+Sosiskali omlet|Омлет с сосисками|Sausage omelette
+Qovurma sho'rva|Кавурма шурпа|Qovurma shurpa
+Loviya sho'rva|Фасолевый суп|Bean soup
+Qo'ziqorinli sho'rva|Грибной суп|Mushroom soup
+Baliq sho'rva|Уха|Fish soup
+Fricadelkali sho'rva|Суп с фрикадельками|Meatball soup
+Quymoq|Блины|Pancakes
+Tvorogli sirniki|Сырники|Syrniki
+Tuxumli non|Гренки|French toast
+Issiq buterbrod|Горячий бутерброд|Hot sandwich
+Yupqa blinchik|Тонкие блинчики|Thin crêpes
+Makaron po-flotski|Макароны по-флотски|Navy-style pasta
+Qovoq manti|Манты с тыквой|Pumpkin manti
+Osh|Плов|Plov
+Dimlama|Димлама|Dimlama
+Lag'mon|Лагман|Lagman
+Mastava|Мастава|Mastava
+Karam do'lma|Голубцы|Cabbage rolls
+Qalampir do'lma|Фаршированный перец|Stuffed peppers
+Mening viktorinam|Моя викторина|My quiz
+Sharcha portlat|Лопни шарик|Pop the balloon
+Rangni top|Найди цвет|Find the colour
+Shakllar|Фигуры|Shapes
+Sanab ko'r|Посчитай|Count them
+Qayerda ko'p?|Где больше?|Where are more?
+Ortiqchasi|Лишний|Odd one out
+Juftini top|Найди пару|Find the pair
+Birinchi harf|Первая буква|First letter
+Ketma-ketlik|Последовательность|Sequence
+Rangli xotira|Цветная память|Colour memory
+Qo'shish|Сложение|Addition
+Ayirish|Вычитание|Subtraction
+Tushgan harf|Пропущенная буква|Missing letter
+So'z yig'|Собери слово|Build a word
+Katta-kichik|Больше-меньше|Greater or less
+Soat necha?|Который час?|What time is it?
+Son qatori|Числовой ряд|Number pattern
+Diqqat: rang|Внимание: цвет|Attention: colour
+Ko'paytirish|Умножение|Multiplication
+Ortiqcha son|Лишнее число|Odd number out
+Berilgan harfli sharlarni bos|Нажимай шарики с нужной буквой|Tap balloons with the given letter
+Rang nomini o'qi va top|Прочитай название цвета и найди|Read the colour name and find it
+Doira, kvadrat, yulduz…|Круг, квадрат, звезда…|Circle, square, star…
+Yulduzchalarni sana|Посчитай звёздочки|Count the stars
+Ko'proq qutini tanla|Выбери, где больше|Pick the bigger box
+Boshqalaridan farqli shakl|Фигура, не похожая на другие|The shape that's different
+Kartalarni eslab qol|Запомни карточки|Remember the cards
+So'z qaysi harf bilan boshlanadi|С какой буквы начинается слово|Which letter does the word start with
+Keyingi shaklni top|Найди следующую фигуру|Find the next shape
+Ketma-ketlikni takrorla|Повтори последовательность|Repeat the sequence
+Sonlarni qo'sh|Складывай числа|Add numbers
+Sonlarni ayir|Вычитай числа|Subtract numbers
+So'zni to'ldir|Дополни слово|Complete the word
+Harflardan so'z tuz|Составь слово из букв|Make a word from letters
+>, < yoki = belgisi|Знак >, < или =|Sign >, < or =
+Soatdan vaqtni o'qi|Определи время по часам|Read the clock
+Qonuniyatni top|Найди закономерность|Find the pattern
+So'z emas, rangini tanla|Выбери цвет, а не слово|Pick the colour, not the word
+Ko'paytirish jadvali|Таблица умножения|Times tables
+Bo'linmaydigan sonni top|Найди число, которое не делится|Find the number that doesn't divide
+Harflarni o'ynab o'rganamiz|Учим буквы играя|Learn letters by playing
+Nechta yulduzcha bor?|Сколько звёздочек?|How many stars?
+Qaysi qutida ko'proq?|В какой коробке больше?|Which box has more?
+Ortiqchasini top|Найди лишнее|Find the odd one
+Bir xil juftlarni top|Найди одинаковые пары|Find matching pairs
+Birinchi harfni top|Найди первую букву|Find the first letter
+Keyingisi qaysi?|Что дальше?|What's next?
+Tushib qolgan harfni top|Найди пропущенную букву|Find the missing letter
+Qaysi belgi to'g'ri?|Какой знак верный?|Which sign is correct?
+Soat necha bo'ldi?|Который час?|What time is it?
+Keyingi son qaysi?|Какое следующее число?|What's the next number?
+So'z qaysi rangda yozilgan?|Каким цветом написано слово?|What colour is the word written in?
+Ko'paytiring|Умножьте|Multiply
+Ortiqcha sonni top|Найди лишнее число|Find the odd number
+Lotin → Кирилл|Латиница → Кирилл|Latin → Cyrillic
+Кирилл → Lotin|Кирилл → Латиница|Cyrillic → Latin
+Matnni yozing yoki joylang — darhol o'giriladi.|Введите или вставьте текст — он сразу преобразуется.|Type or paste text — it converts instantly.
+PDF fayl|PDF-файл|PDF file
+JPG, PNG yoki boshqa rasm|JPG, PNG или другое фото|JPG, PNG or another image
+Fayl telefoningizdan tashqariga chiqmaydi — faqat tayyor natija bot chatingizga yuboriladi.|Файл не покидает телефон — в чат с ботом отправляется только готовый результат.|Your file stays on your phone — only the result is sent to your bot chat.
+Bo'sh qoldirsangiz, har bir sahifa alohida PDF bo'ladi va hammasi ZIP arxivda yuboriladi.|Если оставить пустым, каждая страница станет отдельным PDF, и всё придёт ZIP-архивом.|Leave empty to split every page into its own PDF, sent as a ZIP.
+Birinchi marta ishlatganda til fayllari yuklanadi (taxminan 5–15 MB). Keyingi safar tezroq ishlaydi.|При первом использовании загружаются языковые файлы (примерно 5–15 МБ). Дальше работает быстрее.|The first time, language files download (about 5–15 MB). It's faster after that.
+O'qib bo'ldik · +3 tanga|Прочитали · +3 монеты|Finished · +3 coins
+Shu bilan ertagimiz tugadi. Shirin tushlar ko'r! 🌙|Вот и сказке конец. Сладких снов! 🌙|And that's the end of our story. Sweet dreams! 🌙`;
+const D={ru:{},en:{}};
+I18N_SRC.split('\n').forEach(l=>{const p=l.split('|');if(p.length===3){D.ru[p[0]]=p[1];D.en[p[0]]=p[2]}});
+const MON_UZ=['yanvar','fevral','mart','aprel','may','iyun','iyul','avgust','sentabr','oktabr','noyabr','dekabr'];
+const MON={ru:['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'],en:['January','February','March','April','May','June','July','August','September','October','November','December']};
+const MAB_UZ=['yan','fev','mar','apr','may','iyn','iyl','avg','sen','okt','noy','dek'];
+const MAB={ru:['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'],en:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']};
+const WD_UZ=['Yakshanba','Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba'];
+const WD={ru:['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'],en:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']};
+const WA_UZ=['Ya','Du','Se','Ch','Pa','Ju','Sh'];
+const WA={ru:['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],en:['Su','Mo','Tu','We','Th','Fr','Sa']};
+const ruPl=(n,a,b,c)=>{n=Math.abs(n)%100;const m=n%10;return n>10&&n<20?c:m>1&&m<5?b:m===1?a:c};
+const NOUN={ // uz noun after "N ta": [ru one, few, many, en one, en many]
+ "retsept":['рецепт','рецепта','рецептов','recipe','recipes'],"o'yin":['игра','игры','игр','game','games'],"savol":['вопрос','вопроса','вопросов','question','questions'],
+ "mashq bileti":['тренировочный билет','тренировочных билета','тренировочных билетов','practice ticket','practice tickets'],"bilet":['билет','билета','билетов','ticket','tickets'],
+ "masalliq":['ингредиент','ингредиента','ингредиентов','ingredient','ingredients'],"mahsulot":['продукт','продукта','продуктов','item','items'],"taom":['блюдо','блюда','блюд','dish','dishes'],
+ "belgi bo'yicha":['знак','знака','знаков','sign','signs'],"ertak":['сказка','сказки','сказок','story','stories'],"to'g'ri":['верно','верно','верно','correct','correct'],"xato":['ошибка','ошибки','ошибок','mistake','mistakes'],
+ "tanga":['монета','монеты','монет','coin','coins'],"kun":['день','дня','дней','day','days']};
+function nounT(n,w){const x=NOUN[w];if(!x)return null;return LANG==='ru'?`${n} ${ruPl(+n,x[0],x[1],x[2])}`:`${n} ${+n===1?x[3]:x[4]}`}
+const T=k=>D[LANG]&&D[LANG][k];
+function trDate(s){
+  let m;
+  if(m=s.match(/^(\d{1,2})-([a-z]+)(?: (\d{4}))?$/i)){const i=MON_UZ.indexOf(m[2].toLowerCase());if(i>=0)return LANG==='ru'?`${m[1]} ${MON.ru[i]}${m[3]?' '+m[3]:''}`:`${MON.en[i]} ${m[1]}${m[3]?', '+m[3]:''}`}
+  if(m=s.match(/^(\d{1,2}) ([a-z]{3})$/i)){const i=MAB_UZ.indexOf(m[2].toLowerCase());if(i>=0)return LANG==='ru'?`${m[1]} ${MAB.ru[i]}`:`${MAB.en[i]} ${m[1]}`}
+  return null;
+}
+function trSeg(s){
+  if(!s)return s; let r=T(s); if(r!=null)return r; let m;
+  const L=LANG==='ru';
+  if((r=trDate(s))!=null)return r;
+  if(m=s.match(/^([A-Za-z]+), (.+)$/)){const i=WD_UZ.indexOf(m[1]);if(i>=0)return WD[LANG][i]+', '+(trDate(m[2])||m[2])}
+  if((r=WA_UZ.indexOf(s))>=0)return WA[LANG][r];
+  if((r=WD_UZ.indexOf(s))>=0)return WD[LANG][r];
+  if(m=s.match(/^(\d+) (retsept|o'yin|savol|taom)$/))return nounT(m[1],m[2]);
+  if(m=s.match(/^(\d+)-([a-z]{3})$/)){const i=MAB_UZ.indexOf(m[2]);if(i>=0)return LANG==='ru'?`${m[1]} ${MAB.ru[i]}`:`${MAB.en[i]} ${m[1]}`}
+  if(m=s.match(/^(\d+)-(Muharram|Safar|Rabiul avval|Rabiul oxir|Jumodul avval|Jumodul oxir|Rajab|Sha'bon|Ramazon|Shavvol|Zulqa'da|Zulhijja)(?: (\d{4}))?$/)){
+    const i=HOYLAR.indexOf(m[2]);const HR=['Мухаррам','Сафар','Раби аль-авваль','Раби ас-сани','Джумада аль-уля','Джумада ас-сани','Раджаб','Шабан','Рамадан','Шавваль','Зуль-када','Зуль-хиджа'],HE=['Muharram','Safar','Rabi al-Awwal','Rabi al-Thani','Jumada al-Ula','Jumada al-Akhirah','Rajab',"Sha'ban",'Ramadan','Shawwal',"Dhu al-Qa'dah",'Dhu al-Hijjah'];
+    return LANG==='ru'?`${m[1]} ${HR[i]}${m[3]?' '+m[3]:''}`:`${m[1]} ${HE[i]}${m[3]?' '+m[3]+' AH':''}`}
+  if(m=s.match(/^~?(\d+) daqiqa$/))return (s[0]==='~'?'~':'')+m[1]+(L?' мин':' min');
+  if(m=s.match(/^(\d+) daqiqa · (oson|o'rta|qiyin)$/))return m[1]+(L?' мин · ':' min · ')+T(m[2]);
+  if(m=s.match(/^(\d+)[–-](\d+) yosh$/))return `${m[1]}–${m[2]} ${L?'лет':'years'}`;
+  if(m=s.match(/^(\d+)\+ yosh$/))return `${m[1]}+ ${L?'лет':'years'}`;
+  if(m=s.match(/^(\d+)[–-](\d+) yosh uchun$/))return L?`для ${m[1]}–${m[2]} лет`:`ages ${m[1]}–${m[2]}`;
+  if(m=s.match(/^(\d+) ta (.+)$/)){const x=nounT(m[1],m[2]);if(x)return x}
+  if(m=s.match(/^\+(\d+) (tanga)$/))return '+'+nounT(m[1],'tanga');
+  if(m=s.match(/^(\d+) (tanga|kun)$/))return nounT(m[1],m[2]);
+  if(m=s.match(/^(\d+)-daraja$/))return L?`уровень ${m[1]}`:`level ${m[1]}`;
+  if(m=s.match(/^(\d+)-(savol|bilet)$/))return L?(m[2]==='savol'?`Вопрос ${m[1]}`:`Билет ${m[1]}`):(m[2]==='savol'?`Question ${m[1]}`:`Ticket ${m[1]}`);
+  if(m=s.match(/^xatolar: (\d+)\/(\d+)$/))return (L?'ошибки: ':'mistakes: ')+m[1]+'/'+m[2];
+  if(m=s.match(/^(\d+) tasi o'qilgan$/))return L?`прочитано: ${m[1]}`:`${m[1]} read`;
+  if(m=s.match(/^Keyingi namoz$/))return L?'Следующий намаз':'Next prayer';
+  if(m=s.match(/^(ertaga)$/))return L?'завтра':'tomorrow';
+  if(m=s.match(/^(Barcha taomlar|Barcha valyutalar|Barcha ertaklar|Saqlangan taomlar)$/))return {"Barcha taomlar":L?'Все блюда':'All dishes',"Barcha valyutalar":L?'Все валюты':'All currencies',"Barcha ertaklar":L?'Все сказки':'All stories',"Saqlangan taomlar":L?'Избранные блюда':'Saved dishes'}[m[1]];
+  if(m=s.match(/^Yetmaydi: (.+)$/))return (L?'Не хватает: ':'Missing: ')+m[1].split(', ').map(x=>T(x)||x).join(', ');
+  if(m=s.match(/^Tanlandi: (\d+) ta mahsulot$/))return (L?'Выбрано: ':'Selected: ')+nounT(m[1],'mahsulot');
+  if(m=s.match(/^Hozir tayyorlasa bo'ladi$/))return L?'Можно приготовить сейчас':'Ready to cook now';
+  if(m=s.match(/^(\d+)[–-](\d+) ta mahsulot yetmaydi$/))return L?`не хватает ${m[1]}–${m[2]} продуктов`:`missing ${m[1]}–${m[2]} items`;
+  if(m=s.match(/^Qiyinlik: (.+)$/))return (L?'Сложность: ':'Difficulty: ')+(T(m[1])||m[1]);
+  if(m=s.match(/^(\d+) kishilik$/))return L?`на ${m[1]} чел.`:`${m[1]} servings`;
+  if(m=s.match(/^Avval tayyorlab oling$/))return L?'Сначала подготовьте':'Get ready first';
+  if(m=s.match(/^Manba: (.+)$/))return (L?'Источник: ':'Source: ')+m[1];
+  if(m=s.match(/^Rekord: (.+)$/))return (L?'Рекорд: ':'Best: ')+m[1];
+  if(m=s.match(/^(\d+) soat (\d+) daqiqa (\d+) soniya qoldi$/))return L?`осталось ${m[1]} ч ${m[2]} мин ${m[3]} с`:`${m[1]} h ${m[2]} min ${m[3]} s left`;
+  if(m=s.match(/^(\d+) daqiqa (\d+) soniya qoldi$/))return L?`осталось ${m[1]} мин ${m[2]} с`:`${m[1]} min ${m[2]} s left`;
+  if(m=s.match(/^(.+) — (?:(\d+) soat )?(\d+) daqiqadan so'ng$/)){const p=T(m[1])||m[1];return L?`${p} — через ${m[2]?m[2]+' ч ':''}${m[3]} мин`:`${p} — in ${m[2]?m[2]+' h ':''}${m[3]} min`}
+  if(m=s.match(/^(\d+) savol · (\d+) soniya$/))return L?`${nounT(m[1],'savol')} · ${m[2]} с`:`${m[1]} questions · ${m[2]} s`;
+  if(m=s.match(/^(\d+) ta to'g'ri$/))return L?`${m[1]} верно`:`${m[1]} correct`;
+  if(m=s.match(/^taxminiy$/))return L?'примерно':'approx.';
+  if(m=s.match(/^(\d+)-hijriy yil$/))return L?`${m[1]} г. хиджры`:`${m[1]} AH`;
+  if(m=s.match(/^1 AQSh dollari$/))return T('1 AQSh dollari');
+  if(m=s.match(/^Markaziy bank$/))return L?'ЦБ':'Central Bank';
+  if(m=s.match(/^(.*\d) so'm$/))return m[1]+(L?' сум':' sum');
+  if(m=s.match(/^,(\d+) so'm$/))return ','+m[1]+(L?' сум':' sum');
+  if(m=s.match(/^(\d+)-bilet$/))return L?`Билет ${m[1]}`:`Ticket ${m[1]}`;
+  return null;
+}
+function trText(t){
+  if(LANG==='uzc')return cyrSafe(t);
+  const lead=t.match(/^\s*/)[0],trail=t.match(/\s*$/)[0],s=t.trim();if(!s)return t;
+  let r=T(s);
+  if(r==null&&!s.includes(' · '))r=trSeg(s);
+  if(r==null&&s.includes(' · ')){const parts=s.split(' · ').map(x=>{const y=trSeg(x);return y==null?null:y});if(parts.some(x=>x!=null))r=s.split(' · ').map((x,i)=>parts[i]!=null?parts[i]:x).join(' · ')}
+  return r==null?t:lead+r+trail;
+}
+const CYR_KEEP=/(@[\w.]+|https?:\/\/\S+|\b[\w-]+\.(?:uz|net|com|org|ru|io)\b\S*|\b[A-Z]{2,6}\d*\b|\b[A-Z]\d+\b|\b[FU]\d\b)/;
+function cyrSafe(t){return t.split(CYR_KEEP).map((x,i)=>i%2?x:lat2cyr(x)).join('')}
+const I18N_SKIP='script,style,textarea,input,select,[data-noi18n],#dst,.sign text';
+function i18nApply(root){
+  if(!LANG||LANG==='uz'||!root)return;
+  if(root.nodeType===3){const p=root.parentElement;if(p&&!p.closest(I18N_SKIP)){const v=trText(root.data);if(v!==root.data)root.data=v}return}
+  if(root.nodeType!==1||root.closest&&root.closest(I18N_SKIP))return;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;const list=[];while(n=w.nextNode())list.push(n);
+  list.forEach(n=>{const p=n.parentElement;if(!p||p.closest(I18N_SKIP))return;const v=trText(n.data);if(v!==n.data)n.data=v});
+  const els=[root,...root.querySelectorAll('[placeholder],[aria-label],[title]')];
+  els.forEach(e=>{if(!e.getAttribute)return;['placeholder','aria-label','title'].forEach(a=>{const v=e.getAttribute(a);if(v){const x=trText(v);if(x!==v)e.setAttribute(a,x)}})});
+}
+let i18nObs=null;
+function i18nStart(){
+  if(!LANG||LANG==='uz')return;
+  document.documentElement.lang=LANG==='uzc'?'uz-Cyrl':LANG;
+  i18nApply(document.body);
+  i18nObs=new MutationObserver(ms=>{for(const m of ms){m.addedNodes.forEach(n=>i18nApply(n));if(m.type==='attributes')i18nApply(m.target)}});
+  i18nObs.observe(document.body,{childList:true,subtree:true});
+}
+function langSheet(first){
+  let el=document.getElementById('langsheet');if(el)el.remove();
+  el=document.createElement('div');el.id='langsheet';el.className='lang-sheet';
+  el.innerHTML=`<div class="lang-box" role="dialog" aria-label="Til / Язык / Language"><b>Til · Язык · Language</b>
+    ${LANGS.map(([k,n,s])=>`<button class="lang-opt ${k===(LANG||'uz')?'on':''}" data-l="${k}"><span>${n}</span><small>${s}</small></button>`).join('')}
+    <p class="note" style="margin:6px 2px 0" data-noi18n>${LANG==='ru'||LANG==='en'||first?"Retseptlar, savollar va ertaklar hozircha o'zbek tilida · Рецепты, вопросы и сказки пока на узбекском · Recipes, questions and stories are in Uzbek for now":''}</p></div>`;
+  el.setAttribute('data-noi18n','');document.body.appendChild(el);
+  el.onclick=e=>{const b=e.target.closest('[data-l]');if(b){const v=b.dataset.l;store.set('lang',v);if(v!==(LANG||'uz')){location.reload()}else el.remove();return}if(e.target===el)el.remove()};
+}
+(function(){
+  const h=document.querySelector('header');if(h&&!document.getElementById('langbtn')){const b=document.createElement('button');b.id='langbtn';b.className='lang-btn';b.setAttribute('data-noi18n','');b.setAttribute('aria-label','Til / Язык / Language');
+    b.textContent=({uz:'UZ',uzc:'ЎЗ',ru:'RU',en:'EN'})[LANG||'uz'];b.onclick=()=>langSheet(false);h.insertBefore(b,document.getElementById('todaychip'))}
+  if(!LANG){const lc=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user&&tg.initDataUnsafe.user.language_code;
+    if(lc==='ru'||lc==='en')setTimeout(()=>langSheet(true),600); else store.set('lang','uz');}
+})();
+
+const APP_VER='20261021a';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava};
@@ -2540,6 +3163,7 @@ VIEWS.home=viewHome;VIEWS.audio=viewAudio;
 (function(){const n=uzNow();$('#todaychip').textContent=`${n.getUTCDate()}-${OYLAR[n.getUTCMonth()].slice(0,3)}`})();
 if(!VIEWS[current]) current='home';
 renderTabs(); setHero(current); VIEWS[current](); loadRates();
+i18nStart();
 </script>
 
 </body>
