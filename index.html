@@ -553,6 +553,9 @@ body[data-sec="prava"]{--sec-a:#4a3200;--sec-b:#d99a00;--sec:#b07c00}
 .er-book.night{background:#1d1a16;color:#e9dcc4}.er-book.night .note,.er-book.night .er-end{color:#a8997f}.er-book.night .er-moral{background:#2a251e}
 .lang-btn{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 10px;font-weight:700;font-size:12px;margin-right:6px;flex:none}
 .lang-btn+.today-chip{margin-left:0}
+.theme-btn{margin-left:auto;margin-right:6px;flex:none;width:34px;height:30px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;padding:0}
+.theme-btn svg{width:17px;height:17px}.theme-btn+.lang-btn{margin-left:0}.theme-btn+.today-chip{margin-left:0}
+.theme-anim,.theme-anim *,.theme-anim *::before,.theme-anim *::after{transition:background-color .35s,color .35s,border-color .35s,fill .35s,stroke .35s!important}
 .lang-sheet{position:fixed;inset:0;background:rgba(10,15,30,.45);z-index:80;display:flex;align-items:flex-end;justify-content:center;padding:12px}
 .lang-box{background:var(--surface);border-radius:22px;padding:16px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
 .lang-box>b{font-family:var(--display);font-size:17px;margin:0 2px 4px}
@@ -715,6 +718,28 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':
 const fmt = (n, d=0) => Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d}).replace(/,/g,',');
 const store = { get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}} };
 function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),1800)}
+// ---- Kunduzgi / kechki rejim: tugma bilan almashadi; tanlanmagan bo'lsa Telegram mavzusiga ergashadi ----
+const THEME_BG={light:'#eef3f8',dark:'#0c1330'};
+const THEME_IC={dark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>',
+  light:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>'};
+function themeAuto(){try{if(tg&&(tg.colorScheme==='dark'||tg.colorScheme==='light'))return tg.colorScheme}catch(e){}try{return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch(e){return 'light'}}
+function themeNow(){const t=store.get('theme',null);return t==='light'||t==='dark'?t:themeAuto()}
+function themeApply(anim){
+  const t=themeNow(),r=document.documentElement;
+  if(anim){r.classList.add('theme-anim');clearTimeout(themeApply.t);themeApply.t=setTimeout(()=>r.classList.remove('theme-anim'),450)}
+  r.dataset.theme=t;
+  try{if(tg&&tg.isVersionAtLeast&&tg.isVersionAtLeast('6.1')){let c=getComputedStyle(r).getPropertyValue('--bg').trim();if(!/^#[0-9a-f]{6}$/i.test(c))c=THEME_BG[t];tg.setHeaderColor(c);tg.setBackgroundColor(c)}}catch(e){}
+  const b=document.getElementById('themebtn');if(b){let l=t==='dark'?'Kunduzgi rejim':'Kechki rejim';try{l=trText(l)}catch(e){}b.innerHTML=THEME_IC[t];b.setAttribute('aria-label',l);b.title=l}
+}
+(function(){
+  const h=document.querySelector('header');
+  if(h&&!document.getElementById('themebtn')){const b=document.createElement('button');b.id='themebtn';b.className='theme-btn';
+    b.onclick=()=>{const t=themeNow()==='dark'?'light':'dark';store.set('theme',t);themeApply(true);try{tg&&tg.HapticFeedback&&tg.HapticFeedback.impactOccurred('light')}catch(e){}toast(t==='dark'?'Kechki rejim':'Kunduzgi rejim')};
+    h.insertBefore(b,document.getElementById('todaychip'))}
+  themeApply(false);
+  try{tg&&tg.onEvent&&tg.onEvent('themeChanged',()=>{if(!store.get('theme',null))themeApply(true)})}catch(e){}
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(!store.get('theme',null))themeApply(true)})}catch(e){}
+})();
 
 // greeting
 (function(){
@@ -3826,7 +3851,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261021w';
+const APP_VER='20261021x';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
