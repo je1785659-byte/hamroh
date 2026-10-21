@@ -3814,7 +3814,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261021q';
+const APP_VER='20261021r';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -4057,7 +4057,7 @@ function kkPhotoStart(file){
 function kkRun(P){
   P.st='wait';P.err=null;if(current==='kkal'&&kkView==='photo')kkPhotoV();
   kkAsk(P.img).then(j=>{if(kkPh!==P)return;
-    if(j&&typeof j.left==='number')P.left=j.left;
+    if(j&&typeof j.left==='number')P.left=j.left;P.model=j&&j.model;
     if(!j||!j.ok){P.st='err';P.err=(j&&j.error)||'ai';P.why=j&&j.why}
     else{P.items=(Array.isArray(j.items)?j.items:[]).map(kkFromAI).filter(Boolean).slice(0,8);P.st=P.items.length?'ok':'none';if(P.items.length)haptic('done')}
     if(current==='kkal'&&kkView==='photo')kkPhotoV()})
@@ -4089,7 +4089,7 @@ function kkPhotoV(){
       <div class="kk-tot"><span class="note">Jami</span><b id="kkpt" data-notr>${fmt(kkR(tot()))} ${kkKc()}</b></div>
       ${kkMealChips(P.m)}
       <button class="btn" id="kkok">Kunlikka qo'shish</button>
-      <button class="btn alt" id="kkagain">Boshqa surat</button></section>`;
+      <button class="btn alt" id="kkagain">Boshqa surat</button>${P.model?`<p class="note" data-noi18n style="margin:0">Admin uchun: ${esc(String(P.model).split('/').pop())}</p>`:''}</section>`;
   $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="kkback">← Kaloriya</button><b>Suratdan aniqlash</b><span></span></div>
     <div class="kk-ph ${busy?'busy':''}">${P.img?`<img src="${P.img}" alt="">`:''}${busy?`<div class="kk-scan"><span class="kk-spin"></span><span>${P.st==='prep'?'Rasm tayyorlanmoqda…':'Taom aniqlanmoqda…'}</span></div>`:''}</div>
     ${busy?`<p class="note" style="margin:0 4px">Odatda 3–10 soniya davom etadi.</p>`:body}

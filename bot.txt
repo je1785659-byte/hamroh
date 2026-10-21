@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-3
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-4
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -248,8 +248,8 @@ async function handleCheck(req,env){
 }
 
 // ---- Kaloriya: suratdan taomni aniqlash (Workers AI binding: AI) ----
-const FOOD_MODELS=['@cf/meta/llama-3.2-11b-vision-instruct','@cf/meta/llama-4-scout-17b-16e-instruct'];
-const FOOD_USER_DAY=15, FOOD_ALL_DAY=300; // bepul kunlik limitdan (10 000 neyron) oshmaslik uchun
+const FOOD_MODELS=['@cf/meta/llama-4-scout-17b-16e-instruct','@cf/meta/llama-3.2-11b-vision-instruct']; // birinchisi aniqroq, ikkinchisi zaxira
+const FOOD_USER_DAY=15, FOOD_ALL_DAY=120; // bepul kunlik limitdan (10 000 neyron, ~90 neyron/surat) oshmaslik uchun
 let KKCAT=null,KKCAT_AT=0;
 async function kkCatalog(){
   if(KKCAT&&Date.now()-KKCAT_AT<3600e3)return KKCAT;
@@ -263,6 +263,13 @@ List every distinct food or drink visible in the photo, at most 6. For each one 
 "name": a short English name of what you see;
 "g": the estimated edible weight in grams of the portion in the photo (a dinner plate is about 26 cm wide, a kosa bowl holds about 400 ml, a piyola tea cup about 150 ml, a whole Uzbek non flatbread weighs about 300 g, one somsa about 120 g);
 "kcal100": estimated calories per 100 g.
+Rules:
+- Meat pieces lying on top of plov rice are part of the plov (id "osh"). Never list them as a separate meat dish.
+- Small white eggs about 3 cm long are quail eggs (id "bedana_tuxum", about 10 g each). Count them: g = count x 10.
+- Round dark sausage slices with a white fat ring, often on plov, are kazy (id "qazi", about 30 g per slice).
+- For countable foods (eggs, somsa, manti, skewers, pieces of bread) estimate g as count x typical weight.
+- Include side salads, bread and drinks if they are visible.
+- Do not list things you cannot clearly see, such as oil, butter or sauces mixed into a dish. If unsure what a small item is, leave it out.
 Reply with JSON only, exactly like: {"items":[{"id":"osh","name":"plov","g":350,"kcal100":240}]}
 If there is no food or drink in the photo, reply {"items":[]}.
 Catalog (id: description):
@@ -300,6 +307,7 @@ async function foodAI(env,AI,img,cat){
         const s=String((e&&e.message)||e);
         if(!agreed&&/agree|licen[cs]e|5016/i.test(s)){agreed=true;try{await AI.run(m,{prompt:'agree'})}catch(_){}v--;continue}
         errs.push(m.split('/').pop()+': '+s.slice(0,160));
+        if(/4006|daily free allocation|neurons/i.test(s))throw new Error('QUOTA '+s.slice(0,160));
         if(!/image|input|schema|type|format|invalid/i.test(s))break;
       }
     }
@@ -326,7 +334,7 @@ async function handleFood(req,env){
   }catch(e){console.log('food db',e)}}
   const cat=await kkCatalog();
   let res;
-  try{res=await foodAI(env,AI,img,cat)}catch(e){console.log('food ai',e);return J({ok:false,error:'ai',...(admin?{why:String((e&&e.message)||e).slice(0,400)}:{})})}
+  try{res=await foodAI(env,AI,img,cat)}catch(e){console.log('food ai',e);return J({ok:false,error:/^QUOTA/.test(String(e&&e.message))?'busy':'ai',...(admin?{why:String((e&&e.message)||e).slice(0,400)}:{})})}
   if(db)await db.prepare('INSERT INTO food(day,uid,n) VALUES(?1,?2,1) ON CONFLICT(day,uid) DO UPDATE SET n=n+1').bind(day,u.id).run().catch(()=>{});
   return J({ok:true,items:res.items,left:Math.max(0,userMax-used-1),...(admin?{model:res.m}:{})});
 }
