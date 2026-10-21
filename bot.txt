@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-4
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-5
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -251,9 +251,19 @@ async function handleCheck(req,env){
 const FOOD_MODELS=['@cf/meta/llama-4-scout-17b-16e-instruct','@cf/meta/llama-3.2-11b-vision-instruct']; // birinchisi aniqroq, ikkinchisi zaxira
 const FOOD_USER_DAY=15, FOOD_ALL_DAY=120; // bepul kunlik limitdan (10 000 neyron, ~90 neyron/surat) oshmaslik uchun
 let KKCAT=null,KKCAT_AT=0;
+const FOOD_RULES=`Rules:
+- Meat pieces lying on top of plov rice are part of the plov (id "osh"). Never list them as a separate meat dish.
+- Look carefully at the top and the edges of a plov plate: plov is often garnished with quail eggs and slices of kazy. List each of them as a separate item.
+- Small white or speckled eggs about 3 cm long are quail eggs (id "bedana_tuxum", about 10 g each). Count them: g = count x 10.
+- Round slices of sausage with a white fat ring are kazy (id "qazi", about 30 g per slice). They are not butter.
+- For countable foods (eggs, somsa, manti, skewers, pieces of bread) estimate g as count x typical weight.
+- Include side salads, bread and drinks if they are visible.
+- Do not list oil, butter or sauces that are mixed into a dish and cannot be seen separately.`;
 async function kkCatalog(){
-  if(KKCAT&&Date.now()-KKCAT_AT<3600e3)return KKCAT;
-  try{const r=await fetch(APP_URL+'kkal.json',{cf:{cacheTtl:3600}});if(r.ok){const j=await r.json();KKCAT={ids:new Set(j.f.map(x=>x[0])),text:j.f.map(x=>x[0]+': '+x[9]).join('\n')};KKCAT_AT=Date.now()}}catch(e){}
+  if(KKCAT&&Date.now()-KKCAT_AT<600e3)return KKCAT;
+  // qoidalar va modellar ro'yxati ham kkal.json'da: ularni o'zgartirish uchun botni qayta joylash shart emas
+  try{const r=await fetch(APP_URL+'kkal.json',{cf:{cacheTtl:600}});if(r.ok){const j=await r.json();const ai=j.ai||{};
+    KKCAT={ids:new Set(j.f.map(x=>x[0])),text:j.f.map(x=>x[0]+': '+x[9]).join('\n'),rules:typeof ai.rules==='string'?ai.rules:null,models:Array.isArray(ai.models)&&ai.models.length?ai.models.map(String):null};KKCAT_AT=Date.now()}}catch(e){}
   return KKCAT;
 }
 function foodPrompt(cat){
@@ -263,13 +273,7 @@ List every distinct food or drink visible in the photo, at most 6. For each one 
 "name": a short English name of what you see;
 "g": the estimated edible weight in grams of the portion in the photo (a dinner plate is about 26 cm wide, a kosa bowl holds about 400 ml, a piyola tea cup about 150 ml, a whole Uzbek non flatbread weighs about 300 g, one somsa about 120 g);
 "kcal100": estimated calories per 100 g.
-Rules:
-- Meat pieces lying on top of plov rice are part of the plov (id "osh"). Never list them as a separate meat dish.
-- Small white eggs about 3 cm long are quail eggs (id "bedana_tuxum", about 10 g each). Count them: g = count x 10.
-- Round dark sausage slices with a white fat ring, often on plov, are kazy (id "qazi", about 30 g per slice).
-- For countable foods (eggs, somsa, manti, skewers, pieces of bread) estimate g as count x typical weight.
-- Include side salads, bread and drinks if they are visible.
-- Do not list things you cannot clearly see, such as oil, butter or sauces mixed into a dish. If unsure what a small item is, leave it out.
+${(cat&&cat.rules)||FOOD_RULES}
 Reply with JSON only, exactly like: {"items":[{"id":"osh","name":"plov","g":350,"kcal100":240}]}
 If there is no food or drink in the photo, reply {"items":[]}.
 Catalog (id: description):
@@ -288,7 +292,7 @@ function foodParse(r,ids){
 function b64bytes(d){const s=atob(d.slice(d.indexOf(',')+1)),a=new Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
 async function foodAI(env,AI,img,cat){
   const prompt=foodPrompt(cat),ask='What food and drinks are in this photo? Reply with JSON only.',errs=[];
-  const models=env.FOOD_MODEL?String(env.FOOD_MODEL).split(',').map(x=>x.trim()).filter(Boolean):FOOD_MODELS;
+  const models=env.FOOD_MODEL?String(env.FOOD_MODEL).split(',').map(x=>x.trim()).filter(Boolean):(cat&&cat.models)||FOOD_MODELS;
   for(const m of models){
     const parts=/llama-4|gemma|mistral/.test(m);
     const msg=[{role:'system',content:prompt},{role:'user',content:ask}];

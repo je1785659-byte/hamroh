@@ -3814,7 +3814,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261021r';
+const APP_VER='20261021s';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -4064,6 +4064,13 @@ function kkRun(P){
   .catch(()=>{if(kkPh!==P)return;P.st='err';P.err='net';if(current==='kkal'&&kkView==='photo')kkPhotoV()});
 }
 const kkStepG=g=>g<60?5:g<200?10:25;
+// donalab sanaladigan kichik taomlar (bedana tuxumi, manti, qazi...) bir donadan o'zgaradi
+const kkStepX=x=>x.f.u&&['dona','six',"bo'lak"].includes(x.f.u)&&x.f.g&&x.f.g<=60?x.f.g:kkStepG(x.g);
+// taom bilan odatda birga yeyiladiganlar: AI ko'rmay qolsa, bir bosishda qo'shiladi
+const KK_PAIR={osh:['bedana_tuxum','qazi','achchiq_chuchuk','non','choy'],shashlik:['non','achchiq_chuchuk','choy'],tovuq_shashlik:['non','achchiq_chuchuk','choy'],jigar_kabob:['non','achchiq_chuchuk','choy'],lyulya:['non','achchiq_chuchuk','choy'],
+  somsa:['choy','achchiq_chuchuk'],kok_somsa:['choy'],qovoq_somsa:['choy'],manti:['smetana','choy'],chuchvara:['smetana','non'],lagmon:['non','choy'],lagmon_q:['choy'],shurva:['non','choy'],mastava:['non','smetana'],moshxorda:['non'],
+  norin:['choy'],qozon_kabob:['non','achchiq_chuchuk'],dimlama:['non'],burger:['fri','kola'],lavash:['kola','fri'],donar:['kola'],pitsa:['kola'],hotdog:['kola']};
+function kkPairs(items){const have=new Set(items.map(x=>x.f.id)),out=[];items.forEach(x=>(KK_PAIR[x.f.id]||[]).forEach(id=>{if(!have.has(id)&&!out.includes(id)&&KK.by[id])out.push(id)}));return out.slice(0,6)}
 function kkPhotoV(){
   const P=kkPh;if(!P){kkView='day';return kkDayV()}
   const busy=P.st==='prep'||P.st==='wait';
@@ -4085,6 +4092,7 @@ function kkPhotoV(){
       ${P.items.map((x,i)=>`<div class="kk-d"><div class="kk-dh"><button data-ch="${i}"><b ${x.f.ai?'data-noi18n':''}>${esc(x.f.n)}</b><small>${x.f.ai?"Ro'yxatda yo'q · almashtirish":'Almashtirish'}</small></button><button class="kk-x" data-rm="${i}" aria-label="Olib tashlash">✕</button></div>
         <div class="kk-dr"><button data-dg="${i}" data-s="-1" aria-label="Kamaytirish">−</button><input data-g="${i}" type="number" inputmode="numeric" min="1" max="3000" value="${kkR(x.g)}" aria-label="Gramm"><button data-dg="${i}" data-s="1" aria-label="Ko'paytirish">+</button><span class="kk-k" data-notr><span data-kk="${i}">${fmt(kkR(x.f.k*x.g/100))}</span><small>${kkKc()}</small></span></div>
         <small class="note" data-notr data-ku="${i}">${x.f.u?kkAmt(x.f.u,x.f.g,x.g):`${kkR(x.g)} ${kkG()}`}</small></div>`).join('')}
+      ${kkPairs(P.items).length?`<div class="label">Yana bormi?</div><div class="kk-quick">${kkPairs(P.items).map(id=>`<button class="chip" data-pr="${id}">+ ${esc(KK.by[id].n)}</button>`).join('')}</div>`:''}
       <button class="chip" id="kkmore" style="align-self:flex-start">+ Yana taom qo'shish</button>
       <div class="kk-tot"><span class="note">Jami</span><b id="kkpt" data-notr>${fmt(kkR(tot()))} ${kkKc()}</b></div>
       ${kkMealChips(P.m)}
@@ -4099,8 +4107,9 @@ function kkPhotoV(){
   on('#kkretry',()=>kkRun(P));on('#kklist2',()=>{kkPh=null;kkMealSel=P.m;kkGo('add')});on('#kkagain',()=>kkSnap(true));
   if(P.st!=='ok')return;
   const sync=i=>{const x=P.items[i],a=$(`[data-kk="${i}"]`),u=$(`[data-ku="${i}"]`);if(a)a.textContent=fmt(kkR(x.f.k*x.g/100));if(u)u.textContent=x.f.u?kkAmt(x.f.u,x.f.g,x.g):`${kkR(x.g)} ${kkG()}`;$('#kkpt').textContent=`${fmt(kkR(tot()))} ${kkKc()}`};
-  $('#screen').querySelectorAll('[data-dg]').forEach(b=>b.onclick=()=>{const i=+b.dataset.dg,x=P.items[i],st=kkStepG(x.g);x.g=Math.max(st,Math.min(3000,Math.round(x.g/st)*st+(+b.dataset.s)*st));$(`[data-g="${i}"]`).value=x.g;haptic('light');sync(i)});
+  $('#screen').querySelectorAll('[data-dg]').forEach(b=>b.onclick=()=>{const i=+b.dataset.dg,x=P.items[i],st=kkStepX(x);x.g=Math.max(st,Math.min(3000,Math.round(x.g/st)*st+(+b.dataset.s)*st));$(`[data-g="${i}"]`).value=x.g;haptic('light');sync(i)});
   $('#screen').querySelectorAll('[data-g]').forEach(inp=>inp.oninput=()=>{const i=+inp.dataset.g,v=parseFloat(inp.value);if(v>0&&v<=3000){P.items[i].g=v;sync(i)}});
+  $('#screen').querySelectorAll('[data-pr]').forEach(b=>b.onclick=()=>{const f=KK.by[b.dataset.pr];if(!f)return;P.items.push({f,g:f.g});haptic('light');kkPhotoV()});
   $('#screen').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{P.items.splice(+b.dataset.rm,1);if(!P.items.length)P.st='none';kkPhotoV()});
   $('#screen').querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ch;kkPick=f=>{if(P.items[i])P.items[i].f=f;kkGo('photo')};kkQ='';kkCat='all';kkGo('add')});
   on('#kkmore',()=>{kkPick=f=>{P.items.push({f,g:f.g});kkGo('photo')};kkQ='';kkCat='all';kkGo('add')});
