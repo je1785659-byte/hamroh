@@ -284,11 +284,13 @@ async function foodAI(env,AI,img,cat){
   const models=env.FOOD_MODEL?String(env.FOOD_MODEL).split(',').map(x=>x.trim()).filter(Boolean):FOOD_MODELS;
   for(const m of models){
     const parts=/llama-4|gemma|mistral/.test(m);
-    const variants=parts?[{messages:[{role:'system',content:prompt},{role:'user',content:[{type:'text',text:ask},{type:'image_url',image_url:{url:img}}]}]}]
-      :[{messages:[{role:'system',content:prompt},{role:'user',content:ask}],image:img},{messages:[{role:'system',content:prompt},{role:'user',content:ask}],image:img.slice(img.indexOf(',')+1)},'bytes'];
+    const msg=[{role:'system',content:prompt},{role:'user',content:ask}];
+    /** @type {Array<() => any>} */
+    const variants=parts?[()=>({messages:[{role:'system',content:prompt},{role:'user',content:[{type:'text',text:ask},{type:'image_url',image_url:{url:img}}]}]})]
+      :[()=>({messages:msg,image:img}),()=>({messages:msg,image:img.slice(img.indexOf(',')+1)}),()=>({messages:msg,image:b64bytes(img)})];
     let agreed=false;
     for(let v=0;v<variants.length;v++){
-      let inp=variants[v];if(inp==='bytes')inp={messages:[{role:'system',content:prompt},{role:'user',content:ask}],image:b64bytes(img)};
+      const inp=variants[v]();
       try{
         const r=await AI.run(m,{...inp,max_tokens:600,temperature:0.2});
         const items=foodParse(r,cat&&cat.ids);
