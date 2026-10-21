@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook).
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-3
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -306,10 +306,12 @@ async function foodAI(env,AI,img,cat){
   }
   throw new Error(errs.join(' | ')||'ai');
 }
+// Workers AI binding'ini nomidan qat'i nazar topadi (AI, AL va h.k.)
+function aiBinding(env){if(env.AI)return env.AI;for(const k in env){const v=env[k];if(v&&typeof v==='object'&&typeof v.run==='function'&&typeof v.prepare!=='function')return v}return null}
 async function handleFood(req,env){
   let f;try{f=await req.formData()}catch(e){return J({ok:false,error:'img'},400)}
   const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false,error:'auth'},403);
-  const AI=env.AI||env.AL;if(!AI)return J({ok:false,error:'noai'}); // AL: binding nomi adashib yozilgan holat uchun
+  const AI=aiBinding(env);if(!AI)return J({ok:false,error:'noai'});
   const img=String(f.get('img')||'');
   if(img.length>1500000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(img))return J({ok:false,error:'img'},400);
   const db=await D(env).catch(()=>null),day=dstr(Date.now());
