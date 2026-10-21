@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-7
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-8
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -254,6 +254,11 @@ async function handleCheck(req,env){
 const FOOD_MODELS=['@cf/meta/llama-4-scout-17b-16e-instruct','@cf/meta/llama-3.2-11b-vision-instruct']; // birinchisi aniqroq, ikkinchisi zaxira
 const FOOD_USER_DAY=15, FOOD_ALL_DAY=120; // bepul kunlik limitdan (10 000 neyron, ~90 neyron/surat) oshmaslik uchun
 let KKCAT=null,KKCAT_AT=0;
+const FOOD_FIELDS=`"n": for countable foods (eggs, somsa, manti, skewers, dolma, meatballs, cutlets, pastries, fruits, pieces of bread) the number of pieces you see; count Uzbek non flatbread in quarters (a whole non is 4); otherwise 0;
+"size": for dishes served as a portion (plov, soup, salad, porridge, laghman, stew, drinks) compare with one typical individual serving: "small", "medium" or "large";
+"g": the estimated edible weight in grams of what is in the photo (a dinner plate is about 26 cm wide, a kosa bowl holds about 400 ml, a piyola tea cup about 150 ml, a whole Uzbek non flatbread weighs about 300 g, one somsa about 120 g);
+"kcal100": estimated calories per 100 g;
+"conf": how sure you are about this item: "high", "medium" or "low".`;
 const FOOD_RULES=`Rules:
 - Meat pieces lying on top of plov rice are part of the plov (id "osh"). Never list them as a separate meat dish.
 - Look carefully at the top and the edges of a plov plate: plov is often garnished with quail eggs and slices of kazy. List each of them as a separate item.
@@ -266,22 +271,18 @@ async function kkCatalog(){
   if(KKCAT&&Date.now()-KKCAT_AT<600e3)return KKCAT;
   // qoidalar va modellar ro'yxati ham kkal.json'da: ularni o'zgartirish uchun botni qayta joylash shart emas
   try{const r=await fetch(APP_URL+'kkal.json',{cf:{cacheTtl:600}});if(r.ok){const j=await r.json();const ai=j.ai||{};
-    KKCAT={ids:new Set(j.f.map(x=>x[0])),text:j.f.map(x=>x[0]+': '+x[9]).join('\n'),rules:typeof ai.rules==='string'?ai.rules:null,claude:typeof ai.claude==='string'?ai.claude:null,models:Array.isArray(ai.models)&&ai.models.length?ai.models.map(String):null};KKCAT_AT=Date.now()}}catch(e){}
+    KKCAT={ids:new Set(j.f.map(x=>x[0])),text:j.f.map(x=>x[0]+': '+x[9]).join('\n'),rules:typeof ai.rules==='string'?ai.rules:null,fields:typeof ai.fields==='string'?ai.fields:null,claude:typeof ai.claude==='string'?ai.claude:null,models:Array.isArray(ai.models)&&ai.models.length?ai.models.map(String):null};KKCAT_AT=Date.now()}}catch(e){}
   return KKCAT;
 }
 function foodPrompt(cat,names,tool){
   return `You identify food in photos for a calorie counting app used in Uzbekistan.
 First write "seen": one short sentence describing what is on the plate(s), with counts of pieces.
-Set "shared": true if the photo shows a shared table (dasturxon) with several serving dishes, otherwise false.
+Set "shared": true if several people seem to eat from it: one big shared dish (a lagan of plov) or a table (dasturxon) with several serving dishes; otherwise false.
 Then list every distinct food or drink in "items", at most 8. For each item give:
 "id": the best matching id from the catalog below, or null if nothing fits;
 "name": a short English name of what you see;${names?`
 "uz": the name in Uzbek (Latin script); "ru": the name in Russian;`:''}
-"n": for countable foods (eggs, somsa, manti, skewers, dolma, meatballs, cutlets, pastries, fruits, pieces of bread) the number of pieces you see; count Uzbek non flatbread in quarters (a whole non is 4); otherwise 0;
-"size": for dishes served as a portion (plov, soup, salad, porridge, laghman, stew, drinks) compare with one typical individual serving: "small", "medium" or "large";
-"g": the estimated edible weight in grams of what is in the photo (a dinner plate is about 26 cm wide, a kosa bowl holds about 400 ml, a piyola tea cup about 150 ml, a whole Uzbek non flatbread weighs about 300 g, one somsa about 120 g);
-"kcal100": estimated calories per 100 g;
-"conf": how sure you are about this item: "high", "medium" or "low".
+${(cat&&cat.fields)||FOOD_FIELDS}
 ${(cat&&cat.rules)||FOOD_RULES}
 ${tool?'Report the result with the report_foods tool.':`Reply with JSON only, exactly like: {"seen":"one plate of plov with 2 quail eggs","shared":false,"items":[{"id":"osh","name":"plov","n":0,"size":"medium","g":350,"kcal100":240,"conf":"high"}]}
 If there is no food or drink in the photo, reply {"seen":"no food","shared":false,"items":[]}.`}

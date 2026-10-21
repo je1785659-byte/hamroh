@@ -673,9 +673,9 @@ body[data-sec="kkal"]{--kk-a:#1a7d4c}
 .kk-warn{padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--saffron) 16%,var(--surface));font-size:13px;line-height:1.4}
 .kk-norm{display:flex;align-items:center;gap:12px;width:100%;text-align:left}
 .kk-norm>span:nth-child(1){flex:1}.kk-norm b{display:block}.kk-norm small{color:var(--muted);font-size:12.5px}
-.kk-sz{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kk-sz{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
 .kk-sz .chip{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 4px;border-radius:12px;line-height:1.2}
-.kk-sz .chip b{font-size:13.5px;font-weight:700}.kk-sz .chip small{font-size:11px;color:var(--muted)}
+.kk-sz .chip b{font-size:15px;font-weight:800}.kk-sz .chip small{font-size:11px;color:var(--muted)}
 .kk-sz .chip[aria-pressed="true"]{background:var(--sec);border-color:var(--sec);color:#fff}.kk-sz .chip[aria-pressed="true"] small{color:rgba(255,255,255,.85)}
 #kkshare{display:grid;grid-template-columns:repeat(4,1fr)}#kkshare .chip{padding:8px 2px;text-align:center}#kkshare .chip[aria-pressed="true"]{background:var(--sec);border-color:var(--sec);color:#fff}
 .kk-tips{display:flex;flex-direction:column;gap:10px}.kk-tips>div{display:flex;gap:12px;align-items:flex-start}
@@ -684,6 +684,7 @@ body[data-sec="kkal"]{--kk-a:#1a7d4c}
 .kk-d.kk-low{border-color:color-mix(in srgb,var(--saffron) 65%,var(--line));background:color-mix(in srgb,var(--saffron) 8%,var(--surface))}
 .kk-d.kk-low .kk-dh small{color:color-mix(in srgb,var(--saffron) 75%,var(--ink))}
 .ad-fix>div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}.ad-fix>div:first-of-type{border-top:0}.ad-fix i{color:var(--muted);font-style:normal;font-size:12px}
+.kk-ppl{align-self:stretch;text-align:center;font-weight:600}.kk-ppl[aria-pressed="true"]{background:var(--sec);border-color:var(--sec);color:#fff}
 .kk-quick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.kk-quick::-webkit-scrollbar{display:none}
 .kk-quick .chip{flex:none;white-space:nowrap}
 </style>
@@ -3825,7 +3826,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261021v';
+const APP_VER='20261021w';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -3867,7 +3868,7 @@ let kkPulled=false;
 function kkCloudPull(){
   const cs=kkCS();if(!cs||kkPulled)return;kkPulled=true;
   try{cs.getKeys((err,keys)=>{if(err||!Array.isArray(keys))return;
-    const old=kkKey(-KK_CDAYS),dk=keys.filter(k=>/^kk_d_\d{8}$/.test(k)),stale=dk.filter(k=>kkKC(k)<old),want=dk.filter(k=>kkKC(k)>=old).concat(['kk_prof','kk_recent'].filter(k=>keys.includes(k)));
+    const old=kkKey(-KK_CDAYS),dk=keys.filter(k=>/^kk_d_\d{8}$/.test(k)),stale=dk.filter(k=>kkKC(k)<old),want=dk.filter(k=>kkKC(k)>=old).concat(['kk_prof','kk_recent','kk_my'].filter(k=>keys.includes(k)));
     if(stale.length)try{cs.removeItems(stale,()=>{})}catch(e){}
     const push=()=>{const U=store.get('kk_logu',{}),have=new Set(dk);Object.keys(kkLog()).filter(d=>d>=old&&!have.has(kkCK(d))).forEach(d=>{if(!U[d]){U[d]=Date.now();store.set('kk_logu',U)}kkCloudPut(d)});
       if(!keys.includes('kk_prof')&&kkProf())kkCloudSet('kk_prof',kkProf());if(!keys.includes('kk_recent')&&store.get('kk_recent',[]).length)kkCloudSet('kk_recent',store.get('kk_recent',[]))};
@@ -3877,6 +3878,7 @@ function kkCloudPull(){
         if(v.u>(U[d]||0)){const it=kkUnpack(v.i);if(it.length)L[d]=it;else delete L[d];U[d]=v.u;changed=true}else if((U[d]||0)>v.u)kkCloudPut(d)});
       if(changed){store.set('kk_log',L);store.set('kk_logu',U)}
       try{const pr=JSON.parse(vals.kk_prof||'null');if(pr&&typeof pr==='object'&&!kkProf()){store.set('kk_prof',pr);changed=true}}catch(e){}
+      try{const my=JSON.parse(vals.kk_my||'null');if(my&&typeof my==='object'&&!Object.keys(store.get('kk_my',{})).length)store.set('kk_my',my)}catch(e){}
       try{const rc=JSON.parse(vals.kk_recent||'null');if(Array.isArray(rc)&&!store.get('kk_recent',[]).length){store.set('kk_recent',rc.filter(x=>typeof x==='string').slice(0,12));changed=true}}catch(e){}
       push();
       if(changed&&current==='kkal'&&kkView==='day'&&!$('#kksheet'))kkDayV()})})}catch(e){}
@@ -3915,7 +3917,7 @@ function kkFiles(){
 }
 function kkSnap(cam){kkFiles();if(!(tg&&tg.initData)){toast("Suratdan aniqlash faqat Telegram ichida ishlaydi");return}
   if(store.get('kk_tip',0))return $(cam?'#kkcamf':'#kkgalf').click();
-  const T=[['📐','Tepadan oling',"Likopcha butunlay kadrga sig'sin, yon tomondan emas."],['💡',"Yorug' joyda","Soya va qorong'i rasmda taom yomon taniladi."],['🥄',"Yoniga qoshiq qo'ying","Qoshiq yoki vilka porsiya o'lchamini aniqroq topishga yordam beradi."],['🍽',"Yeyishdan oldin","Keyin «Qancha yedingiz?» da yeyilgan qismini belgilaysiz."]];
+  const T=[['📐','Tepadan oling',"Likopcha butunlay kadrga sig'sin, yon tomondan emas."],['💡',"Yorug' joyda","Soya va qorong'i rasmda taom yomon taniladi."],['🥄',"Yoniga qoshiq qo'ying","Qoshiq yoki vilka porsiya o'lchamini aniqroq topishga yordam beradi."],['🍽',"Yeyishdan oldin","Keyin qancha yeganingizni yoki laganda necha kishi birga yeganini belgilaysiz."]];
   const s=kkSheet(`<h3>Qanday suratga olish kerak?</h3><div class="kk-tips">${T.map(([i,b,t])=>`<div><span>${i}</span><p><b>${b}</b>${t}</p></div>`).join('')}</div><button class="btn" id="kktipok">${cam?'Tushunarli, suratga olish':'Tushunarli, rasm tanlash'}</button>`);
   $('#kktipok').onclick=()=>{store.set('kk_tip',1);s.remove();$(cam?'#kkcamf':'#kkgalf').click()}}
 const KK_CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg>';
@@ -3964,15 +3966,15 @@ function kkDayV(){
   $('#kkprof').onclick=()=>kkGo('prof');
   $('#screen').querySelectorAll('[data-am]').forEach(b=>b.onclick=()=>{kkMealSel=b.dataset.am;kkPick=null;kkGo('add')});
   $('#screen').querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{kkOff=+b.dataset.o;kkDayV()});
-  $('#screen').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const f=KK.by[b.dataset.q];if(f)kkAmount(f,f.g,{meal:kkMealNow(),btn:"Kunlikka qo'shish",save:(g,m)=>{kkAddItem(f,g,m,'man');kkAdded(f,g);kkDayV()}})});
+  $('#screen').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const f=KK.by[b.dataset.q];if(f)kkAmount(f,kkMyG(f),{meal:kkMealNow(),btn:"Kunlikka qo'shish",save:(g,m)=>{kkAddItem(f,g,m,'man');kkAdded(f,g);kkDayV()}})});
   $('#screen').querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>kkEdit(key,+b.dataset.e));
 }
 function kkAdded(f,g){haptic('light');toast(KT(`Qo'shildi: ${f.n} · ${kkR(f.k*g/100)} kkal`,`Добавлено: ${trText(f.n)} · ${kkR(f.k*g/100)} ккал`,`Added: ${trText(f.n)} · ${kkR(f.k*g/100)} kcal`))}
-function kkAddItem(f,g,m,src,key){
+function kkAddItem(f,g,m,src,key,noMy){
   key=key||kkKey(kkOff);const it=kkDayItems(key);
   it.push({id:f.id||null,n:f.n,g:Math.max(1,Math.round(g)),k1:f.k,p1:f.p,f1:f.f,c1:f.c,u:f.u||null,ug:f.g||null,m,t:Date.now(),s:src,...(f.ai?{ai:1}:{})});
   kkSave(key,it);
-  if(f.id&&KK.by[f.id]){const r=store.get('kk_recent',[]).filter(x=>x!==f.id);r.unshift(f.id);store.set('kk_recent',r.slice(0,12));kkCloudSet('kk_recent',r.slice(0,12))}
+  if(f.id&&KK.by[f.id]){if(!noMy){const my=store.get('kk_my',{});my[f.id]=Math.max(1,Math.round(g));store.set('kk_my',my);kkCloudSet('kk_my',my)}const r=store.get('kk_recent',[]).filter(x=>x!==f.id);r.unshift(f.id);store.set('kk_recent',r.slice(0,12));kkCloudSet('kk_recent',r.slice(0,12))}
 }
 function kkSheet(html){
   const old=$('#kksheet');if(old)old.remove();
@@ -3987,7 +3989,7 @@ function kkAmount(f,g0,o){
   const mac=f.p!=null?KT(` · oqsil ${f.p} g · yog' ${f.f} g · uglevod ${f.c} g`,` · белки ${f.p} г · жиры ${f.f} г · углеводы ${f.c} г`,` · protein ${f.p} g · fat ${f.f} g · carbs ${f.c} g`):'';
   const s=kkSheet(`<h3 ${f.ai?'data-noi18n':''}>${esc(f.n)}</h3>
     <div class="note" data-notr>${KT(`100 g: ${f.k} kkal`,`100 г: ${f.k} ккал`,`100 g: ${f.k} kcal`)}${mac}</div>
-    ${kkSized(f)?`<div class="label">Porsiya</div>${kkSzHtml(f,g)}`:''}
+    ${kkSized(f)?`<div class="label" data-notr>${KT(`Porsiya (1 = ${f.g} g)`,`Порция (1 = ${f.g} г)`,`Portion (1 = ${f.g} g)`)}</div>${kkSzHtml(f,g)}`:''}
     ${f.u&&!kkSized(f)?`<div class="kk-step"><button data-d="-1" aria-label="Kamaytirish">−</button><div id="kku" data-notr></div><button data-d="1" aria-label="Ko'paytirish">+</button></div>`:''}
     <div class="kk-gr"><input id="kkg" type="number" inputmode="numeric" min="1" max="3000" step="1" value="${kkR(g)}" aria-label="Gramm"><span data-notr>${kkG()}</span></div>
     <div class="kk-tot"><span class="note">Jami</span><b id="kkt" data-notr></b></div>
@@ -4042,7 +4044,7 @@ function kkAddV(){
       :`<section class="card"><p class="note">Hech narsa topilmadi. Boshqacha yozib ko'ring yoki taomni o'zingiz kiriting.</p></section>`;
     $('#kklist').querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const f=KK.by[b.dataset.id];if(!f)return;
       if(kkPick){const cb=kkPick;kkPick=null;cb(f);return}
-      kkAmount(f,f.g,{meal:kkMealSel||kkMealNow(),btn:"Kunlikka qo'shish",save:(g,m)=>{kkMealSel=m;kkAddItem(f,g,m,'man');kkAdded(f,g);const t=$('#kktot');if(t)t.textContent=tot()}})})};
+      kkAmount(f,kkMyG(f),{meal:kkMealSel||kkMealNow(),btn:"Kunlikka qo'shish",save:(g,m)=>{kkMealSel=m;kkAddItem(f,g,m,'man');kkAdded(f,g);const t=$('#kktot');if(t)t.textContent=tot()}})})};
   draw();
   const q=$('#kkq');q.oninput=()=>{kkQ=q.value;if(kkQ&&kkCat!=='all'){kkCat='all';$('#kkcats').querySelectorAll('[data-c]').forEach(x=>x.classList.toggle('on',x.dataset.c==='all'))}draw()};
   $('#kkcats').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;kkCat=b.dataset.c;$('#kkcats').querySelectorAll('[data-c]').forEach(x=>x.classList.toggle('on',x===b));if(kkQ){kkQ='';q.value=''}draw()};
@@ -4095,14 +4097,15 @@ function kkAsk(d){const fd=new FormData();fd.append('initData',tg.initData);fd.a
   return fetch(BOT_API+'/food',{method:'POST',body:fd,signal:ac?ac.signal:undefined}).then(r=>r.json()).finally(()=>clearTimeout(tm))}
 // AI grammni taxmin qilmaydi: sanaladiganlarda soni, porsiyalilarda o'lchami olinadi, gramm jadvaldan hisoblanadi
 const KK_CNT=['dona','six',"bo'lak",'chorak','boshoq','paket','banka','choy qoshiq','osh qoshiq'];
-function kkAIg(f,it){const n=+it.n||0,sz={small:0.7,medium:1,large:1.4}[it.size],g=Math.max(5,Math.min(2000,Math.round(+it.g||0)));
+function kkAIg(f,it,shared){const n=+it.n||0,sz={small:0.7,medium:1,large:1.4}[it.size],g=Math.max(5,Math.min(2000,Math.round(+it.g||0)));
   if(KK_CNT.includes(f.u)&&n>0&&n<=50)return n*f.g;
+  if(kkSized(f)&&+it.g>0)return Math.max(Math.round(f.g*0.3/5)*5,Math.min(shared?4000:Math.round(f.g*3/5)*5,Math.round((shared?Math.min(4000,+it.g):g)/5)*5));
   if(kkSized(f)&&sz)return Math.round(f.g*sz/5)*5;
   return +it.g>0?g:f.g}
-function kkFromAI(it){
+function kkFromAI(it,shared){
   if(!it||typeof it!=='object')return null;const g=Math.max(5,Math.min(2000,Math.round(+it.g||0)));const f=(it.id&&KK.by[it.id])||(!it.id&&it.name&&kkGuess(it.name));
   const conf=['high','medium','low'].includes(it.conf)?it.conf:null;
-  if(f){const gg=kkAIg(f,it);return {f,g:gg,conf,ai0:{id:f.id,g:gg}}}
+  if(f){const gg=kkAIg(f,it,shared);return {f,g:gg,conf,ai0:{id:f.id,g:gg}}}
   const k=Math.round(+it.kcal100);if(!(k>=0&&k<=900)||!it.name)return null;
   const nm=(LANG==='uz'||LANG==='uzc'||!LANG)&&it.uz?(LANG==='uzc'?lat2cyr(it.uz):it.uz):LANG==='ru'&&it.ru?it.ru:it.name;
   const gu=+it.g>0?g:150;return {f:{id:null,n:String(nm).slice(0,40),k,p:null,f:null,c:null,g:null,u:null,ai:1},g:gu,conf,ai0:{id:null,name:String(it.name).slice(0,30),g:gu}};
@@ -4115,15 +4118,15 @@ function kkGuess(name){
 function kkPhotoStart(file){
   if(!(tg&&tg.initData)){toast("Suratdan aniqlash faqat Telegram ichida ishlaydi");return}
   statSec('kk_photo');kkPick=null;
-  const P=kkPh={img:null,st:'prep',items:[],m:kkMealNow(),key:kkKey(kkOff),share:1};kkGo('photo');
+  const P=kkPh={img:null,st:'prep',items:[],m:kkMealNow(),key:kkKey(kkOff),share:1,ppl:0};kkGo('photo');
   kkShrink(file).then(d=>{if(kkPh!==P)return;P.img=d;kkRun(P)}).catch(()=>{if(kkPh!==P)return;P.st='err';P.err='img';if(current==='kkal'&&kkView==='photo')kkPhotoV()});
 }
 function kkRun(P){
   P.st='wait';P.err=null;if(current==='kkal'&&kkView==='photo')kkPhotoV();
   kkAsk(P.img).then(j=>{if(kkPh!==P)return;
-    if(j&&typeof j.left==='number')P.left=j.left;P.model=j&&j.model;P.seen=j&&j.seen;P.shared=!!(j&&j.shared);
+    if(j&&typeof j.left==='number')P.left=j.left;P.model=j&&j.model;P.seen=j&&j.seen;P.shared=!!(j&&j.shared);if(P.shared&&!P.ppl){P.ppl=4;P.share=0.25}
     if(!j||!j.ok){P.st='err';P.err=(j&&j.error)||'ai';P.why=j&&j.why}
-    else{P.items=(Array.isArray(j.items)?j.items:[]).map(kkFromAI).filter(Boolean).slice(0,8);P.st=P.items.length?'ok':'none';if(P.items.length)haptic('done')}
+    else{P.items=(Array.isArray(j.items)?j.items:[]).map(x=>kkFromAI(x,!!j.shared)).filter(Boolean).slice(0,8);P.st=P.items.length?'ok':'none';if(P.items.length)haptic('done')}
     if(current==='kkal'&&kkView==='photo')kkPhotoV()})
   .catch(()=>{if(kkPh!==P)return;P.st='err';P.err='net';if(current==='kkal'&&kkView==='photo')kkPhotoV()});
 }
@@ -4137,10 +4140,12 @@ function kkFixes(P){const A=a=>a.id||('?'+String(a.name||'').toLowerCase().slice
   return fx.slice(0,20)}
 function kkSendFix(P){if(!(tg&&tg.initData))return;try{const fd=new FormData();fd.append('initData',tg.initData);fd.append('fx',JSON.stringify(kkFixes(P)));fetch(BOT_API+'/food/fix',{method:'POST',body:fd,keepalive:true}).catch(()=>{})}catch(e){}}
 // porsiya o'lchami tugmalari (gramm o'rniga): faqat "porsiya"ga o'xshash birliklarda
-const KK_SZ=[[0.7,['Kichik','Маленькая','Small']],[1,["O'rtacha",'Средняя','Medium']],[1.4,['Katta','Большая','Large']]];
+const KK_SZ=[[0.5,'½'],[0.75,'¾'],[1,'1'],[1.5,'1½'],[2,'2']];
 const kkSized=f=>!!(f&&f.g&&['porsiya','kosa','tilim','hovuch','shingil','stakan','piyola'].includes(f.u));
-function kkSzHtml(f,g,i){if(!kkSized(f))return '';return `<div class="kk-sz"${i!=null?` data-szi="${i}"`:''}>${KK_SZ.map(([m,l])=>{const v=Math.round(f.g*m/5)*5;return `<button class="chip" data-sz="${v}" aria-pressed="${Math.abs(g-v)/v<0.08}" data-notr><b>${KT(...l)}</b><small>${v} ${kkG()}</small></button>`}).join('')}</div>`}
+function kkSzHtml(f,g,i){if(!kkSized(f))return '';return `<div class="kk-sz"${i!=null?` data-szi="${i}"`:''}>${KK_SZ.map(([m,l])=>{const v=Math.round(f.g*m/5)*5;return `<button class="chip" data-sz="${v}" aria-pressed="${Math.abs(g-v)/v<0.08}" data-notr><b>${l}</b><small>${v} ${kkG()}</small></button>`}).join('')}</div>`}
 function kkSzMark(box,g){if(box)box.querySelectorAll('[data-sz]').forEach(b=>{const v=+b.dataset.sz;b.setAttribute('aria-pressed',String(Math.abs(g-v)/v<0.08))})}
+const kkPt2=(P,t)=>P.ppl?KT(`suratda: ${fmt(kkR(t))} kkal · ${P.ppl} kishiga bo'lindi`,`на фото: ${fmt(kkR(t))} ккал · на ${P.ppl} чел.`,`in photo: ${fmt(kkR(t))} kcal · split between ${P.ppl}`):P.share<1?KT(`suratda: ${fmt(kkR(t))} kkal`,`на фото: ${fmt(kkR(t))} ккал`,`in photo: ${fmt(kkR(t))} kcal`):'';
+const kkMyG=f=>{const v=(store.get('kk_my',{})||{})[f.id];return v>0&&v<=3000?v:f.g};
 const KK_SHARE=[[1,'Hammasini'],[0.75,'¾'],[0.5,'Yarmini'],[0.25,'¼']];
 // donalab sanaladigan kichik taomlar (bedana tuxumi, manti, qazi...) bir donadan o'zgaradi
 const kkStepX=x=>x.f.u&&['dona','six',"bo'lak"].includes(x.f.u)&&x.f.g&&x.f.g<=60?x.f.g:kkStepG(x.g);
@@ -4167,15 +4172,17 @@ function kkPhotoV(){
   else if(P.st==='none')body=`<section class="card"><b>Rasmda taom topilmadi</b><p class="note" style="margin-top:6px">Taomni yaqinroqdan, yorug' joyda va tepadan suratga olib ko'ring.</p>
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><button class="btn" id="kkagain">Qayta suratga olish</button><button class="btn alt" id="kklist2">Ro'yxatdan qo'shish</button></div></section>`;
   else if(P.st==='ok')body=`<section class="card kk-det"><div class="label">Aniqlangan taomlar</div>
-      ${P.shared?`<div class="kk-warn">Bu umumiy dasturxonga o'xshaydi: har bir taom bir kishilik porsiya bilan hisoblandi. Yemaganlaringizni ✕ bilan olib tashlang.</div>`:''}
+      ${P.shared?`<div class="kk-warn">Bu umumiy lagan yoki dasturxonga o'xshaydi. Pastda necha kishi birga yeganini belgilang — sizga tushgan qism hisoblanadi. Yemagan taomlarni ✕ bilan olib tashlang.</div>`:''}
       ${P.items.map((x,i)=>`<div class="kk-d ${x.conf==='low'?'kk-low':''}"><div class="kk-dh"><button data-ch="${i}"><b ${x.f.ai?'data-noi18n':''}>${esc(x.f.n)}</b><small>${x.conf==='low'?'Aniq emas — tekshiring':x.f.ai?"Ro'yxatda yo'q · almashtirish":'Almashtirish'}</small></button><button class="kk-x" data-rm="${i}" aria-label="Olib tashlash">✕</button></div>
-        ${kkSzHtml(x.f,x.g,i)}
+        ${kkSized(x.f)?`<small class="note" data-notr style="margin-bottom:-4px">${KT(`Porsiya (1 = ${x.f.g} g):`,`Порция (1 = ${x.f.g} г):`,`Portion (1 = ${x.f.g} g):`)}</small>${kkSzHtml(x.f,x.g,i)}`:''}
         <div class="kk-dr"><button data-dg="${i}" data-s="-1" aria-label="Kamaytirish">−</button><input data-g="${i}" type="number" inputmode="numeric" min="1" max="3000" value="${kkR(x.g)}" aria-label="Gramm"><button data-dg="${i}" data-s="1" aria-label="Ko'paytirish">+</button><span class="kk-k" data-notr><span data-kk="${i}">${fmt(kkR(x.f.k*x.g/100))}</span><small>${kkKc()}</small></span></div>
         <small class="note" data-notr data-ku="${i}">${x.f.u?kkAmt(x.f.u,x.f.g,x.g):`${kkR(x.g)} ${kkG()}`}</small></div>`).join('')}
       ${kkPairs(P.items).length?`<div class="label">Yana bormi?</div><div class="kk-quick">${kkPairs(P.items).map(id=>`<button class="chip" data-pr="${id}">+ ${esc(KK.by[id].n)}</button>`).join('')}</div>`:''}
       <button class="chip" id="kkmore" style="align-self:flex-start">+ Yana taom qo'shish</button>
-      <div class="label">Qancha yedingiz?</div><div class="kk-meals" id="kkshare">${KK_SHARE.map(([v,l])=>`<button class="chip" data-sh="${v}" aria-pressed="${v===P.share}">${l}</button>`).join('')}</div>
-      <div class="kk-tot"><span class="note">Jami</span><span style="text-align:right"><b id="kkpt" data-notr>${fmt(kkR(tot()*P.share))} ${kkKc()}</b><small class="note" id="kkpt2" data-notr style="display:block">${P.share<1?KT(`suratda: ${fmt(kkR(tot()))} kkal`,`на фото: ${fmt(kkR(tot()))} ккал`,`in photo: ${fmt(kkR(tot()))} kcal`):''}</small></span></div>
+      <div class="label">Qancha yedingiz?</div><div class="kk-meals" id="kkshare">${KK_SHARE.map(([v,l])=>`<button class="chip" data-sh="${v}" aria-pressed="${!P.ppl&&v===P.share}">${l}</button>`).join('')}</div>
+      <button class="chip kk-ppl" id="kkpplon" aria-pressed="${!!P.ppl}">👥 Bir necha kishi birga yedik</button>
+      <div class="kk-step" id="kkpplst" ${P.ppl?'':'hidden'}><button data-pp="-1" aria-label="Kamaytirish">−</button><div id="kkppl" data-notr>${KT(`${P.ppl||4} kishi`,`${P.ppl||4} чел.`,`${P.ppl||4} people`)}</div><button data-pp="1" aria-label="Ko'paytirish">+</button></div>
+      <div class="kk-tot"><span class="note">Jami</span><span style="text-align:right"><b id="kkpt" data-notr>${fmt(kkR(tot()*P.share))} ${kkKc()}</b><small class="note" id="kkpt2" data-notr style="display:block">${kkPt2(P,tot())}</small></span></div>
       ${kkMealChips(P.m)}
       <button class="btn" id="kkok">Kunlikka qo'shish</button>
       <button class="btn alt" id="kkagain">Boshqa surat</button>${P.model?`<p class="note" data-noi18n style="margin:0">Admin uchun: ${esc(String(P.model).split('/').pop())}${P.seen?` · AI ko'rgani: ${esc(P.seen)}`:''}</p>`:''}</section>`;
@@ -4187,10 +4194,13 @@ function kkPhotoV(){
   const on=(id,f)=>{const b=$(id);if(b)b.onclick=f};
   on('#kkretry',()=>kkRun(P));on('#kklist2',()=>{kkPh=null;kkMealSel=P.m;kkGo('add')});on('#kkagain',()=>kkSnap(true));
   if(P.st!=='ok')return;
-  const syncT=()=>{$('#kkpt').textContent=`${fmt(kkR(tot()*P.share))} ${kkKc()}`;$('#kkpt2').textContent=P.share<1?KT(`suratda: ${fmt(kkR(tot()))} kkal`,`на фото: ${fmt(kkR(tot()))} ккал`,`in photo: ${fmt(kkR(tot()))} kcal`):''};
+  const syncT=()=>{$('#kkpt').textContent=`${fmt(kkR(tot()*P.share))} ${kkKc()}`;$('#kkpt2').textContent=kkPt2(P,tot())};
+  const shMark=()=>{$('#kkshare').querySelectorAll('[data-sh]').forEach(x=>x.setAttribute('aria-pressed',String(!P.ppl&&+x.dataset.sh===P.share)));$('#kkpplon').setAttribute('aria-pressed',String(!!P.ppl));$('#kkpplst').hidden=!P.ppl;if(P.ppl)$('#kkppl').textContent=KT(`${P.ppl} kishi`,`${P.ppl} чел.`,`${P.ppl} people`)};
+  $('#kkpplon').onclick=()=>{if(P.ppl){P.ppl=0;P.share=1}else{P.ppl=4;P.share=0.25}haptic('light');shMark();syncT()};
+  $('#kkpplst').querySelectorAll('[data-pp]').forEach(b=>b.onclick=()=>{P.ppl=Math.max(2,Math.min(30,(P.ppl||4)+(+b.dataset.pp)));P.share=1/P.ppl;haptic('light');shMark();syncT()});
   const sync=i=>{const x=P.items[i],a=$(`[data-kk="${i}"]`),u=$(`[data-ku="${i}"]`);if(a)a.textContent=fmt(kkR(x.f.k*x.g/100));if(u)u.textContent=x.f.u?kkAmt(x.f.u,x.f.g,x.g):`${kkR(x.g)} ${kkG()}`;kkSzMark($(`[data-szi="${i}"]`),x.g);syncT()};
   $('#screen').querySelectorAll('[data-szi]').forEach(box=>box.querySelectorAll('[data-sz]').forEach(b=>b.onclick=()=>{const i=+box.dataset.szi;P.items[i].g=+b.dataset.sz;$(`[data-g="${i}"]`).value=P.items[i].g;haptic('light');sync(i)}));
-  $('#kkshare').querySelectorAll('[data-sh]').forEach(b=>b.onclick=()=>{P.share=+b.dataset.sh;$('#kkshare').querySelectorAll('[data-sh]').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.sh===P.share)));haptic('light');syncT()});
+  $('#kkshare').querySelectorAll('[data-sh]').forEach(b=>b.onclick=()=>{P.share=+b.dataset.sh;P.ppl=0;haptic('light');shMark();syncT()});
   $('#screen').querySelectorAll('[data-dg]').forEach(b=>b.onclick=()=>{const i=+b.dataset.dg,x=P.items[i],st=kkStepX(x);x.g=Math.max(st,Math.min(3000,Math.round(x.g/st)*st+(+b.dataset.s)*st));$(`[data-g="${i}"]`).value=x.g;haptic('light');sync(i)});
   $('#screen').querySelectorAll('[data-g]').forEach(inp=>inp.oninput=()=>{const i=+inp.dataset.g,v=parseFloat(inp.value);if(v>0&&v<=3000){P.items[i].g=v;sync(i)}});
   $('#screen').querySelectorAll('[data-pr]').forEach(b=>b.onclick=()=>{const f=KK.by[b.dataset.pr];if(!f)return;P.items.push({f,g:f.g,added:1});haptic('light');kkPhotoV()});
@@ -4198,7 +4208,7 @@ function kkPhotoV(){
   $('#screen').querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ch;kkPick=f=>{if(P.items[i])P.items[i].f=f;kkGo('photo')};kkQ='';kkCat='all';kkGo('add')});
   on('#kkmore',()=>{kkPick=f=>{P.items.push({f,g:f.g,added:1});kkGo('photo')};kkQ='';kkCat='all';kkGo('add')});
   kkBindMeals($('#screen'),()=>P.m,m=>P.m=m);
-  on('#kkok',()=>{const t=tot()*P.share;kkSendFix(P);P.items.forEach(x=>kkAddItem(x.f,x.g*P.share,P.m,'ai',P.key));kkPh=null;haptic('done');toast(KT(`Qo'shildi: ${fmt(kkR(t))} kkal`,`Добавлено: ${fmt(kkR(t))} ккал`,`Added: ${fmt(kkR(t))} kcal`));kkGo('day')});
+  on('#kkok',()=>{const t=tot()*P.share;kkSendFix(P);P.items.forEach(x=>kkAddItem(x.f,x.g*P.share,P.m,'ai',P.key,P.share<1));kkPh=null;haptic('done');toast(KT(`Qo'shildi: ${fmt(kkR(t))} kkal`,`Добавлено: ${fmt(kkR(t))} ккал`,`Added: ${fmt(kkR(t))} kcal`));kkGo('day')});
 }
 
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava,sert:viewSert};
