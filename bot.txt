@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-6
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-7
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -152,6 +152,7 @@ async function D(env){
       env.DB.prepare('CREATE TABLE IF NOT EXISTS sections(day TEXT,sec TEXT,n INTEGER DEFAULT 0,PRIMARY KEY(day,sec))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY,v TEXT)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS food(day TEXT,uid INTEGER,n INTEGER DEFAULT 0,PRIMARY KEY(day,uid))'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS foodfix(day TEXT,k TEXT,a TEXT,u TEXT,n INTEGER DEFAULT 0,r REAL DEFAULT 0,PRIMARY KEY(day,k,a,u))'),
       env.DB.prepare("INSERT OR IGNORE INTO meta(k,v) VALUES('since',?1)").bind(String(Date.now()))
     ]);
     SCH=true;
@@ -187,7 +188,7 @@ async function trackBot(env,u){
 async function handlePing(req,env){
   let f;try{f=await req.formData()}catch(e){return J({ok:false},400)}
   const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false},403);
-  const db=await D(env).catch(()=>null);if(!db)return J({ok:true,admin:false,nodb:true});
+  const db=await D(env).catch(()=>null);if(!db)return J({ok:true,admin:false,nodb:true,hq:!!env.ANTHROPIC_API_KEY});
   const secs=Math.max(0,Math.min(900,parseInt(f.get('secs'))||0)), open=f.get('open')==='1'?1:0, day=dstr(Date.now());
   let secList=[];try{secList=JSON.parse(f.get('sec')||'[]').filter(x=>typeof x==='string'&&/^[a-z0-9_:-]{1,30}$/.test(x)).slice(0,15)}catch(e){}
   const sp=String(f.get('sp')||'').replace(/[^\w-]/g,'').slice(0,40);
@@ -196,7 +197,7 @@ async function handlePing(req,env){
     ...secList.map(x=>db.prepare('INSERT INTO sections(day,sec,n) VALUES(?1,?2,1) ON CONFLICT(day,sec) DO UPDATE SET n=n+1').bind(day,x)),
     db.prepare("SELECT v FROM meta WHERE k='admins'")];
   const r=await db.batch(st);const row=r[r.length-1].results[0];
-  return J({ok:true,admin:((row&&row.v)||'').split(',').includes(String(u.id))});
+  return J({ok:true,admin:((row&&row.v)||'').split(',').includes(String(u.id)),hq:!!env.ANTHROPIC_API_KEY});
 }
 async function computeStats(db,env){
   const now=Date.now(),today=dstr(now),d7=dstr(now-6*DAY),d30=dstr(now-29*DAY),d60=dstr(now-59*DAY);
@@ -216,14 +217,15 @@ async function computeStats(db,env){
     q("SELECT k,v FROM meta WHERE k IN ('since','checked')"),
     q('SELECT COUNT(*) n,SUM(EXISTS(SELECT 1 FROM daily d WHERE d.uid=users.id AND d.day>=?3)) back FROM users WHERE first_seen<?1 AND first_seen>=?2',t7,t7-7*DAY,d7),
     q('SELECT SUM(secs) s,SUM(secs>0) au FROM daily WHERE day>=?1',d7),
-    q('SELECT COALESCE(SUM(CASE WHEN day=?1 THEN n END),0) d1,COALESCE(SUM(n),0) d7,COUNT(DISTINCT uid) u7 FROM food WHERE day>=?2',today,d7)
+    q('SELECT COALESCE(SUM(CASE WHEN day=?1 THEN n END),0) d1,COALESCE(SUM(n),0) d7,COUNT(DISTINCT uid) u7 FROM food WHERE day>=?2',today,d7),
+    q("SELECT k,a,u,SUM(n) n,SUM(r) r FROM foodfix WHERE day>=?1 GROUP BY k,a,u ORDER BY (k='photo') DESC,n DESC LIMIT 25",d30)
   ]);
   const one=i=>r[i].results[0]||{}, all=i=>r[i].results||[];
   const meta=Object.fromEntries(all(10).map(x=>[x.k,x.v]));
   let wh=null;try{const w=await tg(env,'getWebhookInfo',{});if(w.ok){wh={pending:w.result.pending_update_count||0,error:w.result.last_error_message||null,fixed:false};
     const au=w.result.allowed_updates;if(au&&au.length&&!au.includes('my_chat_member')&&w.result.url){await tg(env,'setWebhook',{url:w.result.url,allowed_updates:[...au,'my_chat_member'],...(env.WEBHOOK_SECRET?{secret_token:env.WEBHOOK_SECRET}:{})});wh.fixed=true}}}catch(e){}
   return {now,today,users:one(0),dau:one(1).n||0,wau:one(2).n||0,mau:one(3).n||0,days:all(4),newDays:all(5),sections:all(6),langs:all(7),platforms:all(8),sources:all(9),
-    since:+meta.since||null,checked:+meta.checked||null,ret:one(11),avg7:one(12),food:one(13),wh};
+    since:+meta.since||null,checked:+meta.checked||null,ret:one(11),avg7:one(12),food:one(13),fixes:all(14),wh};
 }
 async function adminReq(req,env){
   let f;try{f=await req.formData()}catch(e){return [null,J({ok:false,error:'form'},400)]}
@@ -267,19 +269,40 @@ async function kkCatalog(){
     KKCAT={ids:new Set(j.f.map(x=>x[0])),text:j.f.map(x=>x[0]+': '+x[9]).join('\n'),rules:typeof ai.rules==='string'?ai.rules:null,claude:typeof ai.claude==='string'?ai.claude:null,models:Array.isArray(ai.models)&&ai.models.length?ai.models.map(String):null};KKCAT_AT=Date.now()}}catch(e){}
   return KKCAT;
 }
-function foodPrompt(cat,names){
+function foodPrompt(cat,names,tool){
   return `You identify food in photos for a calorie counting app used in Uzbekistan.
-List every distinct food or drink visible in the photo, at most 6. For each one give:
+First write "seen": one short sentence describing what is on the plate(s), with counts of pieces.
+Set "shared": true if the photo shows a shared table (dasturxon) with several serving dishes, otherwise false.
+Then list every distinct food or drink in "items", at most 8. For each item give:
 "id": the best matching id from the catalog below, or null if nothing fits;
-"name": a short English name of what you see;
-"g": the estimated edible weight in grams of the portion in the photo (a dinner plate is about 26 cm wide, a kosa bowl holds about 400 ml, a piyola tea cup about 150 ml, a whole Uzbek non flatbread weighs about 300 g, one somsa about 120 g);
-"kcal100": estimated calories per 100 g;${names?`
-"uz": the name in Uzbek (Latin script), "ru": the name in Russian.`:''}
+"name": a short English name of what you see;${names?`
+"uz": the name in Uzbek (Latin script); "ru": the name in Russian;`:''}
+"n": for countable foods (eggs, somsa, manti, skewers, dolma, meatballs, cutlets, pastries, fruits, pieces of bread) the number of pieces you see; count Uzbek non flatbread in quarters (a whole non is 4); otherwise 0;
+"size": for dishes served as a portion (plov, soup, salad, porridge, laghman, stew, drinks) compare with one typical individual serving: "small", "medium" or "large";
+"g": the estimated edible weight in grams of what is in the photo (a dinner plate is about 26 cm wide, a kosa bowl holds about 400 ml, a piyola tea cup about 150 ml, a whole Uzbek non flatbread weighs about 300 g, one somsa about 120 g);
+"kcal100": estimated calories per 100 g;
+"conf": how sure you are about this item: "high", "medium" or "low".
 ${(cat&&cat.rules)||FOOD_RULES}
-Reply with JSON only, exactly like: {"items":[{"id":"osh","name":"plov","g":350,"kcal100":240${names?',"uz":"Osh","ru":"Плов"':''}}]}
-If there is no food or drink in the photo, reply {"items":[]}.
+${tool?'Report the result with the report_foods tool.':`Reply with JSON only, exactly like: {"seen":"one plate of plov with 2 quail eggs","shared":false,"items":[{"id":"osh","name":"plov","n":0,"size":"medium","g":350,"kcal100":240,"conf":"high"}]}
+If there is no food or drink in the photo, reply {"seen":"no food","shared":false,"items":[]}.`}
 Catalog (id: description):
 ${cat?cat.text:''}`;
+}
+function foodTool(cat){
+  const ids=cat&&cat.ids?[...cat.ids]:[];
+  return {name:'report_foods',description:'Report the foods and drinks recognised in the photo.',input_schema:{type:'object',properties:{
+    seen:{type:'string',description:'One short sentence describing what is visible, with counts.'},
+    shared:{type:'boolean',description:'true if the photo shows a shared table with several serving dishes'},
+    items:{type:'array',maxItems:8,items:{type:'object',properties:{
+      id:{anyOf:[{type:'string',enum:ids},{type:'null'}],description:'catalog id or null'},
+      name:{type:'string'},uz:{type:'string'},ru:{type:'string'},
+      n:{type:'integer',description:'number of pieces for countable foods, else 0'},
+      size:{type:'string',enum:['small','medium','large']},
+      g:{type:'integer',description:'estimated edible grams'},
+      kcal100:{type:'integer'},
+      conf:{type:'string',enum:['high','medium','low']}},
+      required:['id','name','n','g','kcal100','conf']}}},
+    required:['seen','shared','items']}};
 }
 function foodParse(r,ids){
   let t=r&&(r.response!==undefined?r.response:(r.choices&&r.choices[0]&&r.choices[0].message&&r.choices[0].message.content));
@@ -288,23 +311,26 @@ function foodParse(r,ids){
   else if(typeof t==='string'){const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a>=0&&b>a){try{j=JSON.parse(t.slice(a,b+1))}catch(e){}}}
   if(!j)return null;
   const arr=Array.isArray(j)?j:Array.isArray(j.items)?j.items:null;if(!arr)return null;
-  return arr.slice(0,8).filter(x=>x&&typeof x==='object').map(x=>({id:ids&&typeof x.id==='string'&&ids.has(x.id)?x.id:null,name:String(x.name||'').slice(0,40),
+  const items=arr.slice(0,8).filter(x=>x&&typeof x==='object').map(x=>({id:ids&&typeof x.id==='string'&&ids.has(x.id)?x.id:null,name:String(x.name||'').slice(0,40),
     g:Math.max(0,Math.min(3000,Math.round(+x.g||0))),kcal100:Math.max(0,Math.min(900,Math.round(+x.kcal100||0))),
-    ...(typeof x.uz==='string'&&x.uz?{uz:x.uz.slice(0,40)}:{}),...(typeof x.ru==='string'&&x.ru?{ru:x.ru.slice(0,40)}:{})})).filter(x=>x.id||x.name);
+    ...(typeof x.uz==='string'&&x.uz?{uz:x.uz.slice(0,40)}:{}),...(typeof x.ru==='string'&&x.ru?{ru:x.ru.slice(0,40)}:{}),
+    ...(+x.n>0&&+x.n<=50?{n:Math.round(+x.n)}:{}),...(['small','medium','large'].includes(x.size)?{size:x.size}:{}),...(['high','medium','low'].includes(x.conf)?{conf:x.conf}:{})})).filter(x=>x.id||x.name);
+  return {items,seen:typeof j.seen==='string'?j.seen.slice(0,240):'',shared:j.shared===true};
 }
 function b64bytes(d){const s=atob(d.slice(d.indexOf(',')+1)),a=new Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
 async function foodClaude(env,img,cat){
   const model=(cat&&cat.claude)||env.CLAUDE_MODEL||'claude-haiku-5-5';
   const media=img.slice(5,img.indexOf(';')),data=img.slice(img.indexOf(',')+1);
   const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'x-api-key':env.ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','content-type':'application/json'},
-    body:JSON.stringify({model,max_tokens:800,temperature:0.2,system:foodPrompt(cat,true),
-      messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:media,data}},{type:'text',text:'What food and drinks are in this photo? Reply with JSON only.'}]}]})});
+    body:JSON.stringify({model,max_tokens:1000,temperature:0,system:foodPrompt(cat,true,true),tools:[foodTool(cat)],tool_choice:{type:'tool',name:'report_foods'},
+      messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:media,data}},{type:'text',text:'What food and drinks are in this photo?'}]}]})});
   /** @type {any} */
   const j=await r.json().catch(()=>null);
   if(!r.ok||!j)throw new Error('claude '+r.status+': '+String((j&&j.error&&j.error.message)||'').slice(0,200));
-  const t=(j.content||[]).filter(c=>c&&c.type==='text').map(c=>c.text).join('');
-  const items=foodParse({response:t},cat&&cat.ids);if(!items)throw new Error('claude: javob JSON emas');
-  return {items,m:model};
+  const tu=(j.content||[]).find(c=>c&&c.type==='tool_use');
+  const t=tu?tu.input:(j.content||[]).filter(c=>c&&c.type==='text').map(c=>c.text).join('');
+  const res=foodParse({response:t},cat&&cat.ids);if(!res)throw new Error('claude: javob formati noto\'g\'ri');
+  return {...res,m:model};
 }
 async function foodAI(env,AI,img,cat){
   const prompt=foodPrompt(cat),ask='What food and drinks are in this photo? Reply with JSON only.',errs=[];
@@ -320,8 +346,8 @@ async function foodAI(env,AI,img,cat){
       const inp=variants[v]();
       try{
         const r=await AI.run(m,{...inp,max_tokens:600,temperature:0.2});
-        const items=foodParse(r,cat&&cat.ids);
-        if(items)return {items,m};
+        const res=foodParse(r,cat&&cat.ids);
+        if(res)return {...res,m};
         errs.push(m.split('/').pop()+': javob JSON emas');break;
       }catch(e){
         const s=String((e&&e.message)||e);
@@ -358,7 +384,21 @@ async function handleFood(req,env){
   if(!res&&AI){try{res=await foodAI(env,AI,img,cat)}catch(e){console.log('food ai',e);errs.push(String((e&&e.message)||e))}}
   if(!res)return J({ok:false,error:!CL&&/^QUOTA/.test(errs.join(' '))?'busy':'ai',...(admin?{why:errs.join(' || ').slice(0,500)}:{})});
   if(db)await db.prepare('INSERT INTO food(day,uid,n) VALUES(?1,?2,1) ON CONFLICT(day,uid) DO UPDATE SET n=n+1').bind(day,u.id).run().catch(()=>{});
-  return J({ok:true,items:res.items,left:Math.max(0,userMax-used-1),...(admin?{model:res.m}:{})});
+  return J({ok:true,items:res.items,shared:!!res.shared,left:Math.max(0,userMax-used-1),...(admin?{model:res.m,seen:res.seen}:{})});
+}
+// foydalanuvchi AI natijasini qanday tuzatganini yig'adi (rasm saqlanmaydi, faqat taom kodlari)
+async function handleFoodFix(req,env){
+  let f;try{f=await req.formData()}catch(e){return J({ok:false},400)}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false},403);
+  const db=await D(env).catch(()=>null);if(!db)return J({ok:true});
+  let fx=[];try{fx=JSON.parse(String(f.get('fx')||'[]'))}catch(e){}
+  const day=dstr(Date.now()),cl=x=>String(x||'').toLowerCase().replace(/[^a-z0-9_?' -]/g,'').slice(0,32);
+  const st=(Array.isArray(fx)?fx:[]).slice(0,20).filter(x=>x&&['swap','del','add','size'].includes(x.k)).map(x=>{
+    const r=x.k==='size'?Math.max(0.1,Math.min(10,+x.r||1)):0;
+    return db.prepare('INSERT INTO foodfix(day,k,a,u,n,r) VALUES(?1,?2,?3,?4,1,?5) ON CONFLICT(day,k,a,u) DO UPDATE SET n=n+1,r=r+?5').bind(day,x.k,cl(x.a),cl(x.u),r)});
+  st.push(db.prepare("INSERT INTO foodfix(day,k,a,u,n,r) VALUES(?1,'photo','','',1,?2) ON CONFLICT(day,k,a,u) DO UPDATE SET n=n+1,r=r+?2").bind(day,st.length?1:0));
+  try{await db.batch(st)}catch(e){console.log('foodfix',e)}
+  return J({ok:true});
 }
 const fmtMin=s=>{s=Math.round(s||0);const m=Math.floor(s/60);return m?`${m} daq ${s%60} s`:`${s} s`};
 async function statsText(env,db){
@@ -375,6 +415,7 @@ export default {
     if(path==='/admin/stats'&&req.method==='POST')return handleStats(req,env);
     if(path==='/admin/check'&&req.method==='POST')return handleCheck(req,env);
     if(path==='/food'&&req.method==='POST')return handleFood(req,env);
+    if(path==='/food/fix'&&req.method==='POST')return handleFoodFix(req,env);
     if(req.method!=='POST') return new Response('Hamroh bot ishlayapti ✅');
     if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
     const u=await req.json().catch(()=>({}));
