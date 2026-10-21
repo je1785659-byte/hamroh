@@ -1,6 +1,7 @@
 // Hamroh bot — Cloudflare Worker (Telegram webhook).
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
+// Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
 const APP_URL='https://je1785659-byte.github.io/hamroh/';
 const SHARE_LINK='https://t.me/Hamronilovabot/app';
 const COVER=APP_URL+'cover.png';
@@ -149,6 +150,7 @@ async function D(env){
       env.DB.prepare('CREATE TABLE IF NOT EXISTS daily(day TEXT,uid INTEGER,secs INTEGER DEFAULT 0,opens INTEGER DEFAULT 0,msgs INTEGER DEFAULT 0,PRIMARY KEY(day,uid))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS sections(day TEXT,sec TEXT,n INTEGER DEFAULT 0,PRIMARY KEY(day,sec))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY,v TEXT)'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS food(day TEXT,uid INTEGER,n INTEGER DEFAULT 0,PRIMARY KEY(day,uid))'),
       env.DB.prepare("INSERT OR IGNORE INTO meta(k,v) VALUES('since',?1)").bind(String(Date.now()))
     ]);
     SCH=true;
@@ -212,14 +214,15 @@ async function computeStats(db,env){
     q("SELECT COALESCE(src,'?') k,COUNT(*) n FROM users GROUP BY k ORDER BY n DESC LIMIT 30"),
     q("SELECT k,v FROM meta WHERE k IN ('since','checked')"),
     q('SELECT COUNT(*) n,SUM(EXISTS(SELECT 1 FROM daily d WHERE d.uid=users.id AND d.day>=?3)) back FROM users WHERE first_seen<?1 AND first_seen>=?2',t7,t7-7*DAY,d7),
-    q('SELECT SUM(secs) s,SUM(secs>0) au FROM daily WHERE day>=?1',d7)
+    q('SELECT SUM(secs) s,SUM(secs>0) au FROM daily WHERE day>=?1',d7),
+    q('SELECT COALESCE(SUM(CASE WHEN day=?1 THEN n END),0) d1,COALESCE(SUM(n),0) d7,COUNT(DISTINCT uid) u7 FROM food WHERE day>=?2',today,d7)
   ]);
   const one=i=>r[i].results[0]||{}, all=i=>r[i].results||[];
   const meta=Object.fromEntries(all(10).map(x=>[x.k,x.v]));
   let wh=null;try{const w=await tg(env,'getWebhookInfo',{});if(w.ok){wh={pending:w.result.pending_update_count||0,error:w.result.last_error_message||null,fixed:false};
     const au=w.result.allowed_updates;if(au&&au.length&&!au.includes('my_chat_member')&&w.result.url){await tg(env,'setWebhook',{url:w.result.url,allowed_updates:[...au,'my_chat_member'],...(env.WEBHOOK_SECRET?{secret_token:env.WEBHOOK_SECRET}:{})});wh.fixed=true}}}catch(e){}
   return {now,today,users:one(0),dau:one(1).n||0,wau:one(2).n||0,mau:one(3).n||0,days:all(4),newDays:all(5),sections:all(6),langs:all(7),platforms:all(8),sources:all(9),
-    since:+meta.since||null,checked:+meta.checked||null,ret:one(11),avg7:one(12),wh};
+    since:+meta.since||null,checked:+meta.checked||null,ret:one(11),avg7:one(12),food:one(13),wh};
 }
 async function adminReq(req,env){
   let f;try{f=await req.formData()}catch(e){return [null,J({ok:false,error:'form'},400)]}
@@ -243,6 +246,86 @@ async function handleCheck(req,env){
   if(upd.length)await db.batch(upd);
   return J({ok:true,next:rows.length?rows[rows.length-1].id:after,done,alive,blocked});
 }
+
+// ---- Kaloriya: suratdan taomni aniqlash (Workers AI binding: AI) ----
+const FOOD_MODELS=['@cf/meta/llama-3.2-11b-vision-instruct','@cf/meta/llama-4-scout-17b-16e-instruct'];
+const FOOD_USER_DAY=15, FOOD_ALL_DAY=300; // bepul kunlik limitdan (10 000 neyron) oshmaslik uchun
+let KKCAT=null,KKCAT_AT=0;
+async function kkCatalog(){
+  if(KKCAT&&Date.now()-KKCAT_AT<3600e3)return KKCAT;
+  try{const r=await fetch(APP_URL+'kkal.json',{cf:{cacheTtl:3600}});if(r.ok){const j=await r.json();KKCAT={ids:new Set(j.f.map(x=>x[0])),text:j.f.map(x=>x[0]+': '+x[9]).join('\n')};KKCAT_AT=Date.now()}}catch(e){}
+  return KKCAT;
+}
+function foodPrompt(cat){
+  return `You identify food in photos for a calorie counting app used in Uzbekistan.
+List every distinct food or drink visible in the photo, at most 6. For each one give:
+"id": the best matching id from the catalog below, or null if nothing fits;
+"name": a short English name of what you see;
+"g": the estimated edible weight in grams of the portion in the photo (a dinner plate is about 26 cm wide, a kosa bowl holds about 400 ml, a piyola tea cup about 150 ml, a whole Uzbek non flatbread weighs about 300 g, one somsa about 120 g);
+"kcal100": estimated calories per 100 g.
+Reply with JSON only, exactly like: {"items":[{"id":"osh","name":"plov","g":350,"kcal100":240}]}
+If there is no food or drink in the photo, reply {"items":[]}.
+Catalog (id: description):
+${cat?cat.text:''}`;
+}
+function foodParse(r,ids){
+  let t=r&&(r.response!==undefined?r.response:(r.choices&&r.choices[0]&&r.choices[0].message&&r.choices[0].message.content));
+  let j=null;
+  if(t&&typeof t==='object')j=t;
+  else if(typeof t==='string'){const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a>=0&&b>a){try{j=JSON.parse(t.slice(a,b+1))}catch(e){}}}
+  if(!j)return null;
+  const arr=Array.isArray(j)?j:Array.isArray(j.items)?j.items:null;if(!arr)return null;
+  return arr.slice(0,8).filter(x=>x&&typeof x==='object').map(x=>({id:ids&&typeof x.id==='string'&&ids.has(x.id)?x.id:null,name:String(x.name||'').slice(0,40),
+    g:Math.max(0,Math.min(3000,Math.round(+x.g||0))),kcal100:Math.max(0,Math.min(900,Math.round(+x.kcal100||0)))})).filter(x=>x.id||x.name);
+}
+function b64bytes(d){const s=atob(d.slice(d.indexOf(',')+1)),a=new Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
+async function foodAI(env,img,cat){
+  const prompt=foodPrompt(cat),ask='What food and drinks are in this photo? Reply with JSON only.',errs=[];
+  const models=env.FOOD_MODEL?String(env.FOOD_MODEL).split(',').map(x=>x.trim()).filter(Boolean):FOOD_MODELS;
+  for(const m of models){
+    const parts=/llama-4|gemma|mistral/.test(m);
+    const variants=parts?[{messages:[{role:'system',content:prompt},{role:'user',content:[{type:'text',text:ask},{type:'image_url',image_url:{url:img}}]}]}]
+      :[{messages:[{role:'system',content:prompt},{role:'user',content:ask}],image:img},{messages:[{role:'system',content:prompt},{role:'user',content:ask}],image:img.slice(img.indexOf(',')+1)},'bytes'];
+    let agreed=false;
+    for(let v=0;v<variants.length;v++){
+      let inp=variants[v];if(inp==='bytes')inp={messages:[{role:'system',content:prompt},{role:'user',content:ask}],image:b64bytes(img)};
+      try{
+        const r=await env.AI.run(m,{...inp,max_tokens:600,temperature:0.2});
+        const items=foodParse(r,cat&&cat.ids);
+        if(items)return {items,m};
+        errs.push(m.split('/').pop()+': javob JSON emas');break;
+      }catch(e){
+        const s=String((e&&e.message)||e);
+        if(!agreed&&/agree|licen[cs]e|5016/i.test(s)){agreed=true;try{await env.AI.run(m,{prompt:'agree'})}catch(_){}v--;continue}
+        errs.push(m.split('/').pop()+': '+s.slice(0,160));
+        if(!/image|input|schema|type|format|invalid/i.test(s))break;
+      }
+    }
+  }
+  throw new Error(errs.join(' | ')||'ai');
+}
+async function handleFood(req,env){
+  let f;try{f=await req.formData()}catch(e){return J({ok:false,error:'img'},400)}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false,error:'auth'},403);
+  if(!env.AI)return J({ok:false,error:'noai'});
+  const img=String(f.get('img')||'');
+  if(img.length>1500000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(img))return J({ok:false,error:'img'},400);
+  const db=await D(env).catch(()=>null),day=dstr(Date.now());
+  const userMax=+env.FOOD_USER_DAY||FOOD_USER_DAY,allMax=+env.FOOD_ALL_DAY||FOOD_ALL_DAY;
+  let used=0,admin=false;
+  if(db){try{
+    const r=await db.batch([db.prepare('SELECT n FROM food WHERE day=?1 AND uid=?2').bind(day,u.id),db.prepare('SELECT COALESCE(SUM(n),0) s FROM food WHERE day=?1').bind(day),db.prepare("SELECT v FROM meta WHERE k='admins'")]);
+    used=(r[0].results[0]&&r[0].results[0].n)||0;const all=(r[1].results[0]&&r[1].results[0].s)||0;
+    admin=(((r[2].results[0]&&r[2].results[0].v)||'').split(',')).includes(String(u.id));
+    if(!admin&&used>=userMax)return J({ok:false,error:'limit',left:0});
+    if(!admin&&all>=allMax)return J({ok:false,error:'busy'});
+  }catch(e){console.log('food db',e)}}
+  const cat=await kkCatalog();
+  let res;
+  try{res=await foodAI(env,img,cat)}catch(e){console.log('food ai',e);return J({ok:false,error:'ai',...(admin?{why:String((e&&e.message)||e).slice(0,400)}:{})})}
+  if(db)await db.prepare('INSERT INTO food(day,uid,n) VALUES(?1,?2,1) ON CONFLICT(day,uid) DO UPDATE SET n=n+1').bind(day,u.id).run().catch(()=>{});
+  return J({ok:true,items:res.items,left:Math.max(0,userMax-used-1),...(admin?{model:res.m}:{})});
+}
 const fmtMin=s=>{s=Math.round(s||0);const m=Math.floor(s/60);return m?`${m} daq ${s%60} s`:`${s} s`};
 async function statsText(env,db){
   const S=await computeStats(db,env),U=S.users;
@@ -257,6 +340,7 @@ export default {
     if(path==='/ping'&&req.method==='POST')return handlePing(req,env);
     if(path==='/admin/stats'&&req.method==='POST')return handleStats(req,env);
     if(path==='/admin/check'&&req.method==='POST')return handleCheck(req,env);
+    if(path==='/food'&&req.method==='POST')return handleFood(req,env);
     if(req.method!=='POST') return new Response('Hamroh bot ishlayapti ✅');
     if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
     const u=await req.json().catch(()=>({}));

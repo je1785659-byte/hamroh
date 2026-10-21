@@ -577,6 +577,104 @@ body[data-sec="sert"]{--sec-a:#2a1a6e;--sec-b:#6a4fd6;--sec:#5a3fc8}
 .csearch.okin{border-color:var(--good)!important;background:color-mix(in srgb,var(--good) 10%,var(--surface))}.csearch.badin{border-color:var(--bad)!important;background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
 .sr-grades{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}.sr-grades span{text-align:center;border:1px solid var(--line);border-radius:10px;padding:6px 2px;font-size:11px;color:var(--muted)}.sr-grades b{display:block;font-size:15px;color:var(--ink)}.sr-grades .on{border-color:var(--sec);background:color-mix(in srgb,var(--sec) 12%,var(--surface))}
 html[lang="ru"] .prow.next span::after{content:"следующий"}html[lang="en"] .prow.next span::after{content:"next"}html[lang="uz-Cyrl"] .prow.next span::after{content:"кейинги"}
+body[data-sec="kkal"]{--sec-a:#0f5132;--sec-b:#2fa36b;--sec:#1f8a57}
+body[data-sec="kkal"]{--kk-a:#1a7d4c}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body[data-sec="kkal"]{--kk-a:#5fd394}}
+:root[data-theme="dark"] body[data-sec="kkal"]{--kk-a:#5fd394}
+.kk-day{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;margin:-4px -4px 6px}
+.kk-day b{text-align:center;font-family:var(--display);font-size:16px}
+.kk-day button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:18px;font-weight:700}
+.kk-day button:disabled{opacity:.3;cursor:default}
+.kk-top{display:flex;align-items:center;gap:16px}
+.kk-ring{position:relative;width:132px;height:132px;flex:none}
+.kk-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.kk-ring circle{fill:none;stroke-width:12}
+.kk-ring .bg{stroke:var(--surface-2)}.kk-ring .fg{stroke:var(--sec);stroke-linecap:round;transition:stroke-dashoffset .5s}
+.kk-ring.over .fg{stroke:var(--saffron)}
+.kk-rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.kk-rc b{font-family:var(--display);font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.kk-rc small{font-size:11.5px;color:var(--muted);margin-top:3px}
+.kk-side{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px}
+.kk-left{font-weight:600;font-size:14.5px;line-height:1.3}
+.kk-left.over{color:color-mix(in srgb,var(--saffron) 70%,var(--ink))}
+.kk-mac{display:flex;flex-direction:column;gap:3px}
+.kk-mac div{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}.kk-mac div b{color:var(--ink);font-weight:600}
+.kk-mac i{display:block;height:6px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.kk-mac i::after{content:"";display:block;height:100%;width:calc(var(--p)*1%);background:var(--c);border-radius:4px}
+.kk-acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kk-acts .pv-main{grid-column:1/-1}
+.kk-meal{padding:12px 14px}
+.kk-mh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.kk-mh b{font-family:var(--display);font-size:16px}
+.kk-mh span{font-size:13px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.kk-items{display:flex;flex-direction:column;margin-top:6px}
+.kk-it{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;padding:9px 0;border-top:1px solid var(--line)}
+.kk-it:first-child{border-top:0}
+.kk-it>span:first-child{flex:1;min-width:0}
+.kk-it b{display:block;font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kk-it small{color:var(--muted);font-size:12px}
+.kk-k{flex:none;font-weight:700;font-variant-numeric:tabular-nums;text-align:right;font-size:14.5px}
+.kk-k small{display:block;font-size:10.5px;color:var(--muted);font-weight:500}
+.kk-empty{color:var(--muted);font-size:13px;padding:2px 0}
+.kk-addm{border:0;background:none;color:var(--kk-a);font-weight:700;font-size:13px;padding:6px 0 0}
+.kk-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:130px;position:relative;margin-top:12px}
+.kk-wb{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;border:0;background:none;padding:0;min-width:0}
+.kk-wb i{display:block;width:100%;max-width:30px;border-radius:7px 7px 3px 3px;background:color-mix(in srgb,var(--sec) 55%,var(--surface-2));min-height:3px}
+.kk-wb.on i{background:var(--sec)}.kk-wb.over i{background:var(--saffron)}
+.kk-wb small{font-size:11px;line-height:16px;color:var(--muted)}.kk-wb em{font-style:normal;font-size:10px;line-height:14px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.kk-wb.on small{color:var(--ink);font-weight:700}
+.kk-tl{position:absolute;left:0;right:0;border-top:1.5px dashed color-mix(in srgb,var(--ink) 35%,transparent);pointer-events:none}
+.kk-list{display:flex;flex-direction:column;gap:6px}
+.kk-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 14px;border-radius:14px}
+.kk-row>span:first-child{flex:1;min-width:0}
+.kk-row b{display:block;font-weight:600;font-size:14.5px}
+.kk-row small{color:var(--muted);font-size:12px}
+.kk-sheet .lang-box{max-height:88vh;overflow:auto;gap:12px}
+.kk-sheet h3{font-family:var(--display);font-size:19px;margin:0}
+.kk-step{display:grid;grid-template-columns:44px 1fr 44px;gap:8px;align-items:center}
+.kk-step button{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);font-size:20px;font-weight:700}
+.kk-step div{text-align:center;font-weight:700;font-size:16px}
+.kk-gr{display:flex;align-items:center;gap:8px}
+.kk-gr input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:center;font-weight:700}
+.kk-gr span{color:var(--muted);font-weight:600;min-width:2ch}
+.kk-tot{display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--sec) 10%,var(--surface))}
+.kk-tot b{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums}
+.kk-tot small{color:var(--muted);font-size:12px}
+.kk-meals{display:flex;gap:6px;flex-wrap:wrap}
+.kk-meals .chip[aria-pressed="true"]{background:var(--sec);border-color:var(--sec);color:#fff}
+.kk-ph{position:relative;border-radius:18px;overflow:hidden;background:var(--surface-2);aspect-ratio:4/3}
+.kk-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.kk-scan{position:absolute;inset:auto 0 0 0;padding:12px 14px;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-weight:600;display:flex;align-items:center;gap:10px}
+.kk-spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;animation:kkspin .8s linear infinite;flex:none}
+.kk-ph.busy::after{content:"";position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#7dffb8,transparent);box-shadow:0 0 14px #7dffb8;animation:kkscan 1.8s ease-in-out infinite alternate}
+@keyframes kkspin{to{transform:rotate(360deg)}}
+@keyframes kkscan{from{top:6%}to{top:88%}}
+@media (prefers-reduced-motion:reduce){.kk-ph.busy::after{animation:none;top:50%}.kk-spin{animation-duration:2s}}
+.kk-det{display:flex;flex-direction:column;gap:10px}
+.kk-d{border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.kk-dh{display:flex;align-items:flex-start;gap:8px}
+.kk-dh>button:first-child{flex:1;min-width:0;text-align:left;border:0;background:none;padding:0}
+.kk-dh b{display:block;font-size:15px}
+.kk-dh small{color:var(--kk-a);font-size:12px;font-weight:600}
+.kk-x{width:32px;height:32px;border-radius:10px;border:1px solid var(--line);background:var(--surface);flex:none;font-size:14px;color:var(--muted)}
+.kk-dr{display:grid;grid-template-columns:36px 1fr 36px auto;gap:6px;align-items:center}
+.kk-dr button{height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-size:17px;font-weight:700}
+.kk-dr input{width:100%;min-width:0;font:inherit;font-weight:700;text-align:center;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 4px}
+.kk-dr .kk-k{min-width:66px}
+.kk-goal{display:flex;flex-direction:column;gap:8px}
+.kk-opt{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:11px 12px;width:100%}
+.kk-opt b{display:block;font-size:14.5px}.kk-opt small{color:var(--muted);font-size:12px}
+.kk-opt[aria-pressed="true"]{border-color:var(--sec);background:color-mix(in srgb,var(--sec) 10%,var(--surface))}
+.kk-f3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kk-f3 label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
+.kk-f3 input{width:100%;min-width:0;font:inherit;font-size:16px;font-weight:700;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.kk-res{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.kk-res .big{font-size:36px}
+.kk-warn{padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--saffron) 16%,var(--surface));font-size:13px;line-height:1.4}
+.kk-norm{display:flex;align-items:center;gap:12px;width:100%;text-align:left}
+.kk-norm>span:nth-child(1){flex:1}.kk-norm b{display:block}.kk-norm small{color:var(--muted);font-size:12.5px}
+.kk-quick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.kk-quick::-webkit-scrollbar{display:none}
+.kk-quick .chip{flex:none;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -626,6 +724,7 @@ const ICONS = {
 ICONS.audio='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="5" height="7" rx="2"/><rect x="16" y="14" width="5" height="7" rx="2"/></svg>';
 ICONS.prava='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><path d="M3.5 10.5l6.2 1M14.3 11.5l6.2-1M12 14.5V21"/></svg>';
 ICONS.sert='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 4H7l6 8-6 8h10"/></svg>';
+ICONS.kkal='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5c-1.6-1.3-5.2-1.6-6.8 1.3-1.8 3.3.1 9.7 3 11.6 1.3.9 2.4.4 3.8.4s2.5.5 3.8-.4c2.9-1.9 4.8-8.3 3-11.6-1.6-2.9-5.2-2.6-6.8-1.3z"/><path d="M12 7.5c0-2 .9-3.5 2.8-4.3"/></svg>';
 ICONS.home='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>';
 const TABS = [['home','Asosiy'],['namoz','Namoz'],['food','Taomlar'],['cash','Valyuta'],['quiz','Viktorina']];
 const HERO = {
@@ -637,7 +736,8 @@ const HERO = {
   audio:['Audio',"Qur'on tilovati, she'rlar va qo'shiqlar"],
   doc:['Hujjatlar',"PDF, rasm va matn bilan ishlash — fayllar telefoningizdan chiqmaydi"],
   prava:['Prava imtihoni',"Imtihon rejimi, xatolar ustida ishlash va yo'l belgilari"],
-  sert:['Milliy sertifikat',"8 fan: rasmiy format bo'yicha mashq, izohli savollar va imtihon rejimi"]
+  sert:['Milliy sertifikat',"8 fan: rasmiy format bo'yicha mashq, izohli savollar va imtihon rejimi"],
+  kkal:['Kaloriya hisoblagich',"Ovqatni suratga oling — AI taomni taniydi, kaloriya va kunlik normangizni hisoblaydi"]
 };
 let current = store.get('tab','home');
 function renderTabs(){
@@ -656,10 +756,11 @@ function setHero(t){
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;go(b.dataset.tab)});
 const STAT={secs:0,last:Date.now(),set:new Set(),opened:false,admin:store.get('isAdmin',false)};
 function statSec(x){try{STAT.set.add(x)}catch(e){}}
-const BACK_SEL=['#pvback','#srback','#wrback','#spback','#erback','#kback','#qback','#dback','#screen [data-back]','#qhome'];
+const BACK_SEL=['#kkback','#pvback','#srback','#wrback','#spback','#erback','#kback','#qback','#dback','#screen [data-back]','#qhome'];
 function backAction(){
   if(typeof cook!=='undefined'&&cook)return closeCook;
   const ls=document.getElementById('langsheet');if(ls)return()=>ls.remove();
+  const ks=document.getElementById('kksheet');if(ks)return()=>ks.remove();
   for(const q of BACK_SEL){const b=document.querySelector(q);if(b&&b.offsetParent!==null)return()=>b.click()}
   if(current==='namoz'&&pView!=='day')return()=>{pView='day';viewNamoz();window.scrollTo(0,0)};
   if(current!=='home')return()=>go('home');
@@ -827,12 +928,14 @@ function viewFood(){
     </section>
     <section id="recipe"></section>
     <section class="card"><div class="label">Barcha taomlar · ${DISHES[meal].length} ta</div>
-      <div class="chips" style="margin-top:10px">${DISHES[meal].map((d,i)=>`<button class="chip" data-pick="${i}">${esc(d.n)}</button>`).join('')}</div></section>`;
+      <div class="chips" style="margin-top:10px">${DISHES[meal].map((d,i)=>`<button class="chip" data-pick="${i}">${esc(d.n)}</button>`).join('')}</div></section>
+    <button class="card pv-main" id="tokk" style="background:linear-gradient(135deg,#0f5132,#2fa36b)"><span class="pv-ic">${ICONS.kkal}</span><span><b>Kaloriya hisoblagich</b><small>Ovqatni suratga oling — kaloriya bir necha soniyada</small></span><span class="pv-go">→</span></button>`;
   drawWheel();
   const c=$('#wheel'); c.style.transition='none'; c.style.transform=`rotate(${wheelRot}deg)`; c.offsetWidth; c.style.transition='';
   bindMode();
   $('#meals').onclick=e=>{const b=e.target.closest('[data-m]');if(!b||spinning)return;meal=b.dataset.m;picked=null;curRecipe=null;viewFood()};
   $('#spin').onclick=spin;
+  $('#tokk').onclick=()=>go('kkal');
   $('#screen').querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{picked=+b.dataset.pick;curRecipe=DISHES[meal][picked];servings=4;showRecipe(true)});
   if(curRecipe) showRecipe(false);
 }
@@ -1931,7 +2034,7 @@ function viewSaved(){
 }
 // open a shared recipe: t.me/bot/app?startapp=r_osh
 (function(){try{const tq=new URLSearchParams(location.search).get('t');if(tq){current=tq;store.set('tab',tq)}}catch(e){}})();
-(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
+(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
 
 const TOOLIC={qibla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
  tasbeh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="17.5" cy="15" r="2"/><circle cx="12" cy="18.5" r="2"/><circle cx="6.5" cy="15" r="2"/><circle cx="6.5" cy="8.5" r="2"/></svg>',
@@ -3711,9 +3814,300 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261021p';
+const APP_VER='20261021q';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
+/* ---------- KALORIYA HISOBLAGICH ---------- */
+const KK_MEALS=[['nonushta','Nonushta'],['tushlik','Tushlik'],['kechki','Kechki ovqat'],['gazak','Gazak']];
+const KK_ACT=[[1.2,'Kam harakat',"Asosan o'tirib ishlash, deyarli mashq yo'q"],[1.375,'Yengil faollik',"Haftada 1–3 marta mashq yoki ko'p piyoda yurish"],[1.55,"O'rtacha faollik",'Haftada 3–5 marta mashq'],[1.725,'Yuqori faollik','Haftada 6–7 marta mashq'],[1.9,'Juda yuqori faollik',"Og'ir jismoniy ish yoki kuniga 2 mashg'ulot"]];
+const KK_GOAL=[['lose','Vazn tashlash','Normadan biroz kam'],['keep','Vaznni saqlash','Sarflagancha'],['gain','Vazn olish','Normadan biroz ko\'p']];
+const KK_U={porsiya:['porsiya','порция','порции','порций','serving','servings'],dona:['dona','штука','штуки','штук','pc','pcs'],kosa:['kosa','миска','миски','мисок','bowl','bowls'],six:['six','шампур','шампура','шампуров','skewer','skewers'],"bo'lak":["bo'lak",'кусок','куска','кусков','piece','pieces'],chorak:['chorak non','четверть лепёшки','четверти лепёшки','четвертей лепёшки','quarter flatbread','quarter flatbreads'],stakan:['stakan','стакан','стакана','стаканов','glass','glasses'],piyola:['piyola','пиала','пиалы','пиал','cup','cups'],'osh qoshiq':['osh qoshiq','ст. ложка','ст. ложки','ст. ложек','tbsp','tbsp'],'choy qoshiq':['choy qoshiq','ч. ложка','ч. ложки','ч. ложек','tsp','tsp'],hovuch:['hovuch','горсть','горсти','горстей','handful','handfuls'],shingil:['shingil','гроздь','грозди','гроздей','bunch','bunches'],tilim:['tilim','ломтик','ломтика','ломтиков','slice','slices'],boshoq:['boshoq','початок','початка','початков','cob','cobs'],paket:['paket','пакет','пакета','пакетов','pack','packs'],banka:['banka','банка','банки','банок','can','cans']};
+const KK_LIM=15;
+let KK=null,kkView='day',kkOff=0,kkPh=null,kkPick=null,kkCat='all',kkQ='',kkMealSel=null;
+// raqamli matnlar kodda tarjima qilinadi (data-notr bilan), qolgani lug'at orqali
+const KT=(uz,ru,en)=>LANG==='ru'?ru:LANG==='en'?en:uz;
+const kkR=x=>Math.round(x||0);
+const kkN=x=>{const t=String(Math.round(x*10)/10);return LANG==='en'?t:t.replace('.',',')};
+const kkKc=()=>KT('kkal','ккал','kcal'), kkG=()=>KT('g','г','g');
+function kkUL(u,n){const x=KK_U[u];if(!x)return u||'';if(LANG==='ru'){if(!Number.isInteger(n))return x[2];const i=ruPl(n,1,2,3);return x[i]}if(LANG==='en')return n===1?x[4]:x[5];return x[0]}
+function kkAmt(u,ug,g){if(!u||!ug)return `${kkR(g)} ${kkG()}`;const n=g/ug,h=Math.round(n*2)/2;
+  return Math.abs(n-h)<0.04&&h>0?`${kkN(h)} ${kkUL(u,h)} · ${kkR(g)} ${kkG()}`:`${kkR(g)} ${kkG()}`}
+function kkKey(off){const d=kkDate(off||0);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function kkDate(off){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+off);return d}
+function kkLog(){const l=store.get('kk_log',{});return l&&typeof l==='object'?l:{}}
+function kkDayItems(key){const a=kkLog()[key];return Array.isArray(a)?a:[]}
+function kkSave(key,items){const L=kkLog();if(items.length)L[key]=items;else delete L[key];const ks=Object.keys(L).sort();while(ks.length>120)delete L[ks.shift()];store.set('kk_log',L)}
+function kkTot(items){const t={k:0,p:0,f:0,c:0};items.forEach(e=>{const m=(e.g||0)/100;t.k+=(e.k1||0)*m;t.p+=(e.p1||0)*m;t.f+=(e.f1||0)*m;t.c+=(e.c1||0)*m});return t}
+function kkMealNow(){const h=new Date().getHours();return h<11?'nonushta':h<16?'tushlik':h<18?'gazak':'kechki'}
+function kkProf(){return store.get('kk_prof',null)}
+function kkNormCalc(P){
+  if(!P||!(P.age>=18&&P.age<=100&&P.h>=120&&P.h<=230&&P.w>=30&&P.w<=300))return null;
+  const bmr=10*P.w+6.25*P.h-5*P.age+(P.sex==='f'?-161:5),tdee=bmr*KK_ACT[P.act!=null?P.act:1][0],bmi=P.w/((P.h/100)**2);
+  let goal=P.goal||'keep',note='';
+  if(goal==='lose'&&bmi<18.5){goal='keep';note='low'}
+  let k=goal==='lose'?Math.min(tdee,Math.max(tdee*0.85,bmr,P.sex==='f'?1200:1500)):goal==='gain'?tdee*1.1:tdee;
+  k=Math.round(k/10)*10;
+  const p=Math.min(Math.round(P.w*(goal==='keep'?1.2:1.6)),Math.round(k*0.3/4)),f=Math.round(k*0.3/9),c=Math.max(0,Math.round((k-p*4-f*9)/4));
+  return {k,p,f,c,goal,note,bmr:Math.round(bmr),tdee:Math.round(tdee),bmi};
+}
+function kkIdx(j){const by={};j.f.forEach(r=>{by[r[0]]={id:r[0],n:r[1],cat:r[2],k:r[3],p:r[4],f:r[5],c:r[6],g:r[7],u:r[8],en:r[9]}});return KK={by,list:j.f.map(r=>by[r[0]]),cats:j.cats}}
+function kkLoad(){
+  if(KK)return Promise.resolve(KK);
+  const c=store.get('kk_db',null);if(c&&c.av===APP_VER&&c.f)return Promise.resolve(kkIdx(c));
+  return fetch('kkal.json?v='+APP_VER).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{store.set('kk_db',{...j,av:APP_VER});return kkIdx(j)}).catch(e=>{if(c&&c.f)return kkIdx(c);throw e});
+}
+function kkGo(v){kkView=v;const h=$('#hero');if(v==='day')setHero('kkal');else if(h)h.hidden=true;window.scrollTo(0,0);viewKkal()}
+function viewKkal(){
+  if(kkView!=='day'){const h=$('#hero');if(h)h.hidden=true}
+  if(!KK)$('#screen').innerHTML=`<section class="card"><p class="note">Yuklanmoqda…</p></section>`;
+  kkLoad().then(()=>{if(current!=='kkal')return;({day:kkDayV,add:kkAddV,prof:kkProfV,photo:kkPhotoV}[kkView]||kkDayV)()})
+    .catch(()=>{if(current!=='kkal')return;$('#screen').innerHTML=`<section class="card"><b>Ma'lumotni yuklab bo'lmadi</b><p class="note" style="margin-top:6px">Internetni tekshirib, qayta oching.</p><button class="btn" id="kkretry" style="margin-top:10px">Qayta urinish</button></section>`;$('#kkretry').onclick=viewKkal});
+}
+function kkFiles(){
+  if($('#kkcamf'))return;
+  const mk=(id,cap)=>{const i=document.createElement('input');i.type='file';i.accept='image/*';i.id=id;i.hidden=true;if(cap)i.setAttribute('capture','environment');
+    i.onchange=()=>{const f=i.files&&i.files[0];i.value='';if(f)kkPhotoStart(f)};document.body.appendChild(i)};
+  mk('kkcamf',true);mk('kkgalf',false);
+}
+function kkSnap(cam){kkFiles();if(!(tg&&tg.initData)){toast("Suratdan aniqlash faqat Telegram ichida ishlaydi");return}$(cam?'#kkcamf':'#kkgalf').click()}
+const KK_CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+function kkDayLabel(off){if(off===0)return 'Bugun';if(off===-1)return 'Kecha';const d=kkDate(off);return `${KUNLAR[d.getDay()]}, ${d.getDate()}-${OYLAR[d.getMonth()]}`}
+function kkDayV(){
+  kkFiles();
+  const key=kkKey(kkOff),items=kkDayItems(key),t=kkTot(items),N=kkNormCalc(kkProf());
+  const tgt=N?N.k:0,over=tgt&&t.k>tgt+5,C=2*Math.PI*52,pct=tgt?Math.min(1,t.k/tgt):(items.length?1:0);
+  const left=!tgt?'':over?KT(`Normadan ${fmt(kkR(t.k-tgt))} kkal ko'p`,`На ${fmt(kkR(t.k-tgt))} ккал больше нормы`,`${fmt(kkR(t.k-tgt))} kcal over target`):KT(`Yana ${fmt(kkR(tgt-t.k))} kkal qoldi`,`Осталось ${fmt(kkR(tgt-t.k))} ккал`,`${fmt(kkR(tgt-t.k))} kcal left`);
+  const mac=(lbl,v,g,col)=>`<div class="kk-mac"><div><span>${lbl}</span><b data-notr>${kkR(v)}${g?' / '+g:''} ${kkG()}</b></div><i style="--p:${g?Math.min(100,v/g*100):0};--c:${col}"></i></div>`;
+  const recent=store.get('kk_recent',[]).map(id=>KK.by[id]).filter(Boolean).slice(0,8);
+  const days=[];for(let o=-6;o<=0;o++){days.push([o,kkTot(kkDayItems(kkKey(o))).k])}
+  const mx=Math.max(tgt*1.15,...days.map(d=>d[1]),500);
+  $('#screen').innerHTML=`
+    <section class="card">
+      <div class="kk-day"><button id="kkprev" aria-label="Oldingi kun">‹</button><b>${kkDayLabel(kkOff)}</b><button id="kknext" aria-label="Keyingi kun" ${kkOff>=0?'disabled':''}>›</button></div>
+      <div class="kk-top">
+        <div class="kk-ring ${over?'over':''}"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" cx="60" cy="60" r="52" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-pct)).toFixed(1)}"/></svg>
+          <div class="kk-rc"><b>${fmt(kkR(t.k))}</b><small data-notr>${tgt?`/ ${fmt(tgt)} ${kkKc()}`:kkKc()}</small></div></div>
+        <div class="kk-side">
+          ${tgt?`<div class="kk-left ${over?'over':''}" data-notr>${left}</div>`:`<div class="kk-left">Kunlik norma hali hisoblanmagan</div>`}
+          ${mac('Oqsil',t.p,N&&N.p,'var(--cobalt)')}${mac("Yog'",t.f,N&&N.f,'var(--saffron)')}${mac('Uglevod',t.c,N&&N.c,'var(--turq)')}
+        </div>
+      </div>
+    </section>
+    <div class="kk-acts">
+      <button class="card pv-main" id="kkcam"><span class="pv-ic">${KK_CAM}</span><span><b>Suratga olish</b><small>AI taomni taniydi va kaloriyani hisoblaydi</small></span><span class="pv-go">→</span></button>
+      <button class="qtopic" id="kkgal"><span class="kic" style="background:linear-gradient(135deg,#0f5132,#2fa36b)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5l-4.5-4.5-8.5 8.5"/></svg></span><b>Galereyadan</b><small>Tayyor rasmni tanlash</small></button>
+      <button class="qtopic" id="kkadd"><span class="kic" style="background:linear-gradient(135deg,#14296e,#3563d4)">＋</span><b>Ro'yxatdan qo'shish</b><small data-notr>${KT(`${KK.list.length} ta taom va mahsulot`,`${KK.list.length} блюд и продуктов`,`${KK.list.length} dishes and foods`)}</small></button>
+    </div>
+    ${recent.length?`<div class="kk-quick" id="kkquick">${recent.map(f=>`<button class="chip" data-q="${f.id}">+ ${esc(f.n)}</button>`).join('')}</div>`:''}
+    ${KK_MEALS.map(([m,ml])=>{const its=items.map((e,i)=>[e,i]).filter(([e])=>e.m===m),mt=kkTot(its.map(x=>x[0]));
+      return `<section class="card kk-meal"><div class="kk-mh"><b>${ml}</b><span data-notr>${its.length?`${fmt(kkR(mt.k))} ${kkKc()}`:''}</span></div>
+        ${its.length?`<div class="kk-items">${its.map(([e,i])=>`<button class="kk-it" data-e="${i}"><span><b ${e.s==='cu'||e.ai?'data-noi18n':''}>${esc(e.n)}</b><small data-notr>${e.s==='cu'?KT("qo'lda kiritilgan",'введено вручную','entered manually'):kkAmt(e.u,e.ug,e.g)}${e.s==='ai'?' · AI':''}</small></span><span class="kk-k" data-notr>${fmt(kkR(e.k1*e.g/100))}<small>${kkKc()}</small></span></button>`).join('')}</div>`:''}
+        <button class="kk-addm" data-am="${m}">+ Taom qo'shish</button></section>`}).join('')}
+    <div class="sec-title"><b>So'nggi 7 kun</b>${tgt?`<span class="note" data-notr>${KT(`norma: ${fmt(tgt)} kkal`,`норма: ${fmt(tgt)} ккал`,`target: ${fmt(tgt)} kcal`)}</span>`:''}</div>
+    <section class="card"><div class="kk-week">${tgt?`<span class="kk-tl" style="bottom:calc(${(tgt/mx*72).toFixed(1)}% + 20px)"></span>`:''}${days.map(([o,k])=>{const d=kkDate(o);
+      return `<button class="kk-wb ${o===kkOff?'on':''} ${tgt&&k>tgt+5?'over':''}" data-o="${o}"><em data-notr>${k?fmt(kkR(k)):''}</em><i style="height:${(k/mx*72).toFixed(1)}%"></i><small>${WA_UZ[d.getDay()]}</small></button>`}).join('')}</div></section>
+    <button class="card kk-norm" id="kkprof"><span>${N?`<b>Kunlik norma</b><small data-notr>${fmt(N.k)} ${kkKc()} · ${KT(...{lose:['vazn tashlash','снижение веса','weight loss'],keep:['vaznni saqlash','поддержание веса','maintain weight'],gain:['vazn olish','набор веса','weight gain']}[N.goal])}</small>`:`<b>Kunlik normangizni hisoblang</b><small>Yosh, bo'y, vazn va faollik bo'yicha — 1 daqiqa</small>`}</span><span class="pv-go">→</span></button>
+    <p class="note" style="margin:0 4px">Hisob taxminiy: kaloriya o'rtacha retseptlar bo'yicha olinadi, suratdan gramm taxminan aniqlanadi. Bu shifokor yoki dietolog maslahati o'rnini bosmaydi.</p>`;
+  $('#kkprev').onclick=()=>{if(kkOff>-90){kkOff--;kkDayV()}};
+  $('#kknext').onclick=()=>{if(kkOff<0){kkOff++;kkDayV()}};
+  $('#kkcam').onclick=()=>kkSnap(true);$('#kkgal').onclick=()=>kkSnap(false);
+  $('#kkadd').onclick=()=>{kkMealSel=null;kkPick=null;kkGo('add')};
+  $('#kkprof').onclick=()=>kkGo('prof');
+  $('#screen').querySelectorAll('[data-am]').forEach(b=>b.onclick=()=>{kkMealSel=b.dataset.am;kkPick=null;kkGo('add')});
+  $('#screen').querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{kkOff=+b.dataset.o;kkDayV()});
+  $('#screen').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const f=KK.by[b.dataset.q];if(f)kkAmount(f,f.g,{meal:kkMealNow(),btn:"Kunlikka qo'shish",save:(g,m)=>{kkAddItem(f,g,m,'man');kkAdded(f,g);kkDayV()}})});
+  $('#screen').querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>kkEdit(key,+b.dataset.e));
+}
+function kkAdded(f,g){haptic('light');toast(KT(`Qo'shildi: ${f.n} · ${kkR(f.k*g/100)} kkal`,`Добавлено: ${trText(f.n)} · ${kkR(f.k*g/100)} ккал`,`Added: ${trText(f.n)} · ${kkR(f.k*g/100)} kcal`))}
+function kkAddItem(f,g,m,src,key){
+  key=key||kkKey(kkOff);const it=kkDayItems(key);
+  it.push({id:f.id||null,n:f.n,g:Math.max(1,Math.round(g)),k1:f.k,p1:f.p,f1:f.f,c1:f.c,u:f.u||null,ug:f.g||null,m,t:Date.now(),s:src,...(f.ai?{ai:1}:{})});
+  kkSave(key,it);
+  if(f.id&&KK.by[f.id]){const r=store.get('kk_recent',[]).filter(x=>x!==f.id);r.unshift(f.id);store.set('kk_recent',r.slice(0,12))}
+}
+function kkSheet(html){
+  const old=$('#kksheet');if(old)old.remove();
+  const s=document.createElement('div');s.className='lang-sheet kk-sheet';s.id='kksheet';s.innerHTML=`<div class="lang-box" role="dialog" aria-modal="true">${html}</div>`;
+  s.onclick=e=>{if(e.target===s)s.remove()};document.body.appendChild(s);return s;
+}
+function kkMealChips(sel){return `<div class="label">Ovqat vaqti</div><div class="kk-meals" id="kkms">${KK_MEALS.map(([k,l])=>`<button class="chip" data-m="${k}" aria-pressed="${k===sel}">${l}</button>`).join('')}</div>`}
+function kkBindMeals(s,get,set){s.querySelectorAll('#kkms [data-m]').forEach(b=>b.onclick=()=>{set(b.dataset.m);s.querySelectorAll('#kkms [data-m]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===get())))})}
+// miqdor oynasi: f = {n,k,p,f,c,g,u}; o = {meal, btn, save(g,meal), del()}
+function kkAmount(f,g0,o){
+  let g=g0,meal=o.meal;const ug=f.g||100;
+  const mac=f.p!=null?KT(` · oqsil ${f.p} g · yog' ${f.f} g · uglevod ${f.c} g`,` · белки ${f.p} г · жиры ${f.f} г · углеводы ${f.c} г`,` · protein ${f.p} g · fat ${f.f} g · carbs ${f.c} g`):'';
+  const s=kkSheet(`<h3 ${f.ai?'data-noi18n':''}>${esc(f.n)}</h3>
+    <div class="note" data-notr>${KT(`100 g: ${f.k} kkal`,`100 г: ${f.k} ккал`,`100 g: ${f.k} kcal`)}${mac}</div>
+    ${f.u?`<div class="kk-step"><button data-d="-1" aria-label="Kamaytirish">−</button><div id="kku" data-notr></div><button data-d="1" aria-label="Ko'paytirish">+</button></div>`:''}
+    <div class="kk-gr"><input id="kkg" type="number" inputmode="numeric" min="1" max="3000" step="1" value="${kkR(g)}" aria-label="Gramm"><span data-notr>${kkG()}</span></div>
+    <div class="kk-tot"><span class="note">Jami</span><b id="kkt" data-notr></b></div>
+    ${o.meal?kkMealChips(meal):''}
+    <button class="btn" id="kksv">${o.btn}</button>
+    ${o.del?`<button class="btn alt" id="kkdel">O'chirish</button>`:''}`);
+  const upd=(fromInput)=>{const n=g/ug;if($('#kku'))$('#kku').textContent=`${Math.abs(n-Math.round(n*2)/2)<0.04?'':'≈ '}${kkN(Math.round(n*2)/2||Math.round(n*10)/10)} ${kkUL(f.u,Math.round(n*2)/2)}`;
+    if(!fromInput)$('#kkg').value=kkR(g);$('#kkt').textContent=`${fmt(kkR(f.k*g/100))} ${kkKc()}`};
+  upd();
+  s.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const n=g/ug,h=Math.round(n*2)/2,d=+b.dataset.d;let nn=Math.abs(n-h)<0.04?h+d*0.5:(d>0?Math.ceil(n*2)/2:Math.floor(n*2)/2);nn=Math.max(0.5,Math.min(20,nn));g=Math.round(nn*ug);haptic('light');upd()});
+  $('#kkg').oninput=()=>{const v=parseFloat($('#kkg').value);if(v>0&&v<=3000){g=v;upd(true)}};
+  if(o.meal)kkBindMeals(s,()=>meal,m=>meal=m);
+  $('#kksv').onclick=()=>{if(!(g>0)){toast('Grammni kiriting');return}s.remove();o.save(g,meal)};
+  if(o.del)$('#kkdel').onclick=()=>{s.remove();o.del()};
+}
+function kkEdit(key,i){
+  const items=kkDayItems(key),e=items[i];if(!e)return;
+  const done=()=>{kkSave(key,items);kkDayV()};
+  const del=()=>{items.splice(i,1);done();toast("O'chirildi")};
+  if(e.s==='cu'){
+    let meal=e.m;
+    const s=kkSheet(`<h3 data-noi18n>${esc(e.n)}</h3><label class="kk-gr"><input id="kkcv" type="number" inputmode="numeric" min="0" max="5000" value="${kkR(e.k1)}" aria-label="Kaloriya"><span data-notr>${kkKc()}</span></label>${kkMealChips(meal)}<button class="btn" id="kksv">Saqlash</button><button class="btn alt" id="kkdel">O'chirish</button>`);
+    kkBindMeals(s,()=>meal,m=>meal=m);
+    $('#kksv').onclick=()=>{const v=parseFloat($('#kkcv').value);if(!(v>=0&&v<=5000)){toast('Kaloriyani kiriting');return}e.k1=Math.round(v);e.m=meal;s.remove();done()};
+    $('#kkdel').onclick=()=>{s.remove();del()};return;
+  }
+  const f={n:e.n,k:e.k1,p:e.p1,f:e.f1,c:e.c1,g:e.ug,u:e.u,ai:e.ai};
+  kkAmount(f,e.g,{meal:e.m,btn:'Saqlash',save:(g,m)=>{e.g=Math.round(g);e.m=m;done()},del});
+}
+const kkNz=s=>String(s).toLowerCase().replace(/[ʻʼ’‘`´]/g,"'").replace(/ё/g,'е').trim();
+function kkHay(f){if(f._hl!==LANG){f._h=kkNz(f.n+' | '+(LANG&&LANG!=='uz'?trText(f.n):''));f._e=kkNz(f.en);f._hl=LANG}return f}
+function kkFind(q,cat){
+  const rec=store.get('kk_recent',[]);
+  let L=cat==='rec'?rec.map(id=>KK.by[id]).filter(Boolean):cat==='all'?KK.list:KK.list.filter(f=>f.cat===cat);
+  q=kkNz(q);if(!q)return L;
+  const sc=f=>{kkHay(f);const h=f._h;if(h.startsWith(q)||h.includes('| '+q))return 0;if(new RegExp('(^|[\\s(,|-])'+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).test(h))return 1;if(h.includes(q))return 2;if(q.length>2&&f._e.includes(q))return 3;return 9};
+  return (cat==='rec'?L:KK.list).map(f=>[f,sc(f)]).filter(x=>x[1]<9).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);
+}
+function kkAddV(){
+  const rec=store.get('kk_recent',[]).filter(id=>KK.by[id]);
+  if(kkCat==='rec'&&!rec.length)kkCat='all';
+  const cats=[['all','Hammasi'],...(rec.length?[['rec','Yaqinda']]:[]),...KK.cats];
+  const tot=()=>`${fmt(kkR(kkTot(kkDayItems(kkKey(kkOff))).k))} ${kkKc()}`;
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="kkback">${kkPick?'← Natija':'← Kaloriya'}</button><b>${kkPick?'Taomni tanlang':"Taom qo'shish"}</b>${kkPick?'<span></span>':`<span class="badge old" id="kktot" data-notr>${tot()}</span>`}</div>
+    <input class="csearch" id="kkq" type="search" enterkeyhint="search" autocomplete="off" placeholder="Qidirish: osh, somsa, olma…" value="${esc(kkQ)}">
+    <div class="sr-subs" id="kkcats">${cats.map(([k,n])=>`<button class="sr-sub ${k===kkCat?'on':''}" data-c="${k}">${n}</button>`).join('')}</div>
+    <div class="kk-list" id="kklist"></div>
+    ${kkPick?'':`<button class="card kk-row" id="kkcu"><span><b>Ro'yxatda yo'qmi?</b><small>Nomi va kaloriyasini o'zingiz kiriting</small></span><span class="pv-go">→</span></button>`}`;
+  const draw=()=>{const L=kkFind(kkQ,kkCat);
+    $('#kklist').innerHTML=L.length?L.map(f=>`<button class="card kk-row" data-id="${f.id}"><span><b>${esc(f.n)}</b><small data-notr>${kkAmt(f.u,f.g,f.g)}</small></span><span class="kk-k" data-notr>${fmt(kkR(f.k*f.g/100))}<small>${kkKc()}</small></span></button>`).join('')
+      :`<section class="card"><p class="note">Hech narsa topilmadi. Boshqacha yozib ko'ring yoki taomni o'zingiz kiriting.</p></section>`;
+    $('#kklist').querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const f=KK.by[b.dataset.id];if(!f)return;
+      if(kkPick){const cb=kkPick;kkPick=null;cb(f);return}
+      kkAmount(f,f.g,{meal:kkMealSel||kkMealNow(),btn:"Kunlikka qo'shish",save:(g,m)=>{kkMealSel=m;kkAddItem(f,g,m,'man');kkAdded(f,g);const t=$('#kktot');if(t)t.textContent=tot()}})})};
+  draw();
+  const q=$('#kkq');q.oninput=()=>{kkQ=q.value;if(kkQ&&kkCat!=='all'){kkCat='all';$('#kkcats').querySelectorAll('[data-c]').forEach(x=>x.classList.toggle('on',x.dataset.c==='all'))}draw()};
+  $('#kkcats').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;kkCat=b.dataset.c;$('#kkcats').querySelectorAll('[data-c]').forEach(x=>x.classList.toggle('on',x===b));if(kkQ){kkQ='';q.value=''}draw()};
+  $('#kkback').onclick=()=>{kkQ='';if(kkPick){kkPick=null;kkGo('photo')}else kkGo('day')};
+  if($('#kkcu'))$('#kkcu').onclick=kkCustom;
+}
+function kkCustom(){
+  let meal=kkMealSel||kkMealNow();
+  const s=kkSheet(`<h3>O'z taomingiz</h3><input class="csearch" id="kkcn" maxlength="40" placeholder="Nomi, masalan: uy pishiriq"><div class="kk-gr"><input id="kkcv" type="number" inputmode="numeric" min="0" max="5000" placeholder="Kaloriya" aria-label="Kaloriya"><span data-notr>${kkKc()}</span></div><p class="note" style="margin:0">Butun porsiya uchun kaloriyani yozing (qadoqda yoki retseptda ko'rsatilgan).</p>${kkMealChips(meal)}<button class="btn" id="kksv">Kunlikka qo'shish</button>`);
+  kkBindMeals(s,()=>meal,m=>meal=m);
+  $('#kksv').onclick=()=>{const n=$('#kkcn').value.trim(),v=parseFloat($('#kkcv').value);if(!n){toast('Nomini yozing');return}if(!(v>=0&&v<=5000)){toast('Kaloriyani kiriting');return}
+    s.remove();const key=kkKey(kkOff),it=kkDayItems(key);it.push({id:null,n:n.slice(0,40),g:100,k1:Math.round(v),p1:null,f1:null,c1:null,u:null,ug:null,m:meal,t:Date.now(),s:'cu'});kkSave(key,it);
+    haptic('light');toast(KT(`Qo'shildi: ${kkR(v)} kkal`,`Добавлено: ${kkR(v)} ккал`,`Added: ${kkR(v)} kcal`));kkGo('day')};
+}
+function kkProfV(){
+  const P0=kkProf()||{},P={sex:P0.sex||'m',age:P0.age||'',h:P0.h||'',w:P0.w||'',act:P0.act!=null?P0.act:1,goal:P0.goal||'keep'};
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="kkback">← Kaloriya</button><b>Kunlik norma</b><span></span></div>
+    <section class="card kk-goal"><div class="label">Jins</div><div class="swap" id="kksex"><button class="chip" data-v="m">Erkak</button><button class="chip" data-v="f">Ayol</button></div>
+      <div class="kk-f3"><label>Yosh<input id="kka" type="number" inputmode="numeric" min="18" max="100" value="${P.age}" placeholder="30"></label><label>Bo'y, sm<input id="kkh" type="number" inputmode="numeric" min="120" max="230" value="${P.h}" placeholder="170"></label><label>Vazn, kg<input id="kkw" type="number" inputmode="decimal" min="30" max="300" value="${P.w}" placeholder="70"></label></div></section>
+    <section class="card kk-goal"><div class="label">Faollik</div>${KK_ACT.map(([,n,d],i)=>`<button class="kk-opt" data-a="${i}"><span><b>${n}</b><small>${d}</small></span></button>`).join('')}</section>
+    <section class="card kk-goal"><div class="label">Maqsad</div><div class="swap" id="kkgoal">${KK_GOAL.map(([k,n])=>`<button class="chip" data-v="${k}">${n}</button>`).join('')}</div></section>
+    <section class="card" id="kkres"></section>
+    <button class="btn" id="kksv">Saqlash</button>
+    <p class="note" style="margin:0 4px">Norma Mifflin–San Jeor formulasi bo'yicha hisoblanadi. Vazn tashlashda u sarfdan taxminan 15% kam olinadi, lekin organizmning tinch holatdagi ehtiyojidan past tushirilmaydi. Homiladorlik, emizish, kasallik yoki professional sport holatlarida normani shifokor bilan aniqlang.</p>`;
+  const rd=()=>({sex:P.sex,age:parseFloat($('#kka').value),h:parseFloat($('#kkh').value),w:parseFloat($('#kkw').value),act:P.act,goal:P.goal});
+  const sel=()=>{$('#kksex').querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===P.sex)));$('#kkgoal').querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===P.goal)));
+    $('#screen').querySelectorAll('[data-a]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.a===P.act)))};
+  const res=()=>{const X=rd(),N=kkNormCalc(X),box=$('#kkres');
+    if(X.age>0&&X.age<18){box.innerHTML=`<div class="kk-warn">Kunlik norma 18 yoshdan katta odamlar uchun hisoblanadi. O'smirlarning ehtiyoji o'sishga bog'liq — bu haqda shifokor bilan maslahatlashing. Ovqatlarni normasiz ham yozib borishingiz mumkin.</div>`;return null}
+    if(!N){box.innerHTML=`<p class="note">Yosh, bo'y va vaznni kiriting — norma shu yerda chiqadi.</p>`;return null}
+    box.innerHTML=`<div class="kk-res"><div><div class="label">Kunlik norma</div><div class="big" data-notr>${fmt(N.k)}<small>${kkKc()}</small></div></div></div>
+      <div class="note" style="margin-top:6px" data-notr>${KT(`Oqsil ${N.p} g · yog' ${N.f} g · uglevod ${N.c} g`,`Белки ${N.p} г · жиры ${N.f} г · углеводы ${N.c} г`,`Protein ${N.p} g · fat ${N.f} g · carbs ${N.c} g`)}</div>
+      <div class="note" data-notr>${KT(`Tinch holatda: ${fmt(N.bmr)} kkal · faollik bilan: ${fmt(N.tdee)} kkal`,`В покое: ${fmt(N.bmr)} ккал · с активностью: ${fmt(N.tdee)} ккал`,`At rest: ${fmt(N.bmr)} kcal · with activity: ${fmt(N.tdee)} kcal`)}</div>
+      ${N.note==='low'?`<div class="kk-warn" style="margin-top:10px">Vazningiz bo'yingizga nisbatan me'yorning quyi chegarasida, shuning uchun vazn tashlash tavsiya etilmaydi — norma vaznni saqlash uchun hisoblandi.</div>`:''}`;
+    return N};
+  sel();res();
+  $('#kksex').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;P.sex=b.dataset.v;sel();res()};
+  $('#kkgoal').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;P.goal=b.dataset.v;sel();res()};
+  $('#screen').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{P.act=+b.dataset.a;sel();res()});
+  ['#kka','#kkh','#kkw'].forEach(s=>$(s).oninput=res);
+  $('#kksv').onclick=()=>{const X=rd();if(X.age>0&&X.age<18){store.set('kk_prof',X);kkGo('day');return}
+    if(!kkNormCalc(X)){toast("Yosh, bo'y va vaznni to'g'ri kiriting");return}store.set('kk_prof',X);haptic('done');toast('Saqlandi');kkGo('day')};
+  $('#kkback').onclick=()=>kkGo('day');
+}
+function kkShrink(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{try{const M=768,s=Math.min(1,M/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.naturalWidth*s));c.height=Math.max(1,Math.round(im.naturalHeight*s));
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',0.8))}catch(e){URL.revokeObjectURL(u);rej(e)}};
+  im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};im.src=u})}
+function kkAsk(d){const fd=new FormData();fd.append('initData',tg.initData);fd.append('img',d);const ac=typeof AbortController!=='undefined'?new AbortController():null,tm=setTimeout(()=>ac&&ac.abort(),45000);
+  return fetch(BOT_API+'/food',{method:'POST',body:fd,signal:ac?ac.signal:undefined}).then(r=>r.json()).finally(()=>clearTimeout(tm))}
+function kkFromAI(it){
+  if(!it||typeof it!=='object')return null;const g=Math.max(5,Math.min(2000,Math.round(+it.g||0)));const f=it.id&&KK.by[it.id];
+  if(f)return {f,g:+it.g>0?g:f.g};
+  const k=Math.round(+it.kcal100);if(!(k>=0&&k<=900)||!it.name)return null;
+  return {f:{id:null,n:String(it.name).slice(0,40),k,p:null,f:null,c:null,g:null,u:null,ai:1},g:+it.g>0?g:150};
+}
+function kkPhotoStart(file){
+  if(!(tg&&tg.initData)){toast("Suratdan aniqlash faqat Telegram ichida ishlaydi");return}
+  statSec('kk_photo');kkPick=null;
+  const P=kkPh={img:null,st:'prep',items:[],m:kkMealNow(),key:kkKey(kkOff)};kkGo('photo');
+  kkShrink(file).then(d=>{if(kkPh!==P)return;P.img=d;kkRun(P)}).catch(()=>{if(kkPh!==P)return;P.st='err';P.err='img';if(current==='kkal'&&kkView==='photo')kkPhotoV()});
+}
+function kkRun(P){
+  P.st='wait';P.err=null;if(current==='kkal'&&kkView==='photo')kkPhotoV();
+  kkAsk(P.img).then(j=>{if(kkPh!==P)return;
+    if(j&&typeof j.left==='number')P.left=j.left;
+    if(!j||!j.ok){P.st='err';P.err=(j&&j.error)||'ai';P.why=j&&j.why}
+    else{P.items=(Array.isArray(j.items)?j.items:[]).map(kkFromAI).filter(Boolean).slice(0,8);P.st=P.items.length?'ok':'none';if(P.items.length)haptic('done')}
+    if(current==='kkal'&&kkView==='photo')kkPhotoV()})
+  .catch(()=>{if(kkPh!==P)return;P.st='err';P.err='net';if(current==='kkal'&&kkView==='photo')kkPhotoV()});
+}
+const kkStepG=g=>g<60?5:g<200?10:25;
+function kkPhotoV(){
+  const P=kkPh;if(!P){kkView='day';return kkDayV()}
+  const busy=P.st==='prep'||P.st==='wait';
+  const E={noai:['Suratdan aniqlash hali yoqilmagan',"Bot sozlamalarida sun'iy intellekt ulanishi kerak. Hozircha taomni ro'yxatdan qo'shing."],
+    limit:['Bugungi limit tugadi',KT(`Bir kunda ${KK_LIM} ta surat tahlil qilinadi. Ertaga yana urinib ko'ring yoki taomni ro'yxatdan qo'shing.`,`В день можно распознать ${KK_LIM} фото. Попробуйте завтра или добавьте блюдо из списка.`,`Up to ${KK_LIM} photos a day can be analysed. Try again tomorrow or add the dish from the list.`)],
+    busy:["Bugun so'rovlar juda ko'p bo'ldi","Umumiy kunlik limit tugadi. Ertaga yana urinib ko'ring yoki taomni ro'yxatdan qo'shing."],
+    img:["Rasmni o'qib bo'lmadi",'Boshqa rasm tanlab ko\'ring.'],
+    net:["Aloqa yo'q","Internetni tekshirib, qayta urinib ko'ring."],
+    auth:['Ilovani qayta oching','Telegram sessiyasi eskirgan. Ilovani yopib, qaytadan oching.'],
+    ai:["Rasmni tahlil qilib bo'lmadi","Birozdan keyin qayta urinib ko'ring yoki taomni ro'yxatdan qo'shing."]};
+  const er=E[P.err]||E.ai,canRetry=P.img&&['net','ai'].includes(P.err||'ai');
+  const tot=()=>P.items.reduce((s,x)=>s+x.f.k*x.g/100,0);
+  let body='';
+  if(P.st==='err')body=`<section class="card"><b>${er[0]}</b><p class="note" style="margin-top:6px" ${P.err==='limit'?'data-notr':''}>${er[1]}</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">${canRetry?`<button class="btn" id="kkretry">Qayta urinish</button>`:''}<button class="btn ${canRetry?'alt':''}" id="kklist2">Ro'yxatdan qo'shish</button></div>${P.why?`<p class="note" data-noi18n style="margin-top:10px;word-break:break-word">Admin uchun: ${esc(P.why)}</p>`:''}</section>`;
+  else if(P.st==='none')body=`<section class="card"><b>Rasmda taom topilmadi</b><p class="note" style="margin-top:6px">Taomni yaqinroqdan, yorug' joyda va tepadan suratga olib ko'ring.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><button class="btn" id="kkagain">Qayta suratga olish</button><button class="btn alt" id="kklist2">Ro'yxatdan qo'shish</button></div></section>`;
+  else if(P.st==='ok')body=`<section class="card kk-det"><div class="label">Aniqlangan taomlar</div>
+      ${P.items.map((x,i)=>`<div class="kk-d"><div class="kk-dh"><button data-ch="${i}"><b ${x.f.ai?'data-noi18n':''}>${esc(x.f.n)}</b><small>${x.f.ai?"Ro'yxatda yo'q · almashtirish":'Almashtirish'}</small></button><button class="kk-x" data-rm="${i}" aria-label="Olib tashlash">✕</button></div>
+        <div class="kk-dr"><button data-dg="${i}" data-s="-1" aria-label="Kamaytirish">−</button><input data-g="${i}" type="number" inputmode="numeric" min="1" max="3000" value="${kkR(x.g)}" aria-label="Gramm"><button data-dg="${i}" data-s="1" aria-label="Ko'paytirish">+</button><span class="kk-k" data-notr><span data-kk="${i}">${fmt(kkR(x.f.k*x.g/100))}</span><small>${kkKc()}</small></span></div>
+        <small class="note" data-notr data-ku="${i}">${x.f.u?kkAmt(x.f.u,x.f.g,x.g):`${kkR(x.g)} ${kkG()}`}</small></div>`).join('')}
+      <button class="chip" id="kkmore" style="align-self:flex-start">+ Yana taom qo'shish</button>
+      <div class="kk-tot"><span class="note">Jami</span><b id="kkpt" data-notr>${fmt(kkR(tot()))} ${kkKc()}</b></div>
+      ${kkMealChips(P.m)}
+      <button class="btn" id="kkok">Kunlikka qo'shish</button>
+      <button class="btn alt" id="kkagain">Boshqa surat</button></section>`;
+  $('#screen').innerHTML=`<div class="kbar"><button class="chip" id="kkback">← Kaloriya</button><b>Suratdan aniqlash</b><span></span></div>
+    <div class="kk-ph ${busy?'busy':''}">${P.img?`<img src="${P.img}" alt="">`:''}${busy?`<div class="kk-scan"><span class="kk-spin"></span><span>${P.st==='prep'?'Rasm tayyorlanmoqda…':'Taom aniqlanmoqda…'}</span></div>`:''}</div>
+    ${busy?`<p class="note" style="margin:0 4px">Odatda 3–10 soniya davom etadi.</p>`:body}
+    ${P.st==='ok'?`<p class="note" style="margin:0 4px">Gramm suratdan taxminan aniqlanadi — kerak bo'lsa −/+ bilan to'g'rilang yoki taomni almashtiring.${typeof P.left==='number'?' '+`<span data-notr>${KT(`Bugun yana ${P.left} ta surat tahlil qilish mumkin.`,`Сегодня можно распознать ещё ${P.left} фото.`,`${P.left} more photos can be analysed today.`)}</span>`:''}</p>`:''}`;
+  $('#kkback').onclick=()=>{kkPh=null;kkGo('day')};
+  const on=(id,f)=>{const b=$(id);if(b)b.onclick=f};
+  on('#kkretry',()=>kkRun(P));on('#kklist2',()=>{kkPh=null;kkMealSel=P.m;kkGo('add')});on('#kkagain',()=>kkSnap(true));
+  if(P.st!=='ok')return;
+  const sync=i=>{const x=P.items[i],a=$(`[data-kk="${i}"]`),u=$(`[data-ku="${i}"]`);if(a)a.textContent=fmt(kkR(x.f.k*x.g/100));if(u)u.textContent=x.f.u?kkAmt(x.f.u,x.f.g,x.g):`${kkR(x.g)} ${kkG()}`;$('#kkpt').textContent=`${fmt(kkR(tot()))} ${kkKc()}`};
+  $('#screen').querySelectorAll('[data-dg]').forEach(b=>b.onclick=()=>{const i=+b.dataset.dg,x=P.items[i],st=kkStepG(x.g);x.g=Math.max(st,Math.min(3000,Math.round(x.g/st)*st+(+b.dataset.s)*st));$(`[data-g="${i}"]`).value=x.g;haptic('light');sync(i)});
+  $('#screen').querySelectorAll('[data-g]').forEach(inp=>inp.oninput=()=>{const i=+inp.dataset.g,v=parseFloat(inp.value);if(v>0&&v<=3000){P.items[i].g=v;sync(i)}});
+  $('#screen').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{P.items.splice(+b.dataset.rm,1);if(!P.items.length)P.st='none';kkPhotoV()});
+  $('#screen').querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ch;kkPick=f=>{if(P.items[i])P.items[i].f=f;kkGo('photo')};kkQ='';kkCat='all';kkGo('add')});
+  on('#kkmore',()=>{kkPick=f=>{P.items.push({f,g:f.g});kkGo('photo')};kkQ='';kkCat='all';kkGo('add')});
+  kkBindMeals($('#screen'),()=>P.m,m=>P.m=m);
+  on('#kkok',()=>{const t=tot();P.items.forEach(x=>kkAddItem(x.f,x.g,P.m,'ai',P.key));kkPh=null;haptic('done');toast(KT(`Qo'shildi: ${fmt(kkR(t))} kkal`,`Добавлено: ${fmt(kkR(t))} ккал`,`Added: ${fmt(kkR(t))} kcal`));kkGo('day')});
+}
+
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava,sert:viewSert};
 /* ---------- ASOSIY ---------- */
 const TILE_COL={audio:['#5b1f6e','#b0479a'],qibla:['#08332f','#2e9e7a'],tasbeh:['#5b3a1a','#c08a3e'],namoz:['#08332f','#127061'],food:['#9c2a22','#e0812a'],cash:['#14296e','#3563d4'],quiz:['#35217a','#7a4fd6'],kids:['#0f6aa6','#33b2df'],doc:['#25304a','#4a5d86'],prava:['#4a3200','#d99a00'],sert:['#2a1a6e','#6a4fd6']};
@@ -3731,6 +4125,7 @@ function viewHome(){
       <button class="np-mini" id="hnp"></button>
     </section>
     <div class="tiles">${tiles.map(([k,l,s])=>`<button class="tile" data-go="${k==='qibla'||k==='tasbeh'?'namoz':k}" ${k==='qibla'||k==='tasbeh'?`data-pv="${k}"`:''}><span class="t-ic" style="background:linear-gradient(135deg,${TILE_COL[k][0]},${TILE_COL[k][1]})">${ICONS[k]||TOOLIC[k]}</span><span><b>${l}</b><small>${s}</small></span></button>`).join('')}</div>
+    <button class="card pv-main" data-go="kkal" style="margin:0;background:linear-gradient(135deg,#0f5132,#2fa36b)"><span class="pv-ic">${ICONS.kkal}</span><span><b>Kaloriya hisoblagich</b><small>Ovqatni suratga oling · kunlik norma</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="prava" style="margin:0;background:linear-gradient(135deg,#4a3200,#d99a00)"><span class="pv-ic">${ICONS.prava}</span><span><b>Prava imtihoniga tayyorlaning</b><small>Imtihon rejimi · xatolar ustida ishlash · yo'l belgilari</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="sert" style="margin:0;background:linear-gradient(135deg,#2a1a6e,#6a4fd6)"><span class="pv-ic">∑</span><span><b>Milliy sertifikatga tayyorlaning</b><small>8 fan · imtihon rejimi · izohli savollar</small></span><span class="pv-go">→</span></button>
     ${STAT.admin?`<button class="card pv-main" data-go="admin" data-noi18n style="margin:0;background:linear-gradient(135deg,#14224d,#3563d4)"><span class="pv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg></span><span><b>Statistika</b><small>Admin panel · faqat siz ko'rasiz</small></span><span class="pv-go">→</span></button>`:''}
@@ -3759,7 +4154,7 @@ function viewHome(){
 }
 
 /* ---------- ADMIN PANEL: statistika ---------- */
-const AD_SEC={home:'Asosiy',namoz:'Namoz',food:'Taomlar',cash:'Valyuta',quiz:'Viktorina',kids:'Bolalar',audio:'Audio',doc:'Hujjatlar',prava:'Prava',sert:'Sertifikat',admin:'Admin panel',game:"Bolalar o'yinlari",ertak:'Ertaklar',cook:'Pishirish rejimi',pv_exam:'Prava imtihoni',sr_exam:'Sertifikat imtihoni'};
+const AD_SEC={home:'Asosiy',namoz:'Namoz',food:'Taomlar',cash:'Valyuta',quiz:'Viktorina',kids:'Bolalar',audio:'Audio',doc:'Hujjatlar',prava:'Prava',sert:'Sertifikat',admin:'Admin panel',game:"Bolalar o'yinlari",ertak:'Ertaklar',cook:'Pishirish rejimi',pv_exam:'Prava imtihoni',sr_exam:'Sertifikat imtihoni',kkal:'Kaloriya',kk_photo:'Kaloriya: surat tahlili'};
 const AD_PF={android:'Android',ios:'iPhone (iOS)',tdesktop:'Kompyuter (Telegram Desktop)',macos:'Mac',weba:'Telegram Web',webk:'Telegram Web',web:'Telegram Web',unigram:'Windows (Unigram)','?':"Noma'lum"};
 const AD_LANG={uz:"O'zbekcha (lotin)",uzc:"O'zbekcha (kirill)",ru:'Ruscha',en:'Inglizcha','?':"Noma'lum"};
 function adSrc(k){if(k==='bot')return 'Bot: /start';if(k==='app')return 'Ilova havolasi';if(k==='?')return "Eski foydalanuvchi (manba noma'lum)";if(k==='prava')return 'Prava havolasi';if(/^ertak_/.test(k))return 'Ertak ulashilgan';if(/^r_/.test(k))return 'Retsept havolasi';return k}
@@ -3823,6 +4218,9 @@ function renderAdmin(j){
   <section class="card"><span class="label">Yangi foydalanuvchilar</span>
     <div class="ad-two ad-three"><div><b class="ad-mid">${N(U.n1)}</b><small>bugun</small></div><div><b class="ad-mid">${N(U.n7)}</b><small>7 kun</small></div><div><b class="ad-mid">${N(U.n30)}</b><small>30 kun</small></div></div>
     ${ret!=null?`<p class="note" style="margin-top:8px">O'tgan haftada kelganlarning <b>${ret}%</b> shu hafta yana foydalandi.</p>`:''}</section>
+  ${j.food?`<section class="card"><span class="label">Kaloriya: suratdan aniqlash</span>
+    <div class="ad-two ad-three"><div><b class="ad-mid">${N(j.food.d1)}</b><small>bugun, surat</small></div><div><b class="ad-mid">${N(j.food.d7)}</b><small>7 kun, surat</small></div><div><b class="ad-mid">${N(j.food.u7)}</b><small>7 kun, kishi</small></div></div>
+    <p class="note" style="margin-top:8px">Bir kishiga kuniga 15 ta, hammaga birgalikda 300 ta surat — Cloudflare bepul limitidan oshmaslik uchun.</p></section>`:''}
   <section class="card"><span class="label">Kunlik faol foydalanuvchilar · 30 kun</span>${adBars('adc1',dau,days,v=>fmt(v)+' kishi')}</section>
   <section class="card"><span class="label">Yangi qo'shilganlar · 30 kun</span>${adBars('adc2',nw,days,v=>fmt(v)+' kishi')}</section>
   <section class="card"><span class="label">O'rtacha vaqt · 30 kun</span>${adBars('adc3',mins,days,v=>String(v).replace('.',',')+' daq')}</section>
@@ -3841,7 +4239,7 @@ function renderAdmin(j){
     try{for(let k=0;k<1000;k++){b.textContent=`Tekshirilmoqda… ${fmt(al+bl)}`;const r=await adPost('/admin/check',{after});if(!r||!r.ok)throw 0;al+=r.alive;bl+=r.blocked;after=r.next;if(r.done)break}
       toast(`Tayyor: ${fmt(al)} faol, ${fmt(bl)} bloklagan`);adBusy=false;if(current==='admin')viewAdmin()}catch(e){adBusy=false;b.textContent="Xatolik — qayta urinish"}};
 }
-VIEWS.home=viewHome;VIEWS.audio=viewAudio;VIEWS.admin=viewAdmin;
+VIEWS.home=viewHome;VIEWS.audio=viewAudio;VIEWS.admin=viewAdmin;VIEWS.kkal=()=>{kkView='day';kkPick=null;kkPh=null;kkOff=0;kkQ='';viewKkal()};
 (function(){const n=uzNow();$('#todaychip').textContent=`${n.getUTCDate()}-${OYLAR[n.getUTCMonth()].slice(0,3)}`})();
 if(!VIEWS[current]) current='home';
 renderTabs(); setHero(current); VIEWS[current](); loadRates();
