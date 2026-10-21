@@ -1,7 +1,8 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-5
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-6
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
+// Ixtiyoriy secret: ANTHROPIC_API_KEY — bo'lsa, suratni Claude aniqlaydi (aniqroq), Workers AI zaxira bo'lib qoladi.
 const APP_URL='https://je1785659-byte.github.io/hamroh/';
 const SHARE_LINK='https://t.me/Hamronilovabot/app';
 const COVER=APP_URL+'cover.png';
@@ -263,18 +264,19 @@ async function kkCatalog(){
   if(KKCAT&&Date.now()-KKCAT_AT<600e3)return KKCAT;
   // qoidalar va modellar ro'yxati ham kkal.json'da: ularni o'zgartirish uchun botni qayta joylash shart emas
   try{const r=await fetch(APP_URL+'kkal.json',{cf:{cacheTtl:600}});if(r.ok){const j=await r.json();const ai=j.ai||{};
-    KKCAT={ids:new Set(j.f.map(x=>x[0])),text:j.f.map(x=>x[0]+': '+x[9]).join('\n'),rules:typeof ai.rules==='string'?ai.rules:null,models:Array.isArray(ai.models)&&ai.models.length?ai.models.map(String):null};KKCAT_AT=Date.now()}}catch(e){}
+    KKCAT={ids:new Set(j.f.map(x=>x[0])),text:j.f.map(x=>x[0]+': '+x[9]).join('\n'),rules:typeof ai.rules==='string'?ai.rules:null,claude:typeof ai.claude==='string'?ai.claude:null,models:Array.isArray(ai.models)&&ai.models.length?ai.models.map(String):null};KKCAT_AT=Date.now()}}catch(e){}
   return KKCAT;
 }
-function foodPrompt(cat){
+function foodPrompt(cat,names){
   return `You identify food in photos for a calorie counting app used in Uzbekistan.
 List every distinct food or drink visible in the photo, at most 6. For each one give:
 "id": the best matching id from the catalog below, or null if nothing fits;
 "name": a short English name of what you see;
 "g": the estimated edible weight in grams of the portion in the photo (a dinner plate is about 26 cm wide, a kosa bowl holds about 400 ml, a piyola tea cup about 150 ml, a whole Uzbek non flatbread weighs about 300 g, one somsa about 120 g);
-"kcal100": estimated calories per 100 g.
+"kcal100": estimated calories per 100 g;${names?`
+"uz": the name in Uzbek (Latin script), "ru": the name in Russian.`:''}
 ${(cat&&cat.rules)||FOOD_RULES}
-Reply with JSON only, exactly like: {"items":[{"id":"osh","name":"plov","g":350,"kcal100":240}]}
+Reply with JSON only, exactly like: {"items":[{"id":"osh","name":"plov","g":350,"kcal100":240${names?',"uz":"Osh","ru":"Плов"':''}}]}
 If there is no food or drink in the photo, reply {"items":[]}.
 Catalog (id: description):
 ${cat?cat.text:''}`;
@@ -287,9 +289,23 @@ function foodParse(r,ids){
   if(!j)return null;
   const arr=Array.isArray(j)?j:Array.isArray(j.items)?j.items:null;if(!arr)return null;
   return arr.slice(0,8).filter(x=>x&&typeof x==='object').map(x=>({id:ids&&typeof x.id==='string'&&ids.has(x.id)?x.id:null,name:String(x.name||'').slice(0,40),
-    g:Math.max(0,Math.min(3000,Math.round(+x.g||0))),kcal100:Math.max(0,Math.min(900,Math.round(+x.kcal100||0)))})).filter(x=>x.id||x.name);
+    g:Math.max(0,Math.min(3000,Math.round(+x.g||0))),kcal100:Math.max(0,Math.min(900,Math.round(+x.kcal100||0))),
+    ...(typeof x.uz==='string'&&x.uz?{uz:x.uz.slice(0,40)}:{}),...(typeof x.ru==='string'&&x.ru?{ru:x.ru.slice(0,40)}:{})})).filter(x=>x.id||x.name);
 }
 function b64bytes(d){const s=atob(d.slice(d.indexOf(',')+1)),a=new Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
+async function foodClaude(env,img,cat){
+  const model=(cat&&cat.claude)||env.CLAUDE_MODEL||'claude-haiku-5-5';
+  const media=img.slice(5,img.indexOf(';')),data=img.slice(img.indexOf(',')+1);
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'x-api-key':env.ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','content-type':'application/json'},
+    body:JSON.stringify({model,max_tokens:800,temperature:0.2,system:foodPrompt(cat,true),
+      messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:media,data}},{type:'text',text:'What food and drinks are in this photo? Reply with JSON only.'}]}]})});
+  /** @type {any} */
+  const j=await r.json().catch(()=>null);
+  if(!r.ok||!j)throw new Error('claude '+r.status+': '+String((j&&j.error&&j.error.message)||'').slice(0,200));
+  const t=(j.content||[]).filter(c=>c&&c.type==='text').map(c=>c.text).join('');
+  const items=foodParse({response:t},cat&&cat.ids);if(!items)throw new Error('claude: javob JSON emas');
+  return {items,m:model};
+}
 async function foodAI(env,AI,img,cat){
   const prompt=foodPrompt(cat),ask='What food and drinks are in this photo? Reply with JSON only.',errs=[];
   const models=env.FOOD_MODEL?String(env.FOOD_MODEL).split(',').map(x=>x.trim()).filter(Boolean):(cat&&cat.models)||FOOD_MODELS;
@@ -323,11 +339,11 @@ function aiBinding(env){if(env.AI)return env.AI;for(const k in env){const v=env[
 async function handleFood(req,env){
   let f;try{f=await req.formData()}catch(e){return J({ok:false,error:'img'},400)}
   const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false,error:'auth'},403);
-  const AI=aiBinding(env);if(!AI)return J({ok:false,error:'noai'});
+  const AI=aiBinding(env),CL=!!env.ANTHROPIC_API_KEY;if(!AI&&!CL)return J({ok:false,error:'noai'});
   const img=String(f.get('img')||'');
   if(img.length>1500000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(img))return J({ok:false,error:'img'},400);
   const db=await D(env).catch(()=>null),day=dstr(Date.now());
-  const userMax=+env.FOOD_USER_DAY||FOOD_USER_DAY,allMax=+env.FOOD_ALL_DAY||FOOD_ALL_DAY;
+  const userMax=+env.FOOD_USER_DAY||FOOD_USER_DAY,allMax=+env.FOOD_ALL_DAY||(CL?1000:FOOD_ALL_DAY); // Claude bilan ~0,0004$/surat
   let used=0,admin=false;
   if(db){try{
     const r=await db.batch([db.prepare('SELECT n FROM food WHERE day=?1 AND uid=?2').bind(day,u.id),db.prepare('SELECT COALESCE(SUM(n),0) s FROM food WHERE day=?1').bind(day),db.prepare("SELECT v FROM meta WHERE k='admins'")]);
@@ -337,8 +353,10 @@ async function handleFood(req,env){
     if(!admin&&all>=allMax)return J({ok:false,error:'busy'});
   }catch(e){console.log('food db',e)}}
   const cat=await kkCatalog();
-  let res;
-  try{res=await foodAI(env,AI,img,cat)}catch(e){console.log('food ai',e);return J({ok:false,error:/^QUOTA/.test(String(e&&e.message))?'busy':'ai',...(admin?{why:String((e&&e.message)||e).slice(0,400)}:{})})}
+  let res=null;const errs=[];
+  if(CL){try{res=await foodClaude(env,img,cat)}catch(e){console.log('food claude',e);errs.push(String((e&&e.message)||e))}}
+  if(!res&&AI){try{res=await foodAI(env,AI,img,cat)}catch(e){console.log('food ai',e);errs.push(String((e&&e.message)||e))}}
+  if(!res)return J({ok:false,error:!CL&&/^QUOTA/.test(errs.join(' '))?'busy':'ai',...(admin?{why:errs.join(' || ').slice(0,500)}:{})});
   if(db)await db.prepare('INSERT INTO food(day,uid,n) VALUES(?1,?2,1) ON CONFLICT(day,uid) DO UPDATE SET n=n+1').bind(day,u.id).run().catch(()=>{});
   return J({ok:true,items:res.items,left:Math.max(0,userMax-used-1),...(admin?{model:res.m}:{})});
 }

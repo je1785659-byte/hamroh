@@ -3814,7 +3814,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261021s';
+const APP_VER='20261021t';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -4043,10 +4043,16 @@ function kkShrink(file){return new Promise((res,rej)=>{const u=URL.createObjectU
 function kkAsk(d){const fd=new FormData();fd.append('initData',tg.initData);fd.append('img',d);const ac=typeof AbortController!=='undefined'?new AbortController():null,tm=setTimeout(()=>ac&&ac.abort(),45000);
   return fetch(BOT_API+'/food',{method:'POST',body:fd,signal:ac?ac.signal:undefined}).then(r=>r.json()).finally(()=>clearTimeout(tm))}
 function kkFromAI(it){
-  if(!it||typeof it!=='object')return null;const g=Math.max(5,Math.min(2000,Math.round(+it.g||0)));const f=it.id&&KK.by[it.id];
+  if(!it||typeof it!=='object')return null;const g=Math.max(5,Math.min(2000,Math.round(+it.g||0)));const f=(it.id&&KK.by[it.id])||(!it.id&&it.name&&kkGuess(it.name));
   if(f)return {f,g:+it.g>0?g:f.g};
   const k=Math.round(+it.kcal100);if(!(k>=0&&k<=900)||!it.name)return null;
-  return {f:{id:null,n:String(it.name).slice(0,40),k,p:null,f:null,c:null,g:null,u:null,ai:1},g:+it.g>0?g:150};
+  const nm=(LANG==='uz'||LANG==='uzc'||!LANG)&&it.uz?(LANG==='uzc'?lat2cyr(it.uz):it.uz):LANG==='ru'&&it.ru?it.ru:it.name;
+  return {f:{id:null,n:String(nm).slice(0,40),k,p:null,f:null,c:null,g:null,u:null,ai:1},g:+it.g>0?g:150};
+}
+// AI id bermagan bo'lsa, inglizcha nomini ro'yxatdagi tavsifning birinchi qismi bilan solishtiradi ("quail eggs" -> Bedana tuxumi)
+function kkGuess(name){
+  const w=kkNz(name).replace(/[^a-z\s]/g,' ').split(/\s+/).filter(x=>x.length>2).map(x=>x.replace(/s$/,''));if(!w.length)return null;
+  let best=null;KK.list.forEach(f=>{const d=kkNz(f.en).split(/[:,]/)[0];if(w.every(x=>d.includes(x))&&(!best||d.length<kkNz(best.en).split(/[:,]/)[0].length))best=f});return best;
 }
 function kkPhotoStart(file){
   if(!(tg&&tg.initData)){toast("Suratdan aniqlash faqat Telegram ichida ishlaydi");return}
