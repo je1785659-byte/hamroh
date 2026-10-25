@@ -690,6 +690,54 @@ body[data-sec="kkal"]{--kk-a:#1a7d4c}
 .kk-ppl{align-self:stretch;text-align:center;font-weight:600}.kk-ppl[aria-pressed="true"]{background:var(--sec);border-color:var(--sec);color:#fff}
 .kk-quick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.kk-quick::-webkit-scrollbar{display:none}
 .kk-quick .chip{flex:none;white-space:nowrap}
+body[data-sec="mafia"]{--sec-a:#2b0f14;--sec-b:#8e1b2b;--sec:#b3263a}
+.mf-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.mf-h b{font-family:var(--display);font-size:17px}
+.mf-names{display:flex;flex-direction:column;gap:6px}
+.mf-nm{display:grid;grid-template-columns:26px 1fr 32px;gap:8px;align-items:center}
+.mf-nm>span{font-weight:700;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.mf-nm input{padding:9px 11px}
+.mf-nm .kk-x:disabled{opacity:.3}
+.mf-cnt{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-weight:600}
+.mf-cnt:first-of-type{border-top:0}
+.mf-st{display:flex;align-items:center;gap:10px}
+.mf-st button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-size:18px;font-weight:700}
+.mf-st button:disabled{opacity:.35}
+.mf-st b{min-width:2ch;text-align:center;font-size:16px}
+.mf-big{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 16px}
+.mf-big h3{font-family:var(--display);font-size:22px;margin:2px 0;text-wrap:balance}
+.mf-ic{font-size:44px;line-height:1.1}
+.mf-night{background:linear-gradient(160deg,#141a3a,#262a5e);color:#eef1ff;border-color:transparent}
+.mf-night .note{color:#c3c8ef}
+.mf-night .chip{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff}
+.mf-night .chip[aria-pressed="true"]{background:#e3a234;border-color:#e3a234;color:#1a1300}
+.mf-night .chip:disabled{opacity:.35}
+.mf-night .kk-warn{color:var(--ink)}
+.mf-pl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px}
+.mf-pl .chip{font-weight:600;padding:9px 14px}
+.mf-pl .chip[aria-pressed="true"]{background:var(--sec);border-color:var(--sec);color:#fff}
+.mf-res{margin-top:12px;padding:10px 16px;border-radius:14px;font-weight:800;font-size:17px}
+.mf-res.yes{background:#e3a234;color:#1a1300}.mf-res.no{background:rgba(255,255,255,.14);color:#fff}
+.mf-role{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;padding:24px 18px;color:#fff;border:0}
+.mf-role.mf-m{background:linear-gradient(150deg,#2b0f14,#8e1b2b)}.mf-role.mf-t{background:linear-gradient(150deg,#0e3b4a,#1b7a83)}
+.mf-role h3{font-family:var(--display);font-size:30px;margin:0}.mf-role .label{color:rgba(255,255,255,.8)}
+.mf-role p{margin:4px 0 0;line-height:1.45;font-size:14.5px;opacity:.95}
+.mf-mates{background:rgba(0,0,0,.25);padding:8px 12px;border-radius:12px}
+.mf-rv{font-weight:800;font-size:18px;margin:4px 0}
+.mf-time{font-family:var(--display);font-size:64px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;margin:10px 0 6px}
+.mf-time.low{color:var(--bad)}
+.mf-tb{display:grid;grid-template-columns:2fr 1fr;gap:8px;width:100%}
+.mf-host summary{font-weight:700;cursor:pointer;color:var(--muted);font-size:13.5px}
+.mf-list{display:flex;flex-direction:column;margin-top:8px}
+.mf-list>div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
+.mf-list>div:first-child{border-top:0}.mf-list>div.dead{opacity:.5;text-decoration:line-through}
+.mf-list i{font-style:normal;color:var(--muted)}
+.mf-log p{margin:8px 0 0;font-size:13px;line-height:1.4;color:var(--muted)}
+.mf-end.mf-m{background:linear-gradient(150deg,#2b0f14,#8e1b2b);color:#fff;border:0}.mf-end.mf-t{background:linear-gradient(150deg,#0f5132,#2fa36b);color:#fff;border:0}
+.mf-end .note{color:rgba(255,255,255,.85)}
+.mf-rules{display:flex;flex-direction:column;gap:10px}.mf-rules>div{display:flex;gap:12px;align-items:flex-start}
+.mf-rules span{font-size:22px;width:40px;height:40px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center;flex:none}
+.mf-rules p{margin:0;font-size:13.5px;line-height:1.4;color:var(--muted)}.mf-rules b{display:block;color:var(--ink);font-size:14.5px}
 </style>
 </head>
 <body>
@@ -762,6 +810,7 @@ ICONS.audio='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 ICONS.prava='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><path d="M3.5 10.5l6.2 1M14.3 11.5l6.2-1M12 14.5V21"/></svg>';
 ICONS.sert='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 4H7l6 8-6 8h10"/></svg>';
 ICONS.kkal='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5c-1.6-1.3-5.2-1.6-6.8 1.3-1.8 3.3.1 9.7 3 11.6 1.3.9 2.4.4 3.8.4s2.5.5 3.8-.4c2.9-1.9 4.8-8.3 3-11.6-1.6-2.9-5.2-2.6-6.8-1.3z"/><path d="M12 7.5c0-2 .9-3.5 2.8-4.3"/></svg>';
+ICONS.mafia='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15.5c2.5 1.3 5.6 2 9 2s6.5-.7 9-2"/><path d="M6 15.8 7.4 7.5c.2-1.2 1.4-1.9 2.5-1.4L12 7l2.1-.9c1.1-.5 2.3.2 2.5 1.4l1.4 8.3"/><path d="M6.6 12.3c3.6.8 7.2.8 10.8 0"/></svg>';
 ICONS.home='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>';
 const TABS = [['home','Asosiy'],['namoz','Namoz'],['food','Taomlar'],['cash','Valyuta'],['quiz','Viktorina']];
 const HERO = {
@@ -774,6 +823,7 @@ const HERO = {
   doc:['Hujjatlar',"PDF, rasm va matn bilan ishlash — fayllar telefoningizdan chiqmaydi"],
   prava:['Prava imtihoni',"Imtihon rejimi, xatolar ustida ishlash va yo'l belgilari"],
   sert:['Milliy sertifikat',"8 fan: rasmiy format bo'yicha mashq, izohli savollar va imtihon rejimi"],
+  mafia:['Mafiya',"Davrada o'ynash uchun: rollarni tarqatadi, kecha va ovoz berishda boshlovchiga yordam beradi"],
   kkal:['Kaloriya hisoblagich',"Ovqatni suratga oling — AI taomni taniydi, kaloriya va kunlik normangizni hisoblaydi"]
 };
 let current = store.get('tab','home');
@@ -2071,7 +2121,7 @@ function viewSaved(){
 }
 // open a shared recipe: t.me/bot/app?startapp=r_osh
 (function(){try{const tq=new URLSearchParams(location.search).get('t');if(tq){current=tq;store.set('tab',tq)}}catch(e){}})();
-(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
+(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
 
 const TOOLIC={qibla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
  tasbeh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="17.5" cy="15" r="2"/><circle cx="12" cy="18.5" r="2"/><circle cx="6.5" cy="15" r="2"/><circle cx="6.5" cy="8.5" r="2"/></svg>',
@@ -3851,7 +3901,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261021x';
+const APP_VER='20261026a';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -4235,6 +4285,203 @@ function kkPhotoV(){
   kkBindMeals($('#screen'),()=>P.m,m=>P.m=m);
   on('#kkok',()=>{const t=tot()*P.share;kkSendFix(P);P.items.forEach(x=>kkAddItem(x.f,x.g*P.share,P.m,'ai',P.key,P.share<1));kkPh=null;haptic('done');toast(KT(`Qo'shildi: ${fmt(kkR(t))} kkal`,`Добавлено: ${fmt(kkR(t))} ккал`,`Added: ${fmt(kkR(t))} kcal`));kkGo('day')});
 }
+/* ---------- MAFIYA: davrada o'ynash uchun, ilova boshlovchiga yordam beradi ---------- */
+const MF_R={
+  mafia:{n:'Mafiya',ic:'🕶',t:'m',d:"Kechasi boshqa mafiyachilar bilan birga bitta o'yinchini o'yindan chiqarishni tanlaysiz. Kunduzi o'zingizni tinch aholi qilib ko'rsating."},
+  don:{n:'Don',ic:'🎩',t:'m',d:"Mafiya boshlig'i. Mafiya bilan birga qurbon tanlaysiz, keyin alohida uyg'onib Komissarni qidirasiz."},
+  kom:{n:'Komissar',ic:'🕵️',t:'t',d:"Har kecha bitta o'yinchini tekshirasiz: boshlovchi u mafiyami yoki yo'qligini ishora bilan bildiradi."},
+  doc:{n:'Doktor',ic:'🩺',t:'t',d:"Har kecha bitta o'yinchini davolaysiz: mafiya aynan uni tanlagan bo'lsa, u omon qoladi. Bitta odamni ketma-ket ikki kecha davolab bo'lmaydi."},
+  civ:{n:'Tinch aholi',ic:'🙂',t:'t',d:"Kechasi uxlaysiz. Kunduzi muhokamada mafiyani topib, ovoz berish orqali o'yindan chiqarishga harakat qiling."}
+};
+const MF_ORDER=['mafia','don','kom','doc','civ'];
+let MF=store.get('mf',null),mfTimer=null,mfShow=false,mfPick=null,mfHost=false;
+const mfSave=()=>store.set('mf',MF);
+const mfName=(i)=>MF.p[i].n;
+function mfRec(n){const m=Math.max(1,Math.min(6,Math.floor(n/3)));return {mafia:m>=2?m-1:m,don:m>=2?1:0,kom:n>=4?1:0,doc:n>=5?1:0}}
+function mfSetupGet(){let S=store.get('mf_setup',null);if(!S||!Array.isArray(S.names))S={names:Array(8).fill(''),cnt:mfRec(8),reveal:true,first:false,talk:120};return S}
+function mfCiv(S){const n=S.names.length;return n-S.cnt.mafia-S.cnt.don-S.cnt.kom-S.cnt.doc}
+function mfLabel(S,i){return (S.names[i]||'').trim()||KT(`${i+1}-o'yinchi`,`Игрок ${i+1}`,`Player ${i+1}`)}
+function viewMafia(){
+  clearInterval(mfTimer);
+  const h=$('#hero');if(MF&&MF.ph&&MF.ph!=='setup'){if(h)h.hidden=true}else if(h&&h.hidden)setHero('mafia');
+  if(!MF||!MF.ph||MF.ph==='setup')return mfSetupV();
+  ({deal:mfDealV,night:mfNightV,morning:mfMorningV,day:mfDayV,vote:mfVoteV,voted:mfVotedV,end:mfEndV}[MF.ph]||mfSetupV)();
+}
+function mfStepper(k,label,v,min,max){return `<div class="mf-cnt"><span>${MF_R[k].ic} ${label}</span><div class="mf-st"><button data-c="${k}" data-d="-1" ${v<=min?'disabled':''} aria-label="Kamaytirish">−</button><b data-notr>${v}</b><button data-c="${k}" data-d="1" ${v>=max?'disabled':''} aria-label="Ko'paytirish">+</button></div></div>`}
+function mfSetupV(){
+  const S=mfSetupGet(),n=S.names.length,civ=mfCiv(S),mt=S.cnt.mafia+S.cnt.don;
+  const err=n<4?"Kamida 4 o'yinchi kerak.":mt<1?"Kamida bitta mafiya kerak.":civ<0?"Rollar o'yinchilardan ko'p bo'lib qoldi.":mt>=n-mt?"Mafiya tinch aholidan kam bo'lishi kerak.":'';
+  $('#screen').innerHTML=`
+    <section class="card"><div class="mf-h"><b>O'yinchilar</b><span class="badge old" data-notr>${KT(`${n} kishi`,`${n} чел.`,`${n} players`)}</span></div>
+      <div class="mf-names">${S.names.map((x,i)=>`<div class="mf-nm"><span data-notr>${i+1}</span><input class="csearch" data-i="${i}" maxlength="18" value="${esc(x)}" placeholder="${esc(mfLabel({names:[]},i))}" data-noi18n><button class="kk-x" data-rm="${i}" aria-label="O'chirish" ${n<=4?'disabled':''}>✕</button></div>`).join('')}</div>
+      <button class="chip" id="mfadd" ${n>=20?'disabled':''} style="margin-top:10px">+ O'yinchi qo'shish</button>
+      <p class="note" style="margin-top:8px">Boshlovchi o'yinchilar qatoriga kirmaydi: u telefonni ushlab, o'yinni olib boradi.</p></section>
+    <section class="card"><div class="mf-h"><b>Rollar</b><button class="chip" id="mfrec">Tavsiya etilgan</button></div>
+      ${mfStepper('mafia','Mafiya',S.cnt.mafia,0,6)}${mfStepper('don','Don',S.cnt.don,0,1)}${mfStepper('kom','Komissar',S.cnt.kom,0,1)}${mfStepper('doc','Doktor',S.cnt.doc,0,1)}
+      <div class="mf-cnt"><span>${MF_R.civ.ic} Tinch aholi</span><b data-notr style="padding-right:14px">${Math.max(0,civ)}</b></div>
+      ${err?`<div class="kk-warn" style="margin-top:8px">${err}</div>`:''}</section>
+    <section class="card kk-goal"><div class="label">Sozlamalar</div>
+      <button class="kk-opt" id="mfrev" aria-pressed="${S.reveal}"><span><b>O'yindan chiqqanning roli ochiladi</b><small>O'chirilsa, rollar faqat o'yin oxirida ma'lum bo'ladi</small></span></button>
+      <button class="kk-opt" id="mffirst" aria-pressed="${S.first}"><span><b>Birinchi kecha — tanishuv</b><small>Mafiya faqat bir-birini taniydi, hech kim chiqmaydi</small></span></button>
+      <div class="label" style="margin-top:4px">Kunduzgi muhokama vaqti</div>
+      <div class="kk-meals" id="mftalk">${[60,120,180,300].map(t=>`<button class="chip" data-t="${t}" aria-pressed="${S.talk===t}" data-notr>${KT(`${t/60} daqiqa`,`${t/60} мин`,`${t/60} min`)}</button>`).join('')}</div></section>
+    <button class="btn" id="mfgo" ${err?'disabled':''}>Rollarni tarqatish</button>
+    <button class="card pv-main" id="mfhow" style="background:linear-gradient(135deg,#2b0f14,#8e1b2b)"><span class="pv-ic">?</span><span><b>O'yin qoidalari</b><small>Rollar va o'yin qanday o'tishi</small></span><span class="pv-go">→</span></button>`;
+  const save=()=>store.set('mf_setup',S);
+  $('#screen').querySelectorAll('.mf-names input').forEach(inp=>inp.oninput=()=>{S.names[+inp.dataset.i]=inp.value;save()});
+  $('#screen').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{S.names.splice(+b.dataset.rm,1);save();mfSetupV()});
+  $('#mfadd').onclick=()=>{if(S.names.length<20){S.names.push('');save();mfSetupV();const l=$('#screen').querySelectorAll('.mf-names input');l[l.length-1].focus()}};
+  $('#mfrec').onclick=()=>{S.cnt=mfRec(S.names.length);save();mfSetupV()};
+  $('#screen').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c,lim={mafia:6,don:1,kom:1,doc:1}[k];S.cnt[k]=Math.max(0,Math.min(lim,S.cnt[k]+(+b.dataset.d)));save();mfSetupV()});
+  $('#mfrev').onclick=()=>{S.reveal=!S.reveal;save();mfSetupV()};
+  $('#mffirst').onclick=()=>{S.first=!S.first;save();mfSetupV()};
+  $('#mftalk').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;S.talk=+b.dataset.t;save();mfSetupV()};
+  $('#mfhow').onclick=mfRules;
+  $('#mfgo').onclick=()=>{if(err)return;mfStart(S)};
+}
+function mfStart(S){
+  const roles=[];MF_ORDER.forEach(k=>{const c=k==='civ'?mfCiv(S):S.cnt[k];for(let i=0;i<c;i++)roles.push(k)});
+  for(let i=roles.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[roles[i],roles[j]]=[roles[j],roles[i]]}
+  MF={ph:'deal',p:S.names.map((x,i)=>({n:mfLabel(S,i),r:roles[i],a:1})),reveal:S.reveal,first:S.first,talk:S.talk,day:1,deal:0,night:null,lastHeal:null,log:[],win:null,news:null};
+  mfShow=false;mfSave();statSec('mafia_game');viewMafia();window.scrollTo(0,0);
+}
+function mfQuit(){if(!confirmTap('mfquit'))return;MF=null;store.set('mf',null);clearInterval(mfTimer);viewMafia();window.scrollTo(0,0)}
+// ikkinchi bosishda tasdiqlash (brauzer oynasisiz)
+function confirmTap(id){const b=document.getElementById(id);if(!b)return true;if(b.dataset.sure){return true}b.dataset.sure=1;const o=b.textContent;b.textContent=trText('Yana bir marta bosing');setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.textContent=o}},2500);return false}
+function mfTop(title){return `<div class="kbar"><span></span><b>${title}</b><button class="chip" id="mfquit">O'yinni tugatish</button></div>`}
+function mfBindTop(){const q=$('#mfquit');if(q)q.onclick=mfQuit}
+function mfDealV(){
+  const i=MF.deal,P=MF.p[i];
+  if(i>=MF.p.length){
+    $('#screen').innerHTML=`${mfTop('Rollar tarqatildi')}<section class="card mf-big"><div class="mf-ic">🌙</div><h3>Hamma rolini bildi</h3><p class="note">Telefonni boshlovchiga bering. Boshlovchi kechani boshlaydi.</p></section>
+      <button class="btn" id="mfnight">Kechani boshlash</button>`;
+    mfBindTop();$('#mfnight').onclick=()=>{mfNightStart()};return;
+  }
+  const R=MF_R[P.r],mates=MF.p.map((x,j)=>j).filter(j=>j!==i&&MF_R[MF.p[j].r].t==='m');
+  $('#screen').innerHTML=`${mfTop('Rollarni tarqatish')}
+    <div class="pv-prog">${MF.p.map((_,j)=>`<i class="${j<i?'ok':j===i?'cur':''}"></i>`).join('')}</div>
+    ${mfShow?`<section class="card mf-role mf-${R.t}"><div class="mf-ic">${R.ic}</div><div class="label" data-noi18n>${esc(P.n)}</div><h3>${R.n}</h3><p>${R.d}</p>
+        ${R.t==='m'&&mates.length?`<p class="mf-mates"><b>Sheriklaringiz:</b> <span data-noi18n>${mates.map(j=>esc(mfName(j))+(MF.p[j].r==='don'?' (Don)':'')).join(', ')}</span></p>`:''}</section>
+      <button class="btn" id="mfhide">Yashirdim — keyingisiga beraman</button>`
+    :`<section class="card mf-big"><div class="mf-ic">📱</div><p class="note">Telefonni shu o'yinchiga bering:</p><h3 data-noi18n>${esc(P.n)}</h3><p class="note">Rolingizni boshqalar ko'rmasin.</p></section>
+      <button class="btn" id="mfsee">Rolimni ko'rish</button>`}`;
+  mfBindTop();
+  if(mfShow)$('#mfhide').onclick=()=>{mfShow=false;MF.deal++;mfSave();haptic('light');mfDealV();window.scrollTo(0,0)};
+  else $('#mfsee').onclick=()=>{mfShow=true;haptic('medium');mfDealV()};
+}
+const mfAlive=r=>MF.p.some(x=>x.a&&x.r===r);
+const mfHas=r=>MF.p.some(x=>x.r===r);
+function mfNightStart(){
+  const steps=['intro','mafia'];if(mfHas('don'))steps.push('don');if(mfHas('kom'))steps.push('kom');if(mfHas('doc'))steps.push('doc');steps.push('dawn');
+  MF.ph='night';MF.night={steps,i:0,kill:null,heal:null,kom:null,don:null};MF.news=null;mfSave();mfPick=null;viewMafia();window.scrollTo(0,0);
+}
+function mfHostBox(){return `<details class="card mf-host" ${mfHost?'open':''}><summary>Boshlovchi uchun: kim qaysi rolda</summary>
+  <div class="mf-list">${MF.p.map(x=>`<div class="${x.a?'':'dead'}"><span data-noi18n>${esc(x.n)}</span><span>${MF_R[x.r].ic} ${MF_R[x.r].n}${x.a?'':` · <i>chiqqan</i>`}</span></div>`).join('')}</div></details>`}
+function mfBindHost(){const d=$('.mf-host');if(d)d.ontoggle=()=>{mfHost=d.open}}
+function mfPlayers(filter,sel,dis){return `<div class="mf-pl">${MF.p.map((x,i)=>x.a&&filter(i)?`<button class="chip" data-pi="${i}" aria-pressed="${sel===i}" ${dis===i?'disabled':''} data-noi18n>${esc(x.n)}</button>`:'').join('')}</div>`}
+function mfNightV(){
+  const N=MF.night,st=N.steps[N.i],first=MF.first&&MF.day===1;
+  const T={intro:['🌙','Shahar uxlaydi',"Hamma ko'zini yumsin. Boshlovchi rollarni navbat bilan uyg'otadi."],
+    mafia:['🕶',first?'Mafiya uyg\'onadi va tanishadi':"Mafiya uyg'onadi",first?"Mafiyachilar bir-birini ko'rib oladi. Bu kecha hech kim chiqmaydi.":"Mafiya birgalikda qurbonni ishora bilan ko'rsatadi. Boshlovchi uni belgilaydi."],
+    don:['🎩',"Don uyg'onadi","Don Komissarni qidiradi: bir o'yinchini ko'rsatadi, boshlovchi «ha» yoki «yo'q» ishorasini qiladi."],
+    kom:['🕵️',"Komissar uyg'onadi","Komissar bir o'yinchini ko'rsatadi, boshlovchi u mafiyami yoki yo'qligini ishora bilan bildiradi."],
+    doc:['🩺',"Doktor uyg'onadi","Doktor davolamoqchi bo'lgan o'yinchini ko'rsatadi."],
+    dawn:['🌅','Tong otmoqda',"Hamma uyg'onsin. Boshlovchi tunda nima bo'lganini e'lon qiladi."]}[st];
+  let body='',canNext=true;
+  if(st==='mafia'&&!first){canNext=N.kill!=null;body=mfPlayers(()=>true,N.kill)}
+  if(['don','kom','doc'].includes(st)){
+    if(!mfAlive(st))body=`<div class="kk-warn">Bu rol o'yindan chiqqan. Boshqalar sezmasligi uchun bir necha soniya kutib, keyin davom eting.</div>`;
+    else{const me=MF.p.findIndex(x=>x.r===st&&x.a);
+      if(st==='doc'){canNext=N.heal!=null;body=mfPlayers(()=>true,N.heal,MF.lastHeal)+(MF.lastHeal!=null&&MF.p[MF.lastHeal].a?`<p class="note" data-notr>${KT(`${esc(mfName(MF.lastHeal))} kecha davolangan — bugun uni tanlab bo'lmaydi.`,`${esc(mfName(MF.lastHeal))} лечили прошлой ночью — сегодня нельзя.`,`${esc(mfName(MF.lastHeal))} was healed last night and can't be chosen tonight.`)}</p>`:'')}
+      else{const key=st==='kom'?'kom':'don',sel=N[key];canNext=sel!=null;body=mfPlayers(i=>i!==me,sel);
+        if(sel!=null){const r=MF.p[sel].r,yes=st==='kom'?MF_R[r].t==='m':r==='kom';
+          body+=`<div class="mf-res ${yes?'yes':'no'}">${st==='kom'?(yes?'👍 Ha, bu mafiya':"👎 Yo'q, bu tinch aholi"):(yes?'👍 Ha, bu Komissar':"👎 Yo'q, bu Komissar emas")}</div><p class="note">Natijani ovoz chiqarmay, ishora bilan ko'rsating.</p>`}}}
+  }
+  $('#screen').innerHTML=`${mfTop(KT(`${MF.day}-kecha`,`Ночь ${MF.day}`,`Night ${MF.day}`))}
+    <section class="card mf-big mf-night"><div class="mf-ic">${T[0]}</div><h3>${T[1]}</h3><p class="note">${T[2]}</p>${body}</section>
+    <button class="btn" id="mfnext" ${canNext?'':'disabled'}>${st==='dawn'?"Tongni e'lon qilish":st==='intro'?'Boshlash':'Uxlasin — davom etish'}</button>
+    ${mfHostBox()}`;
+  mfBindTop();mfBindHost();
+  $('#screen').querySelectorAll('[data-pi]').forEach(b=>b.onclick=()=>{const i=+b.dataset.pi;if(st==='mafia')N.kill=i;else if(st==='doc')N.heal=i;else N[st]=i;haptic('light');mfSave();mfNightV()});
+  $('#mfnext').onclick=()=>{if(st==='dawn')return mfDawn();N.i++;mfSave();mfNightV();window.scrollTo(0,0)};
+}
+function mfWin(){const al=MF.p.filter(x=>x.a),m=al.filter(x=>MF_R[x.r].t==='m').length,t=al.length-m;if(!m)return 't';if(m>=t)return 'm';return null}
+function mfDawn(){
+  const N=MF.night,first=MF.first&&MF.day===1;let out=null;
+  if(!first&&N.kill!=null&&N.kill!==N.heal){out=N.kill;MF.p[out].a=0}
+  const saved=!first&&N.kill!=null&&N.kill===N.heal;
+  MF.lastHeal=N.heal;
+  MF.log.push({d:MF.day,k:'n',kill:first?null:N.kill,heal:N.heal,kom:N.kom,don:N.don,out,saved});
+  MF.news={out,saved};MF.win=mfWin();MF.ph=MF.win?'end':'morning';mfSave();haptic('done');viewMafia();window.scrollTo(0,0);
+}
+function mfMorningV(){
+  const o=MF.news&&MF.news.out;
+  $('#screen').innerHTML=`${mfTop(KT(`${MF.day}-kun`,`День ${MF.day}`,`Day ${MF.day}`))}
+    <section class="card mf-big"><div class="mf-ic">🌅</div>${o!=null?`<h3 data-notr>${KT(`Tunda ${esc(mfName(o))} o'yindan chiqdi`,`Этой ночью выбыл(а) ${esc(mfName(o))}`,`${esc(mfName(o))} was eliminated tonight`)}</h3>
+      ${MF.reveal?`<p class="mf-rv">${MF_R[MF.p[o].r].ic} <span>${MF_R[MF.p[o].r].n}</span></p>`:''}`:`<h3>Bu tun hech kim o'yindan chiqmadi</h3>`}
+      <p class="note">Qolgan o'yinchilar muhokamani boshlaydi.</p></section>
+    <button class="btn" id="mfday">Muhokamani boshlash</button>${mfHostBox()}`;
+  mfBindTop();mfBindHost();$('#mfday').onclick=()=>{MF.ph='day';MF.left=MF.talk;MF.run=false;mfSave();viewMafia();window.scrollTo(0,0)};
+}
+function mfDayV(){
+  const draw=()=>{const t=$('#mftime');if(!t)return;const l=Math.max(0,MF.left|0);t.textContent=`${Math.floor(l/60)}:${String(l%60).padStart(2,'0')}`;t.classList.toggle('low',l<=10);$('#mfrun').textContent=trText(MF.run?'Pauza':l>0?'Boshlash':'Vaqt tugadi')};
+  $('#screen').innerHTML=`${mfTop(KT(`${MF.day}-kun`,`День ${MF.day}`,`Day ${MF.day}`))}
+    <section class="card mf-big"><div class="mf-ic">☀️</div><h3>Kunduzgi muhokama</h3><p class="note">Kim mafiya ekanini muhokama qiling. Vaqt tugagach, ovoz berishga o'tiladi.</p>
+      <div class="mf-time" id="mftime" data-notr></div>
+      <div class="mf-tb"><button class="btn" id="mfrun"></button><button class="btn alt" id="mfplus" data-notr>+30 s</button></div></section>
+    <section class="card"><div class="label">O'yinda qolganlar</div><div class="mf-pl">${MF.p.map(x=>x.a?`<span class="chip" data-noi18n>${esc(x.n)}</span>`:'').join('')}</div></section>
+    <button class="btn" id="mfvote">Ovoz berishga o'tish</button>${mfHostBox()}`;
+  mfBindTop();mfBindHost();draw();
+  const tick=()=>{if(current!=='mafia'||MF.ph!=='day'){clearInterval(mfTimer);return}if(!MF.run)return;MF.left--;if(MF.left<=0){MF.left=0;MF.run=false;haptic('done');try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}}mfSave();draw()};
+  clearInterval(mfTimer);mfTimer=setInterval(tick,1000);
+  $('#mfrun').onclick=()=>{if(MF.left<=0)return;MF.run=!MF.run;mfSave();draw()};
+  $('#mfplus').onclick=()=>{MF.left+=30;mfSave();draw()};
+  $('#mfvote').onclick=()=>{MF.run=false;MF.ph='vote';mfPick=null;mfSave();viewMafia();window.scrollTo(0,0)};
+}
+function mfVoteV(){
+  clearInterval(mfTimer);
+  $('#screen').innerHTML=`${mfTop(KT(`${MF.day}-kun · ovoz berish`,`День ${MF.day} · голосование`,`Day ${MF.day} · vote`))}
+    <section class="card mf-big"><div class="mf-ic">✋</div><h3>Kim o'yindan chiqarilsin?</h3><p class="note">Har kim qo'l ko'tarib ovoz beradi. Eng ko'p ovoz olgan o'yinchini belgilang.</p>
+      ${mfPlayers(()=>true,mfPick)}</section>
+    <button class="btn" id="mfout" ${mfPick==null?'disabled':''} data-notr>${mfPick==null?trText("O'yinchini tanlang"):KT(`${esc(mfName(mfPick))} chiqarilsin`,`Исключить: ${esc(mfName(mfPick))}`,`Eliminate ${esc(mfName(mfPick))}`)}</button>
+    <button class="btn alt" id="mfnone">Hech kim chiqarilmadi</button>${mfHostBox()}`;
+  mfBindTop();mfBindHost();
+  $('#screen').querySelectorAll('[data-pi]').forEach(b=>b.onclick=()=>{mfPick=+b.dataset.pi;haptic('light');mfVoteV()});
+  const fin=(out)=>{if(out!=null)MF.p[out].a=0;MF.log.push({d:MF.day,k:'v',out});MF.voted=out;MF.win=mfWin();MF.ph=MF.win?'end':'voted';mfSave();haptic('done');mfVotedV();window.scrollTo(0,0)};
+  $('#mfout').onclick=()=>{if(mfPick!=null)fin(mfPick)};$('#mfnone').onclick=()=>fin(null);
+}
+function mfVotedV(){
+  if(MF.ph==='end')return mfEndV();
+  const o=MF.voted;
+  $('#screen').innerHTML=`${mfTop(KT(`${MF.day}-kun`,`День ${MF.day}`,`Day ${MF.day}`))}
+    <section class="card mf-big"><div class="mf-ic">⚖️</div>${o!=null?`<h3 data-notr>${KT(`${esc(mfName(o))} o'yindan chiqarildi`,`${esc(mfName(o))} исключён(а) из игры`,`${esc(mfName(o))} has been voted out`)}</h3>${MF.reveal?`<p class="mf-rv">${MF_R[MF.p[o].r].ic} <span>${MF_R[MF.p[o].r].n}</span></p>`:''}`:`<h3>Bugun hech kim chiqarilmadi</h3>`}
+      <p class="note">Shahar yana uxlashga yotadi.</p></section>
+    <button class="btn" id="mfnn">Kechaga o'tish</button>${mfHostBox()}`;
+  mfBindTop();mfBindHost();$('#mfnn').onclick=()=>{MF.day++;mfNightStart()};
+}
+function mfEndV(){
+  clearInterval(mfTimer);const w=MF.win,nm=i=>i==null?'—':esc(mfName(i));
+  const log=MF.log.map(e=>e.k==='n'?KT(`${e.d}-kecha: mafiya → ${nm(e.kill)}; doktor → ${nm(e.heal)}${e.kom!=null?`; komissar → ${nm(e.kom)}`:''}. ${e.out!=null?`Chiqdi: ${nm(e.out)}`:e.saved?'Doktor qutqardi':'Hech kim chiqmadi'}`,
+      `Ночь ${e.d}: мафия → ${nm(e.kill)}; доктор → ${nm(e.heal)}${e.kom!=null?`; комиссар → ${nm(e.kom)}`:''}. ${e.out!=null?`Выбыл(а): ${nm(e.out)}`:e.saved?'Доктор спас':'Никто не выбыл'}`,
+      `Night ${e.d}: mafia → ${nm(e.kill)}; doctor → ${nm(e.heal)}${e.kom!=null?`; commissioner → ${nm(e.kom)}`:''}. ${e.out!=null?`Out: ${nm(e.out)}`:e.saved?'Saved by the doctor':'Nobody out'}`)
+    :KT(`${e.d}-kun ovozi: ${e.out!=null?`chiqarildi ${nm(e.out)}`:'hech kim chiqarilmadi'}`,`Голосование дня ${e.d}: ${e.out!=null?`исключён(а) ${nm(e.out)}`:'никто не исключён'}`,`Day ${e.d} vote: ${e.out!=null?`${nm(e.out)} voted out`:'nobody voted out'}`));
+  $('#screen').innerHTML=`<section class="card mf-big mf-end ${w==='m'?'mf-m':'mf-t'}"><div class="mf-ic">${w==='m'?'🕶':'🎉'}</div><h3>${w==='m'?"Mafiya g'alaba qozondi":"Tinch aholi g'alaba qozondi"}</h3>
+      <p class="note">${w==='m'?"Mafiyachilar soni tinch aholiga tenglashdi.":"Barcha mafiyachilar topildi."}</p></section>
+    <section class="card"><div class="label">Hamma rollar</div><div class="mf-list">${MF.p.map(x=>`<div class="${x.a?'':'dead'}"><span data-noi18n>${esc(x.n)}</span><span>${MF_R[x.r].ic} ${MF_R[x.r].n}</span></div>`).join('')}</div></section>
+    <details class="card mf-host"><summary>O'yin tarixi</summary><div class="mf-log" data-notr data-noi18n>${log.map(l=>`<p>${l}</p>`).join('')}</div></details>
+    <button class="btn" id="mfagain">Shu tarkib bilan qayta o'ynash</button>
+    <button class="btn alt" id="mfset">Sozlamalarga qaytish</button>`;
+  $('#mfagain').onclick=()=>mfStart(mfSetupGet());
+  $('#mfset').onclick=()=>{MF=null;store.set('mf',null);viewMafia();window.scrollTo(0,0)};
+}
+function mfRules(){
+  const s=kkSheet(`<h3>Mafiya qoidalari</h3>
+    <p class="note" style="margin:0">O'yinchilar ikki jamoaga bo'linadi: <b>mafiya</b> va <b>tinch aholi</b>. Har kim faqat o'z rolini biladi. O'yinni boshlovchi olib boradi va telefon uning qo'lida bo'ladi.</p>
+    <div class="mf-rules">${MF_ORDER.map(k=>`<div><span>${MF_R[k].ic}</span><p><b>${MF_R[k].n}</b>${MF_R[k].d}</p></div>`).join('')}</div>
+    <p class="note" style="margin:0"><b>Kecha:</b> hamma ko'zini yumadi, rollar navbat bilan uyg'onadi. <b>Tong:</b> boshlovchi kim chiqqanini e'lon qiladi. <b>Kunduz:</b> muhokama, keyin ovoz berish. Mafiya hammasi topilsa — tinch aholi, mafiya soni tinch aholiga tenglashsa — mafiya g'alaba qiladi.</p>
+    <button class="btn" id="mfrok">Tushunarli</button>`);
+  $('#mfrok').onclick=()=>s.remove();
+}
 
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava,sert:viewSert};
 /* ---------- ASOSIY ---------- */
@@ -4254,6 +4501,7 @@ function viewHome(){
     </section>
     <div class="tiles">${tiles.map(([k,l,s])=>`<button class="tile" data-go="${k==='qibla'||k==='tasbeh'?'namoz':k}" ${k==='qibla'||k==='tasbeh'?`data-pv="${k}"`:''}><span class="t-ic" style="background:linear-gradient(135deg,${TILE_COL[k][0]},${TILE_COL[k][1]})">${ICONS[k]||TOOLIC[k]}</span><span><b>${l}</b><small>${s}</small></span></button>`).join('')}</div>
     <button class="card pv-main" data-go="kkal" style="margin:0;background:linear-gradient(135deg,#0f5132,#2fa36b)"><span class="pv-ic">${ICONS.kkal}</span><span><b>Kaloriya hisoblagich</b><small>Ovqatni suratga oling · kunlik norma</small></span><span class="pv-go">→</span></button>
+    <button class="card pv-main" data-go="mafia" style="margin:0;background:linear-gradient(135deg,#2b0f14,#8e1b2b)"><span class="pv-ic">${ICONS.mafia}</span><span><b>Mafiya o'yini</b><small>Davrada o'ynash · ilova boshlovchiga yordam beradi</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="prava" style="margin:0;background:linear-gradient(135deg,#4a3200,#d99a00)"><span class="pv-ic">${ICONS.prava}</span><span><b>Prava imtihoniga tayyorlaning</b><small>Imtihon rejimi · xatolar ustida ishlash · yo'l belgilari</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="sert" style="margin:0;background:linear-gradient(135deg,#2a1a6e,#6a4fd6)"><span class="pv-ic">∑</span><span><b>Milliy sertifikatga tayyorlaning</b><small>8 fan · imtihon rejimi · izohli savollar</small></span><span class="pv-go">→</span></button>
     ${STAT.admin?`<button class="card pv-main" data-go="admin" data-noi18n style="margin:0;background:linear-gradient(135deg,#14224d,#3563d4)"><span class="pv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg></span><span><b>Statistika</b><small>Admin panel · faqat siz ko'rasiz</small></span><span class="pv-go">→</span></button>`:''}
@@ -4282,7 +4530,7 @@ function viewHome(){
 }
 
 /* ---------- ADMIN PANEL: statistika ---------- */
-const AD_SEC={home:'Asosiy',namoz:'Namoz',food:'Taomlar',cash:'Valyuta',quiz:'Viktorina',kids:'Bolalar',audio:'Audio',doc:'Hujjatlar',prava:'Prava',sert:'Sertifikat',admin:'Admin panel',game:"Bolalar o'yinlari",ertak:'Ertaklar',cook:'Pishirish rejimi',pv_exam:'Prava imtihoni',sr_exam:'Sertifikat imtihoni',kkal:'Kaloriya',kk_photo:'Kaloriya: surat tahlili'};
+const AD_SEC={home:'Asosiy',namoz:'Namoz',food:'Taomlar',cash:'Valyuta',quiz:'Viktorina',kids:'Bolalar',audio:'Audio',doc:'Hujjatlar',prava:'Prava',sert:'Sertifikat',admin:'Admin panel',game:"Bolalar o'yinlari",ertak:'Ertaklar',cook:'Pishirish rejimi',pv_exam:'Prava imtihoni',sr_exam:'Sertifikat imtihoni',kkal:'Kaloriya',kk_photo:'Kaloriya: surat tahlili',mafia:'Mafiya',mafia_game:'Mafiya: yangi o\'yin'};
 const AD_PF={android:'Android',ios:'iPhone (iOS)',tdesktop:'Kompyuter (Telegram Desktop)',macos:'Mac',weba:'Telegram Web',webk:'Telegram Web',web:'Telegram Web',unigram:'Windows (Unigram)','?':"Noma'lum"};
 const AD_LANG={uz:"O'zbekcha (lotin)",uzc:"O'zbekcha (kirill)",ru:'Ruscha',en:'Inglizcha','?':"Noma'lum"};
 function adSrc(k){if(k==='bot')return 'Bot: /start';if(k==='app')return 'Ilova havolasi';if(k==='?')return "Eski foydalanuvchi (manba noma'lum)";if(k==='prava')return 'Prava havolasi';if(/^ertak_/.test(k))return 'Ertak ulashilgan';if(/^r_/.test(k))return 'Retsept havolasi';return k}
@@ -4373,7 +4621,7 @@ function renderAdmin(j){
     try{for(let k=0;k<1000;k++){b.textContent=`Tekshirilmoqda… ${fmt(al+bl)}`;const r=await adPost('/admin/check',{after});if(!r||!r.ok)throw 0;al+=r.alive;bl+=r.blocked;after=r.next;if(r.done)break}
       toast(`Tayyor: ${fmt(al)} faol, ${fmt(bl)} bloklagan`);adBusy=false;if(current==='admin')viewAdmin()}catch(e){adBusy=false;b.textContent="Xatolik — qayta urinish"}};
 }
-VIEWS.home=viewHome;VIEWS.audio=viewAudio;VIEWS.admin=viewAdmin;VIEWS.kkal=()=>{kkView='day';kkPick=null;kkPh=null;kkOff=0;kkQ='';viewKkal()};
+VIEWS.home=viewHome;VIEWS.audio=viewAudio;VIEWS.admin=viewAdmin;VIEWS.mafia=viewMafia;VIEWS.kkal=()=>{kkView='day';kkPick=null;kkPh=null;kkOff=0;kkQ='';viewKkal()};
 (function(){const n=uzNow();$('#todaychip').textContent=`${n.getUTCDate()}-${OYLAR[n.getUTCMonth()].slice(0,3)}`})();
 if(!VIEWS[current]) current='home';
 renderTabs(); setHero(current); VIEWS[current](); loadRates();
