@@ -1,0 +1,9 @@
+{
+  "name": "hamroh-bot",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --no-warnings --test test/*.test.mjs",
+    "coverage": "mkdir -p coverage && node --no-warnings --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info test/*.test.mjs"
+  }
+}

@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-8
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-9
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -78,32 +78,49 @@ async function handleHello(req,env){
   const user=await verifyInit(form.get('initData')||'',env.BOT_TOKEN);if(!user||!user.id)return J({ok:false,error:'auth'},403);
   const r=await sendStart(env,user.id,await cfg(),true);return J({ok:!!r.ok,error:r.description},r.ok?200:502);
 }
+// Bot buyruqlari: har biri o'z funksiyasida, onMessage faqat yo'naltiradi.
+const say=(env,chat,text,extra={})=>tg(env,'sendMessage',{chat_id:chat,text,...extra});
+const HUJJAT_TEXT=`📄 <b>Hujjatlar bilan ishlash</b>\n\n• Rasmlardan PDF\n• PDF birlashtirish\n• Sahifalarni ajratish\n• PDF → rasm\n• Rasmdan matn (o‘zbek, rus, ingliz)\n• Rasmni siqish\n• Lotin ↔ Kirill\n\nTayyor fayl shu chatga yuboriladi.`;
+const HELP_TEXT=`<b>Hamroh bot buyruqlari</b>\n\n/start — bosh sahifa\n/namoz — bugungi namoz vaqtlari\n/kurs — valyuta kursi\n/taom — bugun nima pishiramiz?\n/hujjat — PDF va hujjatlar\n\nTo‘liq imkoniyatlar — «Hamroh» ilovasida.`;
+async function cmdTaom(env,chat){
+  const C=await cfg(),DL=(C.dishes&&C.dishes.length)?C.dishes:DISHES,n=DL[Math.floor(Math.random()*DL.length)];
+  return say(env,chat,`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,{parse_mode:'HTML',
+    reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',web_app:{url:APP_URL+'?r='+slug(n)}}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}});
+}
+const COMMANDS={
+  '/namoz':(env,chat)=>say(env,chat,namozText(0)+'\n\nHududni tanlang:',{parse_mode:'HTML',reply_markup:regionKb()}),
+  '/kurs':async(env,chat)=>say(env,chat,await kursText(),{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('💱 Konvertorni ochish')]]}}),
+  '/taom':cmdTaom,
+  '/hujjat':(env,chat)=>say(env,chat,HUJJAT_TEXT,{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('📄 Hujjatlar bo‘limini ochish',APP_URL+'?t=doc')]]}}),
+  '/yordam':(env,chat)=>say(env,chat,HELP_TEXT,{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()]]}})
+};
+COMMANDS['/help']=COMMANDS['/yordam'];
+// /admin KOD — adminlikni olish; /stats — statistika. Admin bo'lmasa, javob bermaydi (true qaytarmaydi).
+// kodli xabar darhol o'chiriladi; kod to'g'ri bo'lsa admin qo'shiladi. Xesh env.ADMIN_HASH bilan almashtirilishi mumkin.
+async function claimAdmin(env,msg,db,code){
+  try{await tg(env,'deleteMessage',{chat_id:msg.chat.id,message_id:msg.message_id})}catch(e){}
+  if(await sha256hex(code)!==(env.ADMIN_HASH||ADMIN_HASH)){await say(env,msg.chat.id,'Kod noto‘g‘ri.');return false}
+  await addAdmin(db,msg.from.id);return true;
+}
+async function cmdAdmin(env,msg,cmd,text){
+  const chat=msg.chat.id,db=await D(env).catch(()=>null);
+  if(!db){await say(env,chat,'Statistika bazasi hali ulanmagan (Cloudflare → Bindings → D1 → DB).');return true}
+  const code=cmd==='/admin'?(text.split(/\s+/)[1]||'').trim():'';
+  if(code&&!await claimAdmin(env,msg,db,code))return true;
+  if(!await isAdmin(db,msg.from.id))return false;
+  await say(env,chat,(code?'✅ Siz admin bo‘ldingiz.\n\n':'')+await statsText(env,db),{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('📊 Admin panelni ochish',APP_URL+'?t=admin')]]}});
+  return true;
+}
+const ADMIN_CMDS=['/admin','/stats'];
+const adminRoute=(env,msg,priv,cmd,text)=>priv&&ADMIN_CMDS.includes(cmd)?cmdAdmin(env,msg,cmd,text):false;
+const cmdOf=text=>text.split(/[\s@]/)[0].toLowerCase();
 async function onMessage(env,msg){
-  const C=await cfg(); const ST=C.start||START, DL=(C.dishes&&C.dishes.length)?C.dishes:DISHES;
-  const chat=msg.chat.id, text=(msg.text||'').trim(), cmd=text.split(/[\s@]/)[0].toLowerCase();
-  if(msg.chat.type!=='private'&&!text.startsWith('/'))return;
-  if(cmd==='/start'){await sendStart(env,chat,C,msg.chat.type==='private');return}
-  if((cmd==='/admin'||cmd==='/stats')&&msg.chat.type==='private'){
-    const db=await D(env).catch(()=>null);
-    if(!db) return tg(env,'sendMessage',{chat_id:chat,text:'Statistika bazasi hali ulanmagan (Cloudflare → Bindings → D1 → DB).'});
-    const code=cmd==='/admin'?(text.split(/\s+/)[1]||'').trim():'';
-    if(code){
-      try{await tg(env,'deleteMessage',{chat_id:chat,message_id:msg.message_id})}catch(e){}
-      if(await sha256hex(code)!==ADMIN_HASH) return tg(env,'sendMessage',{chat_id:chat,text:'Kod noto‘g‘ri.'});
-      await addAdmin(db,msg.from.id);
-    }
-    if(await isAdmin(db,msg.from.id)) return tg(env,'sendMessage',{chat_id:chat,parse_mode:'HTML',text:(code?'✅ Siz admin bo‘ldingiz.\n\n':'')+await statsText(env,db),reply_markup:{inline_keyboard:[[appBtn('📊 Admin panelni ochish',APP_URL+'?t=admin')]]}});
-  }
-  if(cmd==='/namoz') return tg(env,'sendMessage',{chat_id:chat,text:namozText(0)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()});
-  if(cmd==='/kurs') return tg(env,'sendMessage',{chat_id:chat,text:await kursText(),parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('💱 Konvertorni ochish')]]}});
-  if(cmd==='/taom'){const n=DL[Math.floor(Math.random()*DL.length)];
-    return tg(env,'sendMessage',{chat_id:chat,text:`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,parse_mode:'HTML',
-      reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',web_app:{url:APP_URL+'?r='+slug(n)}}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
-  if(cmd==='/hujjat') return tg(env,'sendMessage',{chat_id:chat,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('📄 Hujjatlar bo‘limini ochish',APP_URL+'?t=doc')]]},
-    text:`📄 <b>Hujjatlar bilan ishlash</b>\n\n• Rasmlardan PDF\n• PDF birlashtirish\n• Sahifalarni ajratish\n• PDF → rasm\n• Rasmdan matn (o‘zbek, rus, ingliz)\n• Rasmni siqish\n• Lotin ↔ Kirill\n\nTayyor fayl shu chatga yuboriladi.`});
-  if(cmd==='/yordam'||cmd==='/help') return tg(env,'sendMessage',{chat_id:chat,parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()]]},
-    text:`<b>Hamroh bot buyruqlari</b>\n\n/start — bosh sahifa\n/namoz — bugungi namoz vaqtlari\n/kurs — valyuta kursi\n/taom — bugun nima pishiramiz?\n/hujjat — PDF va hujjatlar\n\nTo‘liq imkoniyatlar — «Hamroh» ilovasida.`});
-  if(msg.chat.type==='private') return tg(env,'sendMessage',{chat_id:chat,text:'Quyidagi tugma orqali ilovani oching yoki /yordam ni bosing.',reply_markup:{inline_keyboard:[[appBtn()]]}});
+  const chat=msg.chat.id,priv=msg.chat.type==='private',text=String(msg.text||'').trim(),cmd=cmdOf(text);
+  if(!priv&&!text.startsWith('/'))return;
+  if(cmd==='/start')return sendStart(env,chat,await cfg(),priv);
+  if(await adminRoute(env,msg,priv,cmd,text))return;
+  if(COMMANDS[cmd])return COMMANDS[cmd](env,chat);
+  if(priv)return say(env,chat,'Quyidagi tugma orqali ilovani oching yoki /yordam ni bosing.',{reply_markup:{inline_keyboard:[[appBtn()]]}});
 }
 async function onCallback(env,q){
   const C=await cfg(); const DL=(C.dishes&&C.dishes.length)?C.dishes:DISHES;
@@ -305,17 +322,38 @@ function foodTool(cat){
       required:['id','name','n','g','kcal100','conf']}}},
     required:['seen','shared','items']}};
 }
+// AI javobini bir xil shaklga keltiradi. Kirish nuqtasi: foodParse; qolganlari kichik, sof yordamchilar.
+const clampInt=(v,lo,hi)=>Math.max(lo,Math.min(hi,Math.round(+v||0)));
+const optStr=(key,v,n)=>typeof v==='string'&&v?{[key]:v.slice(0,n)}:{};
+const optOneOf=(key,v,list)=>list.includes(v)?{[key]:v}:{};
+const optCount=v=>+v>0&&+v<=50?{n:Math.round(+v)}:{};
+function aiPayload(r){
+  if(!r)return r;
+  if(r.response!==undefined)return r.response;
+  const c=r.choices&&r.choices[0];
+  return c&&c.message&&c.message.content;
+}
+function looseJson(t){
+  if(t&&typeof t==='object')return t;
+  if(typeof t!=='string')return null;
+  const a=t.indexOf('{'),b=t.lastIndexOf('}');
+  if(a<0)return null;
+  try{return JSON.parse(t.slice(a,b+1))}catch(e){return null}
+}
+function itemList(j){
+  if(Array.isArray(j))return j;
+  return j&&Array.isArray(j.items)?j.items:null;
+}
+function foodItem(x,ids){
+  const id=typeof x.id==='string'&&ids&&ids.has(x.id)?x.id:null;
+  return {id,name:String(x.name||'').slice(0,40),g:clampInt(x.g,0,3000),kcal100:clampInt(x.kcal100,0,900),
+    ...optStr('uz',x.uz,40),...optStr('ru',x.ru,40),...optCount(x.n),
+    ...optOneOf('size',x.size,['small','medium','large']),...optOneOf('conf',x.conf,['high','medium','low'])};
+}
 function foodParse(r,ids){
-  let t=r&&(r.response!==undefined?r.response:(r.choices&&r.choices[0]&&r.choices[0].message&&r.choices[0].message.content));
-  let j=null;
-  if(t&&typeof t==='object')j=t;
-  else if(typeof t==='string'){const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a>=0&&b>a){try{j=JSON.parse(t.slice(a,b+1))}catch(e){}}}
-  if(!j)return null;
-  const arr=Array.isArray(j)?j:Array.isArray(j.items)?j.items:null;if(!arr)return null;
-  const items=arr.slice(0,8).filter(x=>x&&typeof x==='object').map(x=>({id:ids&&typeof x.id==='string'&&ids.has(x.id)?x.id:null,name:String(x.name||'').slice(0,40),
-    g:Math.max(0,Math.min(3000,Math.round(+x.g||0))),kcal100:Math.max(0,Math.min(900,Math.round(+x.kcal100||0))),
-    ...(typeof x.uz==='string'&&x.uz?{uz:x.uz.slice(0,40)}:{}),...(typeof x.ru==='string'&&x.ru?{ru:x.ru.slice(0,40)}:{}),
-    ...(+x.n>0&&+x.n<=50?{n:Math.round(+x.n)}:{}),...(['small','medium','large'].includes(x.size)?{size:x.size}:{}),...(['high','medium','low'].includes(x.conf)?{conf:x.conf}:{})})).filter(x=>x.id||x.name);
+  const j=looseJson(aiPayload(r)),arr=itemList(j);
+  if(!arr)return null;
+  const items=arr.slice(0,8).filter(x=>x&&typeof x==='object').map(x=>foodItem(x,ids)).filter(x=>x.id||x.name);
   return {items,seen:typeof j.seen==='string'?j.seen.slice(0,240):'',shared:j.shared===true};
 }
 function b64bytes(d){const s=atob(d.slice(d.indexOf(',')+1)),a=new Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
@@ -363,29 +401,54 @@ async function foodAI(env,AI,img,cat){
 }
 // Workers AI binding'ini nomidan qat'i nazar topadi (AI, AL va h.k.)
 function aiBinding(env){if(env.AI)return env.AI;for(const k in env){const v=env[k];if(v&&typeof v==='object'&&typeof v.run==='function'&&typeof v.prepare!=='function')return v}return null}
-async function handleFood(req,env){
-  let f;try{f=await req.formData()}catch(e){return J({ok:false,error:'img'},400)}
-  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false,error:'auth'},403);
-  const AI=aiBinding(env),CL=!!env.ANTHROPIC_API_KEY;if(!AI&&!CL)return J({ok:false,error:'noai'});
+// POST /food: suratdan taomni aniqlash. Bosqichlar: so'rovni tekshirish -> limit -> AI -> javob.
+const IMG_RE=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+const validImg=img=>img.length<=1500000&&IMG_RE.test(img);
+const errMsg=e=>String((e&&e.message)||e);
+async function foodRequest(req,env){
+  let f;try{f=await req.formData()}catch(e){return {fail:J({ok:false,error:'img'},400)}}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);
+  if(!u||!u.id)return {fail:J({ok:false,error:'auth'},403)};
+  const AI=aiBinding(env),CL=!!env.ANTHROPIC_API_KEY;
+  if(!AI&&!CL)return {fail:J({ok:false,error:'noai'})};
   const img=String(f.get('img')||'');
-  if(img.length>1500000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(img))return J({ok:false,error:'img'},400);
-  const db=await D(env).catch(()=>null),day=dstr(Date.now());
-  const userMax=+env.FOOD_USER_DAY||FOOD_USER_DAY,allMax=+env.FOOD_ALL_DAY||(CL?1000:FOOD_ALL_DAY); // Claude bilan ~0,0004$/surat
-  let used=0,admin=false;
-  if(db){try{
-    const r=await db.batch([db.prepare('SELECT n FROM food WHERE day=?1 AND uid=?2').bind(day,u.id),db.prepare('SELECT COALESCE(SUM(n),0) s FROM food WHERE day=?1').bind(day),db.prepare("SELECT v FROM meta WHERE k='admins'")]);
-    used=(r[0].results[0]&&r[0].results[0].n)||0;const all=(r[1].results[0]&&r[1].results[0].s)||0;
-    admin=(((r[2].results[0]&&r[2].results[0].v)||'').split(',')).includes(String(u.id));
-    if(!admin&&used>=userMax)return J({ok:false,error:'limit',left:0});
-    if(!admin&&all>=allMax)return J({ok:false,error:'busy'});
-  }catch(e){console.log('food db',e)}}
-  const cat=await kkCatalog();
-  let res=null;const errs=[];
-  if(CL){try{res=await foodClaude(env,img,cat)}catch(e){console.log('food claude',e);errs.push(String((e&&e.message)||e))}}
-  if(!res&&AI){try{res=await foodAI(env,AI,img,cat)}catch(e){console.log('food ai',e);errs.push(String((e&&e.message)||e))}}
-  if(!res)return J({ok:false,error:!CL&&/^QUOTA/.test(errs.join(' '))?'busy':'ai',...(admin?{why:errs.join(' || ').slice(0,500)}:{})});
-  if(db)await db.prepare('INSERT INTO food(day,uid,n) VALUES(?1,?2,1) ON CONFLICT(day,uid) DO UPDATE SET n=n+1').bind(day,u.id).run().catch(()=>{});
-  return J({ok:true,items:res.items,shared:!!res.shared,left:Math.max(0,userMax-used-1),...(admin?{model:res.m,seen:res.seen}:{})});
+  if(!validImg(img))return {fail:J({ok:false,error:'img'},400)};
+  return {u,img,AI,CL};
+}
+function foodLimits(env,CL){return {user:+env.FOOD_USER_DAY||FOOD_USER_DAY,all:+env.FOOD_ALL_DAY||(CL?1000:FOOD_ALL_DAY)}} // Claude bilan ~0,0004$/surat
+const firstVal=(r,key)=>(r.results[0]&&r.results[0][key])||0;
+async function foodQuota(db,day,uid,lim){
+  const q={used:0,admin:false,fail:null};
+  if(!db)return q;
+  try{
+    const r=await db.batch([db.prepare('SELECT n FROM food WHERE day=?1 AND uid=?2').bind(day,uid),db.prepare('SELECT COALESCE(SUM(n),0) s FROM food WHERE day=?1').bind(day),db.prepare("SELECT v FROM meta WHERE k='admins'")]);
+    q.used=firstVal(r[0],'n');
+    q.admin=String(firstVal(r[2],'v')||'').split(',').includes(String(uid));
+    if(q.admin)return q;
+    if(q.used>=lim.user)q.fail=J({ok:false,error:'limit',left:0});
+    else if(firstVal(r[1],'s')>=lim.all)q.fail=J({ok:false,error:'busy'});
+  }catch(e){console.log('food db',e)}
+  return q;
+}
+async function recognise(env,rq,cat){
+  const errs=[];
+  const tryOne=async run=>{try{return await run()}catch(e){console.log('food',e);errs.push(errMsg(e));return null}};
+  let res=rq.CL?await tryOne(()=>foodClaude(env,rq.img,cat)):null;
+  if(!res&&rq.AI)res=await tryOne(()=>foodAI(env,rq.AI,rq.img,cat));
+  return {res,errs};
+}
+function foodFailure(rq,errs,admin){
+  const busy=!rq.CL&&/^QUOTA/.test(errs.join(' '));
+  return J({ok:false,error:busy?'busy':'ai',...(admin?{why:errs.join(' || ').slice(0,500)}:{})});
+}
+async function handleFood(req,env){
+  const rq=await foodRequest(req,env);if(rq.fail)return rq.fail;
+  const db=await D(env).catch(()=>null),day=dstr(Date.now()),lim=foodLimits(env,rq.CL);
+  const q=await foodQuota(db,day,rq.u.id,lim);if(q.fail)return q.fail;
+  const {res,errs}=await recognise(env,rq,await kkCatalog());
+  if(!res)return foodFailure(rq,errs,q.admin);
+  if(db)await db.prepare('INSERT INTO food(day,uid,n) VALUES(?1,?2,1) ON CONFLICT(day,uid) DO UPDATE SET n=n+1').bind(day,rq.u.id).run().catch(()=>{});
+  return J({ok:true,items:res.items,shared:!!res.shared,left:Math.max(0,lim.user-q.used-1),...(q.admin?{model:res.m,seen:res.seen}:{})});
 }
 // foydalanuvchi AI natijasini qanday tuzatganini yig'adi (rasm saqlanmaydi, faqat taom kodlari)
 async function handleFoodFix(req,env){
