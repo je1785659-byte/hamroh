@@ -747,6 +747,13 @@ body.bl-play nav.tabs{display:none}
 .bl3-sph{display:flex;flex-direction:column;gap:3px;font-size:12px;color:rgba(255,255,255,.75);align-self:stretch}
 .bl3-spa{display:flex;gap:8px;align-self:stretch}.bl3-spa .btn{flex:1}
 .bl3-spa .chip{background:transparent;color:#fff;border-color:rgba(255,255,255,.25)}
+#blff.on{background:#e3a234;color:#1a1300}
+.bl3-tut{position:absolute;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;z-index:4}
+.bl3-tutc{background:rgba(16,20,24,.96);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:20px 18px 16px;width:min(330px,calc(100% - 32px));display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.bl3-tuti{font-size:46px;line-height:1.1;animation:bltut 1.6s ease-in-out infinite}
+@keyframes bltut{0%,100%{transform:translateX(-8px)}50%{transform:translateX(8px)}}
+.bl3-tutc small{color:rgba(255,255,255,.55);font-size:11.5px}
+.bl3-tutc b{font-size:17px}.bl3-tutc p{margin:0 0 6px;font-size:13.5px;line-height:1.45;color:rgba(255,255,255,.82)}
 .mf-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
 .mf-h b{font-family:var(--display);font-size:17px}
 .mf-names{display:flex;flex-direction:column;gap:6px}
@@ -3959,7 +3966,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101c';
+const APP_VER='20261101d';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -4763,13 +4770,27 @@ function blBotPlace(G,balls){
   for(let y=G.house?BL.head.y+0.02:0.15;y<1.9;y+=G.house?0.06:0.12)for(let x=0.12;x<0.9;x+=0.12){if(!blCanPlace(G,balls,x,y))continue;const ox=c.x,oy=c.y;c.x=x;c.y=y;const p=blPlan(G,balls);c.x=ox;c.y=oy;if(!best||p.score>best.s)best={s:p.score,x,y}}
   if(best){c.x=best.x;c.y=best.y}
 }
+// Zarbaning oldindan ko'rinishi: haqiqiy fizikada nusxa ustida; urilgandan keyingi biton va urilgan shar yo'li
+function blPredict(balls,ang,power,spin,len=0.45){
+  const B=balls.map(b=>({...b,vx:0,vy:0,wx:0,wy:0,wz:0})),c=blCue(B);blShoot(B,ang,power,spin);
+  const ev={first:null,potted:[],snd:[],rail:false},cue=[],obj=[];let hit=null,lc=null,lo=null,dc=0,doo=0;
+  for(let t=0;t<4&&blMoving(B);t+=1/240){
+    const before=ev.first;blStep(B,1/240,ev);
+    if(before==null&&ev.first!=null){hit=B.find(b=>b.id===ev.first);lc=[c.x,c.y];lo=[hit.x,hit.y];cue.push(lc);obj.push(lo)}
+    if(hit==null)continue;
+    if(dc<len&&!c.in){const d=Math.hypot(c.x-lc[0],c.y-lc[1]);if(d>0.012){dc+=d;lc=[c.x,c.y];cue.push(lc)}}
+    if(doo<len*1.6&&!hit.in){const d=Math.hypot(hit.x-lo[0],hit.y-lo[1]);if(d>0.012){doo+=d;lo=[hit.x,hit.y];obj.push(lo)}}
+    if(dc>=len&&(doo>=len*1.6||hit.in))break;
+  }
+  return {cue,obj,first:ev.first,pot:ev.potted.filter(id=>id)};
+}
 
 /* ---------- BILYARD: 3D ekran, boshqaruv, ovoz ---------- */
 const BL_COL={1:'#f4c20d',2:'#1e4fd6',3:'#d32f2f',4:'#6a1b9a',5:'#f57c00',6:'#2e7d32',7:'#8b1e1e',8:'#111111'};
 const blColor=id=>BL_COL[id>8?id-8:id];
 const BL_RAIL=0.075;
 let BLS=store.get('bl',null);if(BLS&&!BLS.game)BLS.game='8';
-let blSpin={a:0,b:0},blRAF=null,blAng=-Math.PI/2,blPow=0,blBusy=false,blEv=null,blMsg='',blAudio=null,blNB=null,blSc=1,blBotT=null,blR=null,blHandView=false,blStroke=null;
+let blFF=1,blRec=null,blSimT=0,blLast=null,blReplay=null,blSpin={a:0,b:0},blRAF=null,blAng=-Math.PI/2,blPow=0,blBusy=false,blEv=null,blMsg='',blAudio=null,blNB=null,blSc=1,blBotT=null,blR=null,blHandView=false,blStroke=null;
 const blPyr=()=>!!BLS&&BLS.game==='pyr';
 const blSave=()=>{try{store.set('bl',BLS&&{...BLS,balls:BLS.balls.map(b=>({id:b.id,x:b.x,y:b.y,vx:0,vy:0,in:b.in}))})}catch(e){}};
 const blBot=()=>BLS&&BLS.mode==='bot';
@@ -4853,7 +4874,7 @@ function blGameV(){
     <div class="bl3-top"><button class="bl3-ib" id="blmenu" aria-label="Menyu">←</button><div class="bl3-pls" id="blpls"></div><button class="bl3-ib" id="blsnd" aria-label="Ovoz">${store.get('bl_snd',true)?'🔊':'🔇'}</button></div>
     <div class="bl3-msg" id="blmsg" data-notr hidden></div>
     <div class="bl3-pow" id="blpow"><div class="bl3-pt"><i id="blpowi"></i></div><span>Zarba</span></div>
-    <div class="bl3-bot" id="blbotbar"><button class="bl3-ib" id="blcam" hidden></button><button class="bl3-ib bl3-spb" id="blspin" aria-label="Vint"><i id="blspd"></i></button><button class="bl3-ib" id="blL" aria-label="Chapga">◀</button><button class="bl3-ib" id="blR" aria-label="O'ngga">▶</button><button class="bl3-ib" id="blnew">Yangi o'yin</button></div>
+    <div class="bl3-bot" id="blbotbar"><button class="bl3-ib" id="blcam" hidden></button><button class="bl3-ib bl3-spb" id="blspin" aria-label="Vint"><i id="blspd"></i></button><button class="bl3-ib" id="blL" aria-label="Chapga">◀</button><button class="bl3-ib" id="blR" aria-label="O'ngga">▶</button><button class="bl3-ib" id="blff" hidden aria-label="Tezlatish">⏩</button><button class="bl3-ib" id="blrep" hidden aria-label="Qayta ko'rish">🔁</button><button class="bl3-ib" id="blnew">Yangi o'yin</button></div>
     <div class="bl3-sp" id="blsp" hidden><div class="bl3-spc"><b>Vint: biton qayeriga urasiz?</b><div class="bl3-spball" id="blspball"><i class="bl3-splim"></i><i id="blspdot"></i></div>
       <div class="bl3-sph"><span>⬆ yuqori — biton oldinga ketadi</span><span>⬇ past — biton orqaga qaytadi</span><span>⬅ ➡ yon — bortdan burilib qaytadi</span></div>
       <div class="bl3-spa"><button class="chip" id="blsp0">Markaz</button><button class="btn" id="blspok">Tayyor</button></div></div></div>
@@ -4865,6 +4886,8 @@ function blGameV(){
   let rep=null;const hold=(id,d)=>{const b=$(id);b.onpointerdown=e=>{e.preventDefault();if(!blCanAim())return;blAng+=d;clearInterval(rep);let n=0;rep=setInterval(()=>{if(blCanAim())blAng+=d*Math.min(8,1+(n++)/8)},50)};b.onpointerup=b.onpointerleave=b.onpointercancel=()=>clearInterval(rep)};
   hold('#blL',-0.0008);hold('#blR',0.0008);
   $('#blspin').onclick=()=>{if(blCanAim())$('#blsp').hidden=false};
+  $('#blff').onclick=()=>{blFF=blFF>1?1:4;blBtns()};
+  $('#blrep').onclick=()=>blStartReplay();
   $('#blspok').onclick=()=>{$('#blsp').hidden=true};$('#blsp').onclick=e=>{if(e.target.id==='blsp')$('#blsp').hidden=true};
   $('#blsp0').onclick=()=>{blSpin={a:0,b:0};blSpinUI()};
   const sb=$('#blspball');const setSp=e=>{const R=sb.getBoundingClientRect(),cx=R.left+R.width/2,cy=R.top+R.height/2;let a=(e.clientX-cx)/(R.width/2),b=-(e.clientY-cy)/(R.height/2);const m=Math.hypot(a,b);if(m>0.6){a*=0.6/m;b*=0.6/m}blSpin={a,b};blSpinUI()};
@@ -4874,8 +4897,8 @@ function blGameV(){
   blLoad3().then(ok=>{
     if(!$('#blstage')||blR)return;const v=$('#blview');v.innerHTML='';
     let r=null;if(ok){try{r=blMake3D(v)}catch(e){r=null;v.innerHTML=''}}
-    blR=r||blMake2D(v);blCamLabel();blBindView();blLoop();
-    if(blBotTurn())blBotGo();
+    blR=r||blMake2D(v);blCamLabel();blBindView();blLoop();blBtns();
+    if(!store.get('bl_tut',false))blTutorial();else if(blBotTurn())blBotGo();
   });
 }
 function blLoad3(){
@@ -4897,23 +4920,50 @@ function blHud(){
     $('#blagain').onclick=()=>blNew(BLS.mode)}
   else end.innerHTML='';
 }
+function blBtns(){const f=$('#blff'),r=$('#blrep');if(!f)return;f.hidden=!blEv;f.classList.toggle('on',blFF>1);r.hidden=!!blEv||!blLast||blBusy&&!BLS.G.over||!!blReplay}
+// ---- qayta ko'rish: oxirgi zarba sekinlashtirilgan holda ----
+function blStartReplay(){if(!blLast||blEv)return;const f0=blLast.f[0];blReplay={t:0,i:0,balls:blLast.ids.map((id,k)=>({id,x:f0.b[k][0],y:f0.b[k][1],in:f0.b[k][2],vx:0,vy:0,wx:0,wy:0,wz:0}))};$('#blmsg').hidden=true;blBtns()}
+function blStopReplay(){blReplay=null;blHud();blBtns()}
+function blReplayStep(dt){const R=blReplay,F=blLast.f,r=BL.r;R.t+=dt*0.5;while(R.i<F.length-1&&F[R.i+1].t<=R.t)R.i++;
+  const fr=F[R.i],nx=F[Math.min(F.length-1,R.i+1)],span=Math.max(1e-4,nx.t-fr.t),k=Math.max(0,Math.min(1,(R.t-fr.t)/span));
+  R.balls.forEach((b,j)=>{const x=fr.b[j][0]+(nx.b[j][0]-fr.b[j][0])*k,y=fr.b[j][1]+(nx.b[j][1]-fr.b[j][1])*k,vx=(x-b.x)/Math.max(dt*0.5,1e-4),vy=(y-b.y)/Math.max(dt*0.5,1e-4);
+    b.wx=vy/r*0.5;b.wy=-vx/r*0.5;b.x=x;b.y=y;b.in=fr.b[j][2]&&nx.b[j][2]?true:k>0.5?nx.b[j][2]:fr.b[j][2]});
+  if(R.t>F[F.length-1].t+1)blStopReplay()}
+// ---- o'rgatuvchi ----
+function blTutorial(i=0){
+  const S=[['👆↔️',"Nishon olish","Barmoqni ekranda chapga yoki o'ngga suring. Sekin sursangiz, nishon juda aniq buriladi."],
+    ['👆⚪',"Sharni tanlash","Istalgan sharga teging — kiy o'sha sharga to'g'rilanadi. ◀ ▶ tugmalari bilan millimetrlab to'g'rilang."],
+    ['👇',"Zarba","Barmoqni ekranda pastga torting — kiy orqaga tortiladi. Qancha ko'p tortsangiz, zarba shuncha kuchli. Qo'yib yuboring — zarba! O'ngdagi chiziq ham xuddi shunday ishlaydi."],
+    ['🎯',"Vint va biton yo'li","Pastdagi shar tugmasi bilan bitonning qayeriga urishni tanlang. Nuqtali chiziq bitonning urilgandan keyingi yo'lini ko'rsatadi."],
+    ['⏩🔁',"Tezlatish va qayta ko'rish","Sharlar yumalayotganda ⏩ tugmasi vaqtni tezlatadi. Zarbadan keyin 🔁 bilan uni sekin qayta ko'rasiz."]];
+  const st=$('#blstage');if(!st)return;let o=$('#bltut');if(!o){o=document.createElement('div');o.id='bltut';o.className='bl3-tut';st.appendChild(o)}
+  const [ic,h,t]=S[i],last=i===S.length-1;
+  o.innerHTML=`<div class="bl3-tutc"><div class="bl3-tuti">${ic}</div><small data-notr>${i+1} / ${S.length}</small><b>${h}</b><p>${t}</p><div class="bl3-spa"><button class="chip" id="bltsk">O'tkazib yuborish</button><button class="btn" id="bltnx">${last?'Boshladik':'Keyingi'}</button></div></div>`;
+  const done=()=>{store.set('bl_tut',true);o.remove();if(blBotTurn())blBotGo()};
+  $('#bltsk').onclick=done;$('#bltnx').onclick=()=>last?done():blTutorial(i+1);
+}
 function blSpinUI(){const p=(id,sc)=>{const d=$(id);if(d){d.style.left=(50+blSpin.a*sc)+'%';d.style.top=(50-blSpin.b*sc)+'%'}};p('#blspd',50);p('#blspdot',50)}
 function blMini(g){const ids=g==='s'?[1,2,3,4,5,6,7]:[9,10,11,12,13,14,15];return ids.map(id=>{const b=BLS.balls.find(x=>x.id===id);return `<i class="${b.in?'off':''} ${g}" style="--c:${blColor(id)}"></i>`}).join('')}
-const blCanAim=()=>BLS&&!BLS.G.over&&!blBusy&&!blBotTurn()&&!blMoving(BLS.balls)&&!!blR;
+const blCanAim=()=>BLS&&!blReplay&&!BLS.G.over&&!blBusy&&!blBotTurn()&&!blMoving(BLS.balls)&&!!blR;
 function blAimAt(p){const c=blCue(BLS.balls);if(p&&Math.hypot(p.x-c.x,p.y-c.y)>BL.r*0.5)blAng=Math.atan2(p.y-c.y,p.x-c.x)}
 function blBindView(){
-  const el=blR.dom;let st=null;
-  el.onpointerdown=e=>{if(!blCanAim())return;e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}
-    const p=blR.pick(e.clientX,e.clientY),c=blCue(BLS.balls);
-    st={x:e.clientX,y:e.clientY,moved:false,ang:blAng,place:BLS.G.hand&&!!p&&Math.hypot(p.x-c.x,p.y-c.y)<BL.r*3.2};
-    if(!st.place&&blViewMode()==='top')blAimAt(p)};
-  el.onpointermove=e=>{if(!st)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;if(Math.hypot(dx,dy)>6)st.moved=true;
+  const el=blR.dom;let st=null;const fill=v=>{const i=$('#blpowi');if(i)i.style.height=(v*100)+'%'};
+  el.onpointerdown=e=>{if(blReplay){blStopReplay();return}if(!blCanAim())return;e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}
+    const p=blR.pick(e.clientX,e.clientY),c=blCue(BLS.balls),now=performance.now();
+    st={x:e.clientX,y:e.clientY,lx:e.clientX,lt:now,mode:null,place:BLS.G.hand&&!!p&&Math.hypot(p.x-c.x,p.y-c.y)<BL.r*3.2};
+    if(!st.place&&blViewMode()==='top'){blAimAt(p);st.mode='point'}};
+  el.onpointermove=e=>{if(!st)return;
     if(st.place){const p=blR.pick(e.clientX,e.clientY);if(p&&blCanPlace(BLS.G,BLS.balls,p.x,p.y)){const c=blCue(BLS.balls);c.x=p.x;c.y=p.y}return}
-    if(!st.moved)return;
-    if(blViewMode()==='3d')blAng=st.ang+dx*0.0025;else blAimAt(blR.pick(e.clientX,e.clientY))};
+    const dx=e.clientX-st.x,dy=e.clientY-st.y;
+    if(!st.mode){if(Math.hypot(dx,dy)<10)return;st.mode=dy>Math.abs(dx)*1.2?'pull':'aim';st.y0=e.clientY;st.lx=e.clientX;st.lt=performance.now()}
+    if(st.mode==='point'){blAimAt(blR.pick(e.clientX,e.clientY));return}
+    if(st.mode==='pull'){blPow=Math.max(0,Math.min(1,(e.clientY-st.y0)/(innerHeight*0.3)));fill(blPow);return}
+    const now=performance.now(),ddx=e.clientX-st.lx,sp=Math.abs(ddx)/Math.max(1,now-st.lt);st.lx=e.clientX;st.lt=now;
+    blAng+=ddx*(sp<0.15?0.0005:sp<0.5?0.0016:0.003)};
   el.onpointerup=el.onpointercancel=e=>{if(!st)return;const s=st;st=null;
     if(s.place){blSave();return}
-    if(!s.moved&&blViewMode()==='3d'){const b=blR.pickBall(e.clientX,e.clientY);if(b)blAimAt(b)}
+    if(s.mode==='pull'){const p=blPow;fill(0);if(p>0.03&&e.type==='pointerup')blFire(blAng,p);else blPow=0;return}
+    if(!s.mode&&blViewMode()==='3d'){const b=blR.pickBall(e.clientX,e.clientY);if(b)blAimAt(b)}
     if(blHandView){blHandView=false}};
 }
 function blBindPower(el){
@@ -4926,13 +4976,15 @@ function blFire(ang,pow,spin){
   const sp=spin||{...blSpin};blBusy=true;BLS.G.hand=false;BLS.G.house=false;blHandView=false;blMsg='';blHud();
   if(blR&&blR.is3d){blPow=pow;blStroke={t0:performance.now(),ang,pow,sp}}else blShootNow(ang,pow,sp);
 }
-function blShootNow(ang,pow,sp){blPow=0;blEv={first:null,potted:[],snd:[],rail:false};blShoot(BLS.balls,ang,pow,sp);if(!blBotTurn()){blSpin={a:0,b:0};blSpinUI()}blTone('cue',pow);haptic(pow>0.6?'medium':'light')}
+function blShootNow(ang,pow,sp){blPow=0;blFF=1;blSimT=0;blRec=[{t:0,b:BLS.balls.map(b=>[b.x,b.y,b.in])}];blEv={first:null,potted:[],snd:[],rail:false};blBtns();blShoot(BLS.balls,ang,pow,sp);if(!blBotTurn()){blSpin={a:0,b:0};blSpinUI()}blTone('cue',pow);haptic(pow>0.6?'medium':'light')}
 function blLoop(){
   cancelAnimationFrame(blRAF);let last=performance.now();
   const f=now=>{if(current!=='bilyard'||!document.getElementById('blstage')){blDispose();return}
     const dt=Math.min(0.05,(now-last)/1000);last=now;
     if(blStroke){const k=(now-blStroke.t0)/110;blPow=blStroke.pow*Math.max(0,1-k*k);if(k>=1){const s=blStroke;blStroke=null;blShootNow(s.ang,s.pow,s.sp)}}
-    if(blEv){const n=Math.ceil(dt*480);for(let i=0;i<n&&blMoving(BLS.balls);i++)blStep(BLS.balls,1/480,blEv);
+    if(blReplay)blReplayStep(dt);
+    if(blEv){const n=Math.ceil(dt*480*blFF);for(let i=0;i<n&&blMoving(BLS.balls);i++)blStep(BLS.balls,1/480,blEv);
+      blSimT+=n/480;if(blRec&&blRec.length<4000)blRec.push({t:blSimT,b:BLS.balls.map(b=>[b.x,b.y,b.in])});
       const snd=blEv.snd.splice(0);let k=0;for(const [t,v] of snd){if(k++>3)break;blTone(t,v);if(t==='pocket')haptic('light')}
       if(!blMoving(BLS.balls))blSettle()}
     if(blR)blR.draw(dt);
@@ -4940,7 +4992,7 @@ function blLoop(){
   blRAF=requestAnimationFrame(f);
 }
 function blSettle(){
-  const G=BLS.G,ev=blEv,B=BLS.balls;blEv=null;blBusy=false;const me=G.turn,R=blJudge(G,B,ev),opp=blName(G.turn);
+  const G=BLS.G,ev=blEv,B=BLS.balls;blEv=null;blBusy=false;blLast=blRec&&{ids:B.map(b=>b.id),f:blRec};blRec=null;blFF=1;const me=G.turn,R=blJudge(G,B,ev),opp=blName(G.turn);
   const handTip=blBot()&&G.turn===1?'':blPyr()?KT(' — bitonni barmoq bilan suring',' — передвиньте биток пальцем',' — drag the cue ball with your finger'):KT(' — oq sharni barmoq bilan suring',' — передвиньте биток пальцем',' — drag the cue ball with your finger');
   if(blPyr()){
     for(const id of R.back)blRespot(B,id,BL.foot);
@@ -4962,7 +5014,7 @@ function blSettle(){
     else blMsg=G.turn===me?KT(`${blName(me)} yana uradi`,`${blName(me)} бьёт ещё`,`${blName(me)} shoots again`):KT(`Navbat: ${opp}`,`Ход: ${opp}`,`${opp}'s turn`);
   }
   blHandView=G.hand&&!blBotTurn();
-  blSave();blHud();
+  blSave();blHud();blBtns();
   if(blBotTurn())blBotGo();
 }
 function blBotGo(){
@@ -5078,6 +5130,8 @@ function blMake3D(v){
   const gr=new T.RingGeometry(r*0.86,r,32);gr.rotateX(-Math.PI/2);const ghostR=new T.Mesh(gr,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.9,depthWrite:false}));sc.add(ghostR);
   const hr=new T.RingGeometry(r*1.55,r*1.85,40);hr.rotateX(-Math.PI/2);const handR=new T.Mesh(hr,new T.MeshBasicMaterial({color:0xffd54a,transparent:true,opacity:0.9,depthWrite:false}));sc.add(handR);
   const hg=new T.PlaneGeometry(1,2-BL.head.y);hg.rotateX(-Math.PI/2);const house=new T.Mesh(hg,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.07,depthWrite:false}));house.position.set(0,0.0012,(BL.head.y+2)/2-1);sc.add(house);
+  let pred=null,pKey='',pT=-1;const dotG=new T.CircleGeometry(0.0032,10);dotG.rotateX(-Math.PI/2);const dotM=new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.75,depthWrite:false});
+  const dots=Array.from({length:30},()=>{const m=new T.Mesh(dotG,dotM);m.visible=false;sc.add(m);return m});
   // kiy: uchi, oq halqa, zarang tanasi, metall bo'g'in, qora yog'och dastasi
   const cue=new T.Group();let cy=0;
   const seg=(h,r1,r2,mat)=>{const g=new T.CylinderGeometry(r1,r2,h,20);g.translate(0,cy+h/2,0);cy+=h;const o=new T.Mesh(g,mat);o.castShadow=true;cue.add(o)};
@@ -5097,7 +5151,7 @@ function blMake3D(v){
   let first=true,t=0;
   function draw(dt){
     t+=dt;const w=W(),h=H();if(w!==lw||h!==lh){lw=w;lh=h;rd.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix()}
-    const G=BLS.G,B=BLS.balls,c=blCue(B),mode=blViewMode(),moving=!!blEv;
+    const G=BLS.G,B=blReplay?blReplay.balls:BLS.balls,c=blCue(B),mode=blViewMode(),moving=!!blEv||!!blReplay;
     // sharlar: yumalash aylanishi va luzaga tushish
     for(const b of B){const m=meshes[b.id];if(!m)continue;
       if(b.in){if(m.visible){let f=m.userData.fall;if(!f){let best=null;for(const [vx,vz] of vis){const d=Math.hypot(vx-0.5-m.position.x,vz-1-m.position.z);if(!best||d<best.d)best={d,vx,vz}}f=m.userData.fall={k:0,x0:m.position.x,z0:m.position.z,px:best.vx-0.5,pz:best.vz-1}}
@@ -5110,8 +5164,13 @@ function blMake3D(v){
     aimL.visible=objL.visible=tanL.visible=ghost.visible=ghostR.visible=showAim;
     if(showAim){const a=blAim(B,blAng);setStrip(aimL,c.x,c.y,a.gx,a.gy,0.0045);ghost.position.set(a.gx-0.5,r,a.gy-1);ghostR.position.set(a.gx-0.5,0.0018,a.gy-1);
       if(a.hit){setStrip(objL,a.hit.x,a.hit.y,a.hit.x+a.nx*0.5,a.hit.y+a.ny*0.5,0.004);const dot=dx*a.nx+dz*a.ny,tx=dx-dot*a.nx,tz=dz-dot*a.ny;setStrip(tanL,a.gx,a.gy,a.gx+tx*0.16,a.gy+tz*0.16,0.0035)}
-      else objL.visible=tanL.visible=false}
-    handR.visible=G.hand&&human&&!c.in&&!G.over;if(handR.visible){handR.position.set(c.x-0.5,0.002,c.y-1);handR.material.opacity=0.55+0.4*Math.sin(t*5)}
+      else objL.visible=tanL.visible=false
+      const key=[blAng.toFixed(4),blSpin.a.toFixed(2),blSpin.b.toFixed(2),(blPow||0).toFixed(2),c.x.toFixed(3),c.y.toFixed(3)].join();
+      if(key!==pKey&&t-pT>0.12){pKey=key;pT=t;pred=a.hit?blPredict(BLS.balls,blAng,blPow>0.03?blPow:0.35,blSpin,0.42):null}
+      if(pred&&a.hit){tanL.visible=false;const P2=pred.cue;let n=0;for(let i=1;i<P2.length&&n<dots.length;i++){const [x1,z1]=P2[i-1],[x2,z2]=P2[i];const L2=Math.hypot(x2-x1,z2-z1);for(let u=0;u<L2&&n<dots.length;u+=0.022){const dd=dots[n++];dd.visible=true;dd.position.set(x1+(x2-x1)*u/L2-0.5,0.0019,z1+(z2-z1)*u/L2-1)}}
+        for(;n<dots.length;n++)dots[n].visible=false}else dots.forEach(d=>d.visible=false)}
+    else dots.forEach(d=>d.visible=false);
+    handR.visible=G.hand&&human&&!c.in&&!G.over&&!blReplay;if(handR.visible){handR.position.set(c.x-0.5,0.002,c.y-1);handR.material.opacity=0.55+0.4*Math.sin(t*5)}
     house.visible=!!G.house&&G.hand&&human&&!G.over;
     cue.visible=showCue;
     if(showCue){const el=0.09,gap=0.012+blPow*0.2;bd.set(-dx*Math.cos(el),Math.sin(el),-dz*Math.cos(el));cue.quaternion.setFromUnitVectors(Y,bd);const sa=blSpin.a*r,sb=blSpin.b*r;cue.position.set(c.x-0.5+bd.x*(r+gap)-dz*sa,r+bd.y*(r+gap)+sb,c.y-1+bd.z*(r+gap)+dx*sa)}
