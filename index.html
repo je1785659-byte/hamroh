@@ -3988,7 +3988,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101l';
+const APP_VER='20261101m';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -5313,8 +5313,12 @@ function blMake3D(v){
   const fr=new T.Mesh(fg,[woodM,sideM]);fr.receiveShadow=true;fr.position.y=-0.004;sc.add(fr);
   // rezina bortlar: luza chuqurlari bilan kesilgan
   const S=BL.segs,near=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<1e-6;
+  const mouthM=new T.MeshBasicMaterial({color:0x111536,side:T.DoubleSide});
   for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],A=[ax,az],B=[bx,bz];const ja=S6.find(q=>near([q[0],q[1]],A)),jb=S6.find(q=>near([q[0],q[1]],B));
-    const P4=[[ja[2],ja[3]],A,B,[jb[2],jb[3]],[ja[2],ja[3]]],pts=[];
+    // rezina luza og'zida tik kesiladi (orqasida "burchak" qolmaydi); jag' uchburchagi luza og'zining bir qismi bo'ladi
+    const onx=ax===bx?(ax<0.5?-cw:cw):0,onz=az===bz?(az<1?-cw:cw):0,Ab=[ax+onx,az+onz],Bb=[bx+onx,bz+onz];
+    for(const [tp,jw,bk] of [[A,ja,Ab],[B,jb,Bb]]){const tri=new T.Shape([V2(tp[0],tp[1]),V2(jw[2],jw[3]),V2(bk[0],bk[1])]);const m=new T.Mesh(flatG(new T.ShapeGeometry(tri)),mouthM);m.position.y=0.0004;sc.add(m)}
+    const P4=[Ab,A,B,Bb,Ab],pts=[];
     for(let e=0;e<4;e++){const [x1,z1]=P4[e],[x2,z2]=P4[e+1],n=Math.max(2,Math.ceil(Math.hypot(x2-x1,z2-z1)/0.002));for(let k=0;k<n;k++){let x=x1+(x2-x1)*k/n,z=z1+(z2-z1)*k/n;const u=inU(x,z);if(u){[x,z]=u.proj(x,z)}pts.push(V2(x,z))}}
     const g=new T.ExtrudeGeometry(new T.Shape(pts),{depth:chH,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,cushM);m.receiveShadow=true;m.castShadow=false;sc.add(m)}
   // bort chizig'i (rezina movutga tegadigan joy): yorqin, rezina tugaydigan joygacha — luza chuqurigacha
