@@ -691,6 +691,57 @@ body[data-sec="kkal"]{--kk-a:#1a7d4c}
 .kk-quick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.kk-quick::-webkit-scrollbar{display:none}
 .kk-quick .chip{flex:none;white-space:nowrap}
 body[data-sec="mafia"]{--sec-a:#2b0f14;--sec-b:#8e1b2b;--sec:#b3263a}
+body[data-sec="ov"]{--sec-a:#1f2d16;--sec-b:#5a6b2a;--sec:#6b7d2e}
+body.hu-play nav.tabs{display:none}
+.hu-lvls{display:grid;gap:8px}
+.hu-lv{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;text-align:left;padding:10px 12px;border-radius:14px;border:1px solid var(--line,rgba(127,127,127,.2));background:var(--card2,rgba(127,127,127,.06));color:inherit;font:inherit}
+.hu-lv:disabled{opacity:.5}
+.hu-ln{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:800;color:#fff;background:linear-gradient(135deg,#2f4a1c,#7a8f33)}
+.hu-lt b{display:block}.hu-lt small{display:block;opacity:.72;font-size:12.5px;line-height:1.35;margin-top:2px}
+.hu-ls{color:#f2b705;font-size:15px;letter-spacing:1px;white-space:nowrap}.hu-ls i,.hu-stars i{font-style:normal;opacity:.25}
+.hu-how p{margin:6px 0;font-size:14px;line-height:1.45}
+.hu{position:fixed;inset:0;z-index:60;background:#0b0f0a;color:#fff;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.hu-view{position:absolute;inset:0}.hu-view canvas{display:block}
+.hu-load{position:absolute;inset:0;display:grid;place-items:center;font-weight:600;opacity:.8}
+.hu-scope{position:absolute;inset:0;pointer-events:none}
+.hu-edge{position:absolute;inset:0;pointer-events:none}
+.hu-edge i{position:absolute;width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-left:14px solid rgba(255,255,255,.75);filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.hu-edge b{position:absolute;width:0;height:0;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-top:9px solid rgba(255,255,255,.85);filter:drop-shadow(0 1px 2px rgba(0,0,0,.7))}
+.hu-cine{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 13vh 0 #000,inset 0 -13vh 0 #000}
+.hu.cine .hu-ctl,.hu.cine .hu-info,.hu.cine .hu-zoom{opacity:0;pointer-events:none}
+.hu-top{position:absolute;left:0;right:0;top:0;display:flex;gap:8px;align-items:flex-start;padding:10px 10px 0;pointer-events:none}
+.hu-top>*{pointer-events:auto}
+.hu-ib{height:42px;min-width:42px;padding:0 10px;border-radius:13px;border:1px solid rgba(255,255,255,.16);background:rgba(10,14,10,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;font-size:16px;font-weight:700;display:grid;place-items:center;flex:none}
+.hu-goal{flex:1;min-width:0;padding:6px 10px;border-radius:13px;background:rgba(10,14,10,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12)}
+.hu-goal b{display:block;font-size:14px}.hu-goal small{display:block;font-size:12px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hu-info{position:absolute;left:10px;right:10px;top:62px;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none}
+.hu-chip{padding:5px 9px;border-radius:10px;background:rgba(10,14,10,.55);font-size:12.5px;font-weight:600;border:1px solid rgba(255,255,255,.1)}
+.hu-chip b{color:#e8c25a;letter-spacing:1px}.hu-chip i{color:rgba(255,255,255,.25);font-style:normal;letter-spacing:1px}
+#hurng.on{background:rgba(180,40,30,.75)}
+.hu-msg{position:absolute;left:50%;top:104px;transform:translateX(-50%);max-width:88%;padding:8px 14px;border-radius:12px;background:rgba(0,0,0,.7);font-weight:700;font-size:14px;text-align:center;pointer-events:none}
+.hu-zoom{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:8px 4px;border-radius:14px;background:rgba(0,0,0,.45)}
+.hu-zoom input{writing-mode:vertical-lr;direction:rtl;width:30px;height:170px;accent-color:#e8c25a}
+.hu-ctl{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 14px calc(18px + env(safe-area-inset-bottom));pointer-events:none}
+.hu-ctl>*{pointer-events:auto}
+.hu-br{position:relative;width:82px;height:82px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(10,14,10,.55);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;overflow:hidden;touch-action:none}
+.hu-br span{font-size:24px}.hu-br small{font-size:11px;font-weight:700}
+.hu-br i{position:absolute;left:14px;right:14px;bottom:10px;height:4px;border-radius:2px;background:#6fd16f;transform-origin:left}
+.hu-br i.gasp{background:#e5533d}
+.hu-br.on{background:rgba(70,140,70,.65);border-color:#9be39b}
+.hu-rc{display:flex;flex-direction:column;align-items:center;gap:12px}
+.hu-sc{width:58px;height:58px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(10,14,10,.55);font-size:24px;color:#fff}
+.hu-sc.on{background:rgba(232,194,90,.55);border-color:#e8c25a}
+.hu-fire{width:96px;height:96px;border-radius:50%;border:3px solid rgba(255,255,255,.7);background:radial-gradient(circle at 35% 30%,#ef5b4c,#b3261e);color:#fff;font-weight:900;font-size:15px;letter-spacing:.5px;box-shadow:0 6px 18px rgba(0,0,0,.45);touch-action:none}
+.hu-fire:active{transform:scale(.95)}
+.hu-end{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.55);padding:16px;z-index:5}
+.hu-endc{width:100%;max-width:360px;background:#141b12;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:18px;text-align:center}
+.hu-endc h3{margin:0 0 6px;font-size:20px}.hu-endc p{text-align:left;margin:8px 0;font-size:14px;line-height:1.4}
+.hu-stars{font-size:34px;color:#f2b705;letter-spacing:4px;margin:4px 0 8px}
+.hu-kl{display:grid;gap:4px;margin:8px 0}.hu-kl div,.hu-sum{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.06);text-align:left}
+.hu-kl b,.hu-sum b{color:#e8c25a}.hu-sum{margin-top:4px;font-weight:700}
+.hu-ea{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.hu-ea .chip{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.22);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px}
+.hu-ea .btn{flex:1 1 100%}
 body[data-sec="bilyard"]{--sec-a:#0b3d2a;--sec-b:#1f7a52;--sec:#1f8f5c}
 body.bl-play nav.tabs{display:none}
 .bl-games{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -901,6 +952,7 @@ ICONS.sert='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wi
 ICONS.kkal='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5c-1.6-1.3-5.2-1.6-6.8 1.3-1.8 3.3.1 9.7 3 11.6 1.3.9 2.4.4 3.8.4s2.5.5 3.8-.4c2.9-1.9 4.8-8.3 3-11.6-1.6-2.9-5.2-2.6-6.8-1.3z"/><path d="M12 7.5c0-2 .9-3.5 2.8-4.3"/></svg>';
 ICONS.mafia='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15.5c2.5 1.3 5.6 2 9 2s6.5-.7 9-2"/><path d="M6 15.8 7.4 7.5c.2-1.2 1.4-1.9 2.5-1.4L12 7l2.1-.9c1.1-.5 2.3.2 2.5 1.4l1.4 8.3"/><path d="M6.6 12.3c3.6.8 7.2.8 10.8 0"/></svg>';
 ICONS.bilyard='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10.5" r="4.2"/><path d="M12 8.6a.95.95 0 1 0 0 1.9.95.95 0 1 0 0-1.9zM12 10.5a1.15 1.15 0 1 0 0 2.3 1.15 1.15 0 1 0 0-2.3z"/></svg>';
+ICONS.ov='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>';
 ICONS.home='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>';
 const TABS = [['home','Asosiy'],['namoz','Namoz'],['food','Taomlar'],['cash','Valyuta'],['quiz','Viktorina']];
 const HERO = {
@@ -915,6 +967,7 @@ const HERO = {
   sert:['Milliy sertifikat',"8 fan: rasmiy format bo'yicha mashq, izohli savollar va imtihon rejimi"],
   mafia:['Mafiya',"Davrada o'ynash uchun: rollarni tarqatadi, kecha va ovoz berishda boshlovchiga yordam beradi"],
   bilyard:['Bilyard',"Rus piramidasi, Amerikanka va 8-shar: ikki kishi, kompyuterga qarshi yoki mashq"],
+  ov:['Snayper ovi',"3D o'rmon: durbin, shamol va masofa — kiyik, qobon va tulkini ov qiling"],
   kkal:['Kaloriya hisoblagich',"Ovqatni suratga oling — AI taomni taniydi, kaloriya va kunlik normangizni hisoblaydi"]
 };
 let current = store.get('tab','home');
@@ -934,7 +987,7 @@ function setHero(t){
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;go(b.dataset.tab)});
 const STAT={secs:0,last:Date.now(),set:new Set(),opened:false,admin:store.get('isAdmin',false)};
 function statSec(x){try{STAT.set.add(x)}catch(e){}}
-const BACK_SEL=['#kkback','#pvback','#srback','#wrback','#spback','#erback','#kback','#qback','#dback','#screen [data-back]','#qhome','#blmenu'];
+const BACK_SEL=['#kkback','#pvback','#srback','#wrback','#spback','#erback','#kback','#qback','#dback','#screen [data-back]','#qhome','#blmenu','#huback'];
 function backAction(){
   if(typeof cook!=='undefined'&&cook)return closeCook;
   const ls=document.getElementById('langsheet');if(ls)return()=>ls.remove();
@@ -949,7 +1002,7 @@ let bbOn=null;
 function syncBack(){if(!(tg&&tg.BackButton))return;const on=!!backAction();if(on!==bbOn){bbOn=on;try{on?tg.BackButton.show():tg.BackButton.hide()}catch(e){}}}
 if(tg&&tg.BackButton){try{tg.BackButton.onClick(appBack)}catch(e){}}
 new MutationObserver(()=>{clearTimeout(syncBack.t);syncBack.t=setTimeout(syncBack,60)}).observe(document.body,{childList:true,subtree:true});
-function go(t){ statSec(t); document.body.classList.remove('bl-play'); if(typeof compassStop==='function'&&compassStop){compassStop();compassStop=null} current=t; store.set('tab',t); stopGame(); renderTabs(); setHero(t); VIEWS[t](); window.scrollTo(0,0); if(tg&&tg.HapticFeedback){try{tg.HapticFeedback.selectionChanged()}catch(e){}} }
+function go(t){ statSec(t); document.body.classList.remove('bl-play','hu-play'); if(typeof compassStop==='function'&&compassStop){compassStop();compassStop=null} current=t; store.set('tab',t); stopGame(); renderTabs(); setHero(t); VIEWS[t](); window.scrollTo(0,0); if(tg&&tg.HapticFeedback){try{tg.HapticFeedback.selectionChanged()}catch(e){}} }
 
 /* ---------- 1. TAOMLAR ---------- */
 const DISHES = {
@@ -2212,7 +2265,7 @@ function viewSaved(){
 }
 // open a shared recipe: t.me/bot/app?startapp=r_osh
 (function(){try{const tq=new URLSearchParams(location.search).get('t');if(tq){current=tq;store.set('tab',tq)}}catch(e){}})();
-(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'||sp==='bilyard'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('bl_')){store.set('tab','bilyard');current='bilyard';store.set('bl_join',sp.slice(3).replace(/[^a-z0-9]/g,''))}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
+(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'||sp==='bilyard'||sp==='ov'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('bl_')){store.set('tab','bilyard');current='bilyard';store.set('bl_join',sp.slice(3).replace(/[^a-z0-9]/g,''))}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
 
 const TOOLIC={qibla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
  tasbeh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="17.5" cy="15" r="2"/><circle cx="12" cy="18.5" r="2"/><circle cx="6.5" cy="15" r="2"/><circle cx="6.5" cy="8.5" r="2"/></svg>',
@@ -3992,7 +4045,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101s';
+const APP_VER='20261101t';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -5531,6 +5584,567 @@ function blBall(x,cx,cy,r,id){
   x.fillStyle=g;x.fillRect(cx-r,cy-r,2*r,2*r);x.restore();
 }
 
+/* ---------- OV (snayper): dunyo, ballistika, hayvonlar, topshiriqlar — DOM'siz ---------- */
+const HU={
+  g:9.81,v0:820,k:0.000826,zero:100,eyeH:1.7,
+  // turlar: o'lcham (m), tezlik (m/s), ochko
+  sp:{
+    deer:{len:1.5,h:0.95,br:0.3,walk:1.3,run:11,pts:100,legH:0.42,head:[0.95,1.62,0.13],neck:[0.72,1.3,0.13],vital:[0.38,0.92,0.2]},
+    boar:{len:1.15,h:0.55,br:0.3,walk:1.0,run:8,pts:120,legH:0.2,head:[0.72,0.52,0.17],neck:[0.5,0.6,0.2],vital:[0.26,0.52,0.17]},
+    fox:{len:0.7,h:0.34,br:0.14,walk:1.5,run:9,pts:150,legH:0.15,head:[0.46,0.44,0.085],neck:[0.32,0.4,0.08],vital:[0.13,0.34,0.1]},
+  },
+  levels:[
+    {n:'Birinchi ov',ammo:5,wind:0,pop:{deer:3,boar:1},goals:[{sp:'deer',n:1}]},
+    {n:'Ikki kiyik',ammo:6,wind:1.5,pop:{deer:4,boar:1,fox:1},goals:[{sp:'deer',n:2}]},
+    {n:'Qobon',ammo:5,wind:2,pop:{boar:3,deer:2},goals:[{sp:'boar',n:1,clean:true}]},
+    {n:'Ayyor tulki',ammo:5,wind:2.5,pop:{fox:3,deer:2},goals:[{sp:'fox',n:1,minDist:150}]},
+    {n:'Yugurayotgan kiyik',ammo:6,wind:2,pop:{deer:5},goals:[{sp:'deer',n:1,moving:true}]},
+    {n:"To'liq ov",ammo:8,wind:4,pop:{deer:4,boar:2,fox:2},goals:[{sp:'deer',n:2},{sp:'boar',n:1},{sp:'fox',n:1}]},
+  ],
+};
+function huRng(s){s=(s>>>0)||1;return()=>{s=(s*16807)%2147483647;return s/2147483647}}
+// relyef: ovchi turgan tepalik (0,0), oldinda vodiy va past-baland o'rmon
+function huH(w,x,z){
+  if(w.flat)return 0;const s=w.ph;
+  return 5.5*Math.sin(x*0.012+s[0])*Math.cos(z*0.0105+s[1])+2.6*Math.sin(x*0.029+z*0.017+s[2])+1.0*Math.sin(x*0.07+z*0.05+s[3])
+    +11*Math.exp(-(x*x+z*z)/(2*38*38))-3*Math.exp(-((z-170)*(z-170))/(2*90*90));
+}
+const huEye=w=>[0,huH(w,0,0)+HU.eyeH,0];
+function huWorld(lv,seed){
+  const L=HU.levels[lv]||HU.levels[0],R=huRng(seed*7919+lv*31+1);
+  const w={lv,seed,t:0,ph:[R()*6,R()*6,R()*6,R()*6],trees:[],animals:[],ammo:L.ammo,shots:0,kills:[],nid:1,flat:false};
+  const wa=R()*Math.PI*2;w.wind={x:Math.cos(wa)*L.wind,z:Math.sin(wa)*L.wind};
+  // daraxtlar: oldinda tarqoq o'rmon, orqada qalin; ovchi atrofi ochiq
+  for(let i=0;i<520;i++){const x=(R()-0.5)*900,z=(R()-0.35)*900,d=Math.hypot(x,z);
+    if(d<30)continue;if(z>-10&&d<70&&R()<0.85)continue;
+    const big=R();const h=big<0.7?9+R()*9:5+R()*4;
+    w.trees.push({x:+x.toFixed(2),z:+z.toFixed(2),r:+(0.18+h*0.016).toFixed(3),h:+h.toFixed(2),cr:+(h*(big<0.7?0.2:0.36)).toFixed(2),k:big<0.7?0:1})}
+  for(const [sp,n] of Object.entries(L.pop))for(let i=0;i<n;i++)huSpawn(w,sp,R);
+  w.R=R;return w;
+}
+function huFreeSpot(w,x,z){return w.trees.every(t=>Math.hypot(x-t.x,z-t.z)>2.5)}
+function huSpawn(w,sp,R){
+  for(let k=0;k<200;k++){const ang=(R()-0.5)*2.2,d=80+R()*300,x=Math.sin(ang)*d,z=Math.cos(ang)*d;
+    if(!huFreeSpot(w,x,z))continue;
+    const a={id:w.nid++,sp,x,z,y:huH(w,x,z),hd:R()*Math.PI*2,st:'graze',v:0,tt:2+R()*6,hx:x,hz:z};w.animals.push(a);return a}
+}
+// hayvonning urilish zonalari (dunyo koordinatalarida)
+function huZones(a){
+  const S=HU.sp[a.sp],fx=Math.sin(a.hd),fz=Math.cos(a.hd),sx=fz,sz=-fx,y0=a.y;
+  const P=(f,u,s=0)=>[a.x+fx*f+sx*s,y0+u,a.z+fz*f+sz*s];
+  const Z=[];
+  Z.push({zone:'vital',c:P(S.vital[0],S.vital[1]),r:S.vital[2]});
+  // o'tlayotganda bosh pastda (3D model ham shu nuqtalarga bukiladi)
+  const hg=huHeadPos(a);
+  Z.push({zone:'head',c:P(hg[0],hg[1]),r:S.head[2]});
+  Z.push({zone:'body',c:P((hg[2]),(hg[3])),r:S.neck[2]});
+  for(let i=0;i<5;i++){const f=-S.len*0.45+i*S.len*0.85/4;Z.push({zone:'body',c:P(f,S.h),r:S.br})}
+  for(const f of [S.len*0.33,-S.len*0.35])for(const s of [-1,1])Z.push({zone:'leg',c:P(f,S.legH,s*S.br*0.5),r:S.br*0.35});
+  return Z;
+}
+// bo'yin: yelkadagi bo'g'indan boshgacha; o'tlaganda bosh 75° pastga bukiladi (3D model ham aynan shunday)
+function huNeck(sp){const S=HU.sp[sp],px=S.len*0.37,py=S.h+S.br*0.55,L=Math.hypot(S.head[0]-px,S.head[1]-py),eu=Math.atan2(S.head[1]-py,S.head[0]-px);return {px,py,L,eu,eg:-75*Math.PI/180}}
+function huHeadPos(a){const N=huNeck(a.sp),e=a.st==='graze'?N.eg:N.eu,hx=N.px+Math.cos(e)*N.L,hy=N.py+Math.sin(e)*N.L;return [hx,hy,(N.px+hx)/2,(N.py+hy)/2]}
+// nishon chizig'i 100 m da o'q yo'liga to'g'ri kelishi uchun ko'tarish
+function huZeroDir(d){
+  const D=HU.zero,v=HU.v0,k=HU.k,t=(Math.exp(k*D)-1)/(k*v),drop=0.5*HU.g*t*t;
+  const h=Math.hypot(d[0],d[2]),el=Math.atan2(d[1],h)+Math.atan2(drop,D)*1.0,az=Math.atan2(d[0],d[2]);
+  return [Math.sin(az)*Math.cos(el),Math.sin(el),Math.cos(az)*Math.cos(el)];
+}
+// segment-shar kesishishi: 0..1 parametr yoki -1
+function huSegSph(p,q,c,r){
+  const dx=q[0]-p[0],dy=q[1]-p[1],dz=q[2]-p[2],fx=p[0]-c[0],fy=p[1]-c[1],fz=p[2]-c[2];
+  const A=dx*dx+dy*dy+dz*dz,B=2*(fx*dx+fy*dy+fz*dz),C=fx*fx+fy*fy+fz*fz-r*r;if(C<=0)return 0;
+  const D=B*B-4*A*C;if(D<0)return -1;const s=(-B-Math.sqrt(D))/(2*A);return s>=0&&s<=1?s:-1;
+}
+function huAnimAt(a,t){ // t soniyadan keyingi holat (o'q uchayotganda hayvon yuradi)
+  if(!a.v)return a;return {...a,x:a.x+Math.sin(a.hd)*a.v*t,z:a.z+Math.cos(a.hd)*a.v*t};
+}
+// o'q uchishi: havo qarshiligi (shamolga nisbatan), og'irlik; nima bilan to'qnashganini qaytaradi
+function huShoot(w,o,d,opt={}){
+  const dt=0.002,W=[w.wind.x,0,w.wind.z];let p=[...o],v=d.map(x=>x*HU.v0),t=0,path=[[...p]],res={hit:null};
+  for(let i=0;i<2000;i++){
+    const rv=[v[0]-W[0],v[1],v[2]-W[2]],sp=Math.hypot(...rv),k=HU.k*sp;
+    v=[v[0]-k*rv[0]*dt,v[1]-(k*rv[1]+HU.g)*dt,v[2]-k*rv[2]*dt];
+    const q=[p[0]+v[0]*dt,p[1]+v[1]*dt,p[2]+v[2]*dt];t+=dt;
+    if(opt.probeZ!=null&&p[2]<opt.probeZ&&q[2]>=opt.probeZ){const s=(opt.probeZ-p[2])/(q[2]-p[2]);res.probe=[p[0]+(q[0]-p[0])*s,p[1]+(q[1]-p[1])*s,opt.probeZ];res.probeT=t-dt+dt*s}
+    let best=2,hit=null;
+    for(const a of w.animals){if(a.st==='gone')continue;
+      const b=huAnimAt(a,t);if(Math.hypot(b.x-q[0],b.z-q[2])>4&&Math.hypot(b.x-p[0],b.z-p[2])>4)continue;
+      // o'q hayvonni teshib o'tadi: kirgan joy — birinchi tegish, zona — yo'lda kesib o'tgan eng muhim a'zo
+      const rank={vital:0,head:1,body:2,leg:3};let s0=2,zn=null;
+      for(const z of huZones(b)){const s=huSegSph(p,q,z.c,z.r);if(s<0)continue;s0=Math.min(s0,s);if(!zn||rank[z.zone]<rank[zn])zn=z.zone}
+      if(zn&&s0<best){best=s0;hit={hit:'animal',id:a.id,zone:zn}}}
+    for(const tr of w.trees){const mx=(p[0]+q[0])/2,mz=(p[2]+q[2])/2;if(Math.abs(mx-tr.x)>4||Math.abs(mz-tr.z)>4)continue;
+      for(let j=0;j<=4;j++){const s=j/4,x=p[0]+(q[0]-p[0])*s,y=p[1]+(q[1]-p[1])*s,z=p[2]+(q[2]-p[2])*s;
+        const yb=huH(w,tr.x,tr.z),hy=y-yb;if(hy<0||hy>tr.h)continue;
+        const cs=tr.h*(tr.k?0.35:0.25),rr=hy<cs?tr.r:Math.max(tr.r,tr.cr*(tr.k?Math.sin(Math.PI*(hy-cs)/(tr.h-cs)):1-(hy-cs)/(tr.h-cs)));
+        if(Math.hypot(x-tr.x,z-tr.z)<rr*0.8&&s<best){best=s;hit={hit:'tree'};break}}}
+    if(!hit){for(let j=1;j<=4;j++){const s=j/4,x=p[0]+(q[0]-p[0])*s,y=p[1]+(q[1]-p[1])*s,z=p[2]+(q[2]-p[2])*s;if(y<huH(w,x,z)){best=s;hit={hit:'ground'};break}}}
+    if(hit){const P=[p[0]+(q[0]-p[0])*best,p[1]+(q[1]-p[1])*best,p[2]+(q[2]-p[2])*best];path.push(P);
+      Object.assign(res,hit,{point:P,t:t-dt+dt*best,dist:Math.hypot(P[0]-o[0],P[2]-o[2])});res.path=path;return res}
+    p=q;if(i%10===9)path.push([...p]);
+    if(Math.hypot(p[0]-o[0],p[2]-o[2])>900||p[1]<-200)break;
+  }
+  res.path=path;res.t=t;return res;
+}
+// sinov va kompyuter uchun: zonaga tegadigan yo'nalish (tushish, shamol, hayvon yurishi hisobga olinadi)
+function huAimFor(w,o,a,zone){
+  const tgt=t=>{const b=huAnimAt(a,t),Z=huZones(b),S=HU.sp[a.sp];
+    if(zone==='rear'){const f=-S.len*0.4;return [b.x+Math.sin(b.hd)*f,b.y+S.h,b.z+Math.cos(b.hd)*f]}
+    return Z.find(z=>z.zone===zone).c};
+  let T=tgt(0),d;
+  for(let it=0;it<6;it++){d=huZeroDir(huN([T[0]-o[0],T[1]-o[1],T[2]-o[2]]));
+    const w2={...w,animals:[],trees:[],flat:true},dist=Math.hypot(T[0]-o[0],T[2]-o[2]),
+      pr=huShoot(w2,o,d,{probeZ:null}),pts=pr.path;
+    // o'q shu masofaga yetgandagi nuqta va vaqt
+    let P=null,tt=0;const dz=huN([T[0]-o[0],0,T[2]-o[2]]);
+    for(let i=1;i<pts.length;i++){const a0=(pts[i-1][0]-o[0])*dz[0]+(pts[i-1][2]-o[2])*dz[2],a1=(pts[i][0]-o[0])*dz[0]+(pts[i][2]-o[2])*dz[2];
+      if(a0<dist&&a1>=dist){const s=(dist-a0)/(a1-a0);P=pts[i-1].map((x,k)=>x+(pts[i][k]-x)*s);break}}
+    if(!P)break;
+    tt=(Math.exp(HU.k*dist)-1)/(HU.k*HU.v0);
+    const want=tgt(tt);const err=[want[0]-P[0],want[1]-P[1],want[2]-P[2]];
+    T=[T[0]+err[0],T[1]+err[1],T[2]+err[2]];
+  }
+  return huZeroDir(huN([T[0]-o[0],T[1]-o[1],T[2]-o[2]]));
+}
+const huN=v=>{const l=Math.hypot(...v)||1;return v.map(x=>x/l)};
+// otish: o'q sarflanadi, tegsa hayvon holati o'zgaradi, qolganlar cho'chiydi
+function huFire(w,o,d){
+  w.ammo--;w.shots++;const r=huShoot(w,o,d);
+  if(r.hit==='animal'){const a=w.animals.find(x=>x.id===r.id);const moving=a.v>3;
+    r.sp=a.sp;r.moving=moving;
+    if(r.zone==='leg'){a.st='wounded';a.v=HU.sp[a.sp].run*0.7;a.tt=20;a.hd=Math.atan2(a.x-o[0],a.z-o[2])}
+    else{if(a.v){const b=huAnimAt(a,r.t);a.x=b.x;a.z=b.z;a.y=huH(w,a.x,a.z)}a.st='dead';a.v=0;a.tt=0;r.score=huScore(a.sp,r.zone,r.dist,moving);w.kills.push({sp:a.sp,zone:r.zone,dist:r.dist,moving,score:r.score})}}
+  huNoise(w,o,220,true);if(r.point)huNoise(w,r.point,45);
+  return r;
+}
+// tovush: radius ichidagilar cho'chiydi (qochadi), o'q ovozida faqat hushyor bo'ladi
+function huNoise(w,p,rad,far){
+  for(const a of w.animals){if(a.st==='dead'||a.st==='gone')continue;const d=Math.hypot(a.x-p[0],a.z-p[2]);if(d>rad)continue;
+    if(far&&d>rad*0.4){if(a.st!=='flee'&&a.st!=='wounded'){a.st='alert';a.v=0;a.tt=2+((a.id*37)%20)/10;a.lx=p[0];a.lz=p[2]}continue}
+    if(a.st==='wounded')continue;
+    a.st='flee';a.v=HU.sp[a.sp].run;a.tt=6+((a.id*13)%30)/10;a.hd=Math.atan2(a.x-p[0],a.z-p[2])+(((a.id*7)%10)/10-0.5)*0.8}
+}
+function huStep(w,dt){
+  w.t+=dt;const R=w.R||Math.random;
+  for(const a of w.animals){const S=HU.sp[a.sp];
+    if(a.st==='dead'||a.st==='gone')continue;
+    a.tt-=dt;
+    if(a.st==='graze'||a.st==='alert'){a.v=0;if(a.tt<=0){if(a.st==='alert'||R()<0.55){a.st='walk';a.v=S.walk;a.tt=3+R()*4;
+      // uyidan uzoqlashsa orqaga buriladi
+      const dh=Math.hypot(a.x-a.hx,a.z-a.hz);if(dh>15)a.hd=Math.atan2(a.hx-a.x,a.hz-a.z);else a.hd+= (R()-0.5)*1.6}else a.tt=3+R()*5}}
+    else if(a.st==='walk'){a.v=S.walk;a.hd+=(R()-0.5)*0.15*dt*10;if(a.tt<=0){a.st='graze';a.v=0;a.tt=3+R()*6}}
+    else if(a.st==='flee'||a.st==='wounded'){a.hd+=Math.sin(w.t*1.7+a.id)*0.4*dt;
+      if(a.tt<=0&&a.st==='flee'){a.st='walk';a.v=S.walk;a.tt=4;a.hx=a.x;a.hz=a.z}}
+    if(a.v){const nx=a.x+Math.sin(a.hd)*a.v*dt,nz=a.z+Math.cos(a.hd)*a.v*dt;
+      if(huFreeSpot(w,nx,nz)||a.st==='flee'||a.st==='wounded'){a.x=nx;a.z=nz}else{a.hd+=1.2}
+      const d=Math.hypot(a.x,a.z);
+      if(a.st==='walk'&&(d<60||d>430||a.z<20)){a.hd=Math.atan2(a.hx-a.x,a.hz-a.z)}
+      if(d>520||(a.st!=='walk'&&d<25)){a.st='gone';a.v=0;a.gt=w.t}}
+    a.y=huH(w,a.x,a.z);
+  }
+  // ketib qolganlar o'rniga 25 s dan keyin yangisi chiqadi (o'lganlar emas)
+  for(const a of w.animals)if(a.st==='gone'&&!a.re&&w.t-a.gt>25){a.re=true;huSpawn(w,a.sp,R)}
+}
+function huScore(sp,zone,dist,moving){
+  const m={vital:1,head:1,body:0.5,leg:0}[zone]||0;
+  return Math.round(HU.sp[sp].pts*m*(1+dist/300)*(moving?1.3:1));
+}
+function huGoal(w){
+  const L=HU.levels[w.lv],used=new Set();let ok=true;
+  for(const g of L.goals){let n=0;
+    w.kills.forEach((k,i)=>{if(used.has(i)||n>=g.n||k.sp!==g.sp)return;if(g.clean&&k.zone==='body')return;if(g.minDist&&k.dist<g.minDist)return;if(g.moving&&!k.moving)return;used.add(i);n++});
+    if(n<g.n)ok=false}
+  if(ok)return 'win';if(w.ammo<=0)return 'lose';return null;
+}
+// nafas bilan durbin tebranishi (radian); ushlab turilsa deyarli to'xtaydi
+function huSway(t,hold){const k=hold?0.12:1;return [k*(0.0016*Math.sin(t*1.3)+0.0007*Math.sin(t*3.1+1)),k*(0.0021*Math.sin(t*0.9+0.5)+0.0006*Math.sin(t*2.3))]}
+function huStars(w){if(huGoal(w)!=='win')return 0;const need=HU.levels[w.lv].goals.reduce((s,g)=>s+g.n,0);
+  return 1+(w.shots<=need+1?1:0)+(w.kills.every(k=>k.zone==='vital'||k.zone==='head')?1:0)}
+
+/* ---------- OV: 3D o'rmon, durbin, otish, o'q kamerasi ---------- */
+const HU_NM={deer:()=>KT('Kiyik','Олень','Deer'),boar:()=>KT('Qobon','Кабан','Boar'),fox:()=>KT('Tulki','Лиса','Fox')};
+const HU_ZN={vital:()=>KT("Yurak-o'pka",'Сердце-лёгкие','Heart-lungs'),head:()=>KT('Bosh','Голова','Head'),body:()=>KT('Tana','Корпус','Body'),leg:()=>KT('Oyoq','Нога','Leg')};
+let HUW=null,huR=null,huRAF=null,huYaw=0,huPitch=-0.04,huZoom=0,huZoomV=8,huHold=false,huBreath=1,huGasp=0,huReload=0,huKick=0,huCam=null,huMsgT=0,huAud=null,huEnd=null,huRngT=0,huBusy=false;
+const huProg=()=>store.get('hu_p',{u:0,s:{},b:{}});
+function huGoalText(L){return L.goals.map(g=>{let t=`${g.n} ${KT('ta','×','×')} ${HU_NM[g.sp]().toLowerCase()}`;
+  if(g.clean)t+=KT(" — faqat yurak-o'pka yoki boshga",' — только в сердце-лёгкие или голову',' — heart-lungs or head only');
+  if(g.minDist)t+=KT(` — ${g.minDist} m dan uzoqdan`,` — дальше ${g.minDist} м`,` — from over ${g.minDist} m`);
+  if(g.moving)t+=KT(' — yugurib ketayotganda',' — на бегу',' — while running');return t}).join(', ')}
+const HU_LVN=[()=>KT('Birinchi ov','Первая охота','First hunt'),()=>KT('Ikki kiyik','Два оленя','Two deer'),()=>KT('Qobon','Кабан','Boar'),()=>KT('Ayyor tulki','Хитрая лиса','Sly fox'),()=>KT('Yugurayotgan kiyik','Бегущий олень','Running deer'),()=>KT("To'liq ov",'Полная охота','Full hunt')];
+function huDispose(){if(huR){try{huR.dispose()}catch(e){}huR=null}cancelAnimationFrame(huRAF);huStopAmb()}
+function viewOv(){
+  huDispose();document.body.classList.remove('hu-play');try{tg&&tg.enableVerticalSwipes&&tg.enableVerticalSwipes()}catch(e){}
+  setHero('ov');const P=huProg();
+  $('#screen').innerHTML=`<section class="card hu-lvls" data-notr><div class="label">${KT("Ov joyi: O'rmon",'Место охоты: Лес','Hunting ground: Forest')}</div>
+    ${HU.levels.map((L,i)=>{const lock=i>P.u,st=P.s[i]||0;return `<button class="hu-lv" data-lv="${i}" ${lock?'disabled':''}>
+      <span class="hu-ln">${lock?'🔒':i+1}</span><span class="hu-lt"><b>${HU_LVN[i]()}</b><small>${esc(huGoalText(L))} · ${L.ammo} ${KT("o'q","патр.",'rounds')}${L.wind?` · ${KT('shamol','ветер','wind')} ${L.wind} m/s`:''}</small></span>
+      <span class="hu-ls">${'★'.repeat(st)}<i>${'★'.repeat(3-st)}</i></span></button>`}).join('')}</section>
+    <section class="card" data-notr><div class="label">${KT('Qanday o\'ynaladi','Как играть','How to play')}</div><div class="hu-how">
+      <p>👆 ${KT('Ekranni surib atrofga qarang. Hayvonlarni topish uchun chetdagi ko\'rsatkichlar yordam beradi.','Водите пальцем, чтобы осмотреться. Стрелки по краям подскажут, где звери.','Swipe to look around. Edge arrows show where animals are.')}</p>
+      <p>🔭 ${KT('Durbinni yoqing va o\'ngdagi slayder bilan 4× dan 16× gacha kattalashtiring.','Включите прицел и приблизьте ползунком справа (4×–16×).','Turn on the scope and zoom 4×–16× with the slider.')}</p>
+      <p>🎯 ${KT("Miltiq 100 m ga sozlangan. Uzoqroqda o'q pastga tushadi — 200/300/400 belgilaridan oling. Shamol o'qni yonga suradi.",'Винтовка пристреляна на 100 м. Дальше пуля снижается — цельтесь по меткам 200/300/400. Ветер сносит пулю.','Rifle zeroed at 100 m. Beyond that, use the 200/300/400 marks. Wind pushes the bullet.')}</p>
+      <p>🫁 ${KT("«Nafas»ni bosib turing — durbin tinchlanadi. Eng ko'p ochko: yurak-o'pka yoki boshga.",'Держите «Дыхание» — прицел успокоится. Больше всего очков: сердце-лёгкие или голова.','Hold “Breath” to steady. Most points: heart-lungs or head.')}</p></div></section>`;
+  document.querySelectorAll('.hu-lv').forEach(b=>b.onclick=()=>{if(b.disabled)return;huStart(+b.dataset.lv)});
+}
+function huStart(lv){
+  HUW=huWorld(lv,(Date.now()%100000)+lv);huYaw=0;huPitch=-0.04;huZoom=0;huBreath=1;huGasp=0;huReload=0;huCam=null;huEnd=null;huBusy=false;
+  statSec('ov_game');huGameV();window.scrollTo(0,0);
+}
+function huGameV(){
+  document.body.classList.add('hu-play');try{tg&&tg.disableVerticalSwipes&&tg.disableVerticalSwipes()}catch(e){}
+  $('#hero').hidden=true;
+  $('#screen').innerHTML=`<div class="hu" id="hustage" data-notr>
+    <div class="hu-view" id="huview"><div class="hu-load">${KT("O'rmon tayyorlanmoqda…",'Лес загружается…','Loading the forest…')}</div></div>
+    <div class="hu-edge" id="huedge"></div>
+    <div class="hu-scope" id="huscope" hidden><svg id="hurtc" width="100%" height="100%"></svg></div>
+    <div class="hu-cine" id="hucine" hidden></div>
+    <div class="hu-top"><button class="hu-ib" id="huback" aria-label="${KT('Orqaga','Назад','Back')}">←</button>
+      <div class="hu-goal"><b id="hugoal"></b><small id="hudone"></small></div>
+      <button class="hu-ib" id="husnd" aria-label="${KT('Ovoz','Звук','Sound')}">${store.get('hu_snd',true)?'🔊':'🔇'}</button></div>
+    <div class="hu-info"><span class="hu-chip" id="huammo"></span><span class="hu-chip" id="huwind"></span><span class="hu-chip" id="hurng"></span></div>
+    <div class="hu-msg" id="humsg" hidden></div>
+    <div class="hu-zoom" id="huzoom" hidden><span>16×</span><input type="range" id="huzr" min="4" max="16" step="0.5" value="${huZoomV}" aria-label="Zoom"><span>4×</span></div>
+    <div class="hu-ctl">
+      <button class="hu-br" id="hubr"><span>🫁</span><small>${KT('Nafas','Дыхание','Breath')}</small><i id="hubri"></i></button>
+      <div class="hu-rc"><button class="hu-sc" id="husc">🔭</button><button class="hu-fire" id="hufire">${KT('OTISH','ОГОНЬ','FIRE')}</button></div>
+    </div>
+    <div id="huend"></div></div>`;
+  $('#huback').onclick=()=>{huDispose();viewOv()};
+  $('#husnd').onclick=()=>{store.set('hu_snd',!store.get('hu_snd',true));$('#husnd').textContent=store.get('hu_snd',true)?'🔊':'🔇';if(!store.get('hu_snd',true))huStopAmb();else huAmb()};
+  $('#husc').onclick=()=>{huZoom=huZoom?0:huZoomV;huUI();haptic('light')};
+  $('#huzr').oninput=e=>{huZoomV=+e.target.value;if(huZoom)huZoom=huZoomV};
+  const br=$('#hubr');br.onpointerdown=e=>{e.preventDefault();huHold=true;br.classList.add('on')};br.onpointerup=br.onpointerleave=br.onpointercancel=()=>{huHold=false;br.classList.remove('on')};
+  $('#hufire').onpointerdown=e=>{e.preventDefault();huShootNow()};
+  huUI();
+  blLoad3().then(ok=>{
+    if(!$('#hustage')||huR)return;const v=$('#huview');v.innerHTML='';
+    if(!ok){v.innerHTML=`<div class="hu-load">${KT("Qurilmangiz 3D ni qo'llamaydi",'Устройство не поддерживает 3D','3D is not supported on this device')}</div>`;return}
+    try{huR=huMake3D(v)}catch(e){console.error(e);v.innerHTML=`<div class="hu-load">3D xato</div>`;return}
+    huBindLook(v);huLoop();huAmb();
+    if(!store.get('hu_tut',false))huTutorial();
+  });
+}
+function huTutorial(){
+  $('#huend').innerHTML=`<div class="hu-end"><div class="hu-endc"><h3>${KT('Ovga xush kelibsiz!','Добро пожаловать на охоту!','Welcome to the hunt!')}</h3>
+    <p>👆 ${KT('Surib qarang, chetdagi o\'qchalar hayvonlar tomonini ko\'rsatadi.','Водите пальцем; стрелки у края указывают на зверей.','Swipe to look; edge arrows point to animals.')}</p>
+    <p>🔭 ${KT('Durbin → slayder bilan kattalashtiring.','Прицел → приблизьте ползунком.','Scope → zoom with the slider.')}</p>
+    <p>🫁 ${KT('«Nafas»ni bosib turib, «Otish»ni bosing.','Держите «Дыхание» и жмите «Огонь».','Hold “Breath”, then press “Fire”.')}</p>
+    <p>🎯 ${KT("100 m dan uzoqda pastki belgilardan oling: 200, 300, 400 m.",'Дальше 100 м цельтесь по нижним меткам: 200, 300, 400 м.','Beyond 100 m use the lower marks: 200, 300, 400 m.')}</p>
+    <button class="btn" id="hutok">${KT('Tushunarli','Понятно','Got it')}</button></div></div>`;
+  $('#hutok').onclick=()=>{store.set('hu_tut',true);$('#huend').innerHTML=''};
+}
+function huUI(){
+  if(!$('#hustage')||!HUW)return;const L=HU.levels[HUW.lv];
+  $('#hugoal').textContent=`${HUW.lv+1}. ${HU_LVN[HUW.lv]()}`;
+  // bajarilgan / qolgan
+  const left=L.goals.map(g=>{let n=0;HUW.kills.forEach(k=>{if(k.sp===g.sp&&!(g.clean&&k.zone==='body')&&!(g.minDist&&k.dist<g.minDist)&&!(g.moving&&!k.moving))n++});return `${HU_NM[g.sp]()} ${Math.min(n,g.n)}/${g.n}${g.minDist?` (>${g.minDist} m)`:''}${g.clean?' ♥':''}${g.moving?' 🏃':''}`});
+  $('#hudone').textContent=left.join(' · ');
+  $('#huammo').innerHTML=`<b>${'▮'.repeat(Math.max(0,HUW.ammo))}</b><i>${'▮'.repeat(Math.max(0,L.ammo-HUW.ammo))}</i>`;
+  const sc=!!huZoom&&!huCam;$('#huscope').hidden=!sc;$('#huzoom').hidden=!sc;$('#husc').classList.toggle('on',!!huZoom);
+  $('#hubr').style.visibility=sc?'visible':'hidden';
+  $('#hucine').hidden=!huCam;$('#hustage').classList.toggle('cine',!!huCam);
+  if(sc)huReticle();
+}
+// nishon to'ri: markaz, mil nuqtalar, 200/300/400 m belgilari (ballistikadan hisoblangan)
+let huRtKey='';
+function huReticle(){
+  const v=$('#huview'),W=v.clientWidth||innerWidth,H=v.clientHeight||innerHeight,D=Math.min(W,H)*0.92,key=W+'x'+H+':'+huZoom;if(key===huRtKey)return;huRtKey=key;
+  const vf=huScopeFov(W,H),pxr=H/(vf*Math.PI/180),cx=W/2,cy=H/2,R=D/2;
+  const w0={wind:{x:0,z:0},flat:true,trees:[],animals:[]},dz=huZeroDir([0,0,1]);
+  const mk=[200,300,400].map(m=>{const p=huShoot(w0,[0,1.7,0],dz,{probeZ:m}).probe;return [m,(1.7-p[1])/m]});
+  let s=`<defs><mask id="hum"><rect width="100%" height="100%" fill="#fff"/><circle cx="${cx}" cy="${cy}" r="${R}" fill="#000"/></mask>
+    <radialGradient id="hug"><stop offset="0.82" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/></radialGradient></defs>
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#hug)"/><rect width="100%" height="100%" fill="#050505" mask="url(#hum)"/>
+    <g stroke="#111" stroke-width="1.3" fill="none">
+    <path d="M${cx-R} ${cy}H${cx-R*0.12}M${cx+R*0.12} ${cy}H${cx+R}M${cx} ${cy-R}V${cy-R*0.12}" stroke-width="3"/>
+    <path d="M${cx-R*0.12} ${cy}H${cx-6}M${cx+6} ${cy}H${cx+R*0.12}M${cx} ${cy-R*0.12}V${cy-6}M${cx} ${cy+6}V${cy+R}"/></g>`;
+  for(let i=1;i<=4;i++)for(const sg of [-1,1]){const x=cx+sg*i*0.001*pxr;if(Math.abs(x-cx)<R*0.95)s+=`<circle cx="${x}" cy="${cy}" r="1.8" fill="#111"/>`}
+  let lastY=cy;mk.forEach(([m,a],i)=>{const y=cy+a*pxr;if(y>cy+R*0.95)return;const L=i%2?-1:1;s+=`<path d="M${cx-8} ${y}H${cx+8}" stroke="#111" stroke-width="1.3"/>`;if(y-lastY<11)return;lastY=y;s+=`<text x="${cx+L*11}" y="${y+3.5}" font-size="9.5" fill="#111" font-weight="700" text-anchor="${L>0?'start':'end'}">${m}</text>`});
+  s+=`<circle cx="${cx}" cy="${cy}" r="1.9" fill="#e53935"/>`;
+  $('#hurtc').innerHTML=s;
+}
+const huFovV=(W,H)=>Math.min(72,2*Math.atan(Math.tan(36*Math.PI/180)/(W/H))*180/Math.PI);
+// durbin: aylana diametri 24°/zoom ga teng
+const huScopeFov=(W,H)=>(24/(huZoom||1))*H/(Math.min(W,H)*0.92);
+function huBindLook(v){
+  let pid=null,lx=0,ly=0;
+  v.onpointerdown=e=>{if(huCam||huEnd)return;pid=e.pointerId;lx=e.clientX;ly=e.clientY;try{v.setPointerCapture(pid)}catch(_){}};
+  v.onpointermove=e=>{if(e.pointerId!==pid)return;const k=huZoom?0.0042*(1/huZoom)*1.4:0.0042;huYaw-=(e.clientX-lx)*k;huPitch=Math.max(-0.7,Math.min(0.55,huPitch-(e.clientY-ly)*k));lx=e.clientX;ly=e.clientY};
+  v.onpointerup=v.onpointercancel=()=>{pid=null};
+}
+function huDir(){const s=huZoom?huSway(HUW.t,huHold&&huBreath>0&&!huGasp):[0,0],sm=huGasp?3:1,y=huYaw+s[0]*sm*(huZoom?1:0),p=huPitch+s[1]*sm*(huZoom?1:0)+huKick;return [Math.sin(y)*Math.cos(p),Math.sin(p),Math.cos(y)*Math.cos(p)]}
+function huShootNow(){
+  if(!HUW||!huR||huCam||huEnd||huBusy||huReload>0||HUW.ammo<=0)return;
+  const o=huEye(HUW),d=huDir(),r=huFire(HUW,o,huZeroDir(d));haptic('heavy');
+  huSnd('shot');huReload=1.3;huKick=huZoom?0.012:0.05;
+  setTimeout(()=>huSnd('bolt'),520);
+  let msg='';
+  if(r.hit==='animal'){
+    setTimeout(()=>huSnd('hit'),(r.t+r.dist/343)*1000);
+    msg=r.zone==='leg'?KT(`${HU_NM[r.sp]()}: oyog'iga tegdi — yarador qochdi`,`${HU_NM[r.sp]()}: ранен в ногу — убежал`,`${HU_NM[r.sp]()}: leg hit — it ran off wounded`)
+      :`${HU_NM[r.sp]()} · ${HU_ZN[r.zone]()} · ${Math.round(r.dist)} m · +${r.score}`;
+    if(r.zone!=='leg'&&r.dist>40){huCam={r,t:0,dur:1.3+Math.min(1.2,r.dist/350),msg};huUI();return}
+  }else if(r.hit==='tree')msg=KT("Daraxtga tegdi",'Попали в дерево','Hit a tree');
+  else msg=r.point?KT(`Tegmadi · ${Math.round(r.dist)} m`,`Мимо · ${Math.round(r.dist)} м`,`Miss · ${Math.round(r.dist)} m`):KT('Tegmadi','Мимо','Miss');
+  if(r.point&&huR)huR.puff(r.point,r.hit);
+  huAfter(msg);
+}
+function huAfter(msg){
+  huMsg(msg);huUI();const g=huGoal(HUW);
+  if(g){huBusy=true;setTimeout(()=>huFinish(g),1600)}
+}
+function huMsg(t){const m=$('#humsg');if(!m)return;m.textContent=t;m.hidden=false;huMsgT=3.2}
+function huFinish(g){
+  if(!$('#hustage'))return;huEnd=g;const P=huProg(),st=huStars(HUW),sum=HUW.kills.reduce((s,k)=>s+(k.score||0),0);
+  if(g==='win'){P.u=Math.max(P.u,Math.min(HU.levels.length-1,HUW.lv+1));P.s[HUW.lv]=Math.max(P.s[HUW.lv]||0,st);P.b[HUW.lv]=Math.max(P.b[HUW.lv]||0,sum);store.set('hu_p',P);haptic('done')}
+  const next=g==='win'&&HUW.lv<HU.levels.length-1;
+  $('#huend').innerHTML=`<div class="hu-end"><div class="hu-endc">
+    <h3>${g==='win'?KT('Ov muvaffaqiyatli!','Охота удалась!','Great hunt!'):KT("O'qlar tugadi",'Патроны кончились','Out of ammo')}</h3>
+    ${g==='win'?`<div class="hu-stars">${'★'.repeat(st)}<i>${'★'.repeat(3-st)}</i></div>`:''}
+    <div class="hu-kl">${HUW.kills.map(k=>`<div><span>${HU_NM[k.sp]()} · ${HU_ZN[k.zone]()} · ${Math.round(k.dist)} m${k.moving?' 🏃':''}</span><b>+${k.score}</b></div>`).join('')||`<div><span>${KT("Ov yo'q",'Нет добычи','No kills')}</span></div>`}</div>
+    <div class="hu-sum"><span>${KT('Jami','Итого','Total')}</span><b>${sum}</b></div>
+    <div class="hu-sum"><span>${KT('Aniqlik','Точность','Accuracy')}</span><b>${HUW.shots?Math.round(HUW.kills.length/HUW.shots*100):0}%</b></div>
+    <div class="hu-ea">${next?`<button class="btn" id="hunx">${KT('Keyingi daraja','Следующий уровень','Next level')} →</button>`:''}
+    <button class="${next?'chip':'btn'}" id="huagain">${KT('Qayta','Ещё раз','Retry')}</button><button class="chip" id="humn">${KT('Darajalar','Уровни','Levels')}</button></div></div></div>`;
+  if(next)$('#hunx').onclick=()=>{huDispose();huStart(HUW.lv+1)};
+  $('#huagain').onclick=()=>{huDispose();huStart(HUW.lv)};$('#humn').onclick=()=>{huDispose();viewOv()};
+}
+function huLoop(){
+  cancelAnimationFrame(huRAF);let last=performance.now();
+  const f=now=>{if(current!=='ov'||!$('#hustage')||!huR){huDispose();return}
+    const dt=Math.min(0.05,(now-last)/1000);last=now;
+    if(!huCam)huStep(HUW,dt);
+    huReload=Math.max(0,huReload-dt);huKick*=Math.pow(0.02,dt);
+    // nafas: ushlab tursa 4 s gacha, keyin hansirash
+    if(huGasp>0){huGasp=Math.max(0,huGasp-dt);huBreath=Math.min(1,huBreath+dt*0.3)}
+    else if(huHold&&huZoom){huBreath-=dt/4;if(huBreath<=0){huBreath=0;huGasp=2;huHold=false;$('#hubr')&&$('#hubr').classList.remove('on')}}
+    else huBreath=Math.min(1,huBreath+dt*0.35);
+    const bi=$('#hubri');if(bi){bi.style.transform=`scaleX(${huBreath})`;bi.classList.toggle('gasp',huGasp>0)}
+    if(huMsgT>0){huMsgT-=dt;if(huMsgT<=0)$('#humsg').hidden=true}
+    huR.frame(dt);
+    huRAF=requestAnimationFrame(f)};
+  huRAF=requestAnimationFrame(f);
+}
+// ---------------- 3D ----------------
+function huMake3D(v){
+  const T=window.THREE,W=()=>v.clientWidth||innerWidth,H=()=>v.clientHeight||innerHeight;
+  const rd=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+  rd.setPixelRatio(Math.min(1.5,devicePixelRatio||1));rd.setSize(W(),H());rd.outputColorSpace=T.SRGBColorSpace;rd.toneMapping=T.ACESFilmicToneMapping;rd.toneMappingExposure=1.05;
+  v.appendChild(rd.domElement);
+  const w=HUW,tod=w.lv%3; // 0 tong, 1 kun, 2 kechqurun
+  const SKY=[[0x9fc4e6,0xf3d9b0,0xffe2b8,1.5],[0x7fb2e8,0xd6e6f2,0xfff6e6,1.9],[0x6e86b8,0xf0b080,0xffb070,1.4]][tod];
+  const sc=new T.Scene();sc.fog=new T.Fog(SKY[1],180,1300);
+  const cam=new T.PerspectiveCamera(60,W()/H(),0.05,3000);
+  // osmon gumbazi
+  {const g=new T.SphereGeometry(2500,32,16),c=[],top=new T.Color(SKY[0]),hor=new T.Color(SKY[1]);const p=g.attributes.position;
+   for(let i=0;i<p.count;i++){const y=p.getY(i)/2500,k=Math.pow(Math.max(0,y),0.55);const cc=hor.clone().lerp(top,k);c.push(cc.r,cc.g,cc.b)}
+   g.setAttribute('color',new T.Float32BufferAttribute(c,3));sc.add(new T.Mesh(g,new T.MeshBasicMaterial({vertexColors:true,side:T.BackSide,fog:false})))}
+  const sunDir=new T.Vector3(...[[-0.6,0.35,-0.7],[0.3,0.9,-0.3],[0.7,0.22,-0.65]][tod]).normalize();
+  {const s=new T.Mesh(new T.CircleGeometry(60,24),new T.MeshBasicMaterial({color:SKY[2],fog:false}));s.position.copy(sunDir.clone().multiplyScalar(2300));s.lookAt(0,0,0);sc.add(s)}
+  sc.add(new T.HemisphereLight(SKY[0],0x5a6a34,1.25));
+  const sun=new T.DirectionalLight(SKY[2],SKY[3]);sun.position.copy(sunDir.clone().multiplyScalar(100));sc.add(sun);
+  const cvT=(sz,draw,rep)=>{const c=document.createElement('canvas');c.width=c.height=sz;draw(c.getContext('2d'),sz);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;if(rep)t.repeat.set(rep,rep);t.anisotropy=4;return t};
+  // relyef
+  const X0=-600,Z0=-400,SZ=1200,N=240;
+  {const g=new T.PlaneGeometry(SZ,SZ,N,N);g.rotateX(-Math.PI/2);g.translate(X0+SZ/2,0,Z0+SZ/2);const p=g.attributes.position,col=[];
+   const gA=new T.Color(0x5d7f2e),gB=new T.Color(0x7d9a3c),gC=new T.Color(0x4a6326),dirt=new T.Color(0x7a6a45);
+   for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),y=huH(w,x,z);p.setY(i,y);
+     const n=0.5+0.5*Math.sin(x*0.05+z*0.031)*Math.cos(z*0.043-x*0.02),sl=Math.abs(huH(w,x+2,z)-y)+Math.abs(huH(w,x,z+2)-y);
+     const c=gA.clone().lerp(gB,n).lerp(gC,Math.min(1,Math.max(0,(0.5-n)))*0.6).lerp(dirt,Math.min(0.7,sl*0.25));col.push(c.r,c.g,c.b)}
+   g.setAttribute('color',new T.Float32BufferAttribute(col,3));g.computeVertexNormals();
+   const gt=cvT(256,(x,s)=>{x.fillStyle='#e8e8e8';x.fillRect(0,0,s,s);for(let i=0;i<9000;i++){const v=185+Math.random()*70|0;x.fillStyle=`rgb(${v},${v},${v})`;x.fillRect(Math.random()*s,Math.random()*s,1,2+Math.random()*3)}},260);
+   const m=new T.Mesh(g,new T.MeshLambertMaterial({vertexColors:true,map:gt}));sc.add(m)}
+  // uzoq tog'lar
+  {const mg=new T.ConeGeometry(1,1,7,1),mm=new T.MeshLambertMaterial({color:0x6d7f8f,flatShading:true});const R=huRng(w.seed+5);
+   const im=new T.InstancedMesh(mg,mm,46),o=new T.Object3D();
+   for(let i=0;i<46;i++){const a=i/46*Math.PI*2+R()*0.1,d=1050+R()*350,h=120+R()*230;o.position.set(Math.sin(a)*d,h/2-30,Math.cos(a)*d);o.scale.set(160+R()*200,h,160+R()*200);o.rotation.y=R()*3;o.updateMatrix();im.setMatrixAt(i,o.matrix)}
+   sc.add(im)}
+  // daraxtlar (dvigateldagi o'lchamlar bilan bir xil)
+  {const pines=w.trees.filter(t=>!t.k),dec=w.trees.filter(t=>t.k),o=new T.Object3D(),R=huRng(w.seed+9),cc=new T.Color();
+   const trunkG=new T.CylinderGeometry(0.7,1,1,6);trunkG.translate(0,0.5,0);
+   const trunk=new T.InstancedMesh(trunkG,new T.MeshLambertMaterial({color:0x4a3524}),w.trees.length);
+   w.trees.forEach((t,i)=>{o.position.set(t.x,huH(w,t.x,t.z)-0.3,t.z);o.rotation.set(0,0,0);o.scale.set(t.r,t.h*(t.k?0.55:0.9),t.r);o.updateMatrix();trunk.setMatrixAt(i,o.matrix)});sc.add(trunk);
+   const coneG=new T.ConeGeometry(1,1,8);coneG.translate(0,0.5,0);
+   const cones=new T.InstancedMesh(coneG,new T.MeshLambertMaterial({color:0xffffff,flatShading:true}),pines.length*3);let k=0;
+   for(const t of pines){const yb=huH(w,t.x,t.z),cs=t.h*0.25,L=t.h-cs;for(let j=0;j<3;j++){const y0=cs+L*j*0.27,f=1-(j*0.27);o.position.set(t.x,yb+y0,t.z);o.rotation.set(0,R()*6,0);o.scale.set(t.cr*f,L*(0.48-j*0.04)*(j===2?1.25:1),t.cr*f);o.updateMatrix();cones.setMatrixAt(k,o.matrix);
+     cc.setHSL(0.3+R()*0.04,0.42,0.15+R()*0.06+j*0.02);cones.setColorAt(k++,cc)}}
+   sc.add(cones);
+   const crG=new T.IcosahedronGeometry(1,1);const crown=new T.InstancedMesh(crG,new T.MeshLambertMaterial({color:0xffffff,flatShading:true}),dec.length*2);k=0;
+   for(const t of dec){const yb=huH(w,t.x,t.z),cs=t.h*0.35,L=t.h-cs;for(let j=0;j<2;j++){o.position.set(t.x+(j?t.cr*0.25:0),yb+cs+L*(j?0.62:0.45),t.z+(j?-t.cr*0.2:0));o.rotation.set(R(),R(),R());const s=j?0.7:1;o.scale.set(t.cr*s,L*0.5*s,t.cr*s);o.updateMatrix();crown.setMatrixAt(k,o.matrix);
+     cc.setHSL(tod===2&&R()<0.35?0.09+R()*0.05:0.22+R()*0.08,0.45,0.22+R()*0.08);crown.setColorAt(k++,cc)}}
+   sc.add(crown)}
+  // o't tutamlari va toshlar (bezak; o'q ularni tesha oladi)
+  {const R=huRng(w.seed+13),o=new T.Object3D(),gG=new T.ConeGeometry(0.07,0.3,4);gG.translate(0,0.15,0);
+   const gm=new T.InstancedMesh(gG,new T.MeshLambertMaterial({color:0x6f8f34,flatShading:true}),1400),cc=new T.Color();
+   for(let i=0;i<1400;i++){const a=(R()-0.5)*2.6,d=6+Math.pow(R(),1.6)*240,x=Math.sin(a)*d,z=Math.cos(a)*d;o.position.set(x,huH(w,x,z)-0.03,z);o.rotation.set(0,R()*6,0);const s=0.6+R()*0.8;o.scale.set(s,s*(0.7+R()*0.6),s);o.updateMatrix();gm.setMatrixAt(i,o.matrix);cc.setHSL(0.2+R()*0.06,0.5,0.32+R()*0.12);gm.setColorAt(i,cc)}
+   sc.add(gm);
+   const rG=new T.DodecahedronGeometry(1,0),rm=new T.InstancedMesh(rG,new T.MeshLambertMaterial({color:0x8a8a84,flatShading:true}),70);
+   for(let i=0;i<70;i++){const x=(R()-0.5)*700,z=R()*600-80;o.position.set(x,huH(w,x,z),z);o.rotation.set(R()*3,R()*3,R()*3);const s=0.3+R()*1.4;o.scale.set(s*1.3,s*0.7,s);o.updateMatrix();rm.setMatrixAt(i,o.matrix)}
+   sc.add(rm)}
+  // hayvonlar
+  const blobT=cvT(64,(x,s)=>{const g=x.createRadialGradient(32,32,2,32,32,32);g.addColorStop(0,'rgba(0,0,0,.45)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,s,s)});
+  const blobM=new T.MeshBasicMaterial({map:blobT,transparent:true,depthWrite:false});
+  const AM={};
+  function model(sp,ant){
+    const S=HU.sp[sp],NK=huNeck(sp),M=c=>new T.MeshStandardMaterial({color:c,roughness:0.85,flatShading:true}),MS=c=>new T.MeshStandardMaterial({color:c,roughness:0.9});
+    const col={deer:[0x8b5a2b,0xe8dcc8,0x2a1a10],boar:[0x3d3029,0x2a201b,0x171210],fox:[0xc9621f,0xf2ece2,0x1d1410]}[sp];
+    const mB=MS(col[0]),mW=MS(col[1]),mD=MS(col[2]);
+    const root=new T.Group(),fall=new T.Group(),body=new T.Group();root.add(fall);fall.position.y=S.h;fall.add(body);body.position.y=-S.h;
+    const ell=(m,sx,sy,sz,x,y,z,seg=16)=>{const e=new T.Mesh(new T.SphereGeometry(1,seg,Math.max(6,seg-3)),m);e.scale.set(sx,sy,sz);e.position.set(x,y,z);body.add(e);return e};
+    const hl=S.len/2;
+    // tana
+    const vb=sp==='deer'?0.78:1,bw=S.br*vb*(sp==='deer'?0.85:0.95);ell(mB,bw,S.br*vb,hl*0.96,0,S.h,0);ell(mB,bw*1.02,S.br*vb*1.1,hl*0.42,0,S.h-S.br*vb*0.06,hl*0.5);ell(mB,bw*0.98,S.br*vb*1.02,hl*0.4,0,S.h+S.br*vb*0.08,-hl*0.55);
+    if(sp!=='boar')ell(mW,bw*0.75,S.br*vb*0.45,hl*0.7,0,S.h-S.br*vb*0.58,0);
+    if(sp==='boar'){const ridge=new T.Mesh(new T.BoxGeometry(0.06,0.12,S.len*0.8),mD);ridge.position.set(0,S.h+S.br*0.95,0.05);body.add(ridge)}
+    // oyoqlar: son bo'g'ini aylanadi, tizza bukiladi
+    const legs=[];
+    for(const [f,fr] of [[S.len*0.33,1],[-S.len*0.35,0]])for(const s of [-1,1]){
+      const hip=new T.Group();hip.position.set(s*S.br*0.5,S.h-S.br*0.35,f);body.add(hip);
+      const up=S.h-S.br*0.35,u1=up*0.52,u2=up-u1;
+      const th=new T.Mesh(new T.CylinderGeometry(S.br*0.24,S.br*0.15,u1,6),fr?mB:mB);th.position.y=-u1/2;hip.add(th);
+      const knee=new T.Group();knee.position.y=-u1;hip.add(knee);
+      const sh=new T.Mesh(new T.CylinderGeometry(S.br*0.12,S.br*0.09,u2,6),sp==='fox'?mD:mB);sh.position.y=-u2/2;knee.add(sh);
+      const hf=new T.Mesh(new T.CylinderGeometry(S.br*0.1,S.br*0.12,u2*0.12,6),mD);hf.position.y=-u2+u2*0.06;knee.add(hf);
+      legs.push({hip,knee,fr,s})}
+    // bo'yin va bosh
+    const nk=new T.Group();nk.position.set(0,NK.py,NK.px);body.add(nk);
+    const ng=new T.Group();ng.rotation.x=-NK.eu;nk.add(ng); // ng ichida +z — bosh tomon
+    const nl=NK.L+S.br*0.7,nr=sp==='deer'?[0.075,0.15]:[S.br*0.45,S.br*0.78],neck=new T.Mesh(new T.CylinderGeometry(nr[0],nr[1],nl,10),mB);neck.rotation.x=Math.PI/2;neck.position.z=NK.L-nl/2;ng.add(neck);
+    const head=new T.Group();head.position.z=NK.L;head.rotation.x=NK.eu;ng.add(head);
+    const hr=S.head[2];
+    if(sp==='deer'){const h1=new T.Mesh(new T.SphereGeometry(1,12,9),mB);h1.scale.set(hr*0.85,hr*0.95,hr*1.25);head.add(h1);
+      const sn=new T.Mesh(new T.ConeGeometry(hr*0.55,hr*1.4,7),mB);sn.rotation.x=Math.PI/2;sn.position.set(0,-hr*0.25,hr*1.1);head.add(sn);
+      const nose=new T.Mesh(new T.SphereGeometry(hr*0.22,6,5),mD);nose.position.set(0,-hr*0.3,hr*1.75);head.add(nose);
+      for(const s of [-1,1]){const ear=new T.Mesh(new T.ConeGeometry(hr*0.3,hr*1.1,5),mB);ear.position.set(s*hr*0.75,hr*0.7,-hr*0.2);ear.rotation.z=-s*0.9;head.add(ear);
+        if(ant){const am=M(0x6e5a44);const a1=new T.Mesh(new T.CylinderGeometry(0.012,0.02,0.45,5),am);a1.position.set(s*hr*0.4,hr*1.6,-hr*0.2);a1.rotation.z=-s*0.35;a1.rotation.x=-0.3;head.add(a1);
+          for(let j=0;j<3;j++){const t=new T.Mesh(new T.CylinderGeometry(0.008,0.013,0.17,4),am);t.position.set(s*(hr*0.5+j*0.05),hr*1.2+j*0.12,-hr*0.1+0.04);t.rotation.x=-0.9;t.rotation.z=-s*0.3;head.add(t)}}}
+      const tail=new T.Mesh(new T.SphereGeometry(1,6,5),mW);tail.scale.set(0.06,0.09,0.05);tail.position.set(0,S.h+S.br*0.4,-hl-0.02);body.add(tail)}
+    else if(sp==='boar'){const h1=new T.Mesh(new T.ConeGeometry(hr*1.05,hr*2.6,8),mB);h1.rotation.x=Math.PI/2;h1.position.z=hr*0.6;head.add(h1);
+      const sn=new T.Mesh(new T.CylinderGeometry(hr*0.36,hr*0.36,hr*0.15,10),M(0x5a4038));sn.rotation.x=Math.PI/2;sn.position.z=hr*1.95;head.add(sn);
+      for(const s of [-1,1]){const ear=new T.Mesh(new T.ConeGeometry(hr*0.32,hr*0.7,4),mD);ear.position.set(s*hr*0.6,hr*0.75,-hr*0.25);ear.rotation.z=-s*0.5;head.add(ear);
+        const tk=new T.Mesh(new T.ConeGeometry(0.012,0.07,4),M(0xeee6d4));tk.position.set(s*hr*0.42,-hr*0.12,hr*1.65);tk.rotation.x=-0.6;head.add(tk)}
+      const tail=new T.Mesh(new T.CylinderGeometry(0.01,0.015,0.18,4),mD);tail.position.set(0,S.h+0.05,-hl-0.05);tail.rotation.x=0.5;body.add(tail)}
+    else{const h1=new T.Mesh(new T.SphereGeometry(1,8,6),mB);h1.scale.set(hr*1.1,hr,hr*1.05);head.add(h1);
+      const sn=new T.Mesh(new T.ConeGeometry(hr*0.5,hr*1.6,6),mB);sn.rotation.x=Math.PI/2;sn.position.set(0,-hr*0.2,hr*1.2);head.add(sn);
+      const ch=new T.Mesh(new T.SphereGeometry(1,6,5),mW);ch.scale.set(hr*0.7,hr*0.4,hr*0.8);ch.position.set(0,-hr*0.5,hr*0.6);head.add(ch);
+      const nose=new T.Mesh(new T.SphereGeometry(hr*0.16,5,4),mD);nose.position.set(0,-hr*0.25,hr*2);head.add(nose);
+      for(const s of [-1,1]){const ear=new T.Mesh(new T.ConeGeometry(hr*0.42,hr*1.2,4),mB);ear.position.set(s*hr*0.6,hr*1.05,-hr*0.1);ear.rotation.z=-s*0.25;head.add(ear);
+        const ei=new T.Mesh(new T.ConeGeometry(hr*0.2,hr*0.8,4),mD);ei.position.set(s*hr*0.6,hr*1.0,hr*0.05);ei.rotation.z=-s*0.25;head.add(ei)}
+      const tg2=new T.Group();tg2.position.set(0,S.h+S.br*0.3,-hl);tg2.rotation.x=-2.5;body.add(tg2);
+      const tl=new T.Mesh(new T.SphereGeometry(1,8,6),mB);tl.scale.set(0.075,0.075,0.3);tl.position.z=0.27;tg2.add(tl);
+      const tt=new T.Mesh(new T.SphereGeometry(1,6,5),mW);tt.scale.set(0.05,0.05,0.08);tt.position.z=0.55;tg2.add(tt)}
+    const bl=new T.Mesh(new T.PlaneGeometry(S.br*3.2,S.len*1.5),blobM);bl.rotation.x=-Math.PI/2;bl.position.y=0.04;root.add(bl);
+    return {root,fall,body,legs,ng,NK,ph:Math.random()*6,e:NK.eu,fk:0,S};
+  }
+  function syncAnimals(dt){
+    for(const a of w.animals){let m=AM[a.id];if(!m){m=model(a.sp,a.id%3!==0);AM[a.id]=m;sc.add(m.root)}
+      m.root.visible=a.st!=='gone';if(!m.root.visible)continue;
+      m.root.position.set(a.x,a.y,a.z);m.root.rotation.y=a.hd;
+      const run=a.v>3,stride=run?2.4:1.15;m.ph+=a.v*dt/stride*Math.PI*2;
+      const amp=a.v?(run?0.75:0.38):0;
+      for(const L of m.legs){const off=run?(L.fr?0:Math.PI*0.9)+(L.s>0?0.25:0):(L.fr?0:Math.PI)+(L.s>0?Math.PI:0);
+        const s=Math.sin(m.ph+off);L.hip.rotation.x=s*amp;L.knee.rotation.x=(L.fr?-1:1)*Math.max(0,Math.sin(m.ph+off+0.6))*amp*0.9}
+      m.body.position.y=-m.S.h+(run?Math.abs(Math.sin(m.ph))*0.05*m.S.h:0);
+      const tgt=a.st==='graze'?m.NK.eg:m.NK.eu;m.e+=(tgt-m.e)*Math.min(1,dt*3);m.ng.rotation.x=-m.e;
+      m.ng.children[1].rotation.x=m.NK.eu+(m.e-m.NK.eu)*0.35;
+      if(a.st==='dead'&&!(huCam&&huCam.r.id===a.id&&huCam.t<huCam.dur*0.82)){m.fk=Math.min(1,m.fk+dt*2.2);const k=m.fk*m.fk;m.fall.rotation.z=k*Math.PI/2*0.94;m.fall.position.y=m.S.h-(m.S.h-m.S.br)*k}
+    }
+  }
+  // qurol (durbinsiz ko'rinishda pastda)
+  const gun=new T.Group();
+  {const mt=new T.MeshStandardMaterial({color:0x1d1f22,metalness:0.7,roughness:0.35}),wd=new T.MeshStandardMaterial({color:0x5b3518,roughness:0.5});
+   const brl=new T.Mesh(new T.CylinderGeometry(0.009,0.012,0.75,10),mt);brl.rotation.x=Math.PI/2;brl.position.z=0.42;gun.add(brl);
+   const rcv=new T.Mesh(new T.BoxGeometry(0.045,0.05,0.25),mt);rcv.position.z=0.02;gun.add(rcv);
+   const stock=new T.Mesh(new T.BoxGeometry(0.05,0.09,0.55),wd);stock.position.set(0,-0.04,-0.05);gun.add(stock);
+   const fore=new T.Mesh(new T.BoxGeometry(0.05,0.05,0.35),wd);fore.position.set(0,-0.03,0.28);gun.add(fore);
+   const scp=new T.Mesh(new T.CylinderGeometry(0.02,0.02,0.3,14),mt);scp.rotation.x=Math.PI/2;scp.position.set(0,0.06,0.03);gun.add(scp);
+   for(const z of [-0.14,0.2]){const b=new T.Mesh(new T.CylinderGeometry(0.027,0.022,0.07,14),mt);b.rotation.x=Math.PI/2;b.position.set(0,0.06,z);gun.add(b)}
+   gun.scale.setScalar(0.75);gun.position.set(0.15,-0.2,-0.32);gun.rotation.y=Math.PI;cam.add(gun);sc.add(cam)}
+  // o'q va iz (o'q kamerasi uchun)
+  const bullet=new T.Mesh(new T.CylinderGeometry(0.0035,0.0045,0.03,10),new T.MeshStandardMaterial({color:0xd4a64a,metalness:1,roughness:0.25}));bullet.visible=false;sc.add(bullet);
+  const trailG=new T.BufferGeometry();trailG.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(6),3));
+  const trail=new T.Line(trailG,new T.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0.35}));trail.visible=false;sc.add(trail);
+  // tegish changi
+  const puffT=cvT(64,(x,s)=>{const g=x.createRadialGradient(32,32,1,32,32,32);g.addColorStop(0,'rgba(210,190,150,.9)');g.addColorStop(1,'rgba(210,190,150,0)');x.fillStyle=g;x.fillRect(0,0,s,s)});
+  const puffs=[];
+  function puff(p,kind){for(let i=0;i<6;i++){const s=new T.Sprite(new T.SpriteMaterial({map:puffT,transparent:true,depthWrite:false,color:kind==='tree'?0x9a7a50:0xd8c8a0}));s.position.set(p[0],p[1]+0.1,p[2]);s.userData={v:[(Math.random()-0.5)*0.8,0.5+Math.random()*0.8,(Math.random()-0.5)*0.8],t:0};s.scale.setScalar(0.3);sc.add(s);puffs.push(s)}}
+  // chetdagi ko'rsatkichlar
+  const edge=$('#huedge');let edgeT=0;
+  function edges(){
+    if(huZoom||huCam){edge.innerHTML='';return}const Wd=W(),Hd=H(),v3=new T.Vector3();let s='';
+    for(const a of w.animals){if(a.st==='gone'||a.st==='dead')continue;v3.set(a.x,a.y+HU.sp[a.sp].h,a.z).project(cam);
+      const behind=v3.z>1;let x=v3.x,y=v3.y;if(behind){x=-x;y=-y}
+      if(!behind&&Math.abs(x)<0.95&&Math.abs(y)<0.9){s+=`<b style="left:${(x+1)/2*Wd}px;top:${(1-y)/2*Hd-14}px"></b>`;continue}
+      const m=Math.max(Math.abs(x)/0.9,Math.abs(y)/0.8);x/=m;y/=m;const px=(x+1)/2*Wd,py=(1-y)/2*Hd,ang=Math.atan2(-y,x);
+      s+=`<i style="left:${px}px;top:${py}px;transform:translate(-50%,-50%) rotate(${ang}rad)"></i>`}
+    edge.innerHTML=s}
+  // masofa o'lchagich: markazdagi nur
+  function ranger(){
+    const o=huEye(w),d=huDir();let res=null;
+    for(let s=2;s<800;s+=1.5){const x=o[0]+d[0]*s,y=o[1]+d[1]*s,z=o[2]+d[2]*s;
+      for(const a of w.animals){if(a.st==='gone')continue;const S=HU.sp[a.sp];if(Math.hypot(x-a.x,z-a.z)<S.len*0.6&&y>a.y&&y<a.y+S.h+S.br*2){res=[s,a];break}}
+      if(res)break;if(y<huH(w,x,z)){res=[s,null];break}}
+    const el=$('#hurng');if(!el)return;
+    el.innerHTML=res?`◎ ${Math.round(Math.hypot(d[0]*res[0],d[2]*res[0]))} m${res[1]?` · ${HU_NM[res[1].sp]()}`:''}`:'◎ —';el.classList.toggle('on',!!(res&&res[1]));
+  }
+  function windChip(){const el=$('#huwind');if(!el)return;const sp=Math.hypot(w.wind.x,w.wind.z);if(sp<0.1){el.textContent=KT('Shamol yo\'q','Без ветра','No wind');return}
+    // shamol qayerga esadi — ekranga nisbatan
+    const ang=Math.atan2(w.wind.x,w.wind.z)-huYaw;el.innerHTML=`<i style="display:inline-block;transform:rotate(${-ang}rad)">↑</i> ${sp.toFixed(1)} m/s`}
+  const camBase=new T.Vector3();let fovNow=60;
+  function frame(dt){
+    syncAnimals(huCam?dt*0.12:dt);
+    const o=huEye(w);camBase.set(o[0],o[1],o[2]);
+    if(huCam){const c=huCam;c.t+=dt;const P=c.r.path,u=Math.min(1,c.t/(c.dur*0.78)),e=u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+      // yo'l bo'ylab nuqta
+      const L=[];let tot=0;for(let i=1;i<P.length;i++){const l=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1],P[i][2]-P[i-1][2]);L.push(l);tot+=l}
+      let want=e*tot,i=0;while(i<L.length-1&&want>L[i]){want-=L[i];i++}const k=L[i]?want/L[i]:1;
+      const bp=new T.Vector3(...P[i]).lerp(new T.Vector3(...P[i+1]||P[i]),Math.min(1,k)),dir=new T.Vector3(...(P[i+1]||P[i])).sub(new T.Vector3(...P[i])).normalize();
+      bullet.visible=u<1;trail.visible=true;bullet.position.copy(bp);bullet.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),dir);
+      const tp=trailG.attributes.position;tp.setXYZ(0,P[0][0],P[0][1]-0.05,P[0][2]);tp.setXYZ(1,bp.x,bp.y,bp.z);tp.needsUpdate=true;
+      const side=new T.Vector3().crossVectors(dir,new T.Vector3(0,1,0)).normalize();
+      if(u<1){cam.position.copy(bp).addScaledVector(dir,-0.55).addScaledVector(side,0.16).add(new T.Vector3(0,0.07,0));cam.lookAt(bp.clone().addScaledVector(dir,2))}
+      else{const hp=new T.Vector3(...P[P.length-1]),ang=(c.t-c.dur*0.78)*0.5;cam.position.copy(hp).addScaledVector(dir,-4.2*Math.cos(ang)).addScaledVector(side,3.4+Math.sin(ang)*1.5).add(new T.Vector3(0,1.1,0));cam.lookAt(hp.x,hp.y-0.3,hp.z)}
+      cam.fov=40;gun.visible=false;
+      if(c.t>=c.dur){bullet.visible=trail.visible=false;const msg=c.msg;huCam=null;huAfter(msg)}
+    }else{
+      const d=huDir();cam.position.copy(camBase);cam.lookAt(camBase.x+d[0],camBase.y+d[1],camBase.z+d[2]);
+      const target=huZoom?huScopeFov(W(),H()):huFovV(W(),H());fovNow+=(target-fovNow)*Math.min(1,dt*14);if(Math.abs(fovNow-target)<0.01)fovNow=target;cam.fov=fovNow;
+      gun.visible=!huZoom;gun.position.y=-0.2-huKick*0.6+(huReload>0.2&&huReload<1.1?-0.03*Math.sin((1.1-huReload)/0.9*Math.PI):0);
+    }
+    cam.aspect=W()/H();cam.updateProjectionMatrix();
+    for(let i=puffs.length-1;i>=0;i--){const s=puffs[i],u=s.userData;u.t+=dt;s.position.x+=u.v[0]*dt;s.position.y+=u.v[1]*dt;s.position.z+=u.v[2]*dt;s.scale.setScalar(0.3+u.t*1.6);s.material.opacity=Math.max(0,1-u.t/1.4);if(u.t>1.4){sc.remove(s);s.material.dispose();puffs.splice(i,1)}}
+    huRngT-=dt;if(huRngT<=0){huRngT=0.2;ranger();windChip()}
+    edgeT-=dt;if(edgeT<=0){edgeT=0.1;edges()}
+    if(huZoom&&!huCam)huReticle();
+    rd.render(sc,cam);
+  }
+  const onR=()=>{rd.setSize(W(),H());huRtKey=''};addEventListener('resize',onR);
+  return {frame,puff,dispose(){removeEventListener('resize',onR);rd.dispose();try{rd.forceContextLoss()}catch(e){}rd.domElement.remove()}};
+}
+// ---------------- ovoz ----------------
+function huCtx(){if(!store.get('hu_snd',true))return null;try{huAud=huAud||new (window.AudioContext||window.webkitAudioContext)();if(huAud.state==='suspended')huAud.resume();return huAud}catch(e){return null}}
+function huNoiseBuf(a,sec){const n=Math.floor(a.sampleRate*sec),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;return b}
+function huSnd(k){
+  const a=huCtx();if(!a)return;const t=a.currentTime;
+  const burst=(t0,dur,f0,f1,g,type='lowpass')=>{const s=a.createBufferSource();s.buffer=huNoiseBuf(a,dur);const fl=a.createBiquadFilter();fl.type=type;fl.frequency.setValueAtTime(f0,t0);fl.frequency.exponentialRampToValueAtTime(f1,t0+dur);const gn=a.createGain();gn.gain.setValueAtTime(g,t0);gn.gain.exponentialRampToValueAtTime(0.001,t0+dur);s.connect(fl);fl.connect(gn);gn.connect(a.destination);s.start(t0)};
+  const tone=(t0,f0,f1,dur,g)=>{const o=a.createOscillator(),gn=a.createGain();o.frequency.setValueAtTime(f0,t0);o.frequency.exponentialRampToValueAtTime(f1,t0+dur);gn.gain.setValueAtTime(g,t0);gn.gain.exponentialRampToValueAtTime(0.001,t0+dur);o.connect(gn);gn.connect(a.destination);o.start(t0);o.stop(t0+dur)};
+  if(k==='shot'){burst(t,0.45,4000,300,0.9);tone(t,90,35,0.35,0.9);burst(t+0.32,0.6,900,200,0.22);burst(t+0.85,0.8,600,150,0.1)}
+  else if(k==='bolt'){burst(t,0.05,3200,2500,0.35,'bandpass');burst(t+0.28,0.06,2600,2000,0.4,'bandpass')}
+  else if(k==='hit'){tone(t,120,60,0.12,0.5);burst(t,0.1,800,200,0.3)}
+}
+let huAmbT=null,huWindN=null;
+function huAmb(){
+  huStopAmb();const a=huCtx();if(!a)return;
+  try{const s=a.createBufferSource();s.buffer=huNoiseBuf(a,4);s.loop=true;const f=a.createBiquadFilter();f.type='lowpass';f.frequency.value=380;const g=a.createGain();g.gain.value=0.035;s.connect(f);f.connect(g);g.connect(a.destination);s.start();huWindN=s}catch(e){}
+  const bird=()=>{const c=huCtx();if(!c||!$('#hustage'))return;const t=c.currentTime,n=2+Math.random()*4|0,b=2400+Math.random()*1800;
+    for(let i=0;i<n;i++){const o=c.createOscillator(),g=c.createGain(),t0=t+i*0.13;o.frequency.setValueAtTime(b,t0);o.frequency.exponentialRampToValueAtTime(b*(1.2+Math.random()*0.4),t0+0.08);g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(0.03,t0+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t0+0.1);o.connect(g);g.connect(c.destination);o.start(t0);o.stop(t0+0.12)}
+    huAmbT=setTimeout(bird,2500+Math.random()*6000)};
+  huAmbT=setTimeout(bird,1500);
+}
+function huStopAmb(){clearTimeout(huAmbT);try{huWindN&&huWindN.stop()}catch(e){}huWindN=null}
+
 const VIEWS={food:viewFood,namoz:viewNamoz,cash:viewCash,quiz:viewQuiz,kids:viewKids,doc:viewDoc,prava:viewPrava,sert:viewSert};
 /* ---------- ASOSIY ---------- */
 const TILE_COL={audio:['#5b1f6e','#b0479a'],qibla:['#08332f','#2e9e7a'],tasbeh:['#5b3a1a','#c08a3e'],namoz:['#08332f','#127061'],food:['#9c2a22','#e0812a'],cash:['#14296e','#3563d4'],quiz:['#35217a','#7a4fd6'],kids:['#0f6aa6','#33b2df'],doc:['#25304a','#4a5d86'],prava:['#4a3200','#d99a00'],sert:['#2a1a6e','#6a4fd6']};
@@ -5551,6 +6165,7 @@ function viewHome(){
     <button class="card pv-main" data-go="kkal" style="margin:0;background:linear-gradient(135deg,#0f5132,#2fa36b)"><span class="pv-ic">${ICONS.kkal}</span><span><b>Kaloriya hisoblagich</b><small>Ovqatni suratga oling · kunlik norma</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="mafia" style="margin:0;background:linear-gradient(135deg,#2b0f14,#8e1b2b)"><span class="pv-ic">${ICONS.mafia}</span><span><b>Mafiya o'yini</b><small>Davrada o'ynash · ilova boshlovchiga yordam beradi</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="bilyard" style="margin:0;background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">${ICONS.bilyard}</span><span><b>Bilyard</b><small>3D · Rus piramidasi, Amerikanka, 8-shar</small></span><span class="pv-go">→</span></button>
+    <button class="card pv-main" data-go="ov" style="margin:0;background:linear-gradient(135deg,#1f2d16,#6b7d2e)"><span class="pv-ic">${ICONS.ov}</span><span><b>Snayper ovi</b><small>3D o'rmon · durbin, shamol, masofa</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="prava" style="margin:0;background:linear-gradient(135deg,#4a3200,#d99a00)"><span class="pv-ic">${ICONS.prava}</span><span><b>Prava imtihoniga tayyorlaning</b><small>Imtihon rejimi · xatolar ustida ishlash · yo'l belgilari</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="sert" style="margin:0;background:linear-gradient(135deg,#2a1a6e,#6a4fd6)"><span class="pv-ic">∑</span><span><b>Milliy sertifikatga tayyorlaning</b><small>8 fan · imtihon rejimi · izohli savollar</small></span><span class="pv-go">→</span></button>
     ${STAT.admin?`<button class="card pv-main" data-go="admin" data-noi18n style="margin:0;background:linear-gradient(135deg,#14224d,#3563d4)"><span class="pv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg></span><span><b>Statistika</b><small>Admin panel · faqat siz ko'rasiz</small></span><span class="pv-go">→</span></button>`:''}
@@ -5579,7 +6194,7 @@ function viewHome(){
 }
 
 /* ---------- ADMIN PANEL: statistika ---------- */
-const AD_SEC={home:'Asosiy',namoz:'Namoz',food:'Taomlar',cash:'Valyuta',quiz:'Viktorina',kids:'Bolalar',audio:'Audio',doc:'Hujjatlar',prava:'Prava',sert:'Sertifikat',admin:'Admin panel',game:"Bolalar o'yinlari",ertak:'Ertaklar',cook:'Pishirish rejimi',pv_exam:'Prava imtihoni',sr_exam:'Sertifikat imtihoni',kkal:'Kaloriya',kk_photo:'Kaloriya: surat tahlili',mafia:'Mafiya',mafia_game:'Mafiya: yangi o\'yin',bilyard:'Bilyard',bilyard_game:'Bilyard: yangi o\'yin'};
+const AD_SEC={home:'Asosiy',namoz:'Namoz',food:'Taomlar',cash:'Valyuta',quiz:'Viktorina',kids:'Bolalar',audio:'Audio',doc:'Hujjatlar',prava:'Prava',sert:'Sertifikat',admin:'Admin panel',game:"Bolalar o'yinlari",ertak:'Ertaklar',cook:'Pishirish rejimi',pv_exam:'Prava imtihoni',sr_exam:'Sertifikat imtihoni',kkal:'Kaloriya',kk_photo:'Kaloriya: surat tahlili',mafia:'Mafiya',mafia_game:'Mafiya: yangi o\'yin',bilyard:'Bilyard',bilyard_game:'Bilyard: yangi o\'yin',ov:'Snayper ovi',ov_game:'Snayper ovi: yangi ov'};
 const AD_PF={android:'Android',ios:'iPhone (iOS)',tdesktop:'Kompyuter (Telegram Desktop)',macos:'Mac',weba:'Telegram Web',webk:'Telegram Web',web:'Telegram Web',unigram:'Windows (Unigram)','?':"Noma'lum"};
 const AD_LANG={uz:"O'zbekcha (lotin)",uzc:"O'zbekcha (kirill)",ru:'Ruscha',en:'Inglizcha','?':"Noma'lum"};
 function adSrc(k){if(k==='bot')return 'Bot: /start';if(k==='app')return 'Ilova havolasi';if(k==='?')return "Eski foydalanuvchi (manba noma'lum)";if(k==='prava')return 'Prava havolasi';if(/^ertak_/.test(k))return 'Ertak ulashilgan';if(/^r_/.test(k))return 'Retsept havolasi';return k}
@@ -5670,7 +6285,7 @@ function renderAdmin(j){
     try{for(let k=0;k<1000;k++){b.textContent=`Tekshirilmoqda… ${fmt(al+bl)}`;const r=await adPost('/admin/check',{after});if(!r||!r.ok)throw 0;al+=r.alive;bl+=r.blocked;after=r.next;if(r.done)break}
       toast(`Tayyor: ${fmt(al)} faol, ${fmt(bl)} bloklagan`);adBusy=false;if(current==='admin')viewAdmin()}catch(e){adBusy=false;b.textContent="Xatolik — qayta urinish"}};
 }
-VIEWS.home=viewHome;VIEWS.audio=viewAudio;VIEWS.admin=viewAdmin;VIEWS.mafia=viewMafia;VIEWS.bilyard=()=>{if(BLS)BLS.live=false;viewBilyard()};VIEWS.kkal=()=>{kkView='day';kkPick=null;kkPh=null;kkOff=0;kkQ='';viewKkal()};
+VIEWS.home=viewHome;VIEWS.audio=viewAudio;VIEWS.admin=viewAdmin;VIEWS.mafia=viewMafia;VIEWS.ov=()=>viewOv();VIEWS.bilyard=()=>{if(BLS)BLS.live=false;viewBilyard()};VIEWS.kkal=()=>{kkView='day';kkPick=null;kkPh=null;kkOff=0;kkQ='';viewKkal()};
 (function(){const n=uzNow();$('#todaychip').textContent=`${n.getUTCDate()}-${OYLAR[n.getUTCMonth()].slice(0,3)}`})();
 if(!VIEWS[current]) current='home';
 renderTabs(); setHero(current); VIEWS[current](); loadRates();
