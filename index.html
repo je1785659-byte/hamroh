@@ -3988,7 +3988,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101g';
+const APP_VER='20261101h';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -5272,14 +5272,14 @@ function blMake3D(v){
   const V2=(x,z)=>new T.Vector2(x-0.5,-(z-1));
   const box=(x1,x2,y1,y2,z1,z2,m)=>{const o=new T.Mesh(new T.BoxGeometry(x2-x1,y2-y1,z2-z1),m);o.position.set((x1+x2)/2-0.5,(y1+y2)/2,(z1+z2)/2-1);o.receiveShadow=true;sc.add(o);return o};
   const flatG=g=>{g.rotateX(-Math.PI/2);return g};
-  const holes=BL.holes,inQ=(x,z)=>x>-cw&&x<1+cw&&z>-cw&&z<2+cw,inH=(x,z)=>holes.find(o=>Math.hypot(x-o.x,z-o.y)<o.r);
+  const holes=BL.holes.map(o=>({...o,r:o.r*1.18})),inQ=(x,z)=>x>-cw&&x<1+cw&&z>-cw&&z<2+cw,inH=(x,z)=>holes.find(o=>Math.hypot(x-o.x,z-o.y)<o.r);
   // ichki to'rtburchak chegarasi (soat yo'nalishida emas — ketma-ket nuqtalar)
   const Qp=[];{const st=0.002,C=[[-cw,-cw],[1+cw,-cw],[1+cw,2+cw],[-cw,2+cw],[-cw,-cw]];for(let i=0;i<4;i++){const [x1,z1]=C[i],[x2,z2]=C[i+1],n=Math.ceil(Math.hypot(x2-x1,z2-z1)/st);for(let k=0;k<n;k++)Qp.push([x1+(x2-x1)*k/n,z1+(z2-z1)*k/n])}}
   {const k=Qp.findIndex(([x,z])=>!inH(x,z));Qp.push(...Qp.splice(0,k))}
   // movut: o'yin maydoni + har bir luza og'zidagi "tomoq" (jag'lar orasi), teshik qismi kesilgan
   const feltM=new T.MeshStandardMaterial({map:feltT,roughness:0.95});
   const fp=new T.Mesh(flatG(new T.PlaneGeometry(1,2)),feltM);fp.receiveShadow=true;sc.add(fp);
-  const throatM=new T.MeshBasicMaterial({color:0x07110f});
+  const throatM=new T.MeshStandardMaterial({color:fc[1],roughness:0.95});
   {const S6=BL.segs.slice(6),jawAt=(x,z)=>S6.find(q=>Math.hypot(q[0]-x,q[1]-z)<1e-6);
     const tips=[];for(const [ax,az,bx,bz] of BL.segs.slice(0,6))tips.push([ax,az],[bx,bz]);
     for(const o of holes){const tp=tips.filter(([x,z])=>Math.hypot(x-o.mx,z-o.my)<BL.mouthS);const [A,B]=tp,ja=jawAt(A[0],A[1]),jb=jawAt(B[0],B[1]);
@@ -5299,17 +5299,22 @@ function blMake3D(v){
   // rezina bortlar: har bir to'g'ri bort + ikki uchidagi jag' (fizikadagi kesmalar bilan bir xil)
   const S=BL.segs,near=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<1e-6;
   for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],A=[ax,az],B=[bx,bz];const ja=S.slice(6).find(q=>near([q[0],q[1]],A)),jb=S.slice(6).find(q=>near([q[0],q[1]],B));
-    const pts=[[ja[2],ja[3]],A,B,[jb[2],jb[3]]].map(([x,z])=>V2(x,z));
+    const P4=[[ja[2],ja[3]],A,B,[jb[2],jb[3]],[ja[2],ja[3]]],pts=[];
+    for(let e=0;e<4;e++){const [x1,z1]=P4[e],[x2,z2]=P4[e+1],n=Math.max(2,Math.ceil(Math.hypot(x2-x1,z2-z1)/0.002));for(let k=0;k<n;k++){let x=x1+(x2-x1)*k/n,z=z1+(z2-z1)*k/n;const o=inH(x,z);if(o){const d=Math.hypot(x-o.x,z-o.y)||1e-6;x=o.x+(x-o.x)/d*o.r;z=o.y+(z-o.y)/d*o.r}pts.push(V2(x,z))}}
     const g=new T.ExtrudeGeometry(new T.Shape(pts),{depth:chH,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,cushM);m.receiveShadow=true;m.castShadow=false;sc.add(m)}
   box(-O-0.01,1+O+0.01,-0.24,-0.13,-O-0.01,2+O+0.01,darkM);
   for(const [lx,lz] of [[-O+0.04,-O+0.06],[1+O-0.04,-O+0.06],[-O+0.04,2+O-0.06],[1+O-0.04,2+O-0.06],[-O+0.04,1],[1+O-0.04,1]])box(lx-0.045,lx+0.045,-0.9,-0.24,lz-0.045,lz+0.045,darkM);
   const floor=new T.Mesh(new T.PlaneGeometry(14,14),new T.MeshStandardMaterial({color:0x101316,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-0.9;sc.add(floor);
   const flat=(g,m,x,y,z)=>{g.rotateX(-Math.PI/2);const o=new T.Mesh(g,m);o.position.set(x-0.5,y,z-1);sc.add(o);return o};
   // luza ichi: qora devor, tagida to'r (qorong'i), bort ustida metall halqa (tashqi yoyi)
-  const marks=[],vis=[],rimM=new T.MeshStandardMaterial({color:0xe2e6ea,metalness:0.85,roughness:0.22,emissive:0x2a2d30}),linerM=new T.MeshBasicMaterial({color:0x050505,side:T.BackSide});
+  // luza ichidagi to'r (tepadan qaraganda teshik aniq ko'rinadi) va teshik chetidagi to'q chiziq
+  const netT=cvT(128,128,(x,w,h)=>{const g=x.createRadialGradient(64,64,10,64,64,64);g.addColorStop(0,'#1d3566');g.addColorStop(1,'#08101f');x.fillStyle=g;x.fillRect(0,0,w,h);x.strokeStyle='rgba(150,180,255,.35)';x.lineWidth=1.5;for(let i=-128;i<256;i+=11){x.beginPath();x.moveTo(i,0);x.lineTo(i+128,128);x.stroke();x.beginPath();x.moveTo(i,128);x.lineTo(i+128,0);x.stroke()}});
+  const netM=new T.MeshBasicMaterial({map:netT}),edgeM=new T.MeshBasicMaterial({color:0x050505,transparent:true,opacity:0.85,depthWrite:false});
+  const marks=[],vis=[],rimM=new T.MeshStandardMaterial({color:0xd9b25a,metalness:0.9,roughness:0.25,emissive:0x3a2a08}),linerM=new T.MeshBasicMaterial({color:0x0b1426,side:T.BackSide});
   for(const o of holes){vis.push([o.x,o.y]);
     const ln=new T.Mesh(new T.CylinderGeometry(o.r,o.r*0.92,0.12,32,1,true),linerM);ln.position.set(o.x-0.5,-0.06,o.y-1);sc.add(ln);
-    flat(new T.CircleGeometry(o.r,24),black,o.x,-0.1,o.y);
+    flat(new T.CircleGeometry(o.r*0.95,28),netM,o.x,-0.045,o.y);
+    {const eg=new T.RingGeometry(o.r-0.0005,o.r+0.0028,48);const m=flat(eg,edgeM,o.x,0.0006,o.y);m.renderOrder=1}
     const N=180,out=[];for(let i=0;i<N;i++){const a=i/N*Math.PI*2;out.push(!inQ(o.x+Math.cos(a)*o.r,o.y+Math.sin(a)*o.r))}
     let st=out.findIndex((v,i)=>v&&!out[(i+N-1)%N]),n=0;if(st<0)st=0;while(n<N&&out[(st+n)%N])n++;
     const tg2=new T.TorusGeometry(o.r+0.005,0.0058,8,40,n/N*Math.PI*2);tg2.rotateZ(st/N*Math.PI*2);tg2.rotateX(Math.PI/2);
