@@ -3988,7 +3988,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101m';
+const APP_VER='20261101n';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -5314,6 +5314,13 @@ function blMake3D(v){
   // rezina bortlar: luza chuqurlari bilan kesilgan
   const S=BL.segs,near=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<1e-6;
   const mouthM=new T.MeshBasicMaterial({color:0x111536,side:T.DoubleSide});
+  // burchak luzasi: og'iz chizig'idan narigi butun burchak (taxta ko'rinmasin) — luza rangida
+  for(const u of PK){if(!u.o.c)continue;const sx=u.ax<0?-1:1,sz=u.az<0?-1:1,cx=sx<0?0:1,cz=sz<0?0:2,j=BL.jawC;
+    const sq=[[cx-sx*j,cz-sz*j],[cx+sx*cw,cz-sz*j],[cx+sx*cw,cz+sz*cw],[cx-sx*j,cz+sz*cw]],pts=[];
+    const beyond=([x,z])=>(x-u.M[0])*u.ax+(z-u.M[1])*u.az>=-1e-6;
+    for(let i=0;i<4;i++){const p1=sq[i],p2=sq[(i+1)%4],b1=beyond(p1),b2=beyond(p2);if(b1)pts.push(p1);
+      if(b1!==b2){const d1=(p1[0]-u.M[0])*u.ax+(p1[1]-u.M[1])*u.az,d2=(p2[0]-u.M[0])*u.ax+(p2[1]-u.M[1])*u.az,t=d1/(d1-d2);pts.push([p1[0]+(p2[0]-p1[0])*t,p1[1]+(p2[1]-p1[1])*t])}}
+    if(pts.length>2){const m=new T.Mesh(flatG(new T.ShapeGeometry(new T.Shape(pts.map(([x,z])=>V2(x,z))))),mouthM);m.position.y=0.0005;sc.add(m)}}
   for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],A=[ax,az],B=[bx,bz];const ja=S6.find(q=>near([q[0],q[1]],A)),jb=S6.find(q=>near([q[0],q[1]],B));
     // rezina luza og'zida tik kesiladi (orqasida "burchak" qolmaydi); jag' uchburchagi luza og'zining bir qismi bo'ladi
     const onx=ax===bx?(ax<0.5?-cw:cw):0,onz=az===bz?(az<1?-cw:cw):0,Ab=[ax+onx,az+onz],Bb=[bx+onx,bz+onz];
