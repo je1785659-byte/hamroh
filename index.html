@@ -773,6 +773,9 @@ body.bl-play nav.tabs{display:none}
 @media (max-width:380px){.bl3-ib{min-width:38px;height:40px;padding:0 9px}.bl3-bot{gap:6px}}
 .bl-code{font:700 22px/1 ui-monospace,monospace;letter-spacing:3px;background:rgba(255,255,255,.08);padding:10px 14px;border-radius:12px;margin:2px 0 6px}
 #bliback{background:transparent;color:#fff;border-color:rgba(255,255,255,.25)}
+.bl3-msg{transition:opacity .4s}.bl3-msg.fade{opacity:0}
+.bl3-pow{width:40px;right:6px}
+.bl3-2d{inset:70px 54px 70px 8px}
 .mf-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
 .mf-h b{font-family:var(--display);font-size:17px}
 .mf-names{display:flex;flex-direction:column;gap:6px}
@@ -3985,7 +3988,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101d';
+const APP_VER='20261101e';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -5008,7 +5011,8 @@ function blHud(){
   $('#blpls').innerHTML=[0,1].map(i=>`<div class="bl3-pl ${G.turn===i&&!G.over?'on':''}" data-notr><b>${esc(blName(i))}</b>${pyr
     ?`<span class="bl3-sc">${G.score[i]}</span><div class="bl3-dots">${Array.from({length:BL_PYR_WIN},(_,k)=>`<i class="${k<G.score[i]?'on':''}"></i>`).join('')}</div>`
     :`<small>${G.groups[i]?blGroupName(G.groups[i]):KT('guruh ochiq','группа не выбрана','table open')}</small><div class="bl-mini">${G.groups[i]?blMini(G.groups[i]):''}</div>`}</div>`).join('');
-  const m=$('#blmsg');m.textContent=blMsg;m.hidden=!blMsg;
+  const m=$('#blmsg');m.textContent=blMsg;m.hidden=!blMsg;m.classList.remove('fade');clearTimeout(blHud.t);
+  if(blMsg)blHud.t=setTimeout(()=>m.classList.add('fade'),Math.min(7000,2600+blMsg.length*45));
   $('#blpow').hidden=$('#blL').hidden=$('#blR').hidden=G.over;
   const end=$('#blend');
   if(G.over){const w=G.winner,me=blBot()?w===0:true;
@@ -5016,6 +5020,11 @@ function blHud(){
     $('#blagain').onclick=()=>blOnline()?blOnlineNew():blNew(BLS.mode)}
   else end.innerHTML='';
 }
+// HUD egallamagan joy: yuqori panel ostidan pastki tugmalar ustigacha, chapdan kuch chizig'igacha
+function blSafeRect(w,h){const st=$('#blstage');if(!st)return {cx:w/2,cy:h/2,w,h};const R=st.getBoundingClientRect(),g=el=>el&&!el.hidden&&el.offsetParent?el.getBoundingClientRect():null;
+  const tp=g($('.bl3-top')),bt=g($('#blbotbar')),pw=g($('#blpow'));
+  const top=(tp?tp.bottom-R.top:0)+6,bottom=(bt?bt.top-R.top:h)-6,left=8,right=(pw?pw.left-R.left:w)-6;
+  return {cx:(left+right)/2,cy:(top+bottom)/2,w:Math.max(80,right-left),h:Math.max(120,bottom-top)}}
 function blAutoCue(){const on=blOn(BLS.balls);if(!on.length)return;on.sort((a,b)=>Math.hypot(a.x-BL.head.x,a.y-BL.head.y)-Math.hypot(b.x-BL.head.x,b.y-BL.head.y));blSetCue(on[0].id)}
 // ---- statistika va yutuqlar (faqat shu telefonda) ----
 const blSt=()=>store.get('bl_st',{});
@@ -5070,7 +5079,7 @@ const blCanAim=()=>BLS&&!blReplay&&!(blOnline()&&!(BLS.names&&BLS.names[1]))&&!B
 function blAimAt(p){const c=blCue(BLS.balls);if(p&&Math.hypot(p.x-c.x,p.y-c.y)>BL.r*0.5)blAng=Math.atan2(p.y-c.y,p.x-c.x)}
 function blBindView(){
   const el=blR.dom;let st=null;const fill=v=>{const i=$('#blpowi');if(i)i.style.height=(v*100)+'%'};
-  el.onpointerdown=e=>{if(blReplay){blStopReplay();return}if(!blCanAim())return;e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}
+  el.onpointerdown=e=>{const mm=$('#blmsg');if(mm)mm.classList.add('fade');if(blReplay){blStopReplay();return}if(!blCanAim())return;e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}
     const p=blR.pick(e.clientX,e.clientY),c=blCue(BLS.balls),now=performance.now();
     if(blTool==='pick'){const b=blR.pickBall(e.clientX,e.clientY,true);if(b){blSetCue(b.id);blTool=null;blMsg='';blSave();blHud();blBtns()}return}
     if(blTool==='move'&&p){let best=null;for(const b of blOn(BLS.balls)){const d=Math.hypot(b.x-p.x,b.y-p.y);if(d<BL.r*2.2&&(!best||d<best.d))best={d,b}}if(best){st={drag:best.b,mode:'drag'};return}}
@@ -5343,7 +5352,7 @@ function blMake3D(v){
   const P=new T.Vector3(),L=new T.Vector3(),U=new T.Vector3(),cP=new T.Vector3(0,2.6,2.6),cL=new T.Vector3(),cU=new T.Vector3(0,1,0);
   const rc=new T.Raycaster(),plane=new T.Plane(new T.Vector3(0,1,0),-r),tmp=new T.Vector3(),ax=new T.Vector3(),q=new T.Quaternion(),Y=new T.Vector3(0,1,0),bd=new T.Vector3();
   const ndc=(cx,cy2)=>{const b=rd.domElement.getBoundingClientRect();return new T.Vector2((cx-b.left)/b.width*2-1,-(cy2-b.top)/b.height*2+1)};
-  let first=true,t=0;
+  let first=true,t=0,safeT=-1,safe={cx:lw/2,cy:lh/2,w:lw,h:lh};const vo={x:0,y:0};
   function draw(dt){
     t+=dt;const w=W(),h=H();if(w!==lw||h!==lh){lw=w;lh=h;rd.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix()}
     const G=BLS.G,B=blReplay?blReplay.balls:BLS.balls,c=blCue(B),mode=blViewMode(),moving=!!blEv||!!blReplay;
@@ -5372,12 +5381,16 @@ function blMake3D(v){
     cue.visible=showCue;
     if(showCue){const el=0.09,gap=0.012+blPow*0.2;bd.set(-dx*Math.cos(el),Math.sin(el),-dz*Math.cos(el));cue.quaternion.setFromUnitVectors(Y,bd);const sa=blSpin.a*r,sb=blSpin.b*r;cue.position.set(c.x-0.5+bd.x*(r+gap)-dz*sa,r+bd.y*(r+gap)+sb,c.y-1+bd.z*(r+gap)+dx*sa)}
     // kamera
-    if(mode==='top'){const tf=Math.tan(cam.fov*Math.PI/360),hh=Math.max((1+O+0.04)/tf,(0.5+O+0.04)/(tf*cam.aspect));P.set(0,hh,0.0001);L.set(0,0,0);U.set(0,0,-1)}
+    if(t-safeT>0.4){safeT=t;safe=blSafeRect(w,h)}
+    if(mode==='top'){const tf=Math.tan(cam.fov*Math.PI/360),hh=Math.max((2+2*O+0.03)*h/(2*tf*safe.h),(1+2*O+0.03)*h/(2*tf*safe.w));P.set(0,hh,0.0001);L.set(0,0,0);U.set(0,0,-1)}
     else if(blEv&&blSimT<0.8&&!c.in&&store.get('bl_follow',true)){const sd=Math.hypot(c.vx,c.vy)>0.05?Math.atan2(c.vy,c.vx):blAng,fx=Math.cos(sd),fz=Math.sin(sd),cx=c.x-0.5,cz=c.y-1;P.set(cx-fx*0.75,0.55,cz-fz*0.75);L.set(cx+fx*0.6,0,cz+fz*0.6);U.set(0,1,0)}
     else if(moving||G.over||c.in){P.set(0,2.05,2.55);L.set(0,0,-0.12);U.set(0,1,0)}
     else if(blStroke){const cx=c.x-0.5,cz=c.y-1;P.set(cx-dx*0.62,0.34,cz-dz*0.62);L.set(cx+dx*0.75,0,cz+dz*0.75);U.set(0,1,0)}
     else{const cx=c.x-0.5,cz=c.y-1;P.set(cx-dx*0.8,0.44,cz-dz*0.8);L.set(cx+dx*0.75,0,cz+dz*0.75);U.set(0,1,0)}
     const k=first?1:1-Math.exp(-dt*(mode==='3d'&&!moving&&!G.over?10:4));first=false;
+    // ekran markazini HUD qoplamagan bo'sh to'rtburchak markaziga suramiz (luzalar tugmalar ostida qolmaydi)
+    const ox=w/2-safe.cx,oy=h/2-safe.cy;vo.x+=(ox-vo.x)*k;vo.y+=(oy-vo.y)*k;
+    if(Math.abs(vo.x)>0.5||Math.abs(vo.y)>0.5)cam.setViewOffset(w,h,vo.x,vo.y,w,h);else if(cam.view)cam.clearViewOffset();
     cP.lerp(P,k);cL.lerp(L,k);cU.lerp(U,k).normalize();cam.position.copy(cP);cam.up.copy(cU);cam.lookAt(cL);
     if(api.cam){cam.position.set(...api.cam[0]);cam.up.set(0,1,0);cam.lookAt(...api.cam[1])}
     rd.render(sc,cam);
