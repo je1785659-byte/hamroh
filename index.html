@@ -3988,7 +3988,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101n';
+const APP_VER='20261101o';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -5344,6 +5344,7 @@ function blMake3D(v){
   const netM=new T.MeshBasicMaterial({map:netT,side:T.DoubleSide}),botM=new T.MeshBasicMaterial({color:0x26262b});
   const leaT=cvT(64,64,(x,w,h)=>{x.fillStyle='#b4b0a8';x.fillRect(0,0,w,h);for(let i=0;i<300;i++){x.fillStyle=`rgba(${Math.random()<.5?'255,255,255':'0,0,0'},.08)`;x.fillRect(Math.random()*w,Math.random()*h,2,2)}});
   const leaM=new T.MeshStandardMaterial({map:leaT,roughness:0.85}),goldM=new T.MeshStandardMaterial({color:0xeedba8,metalness:0.6,roughness:0.3,emissive:0x2a2210});
+  const rimM=new T.MeshStandardMaterial({color:0xd9b25a,metalness:0.9,roughness:0.25,emissive:0x3a2a08});
   const marks=[],vis=[];
   for(const u of PK){vis.push(u.Bc);
     // voronka: yuqori kontur (movut sathi) -> ichkariga torayib pastga
@@ -5352,12 +5353,11 @@ function blMake3D(v){
     for(let k=0;k<n-1;k++){const a=k*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}
     const fgm=new T.BufferGeometry();fgm.setAttribute('position',new T.Float32BufferAttribute(pos,3));fgm.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));fgm.setIndex(idx);fgm.computeVertexNormals();sc.add(new T.Mesh(fgm,netM));
     const bot=new T.Shape(top.map(([x,z])=>V2(u.Bc[0]+(x-u.Bc[0])*shr,u.Bc[1]+(z-u.Bc[1])*shr)));const bm=new T.Mesh(flatG(new T.ShapeGeometry(bot)),botM);bm.position.y=-dep;sc.add(bm);
-    // orqa tomonda kulrang teri yoy
-    const phi=Math.atan2(u.az,u.ax),rg=new T.RingGeometry(u.hw,u.hw+0.013,28,1,-phi-Math.PI/2,Math.PI);flat(rg,leaM,u.Bc[0],rTop+0.0007,u.Bc[1]);
-    // oltinrang metall plastinkalar: jag' oxiridan bort bo'ylab
-    for(const q of u.jaws){const ex=q[2],ez=q[3],hor=Math.abs(ez+cw)<1e-6||Math.abs(ez-2-cw)<1e-6;const dir=hor?Math.sign(ex-u.Bc[0])||1:Math.sign(ez-u.Bc[1])||1,Lb=0.026,inset=0.007;
-      const bxg=new T.BoxGeometry(hor?Lb:0.0045,0.002,hor?0.0045:Lb),m=new T.Mesh(bxg,goldM);
-      m.position.set(hor?ex+dir*Lb/2-0.5:ex-0.5+(ex<0.5?-inset:inset),rTop+0.001,hor?ez-1+(ez<1?-inset:inset):ez+dir*Lb/2-1);sc.add(m)}
+    // luza chetidagi oltinrang metall halqa (avvalgi ko'rinish): bort ustida, chuqurning tashqi yoyi bo'ylab
+    {const R=u.hw+0.005,N=180,out=[];for(let k=0;k<N;k++){const a=k/N*Math.PI*2;out.push(!inQ(u.Bc[0]+Math.cos(a)*R,u.Bc[1]+Math.sin(a)*R))}
+      let st=out.findIndex((v,k)=>v&&!out[(k+N-1)%N]),n=0;if(st<0)st=0;while(n<N&&out[(st+n)%N])n++;
+      const tg2=new T.TorusGeometry(R,0.0058,8,40,n/N*Math.PI*2);tg2.rotateZ(st/N*Math.PI*2);tg2.rotateX(Math.PI/2);
+      const rim=new T.Mesh(tg2,rimM);rim.position.set(u.Bc[0]-0.5,rTop,u.Bc[1]-1);sc.add(rim)}
     const mg=new T.RingGeometry(u.hw+0.014,u.hw+0.021,40);mg.rotateX(-Math.PI/2);const mk=new T.Mesh(mg,new T.MeshBasicMaterial({color:0xffd54a,transparent:true,opacity:0.9,depthWrite:false}));mk.position.set(u.Bc[0]-0.5,rTop+0.002,u.Bc[1]-1);mk.visible=false;sc.add(mk);marks.push(mk)}
   // bort ustidagi marvarid belgilar
   const dmM=new T.MeshStandardMaterial({color:0xf3ead2,roughness:0.3});
