@@ -3988,7 +3988,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101f';
+const APP_VER='20261101g';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -5084,16 +5084,22 @@ function blBindView(){
     if(blTool==='pick'){const b=blR.pickBall(e.clientX,e.clientY,true);if(b){blSetCue(b.id);blTool=null;blMsg='';blSave();blHud();blBtns()}return}
     if(blTool==='move'&&p){let best=null;for(const b of blOn(BLS.balls)){const d=Math.hypot(b.x-p.x,b.y-p.y);if(d<BL.r*2.2&&(!best||d<best.d))best={d,b}}if(best){st={drag:best.b,mode:'drag'};return}}
     st={x:e.clientX,y:e.clientY,lx:e.clientX,lt:now,mode:null,place:BLS.G.hand&&!!p&&Math.hypot(p.x-c.x,p.y-c.y)<BL.r*3.2};
-    if(!st.place&&blViewMode()==='top'){blAimAt(p);st.mode='point'}};
+    if(!st.place&&blViewMode()==='top'&&p){
+      // kiy orqasiga (sopiga) tegilsa — kiyni sopidan ushlab buramiz: uchi barmoqqa emas, teskari tomonga qaraydi
+      const dx=p.x-c.x,dy=p.y-c.y,d=Math.hypot(dx,dy),ux=Math.cos(blAng),uy=Math.sin(blAng),back=-(dx*ux+dy*uy)/Math.max(d,1e-6);
+      if(d>BL.r*2&&back>Math.cos(0.6)){st.mode='butt';st.a0=Math.atan2(c.y-p.y,c.x-p.x);st.ang=blAng}
+      else{blAimAt(p);st.mode='point'}}
+    else if(!st.place&&blR.proj){const q=blR.proj(c.x,c.y);st.sg=(e.clientY>q.y+18&&Math.abs(e.clientX-q.x)<80)?-1:1}};
   el.onpointermove=e=>{if(!st)return;
     if(st.place){const p=blR.pick(e.clientX,e.clientY);if(p&&blCanPlace(BLS.G,BLS.balls,p.x,p.y)){const c=blCue(BLS.balls);c.x=p.x;c.y=p.y}return}
     if(st.drag){const p=blR.pick(e.clientX,e.clientY);if(p&&blFree(BLS.balls,p.x,p.y,st.drag.id)){st.drag.x=p.x;st.drag.y=p.y}return}
     const dx=e.clientX-st.x,dy=e.clientY-st.y;
     if(!st.mode){if(Math.hypot(dx,dy)<10)return;st.mode=dy>Math.abs(dx)*1.2?'pull':'aim';st.y0=e.clientY;st.lx=e.clientX;st.lt=performance.now()}
     if(st.mode==='point'){blAimAt(blR.pick(e.clientX,e.clientY));return}
+    if(st.mode==='butt'){const p=blR.pick(e.clientX,e.clientY),c=blCue(BLS.balls);if(p&&Math.hypot(p.x-c.x,p.y-c.y)>BL.r){const a=Math.atan2(c.y-p.y,c.x-p.x),da=Math.atan2(Math.sin(a-st.a0),Math.cos(a-st.a0));blAng=st.ang+da}return}
     if(st.mode==='pull'){blPow=Math.max(0,Math.min(1,(e.clientY-st.y0)/(innerHeight*0.3)));fill(blPow);return}
     const now=performance.now(),ddx=e.clientX-st.lx,sp=Math.abs(ddx)/Math.max(1,now-st.lt);st.lx=e.clientX;st.lt=now;
-    blAng+=ddx*(sp<0.15?0.0005:sp<0.5?0.0016:0.003)};
+    blAng+=(st.sg||1)*ddx*(sp<0.15?0.0005:sp<0.5?0.0016:0.003)};
   el.onpointerup=el.onpointercancel=e=>{if(!st)return;const s=st;st=null;
     if(s.place||s.drag){blSave();return}
     if(s.mode==='pull'){const p=blPow;fill(0);if(p>0.03&&e.type==='pointerup')blFire(blAng,p);else blPow=0;return}
