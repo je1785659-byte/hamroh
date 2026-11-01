@@ -3988,7 +3988,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101e';
+const APP_VER='20261101f';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -5273,7 +5273,7 @@ function blMake3D(v){
   // movut: o'yin maydoni + har bir luza og'zidagi "tomoq" (jag'lar orasi), teshik qismi kesilgan
   const feltM=new T.MeshStandardMaterial({map:feltT,roughness:0.95});
   const fp=new T.Mesh(flatG(new T.PlaneGeometry(1,2)),feltM);fp.receiveShadow=true;sc.add(fp);
-  const throatM=new T.MeshStandardMaterial({color:fc[1],roughness:0.95});
+  const throatM=new T.MeshBasicMaterial({color:0x07110f});
   {const S6=BL.segs.slice(6),jawAt=(x,z)=>S6.find(q=>Math.hypot(q[0]-x,q[1]-z)<1e-6);
     const tips=[];for(const [ax,az,bx,bz] of BL.segs.slice(0,6))tips.push([ax,az],[bx,bz]);
     for(const o of holes){const tp=tips.filter(([x,z])=>Math.hypot(x-o.mx,z-o.my)<BL.mouthS);const [A,B]=tp,ja=jawAt(A[0],A[1]),jb=jawAt(B[0],B[1]);
@@ -5300,14 +5300,15 @@ function blMake3D(v){
   const floor=new T.Mesh(new T.PlaneGeometry(14,14),new T.MeshStandardMaterial({color:0x101316,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-0.9;sc.add(floor);
   const flat=(g,m,x,y,z)=>{g.rotateX(-Math.PI/2);const o=new T.Mesh(g,m);o.position.set(x-0.5,y,z-1);sc.add(o);return o};
   // luza ichi: qora devor, tagida to'r (qorong'i), bort ustida metall halqa (tashqi yoyi)
-  const vis=[],rimM=new T.MeshStandardMaterial({color:0x8a8f96,metalness:1,roughness:0.28}),linerM=new T.MeshBasicMaterial({color:0x050505,side:T.BackSide});
+  const marks=[],vis=[],rimM=new T.MeshStandardMaterial({color:0xe2e6ea,metalness:0.85,roughness:0.22,emissive:0x2a2d30}),linerM=new T.MeshBasicMaterial({color:0x050505,side:T.BackSide});
   for(const o of holes){vis.push([o.x,o.y]);
     const ln=new T.Mesh(new T.CylinderGeometry(o.r,o.r*0.92,0.12,32,1,true),linerM);ln.position.set(o.x-0.5,-0.06,o.y-1);sc.add(ln);
     flat(new T.CircleGeometry(o.r,24),black,o.x,-0.1,o.y);
     const N=180,out=[];for(let i=0;i<N;i++){const a=i/N*Math.PI*2;out.push(!inQ(o.x+Math.cos(a)*o.r,o.y+Math.sin(a)*o.r))}
     let st=out.findIndex((v,i)=>v&&!out[(i+N-1)%N]),n=0;if(st<0)st=0;while(n<N&&out[(st+n)%N])n++;
-    const tg2=new T.TorusGeometry(o.r+0.004,0.0042,8,40,n/N*Math.PI*2);tg2.rotateZ(st/N*Math.PI*2);tg2.rotateX(Math.PI/2);
-    const rim=new T.Mesh(tg2,rimM);rim.position.set(o.x-0.5,rTop,o.y-1);sc.add(rim)}
+    const tg2=new T.TorusGeometry(o.r+0.005,0.0058,8,40,n/N*Math.PI*2);tg2.rotateZ(st/N*Math.PI*2);tg2.rotateX(Math.PI/2);
+    const rim=new T.Mesh(tg2,rimM);rim.position.set(o.x-0.5,rTop,o.y-1);sc.add(rim);
+    const mg=new T.RingGeometry(o.r+0.012,o.r+0.02,40);mg.rotateX(-Math.PI/2);const mk=new T.Mesh(mg,new T.MeshBasicMaterial({color:0xffd54a,transparent:true,opacity:0.9,depthWrite:false}));mk.position.set(o.x-0.5,rTop+0.002,o.y-1);mk.visible=false;sc.add(mk);marks.push(mk)}
   // bort ustidagi marvarid belgilar
   const dmM=new T.MeshStandardMaterial({color:0xf3ead2,roughness:0.3});
   for(const z of [0.25,0.5,0.75,1.25,1.5,1.75])for(const x of [-cw-rw/2,1+cw+rw/2])flat(new T.CircleGeometry(0.0075,14),dmM,x,rTop+0.0005,z);
@@ -5361,14 +5362,18 @@ function blMake3D(v){
       const bl=blobs[b.id];
       if(b.in){bl.visible=false;if(m.visible){let f=m.userData.fall;if(!f){let best=null;vis.forEach(([vx,vz],hi)=>{const d=Math.hypot(vx-0.5-m.position.x,vz-1-m.position.z);if(!best||d<best.d)best={d,vx,vz,hi}});f=m.userData.fall={k:0,x0:m.position.x,z0:m.position.z,px:best.vx-0.5,pz:best.vz-1,hi:best.hi}}
         if(f.k<1){f.k+=dt/0.32;const k=Math.min(1,f.k),e=Math.min(1,k*1.6);m.position.set(f.x0+(f.px-f.x0)*e,r-k*k*r*1.75,f.z0+(f.pz-f.z0)*e);
-          if(k>=1){const old=holeTop[f.hi];if(old!=null&&old!==b.id&&meshes[old])meshes[old].visible=false;holeTop[f.hi]=b.id}}}}
+          if(k>=1){f.rest=true;const old=holeTop[f.hi];if(old!=null&&old!==b.id&&meshes[old])meshes[old].visible=false;holeTop[f.hi]=b.id}}}}
       else{m.visible=true;bl.visible=true;bl.position.set(b.x-0.5,0.0011,b.y-1);if(m.userData.fall&&holeTop[m.userData.fall.hi]===b.id)delete holeTop[m.userData.fall.hi];m.userData.fall=null;const nx=b.x-0.5,nz=b.y-1,dx=nx-m.position.x,dz=nz-m.position.z,d=Math.hypot(dx,dz);
         if(d<0.3){ax.set(b.wx||0,-(b.wz||0),b.wy||0);const w=ax.length();if(w>1e-6){q.setFromAxisAngle(ax.multiplyScalar(1/w),w*dt);m.quaternion.premultiply(q)}}m.position.set(nx,r,nz)}}
+    for(const b of B){const m=meshes[b.id];const f=m&&m.userData.fall;if(b.in&&f&&f.rest&&holeTop[f.hi]===b.id)m.visible=mode!=='top'}
     // nishon
     const human=!blBotTurn(),showCue=!G.over&&!c.in&&!moving&&(!blBusy||blStroke||blBotTurn()),showAim=showCue&&human&&!blStroke;
     const dx=Math.cos(blAng),dz=Math.sin(blAng);
     aimL.visible=objL.visible=tanL.visible=ghost.visible=ghostR.visible=showAim;
-    if(showAim){const a=blAim(B,blAng);setStrip(aimL,c.x,c.y,a.gx,a.gy,0.0045);ghost.position.set(a.gx-0.5,r,a.gy-1);ghostR.position.set(a.gx-0.5,0.0018,a.gy-1);
+    marks.forEach(m=>m.visible=false);
+    if(showAim){const a=blAim(B,blAng);
+      if(a.hit){let best=null;BL.holes.forEach((o,i)=>{const vx=o.mx-a.hit.x,vy=o.my-a.hit.y,tt=vx*a.nx+vy*a.ny;if(tt<=0)return;const pp=Math.abs(vx*a.ny-vy*a.nx);if(pp<(o.c?BL.mouthC:BL.mouthS)*1.2&&(!best||pp<best.pp))best={i,pp}});
+        if(best){const m=marks[best.i];m.visible=true;m.material.opacity=0.55+0.4*Math.sin(t*6)}}setStrip(aimL,c.x,c.y,a.gx,a.gy,0.0045);ghost.position.set(a.gx-0.5,r,a.gy-1);ghostR.position.set(a.gx-0.5,0.0018,a.gy-1);
       if(a.hit){setStrip(objL,a.hit.x,a.hit.y,a.hit.x+a.nx*0.5,a.hit.y+a.ny*0.5,0.004);const dot=dx*a.nx+dz*a.ny,tx=dx-dot*a.nx,tz=dz-dot*a.ny;setStrip(tanL,a.gx,a.gy,a.gx+tx*0.16,a.gy+tz*0.16,0.0035)}
       else objL.visible=tanL.visible=false
       const key=[blAng.toFixed(4),blSpin.a.toFixed(2),blSpin.b.toFixed(2),(blPow||0).toFixed(2),c.x.toFixed(3),c.y.toFixed(3)].join();
