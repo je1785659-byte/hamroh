@@ -3988,7 +3988,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101i';
+const APP_VER='20261101j';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -4843,10 +4843,11 @@ function blPredict(balls,ang,power,spin,len=0.45){
 const BL_COL={1:'#f4c20d',2:'#1e4fd6',3:'#d32f2f',4:'#6a1b9a',5:'#f57c00',6:'#2e7d32',7:'#8b1e1e',8:'#111111'};
 const blColor=id=>BL_COL[id>8?id-8:id];
 const BL_RAIL=0.075;
-const BL_FELT={green:['#1f8a55','#0d4f2f','Yashil'],teal:['#11867a','#08463f','Firuza'],blue:['#2368a8','#0e3561',"Ko'k"],wine:['#86222f','#43101a','Bordo'],gray:['#56616c','#272e35','Kulrang']};
-const BL_WOOD={walnut:['#3d170a','#5a2410',"Yong'oq"],mahogany:['#4e130a','#86291a','Qizil daraxt'],oak:['#7a5129','#a87a48','Dub'],black:['#111','#2b2b2b','Qora']};
-const blFelt=()=>{const k=store.get('bl_felt','auto');return BL_FELT[k]||BL_FELT[blPyr()?'teal':'green']};
-const blWood=()=>BL_WOOD[store.get('bl_wood','walnut')]||BL_WOOD.walnut;
+const BL_FELT={classic:['#00a6a0','#009f99','Klassik'],green:['#1f8a55','#0d4f2f','Yashil'],teal:['#11867a','#08463f','Firuza'],blue:['#2368a8','#0e3561',"Ko'k"],wine:['#86222f','#43101a','Bordo'],gray:['#56616c','#272e35','Kulrang']};
+const BL_WOOD={matte:['#0b0b0d','#121215','Klassik qora'],walnut:['#3d170a','#5a2410',"Yong'oq"],mahogany:['#4e130a','#86291a','Qizil daraxt'],oak:['#7a5129','#a87a48','Dub'],black:['#111','#2b2b2b','Qora']};
+const blFelt=()=>{const k=store.get('bl_felt','auto');return BL_FELT[k]||BL_FELT[blPyr()?'classic':'green']};
+const blWood=()=>BL_WOOD[store.get('bl_wood','matte')]||BL_WOOD.matte;
+const blClassic=()=>store.get('bl_wood','matte')==='matte';
 let BLS=store.get('bl',null);if(BLS&&!BLS.game)BLS.game='8';
 let blHouse=false,blUndo=null,blRun=0,blTool=null,blFF=1,blRec=null,blSimT=0,blLast=null,blReplay=null,blSpin={a:0,b:0},blRAF=null,blAng=-Math.PI/2,blPow=0,blBusy=false,blEv=null,blMsg='',blAudio=null,blNB=null,blSc=1,blBotT=null,blR=null,blHandView=false,blStroke=null;
 const blPyr=()=>!!BLS&&['pyr','mos','am'].includes(BLS.game);
@@ -4887,8 +4888,8 @@ function blMenuV(){
       <button class="kk-opt" id="blprac"><span><b>🎯 Mashq</b><small>Yolg'iz, qoidasiz: zarbani qaytarish va sharlarni surish mumkin</small></span></button>
       <div class="kk-meals" id="bllvl">${[['easy','Oson'],['mid',"O'rta"],['hard','Qiyin']].map(([k,l])=>`<button class="chip" data-l="${k}" aria-pressed="${k===L}">${l}</button>`).join('')}</div></section>
     <section class="card kk-goal"><div class="label">Stol ko'rinishi</div>
-      <div class="bl-sw" id="blfelt"><button class="bl-swb" data-f="auto" aria-pressed="${store.get('bl_felt','auto')==='auto'}" style="--a:${T==='pyr'?BL_FELT.teal[0]:BL_FELT.green[0]}">A</button>${Object.entries(BL_FELT).map(([k,v])=>`<button class="bl-swb" data-f="${k}" aria-pressed="${store.get('bl_felt','auto')===k}" style="--a:${v[0]}" aria-label="${v[2]}"></button>`).join('')}</div>
-      <div class="bl-sw" id="blwood">${Object.entries(BL_WOOD).map(([k,v])=>`<button class="bl-swb w" data-w="${k}" aria-pressed="${store.get('bl_wood','walnut')===k}" style="--a:${v[1]};--b:${v[0]}" aria-label="${v[2]}"></button>`).join('')}</div>
+      <div class="bl-sw" id="blfelt"><button class="bl-swb" data-f="auto" aria-pressed="${store.get('bl_felt','auto')==='auto'}" style="--a:${T==='8'?BL_FELT.green[0]:BL_FELT.classic[0]}">A</button>${Object.entries(BL_FELT).map(([k,v])=>`<button class="bl-swb" data-f="${k}" aria-pressed="${store.get('bl_felt','auto')===k}" style="--a:${v[0]}" aria-label="${v[2]}"></button>`).join('')}</div>
+      <div class="bl-sw" id="blwood">${Object.entries(BL_WOOD).map(([k,v])=>`<button class="bl-swb w" data-w="${k}" aria-pressed="${store.get('bl_wood','matte')===k}" style="--a:${v[1]};--b:${v[0]}" aria-label="${v[2]}"></button>`).join('')}</div>
       <div class="kk-meals" id="blq"><span class="bl-ql">Grafika:</span>${[['auto','Avto'],['high','Yuqori'],['low','Tejamkor']].map(([k,l])=>`<button class="chip" data-q="${k}" aria-pressed="${store.get('bl_q','auto')===k}">${l}</button>`).join('')}</div></section>
     <button class="card pv-main" id="blstat" style="background:linear-gradient(135deg,#3b2a05,#a07a14)"><span class="pv-ic">🏆</span><span><b>Statistika va yutuqlar</b><small data-notr>${blAch().filter(a=>a.ok).length} / ${blAch().length} ${KT('yutuq','достижений','achievements')}</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" id="blhow" style="background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">?</span><span><b>O'yin qoidalari</b><small data-notr>${blGameName(T)}</small></span><span class="pv-go">→</span></button>`;
@@ -5243,7 +5244,10 @@ function blMake3D(v){
   rd.setPixelRatio(low?1:Math.min(1.75,devicePixelRatio||1));rd.setSize(lw,lh);
   rd.shadowMap.enabled=!low;rd.shadowMap.type=T.PCFSoftShadowMap;rd.outputColorSpace=T.SRGBColorSpace;rd.toneMapping=T.ACESFilmicToneMapping;rd.toneMappingExposure=1.0;
   v.appendChild(rd.domElement);rd.domElement.setAttribute('aria-label','Bilyard stoli');
-  const sc=new T.Scene();sc.background=new T.Color(0x0a0d10);
+  const sc=new T.Scene();
+  {const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.fillStyle='#19191a';x.fillRect(0,0,256,256);for(let i=0;i<5000;i++){const v=Math.random();x.fillStyle=v<.5?'rgba(0,0,0,.35)':'rgba(255,255,255,.05)';x.fillRect(Math.random()*256,Math.random()*256,1+Math.random()*2,1+Math.random()*2)}
+   const bt=new THREE.CanvasTexture(c);bt.colorSpace=THREE.SRGBColorSpace;bt.wrapS=bt.wrapT=THREE.RepeatWrapping;bt.repeat.set(3,6);sc.background=bt}
+  const classic=blClassic();if(classic){rd.toneMapping=T.LinearToneMapping;rd.toneMappingExposure=0.55}
   const cam=new T.PerspectiveCamera(50,lw/lh,0.01,40);
   // atrof-muhit aksi (sharlardagi yaltiroq chiroqlar)
   const pm=new T.PMREMGenerator(rd),env=new T.Scene();
@@ -5258,14 +5262,17 @@ function blMake3D(v){
   const cvT=(w,h,draw)=>{const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.anisotropy=4;return t};
   const fc=blFelt(),wc=blWood();
   const feltT=cvT(512,1024,(x,w,h)=>{const g=x.createRadialGradient(w/2,h/2,60,w/2,h/2,h*0.6);g.addColorStop(0,fc[0]);g.addColorStop(1,fc[1]);x.fillStyle=g;x.fillRect(0,0,w,h);
+    if(classic){x.fillStyle='rgba(255,255,255,.06)';for(let i=0;i<2500;i++)x.fillRect(Math.random()*w,Math.random()*h,1.5,1.5)}
     const id=x.getImageData(0,0,w,h),d=id.data;for(let i=0;i<d.length;i+=4){const n=(Math.random()-0.5)*12;d[i]+=n;d[i+1]+=n;d[i+2]+=n}x.putImageData(id,0,0);
     x.strokeStyle='rgba(255,255,255,.2)';x.lineWidth=2;const hy=BL.head.y/2*h;x.beginPath();x.moveTo(0,hy);x.lineTo(w,hy);x.stroke();
-    x.fillStyle='rgba(255,255,255,.4)';for(const p of [BL.foot,BL.head]){x.beginPath();x.arc(p.x*w,p.y/2*h,4,0,7);x.fill()}});
+    if(classic){const fy=BL.foot.y/2*h;x.beginPath();x.moveTo(0,fy);x.lineTo(w,fy);x.moveTo(w/2,0);x.lineTo(w/2,fy);x.stroke()}
+    else{x.fillStyle='rgba(255,255,255,.4)';for(const p of [BL.foot,BL.head]){x.beginPath();x.arc(p.x*w,p.y/2*h,4,0,7);x.fill()}}});
   const woodT=cvT(256,1024,(x,w,h)=>{const g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,wc[0]);g.addColorStop(0.5,wc[1]);g.addColorStop(1,wc[0]);x.fillStyle=g;x.fillRect(0,0,w,h);
+    if(classic){for(let i=0;i<3000;i++){x.fillStyle=Math.random()<.5?'rgba(0,0,0,.25)':'rgba(255,255,255,.04)';x.fillRect(Math.random()*w,Math.random()*h,1.5,1.5)}return}
     for(let i=0;i<160;i++){const xx=Math.random()*w;x.strokeStyle=`rgba(${Math.random()<.55?'18,5,0':'140,70,30'},${0.06+Math.random()*0.16})`;x.lineWidth=0.5+Math.random()*2.5;x.beginPath();x.moveTo(xx,0);for(let y=0;y<=h;y+=24)x.lineTo(xx+Math.sin(y/80+i)*5,y);x.stroke()}});
-  const woodM=new T.MeshPhysicalMaterial({map:woodT,roughness:0.45,clearcoat:0.35,clearcoatRoughness:0.35});
+  const woodM=classic?new T.MeshStandardMaterial({map:woodT,roughness:0.75}):new T.MeshPhysicalMaterial({map:woodT,roughness:0.45,clearcoat:0.35,clearcoatRoughness:0.35});
   const darkM=new T.MeshStandardMaterial({color:0x1d0b04,roughness:0.6});
-  const cushM=new T.MeshStandardMaterial({color:fc[1],roughness:0.9});
+  const cushM=new T.MeshStandardMaterial({color:classic?'#00bdb0':fc[1],roughness:0.9});
   const black=new T.MeshBasicMaterial({color:0x030303});
   const cw=BL.cw,chH=r*1.45,rTop=chH+0.012,O=Math.max(cw+0.085,...BL.holes.map(o=>Math.max(-(o.x-o.r),o.x+o.r-1,-(o.y-o.y*0-o.r)*(o.c?1:0),(o.y+o.r-2)*(o.c?1:0))+0.03)),rw=O-cw;
   // e* — stol koordinatalari (x: 0..1, z: 0..2), dunyoda markazlashtiriladi. Shakl tekisligi: (x-0.5, -(z-1)), keyin rotateX(-90°)
@@ -5307,6 +5314,8 @@ function blMake3D(v){
     const P4=[[ja[2],ja[3]],A,B,[jb[2],jb[3]],[ja[2],ja[3]]],pts=[];
     for(let e=0;e<4;e++){const [x1,z1]=P4[e],[x2,z2]=P4[e+1],n=Math.max(2,Math.ceil(Math.hypot(x2-x1,z2-z1)/0.002));for(let k=0;k<n;k++){let x=x1+(x2-x1)*k/n,z=z1+(z2-z1)*k/n;const u=inU(x,z);if(u){[x,z]=u.proj(x,z)}pts.push(V2(x,z))}}
     const g=new T.ExtrudeGeometry(new T.Shape(pts),{depth:chH,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,cushM);m.receiveShadow=true;m.castShadow=false;sc.add(m)}
+  {const lm=new T.MeshBasicMaterial({color:0x006b60,transparent:true,opacity:0.7,depthWrite:false});for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],L=Math.hypot(bx-ax,bz-az),g=new T.PlaneGeometry(L,0.0022);g.rotateX(-Math.PI/2);const m=new T.Mesh(g,lm);
+    const nx=ax===bx?(ax<0.5?0.0011:-0.0011):0,nz=az===bz?(az<1?0.0011:-0.0011):0;m.position.set((ax+bx)/2-0.5+nx,0.0007,(az+bz)/2-1+nz);if(ax===bx)m.rotation.y=Math.PI/2;sc.add(m)}}
   box(-O-0.01,1+O+0.01,-0.24,-0.13,-O-0.01,2+O+0.01,darkM);
   for(const [lx,lz] of [[-O+0.04,-O+0.06],[1+O-0.04,-O+0.06],[-O+0.04,2+O-0.06],[1+O-0.04,2+O-0.06],[-O+0.04,1],[1+O-0.04,1]])box(lx-0.045,lx+0.045,-0.9,-0.24,lz-0.045,lz+0.045,darkM);
   const floor=new T.Mesh(new T.PlaneGeometry(14,14),new T.MeshStandardMaterial({color:0x101316,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-0.9;sc.add(floor);
@@ -5335,11 +5344,11 @@ function blMake3D(v){
     const mg=new T.RingGeometry(u.hw+0.014,u.hw+0.021,40);mg.rotateX(-Math.PI/2);const mk=new T.Mesh(mg,new T.MeshBasicMaterial({color:0xffd54a,transparent:true,opacity:0.9,depthWrite:false}));mk.position.set(u.Bc[0]-0.5,rTop+0.002,u.Bc[1]-1);mk.visible=false;sc.add(mk);marks.push(mk)}
   // bort ustidagi marvarid belgilar
   const dmM=new T.MeshStandardMaterial({color:0xf3ead2,roughness:0.3});
-  for(const z of [0.25,0.5,0.75,1.25,1.5,1.75])for(const x of [-cw-rw/2,1+cw+rw/2])flat(new T.CircleGeometry(0.0075,14),dmM,x,rTop+0.0005,z);
-  for(const x of [0.25,0.5,0.75])for(const z of [-cw-rw/2,2+cw+rw/2])flat(new T.CircleGeometry(0.0075,14),dmM,x,rTop+0.0005,z);
+  if(!classic)for(const z of [0.25,0.5,0.75,1.25,1.5,1.75])for(const x of [-cw-rw/2,1+cw+rw/2])flat(new T.CircleGeometry(0.0075,14),dmM,x,rTop+0.0005,z);
+  if(!classic)for(const x of [0.25,0.5,0.75])for(const z of [-cw-rw/2,2+cw+rw/2])flat(new T.CircleGeometry(0.0075,14),dmM,x,rTop+0.0005,z);
   // sharlar
   const bTex=id=>cvT(512,256,(x,w,h)=>{x.textAlign='center';x.textBaseline='middle';x.scale(2,2);w/=2;h/=2;
-    if(pyr){x.fillStyle=id?'#f2ead3':'#c3122b';x.fillRect(0,0,w,h);
+    if(pyr){x.fillStyle=id?'#f2ead3':'#c3122b';x.fillRect(0,0,w,h);if(id){x.fillStyle='rgba(90,70,40,.45)';for(let i=0;i<22;i++)x.fillRect(Math.random()*w,Math.random()*h,1.2,1.2)}
       if(id){x.fillStyle='#161616';x.font='700 30px system-ui,Arial,sans-serif';for(const u of [64,192]){x.fillText(String(id),u,h/2+1);if(id===6||id===9)x.fillRect(u-9,h/2+17,18,3)}}}
     else{x.fillStyle=id===0||id>8?'#f6f2e6':blColor(id);x.fillRect(0,0,w,h);
       if(id>8){x.fillStyle=blColor(id);x.fillRect(0,h*0.27,w,h*0.46)}
