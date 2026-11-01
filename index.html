@@ -3988,7 +3988,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101j';
+const APP_VER='20261101k';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -5314,8 +5314,9 @@ function blMake3D(v){
     const P4=[[ja[2],ja[3]],A,B,[jb[2],jb[3]],[ja[2],ja[3]]],pts=[];
     for(let e=0;e<4;e++){const [x1,z1]=P4[e],[x2,z2]=P4[e+1],n=Math.max(2,Math.ceil(Math.hypot(x2-x1,z2-z1)/0.002));for(let k=0;k<n;k++){let x=x1+(x2-x1)*k/n,z=z1+(z2-z1)*k/n;const u=inU(x,z);if(u){[x,z]=u.proj(x,z)}pts.push(V2(x,z))}}
     const g=new T.ExtrudeGeometry(new T.Shape(pts),{depth:chH,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,cushM);m.receiveShadow=true;m.castShadow=false;sc.add(m)}
-  {const lm=new T.MeshBasicMaterial({color:0x006b60,transparent:true,opacity:0.7,depthWrite:false});for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],L=Math.hypot(bx-ax,bz-az),g=new T.PlaneGeometry(L,0.0022);g.rotateX(-Math.PI/2);const m=new T.Mesh(g,lm);
-    const nx=ax===bx?(ax<0.5?0.0011:-0.0011):0,nz=az===bz?(az<1?0.0011:-0.0011):0;m.position.set((ax+bx)/2-0.5+nx,0.0007,(az+bz)/2-1+nz);if(ax===bx)m.rotation.y=Math.PI/2;sc.add(m)}}
+  // bort chizig'i (rezina movutga tegadigan joy): yorqin, luza og'ziga yetmasdan to'xtaydi
+  {const lm=new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.95,depthWrite:false}),gap=BL.r*0.9;for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],L=Math.hypot(bx-ax,bz-az)-2*gap;if(L<=0)continue;const g=new T.PlaneGeometry(L,0.0045);g.rotateX(-Math.PI/2);const m=new T.Mesh(g,lm);
+    const nx=ax===bx?(ax<0.5?0.0024:-0.0024):0,nz=az===bz?(az<1?0.0024:-0.0024):0;m.position.set((ax+bx)/2-0.5+nx,0.0008,(az+bz)/2-1+nz);if(ax===bx)m.rotation.y=Math.PI/2;sc.add(m)}}
   box(-O-0.01,1+O+0.01,-0.24,-0.13,-O-0.01,2+O+0.01,darkM);
   for(const [lx,lz] of [[-O+0.04,-O+0.06],[1+O-0.04,-O+0.06],[-O+0.04,2+O-0.06],[1+O-0.04,2+O-0.06],[-O+0.04,1],[1+O-0.04,1]])box(lx-0.045,lx+0.045,-0.9,-0.24,lz-0.045,lz+0.045,darkM);
   const floor=new T.Mesh(new T.PlaneGeometry(14,14),new T.MeshStandardMaterial({color:0x101316,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-0.9;sc.add(floor);
