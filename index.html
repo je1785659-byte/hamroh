@@ -3988,7 +3988,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101k';
+const APP_VER='20261101l';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -5271,10 +5271,10 @@ function blMake3D(v){
     if(classic){for(let i=0;i<3000;i++){x.fillStyle=Math.random()<.5?'rgba(0,0,0,.25)':'rgba(255,255,255,.04)';x.fillRect(Math.random()*w,Math.random()*h,1.5,1.5)}return}
     for(let i=0;i<160;i++){const xx=Math.random()*w;x.strokeStyle=`rgba(${Math.random()<.55?'18,5,0':'140,70,30'},${0.06+Math.random()*0.16})`;x.lineWidth=0.5+Math.random()*2.5;x.beginPath();x.moveTo(xx,0);for(let y=0;y<=h;y+=24)x.lineTo(xx+Math.sin(y/80+i)*5,y);x.stroke()}});
   const woodM=classic?new T.MeshStandardMaterial({map:woodT,roughness:0.75}):new T.MeshPhysicalMaterial({map:woodT,roughness:0.45,clearcoat:0.35,clearcoatRoughness:0.35});
-  const darkM=new T.MeshStandardMaterial({color:0x1d0b04,roughness:0.6});
+  const darkM=new T.MeshStandardMaterial({color:classic?0x111112:0x1d0b04,roughness:0.6});
   const cushM=new T.MeshStandardMaterial({color:classic?'#00bdb0':fc[1],roughness:0.9});
   const black=new T.MeshBasicMaterial({color:0x030303});
-  const cw=BL.cw,chH=r*1.45,rTop=chH+0.012,O=Math.max(cw+0.085,...BL.holes.map(o=>Math.max(-(o.x-o.r),o.x+o.r-1,-(o.y-o.y*0-o.r)*(o.c?1:0),(o.y+o.r-2)*(o.c?1:0))+0.03)),rw=O-cw;
+  const cw=BL.cw,chH=r*1.45,rTop=chH+0.012;let O=cw+0.047,rw=O-cw; // namunadagidek ingichka bort
   // e* — stol koordinatalari (x: 0..1, z: 0..2), dunyoda markazlashtiriladi. Shakl tekisligi: (x-0.5, -(z-1)), keyin rotateX(-90°)
   const V2=(x,z)=>new T.Vector2(x-0.5,-(z-1));
   const box=(x1,x2,y1,y2,z1,z2,m)=>{const o=new T.Mesh(new T.BoxGeometry(x2-x1,y2-y1,z2-z1),m);o.position.set((x1+x2)/2-0.5,(y1+y2)/2,(z1+z2)/2-1);o.receiveShadow=true;sc.add(o);return o};
@@ -5292,6 +5292,9 @@ function blMake3D(v){
     const proj=(x,z)=>{const dx=x-M[0],dz=z-M[1],s1=dx*ax+dz*az,t1=dx*vx+dz*vz;if(s1<=Lw){const t2=Math.sign(t1||1)*hw;return P(s1,t2)}const d=Math.hypot(x-Bc[0],z-Bc[1])||1e-6;return [Bc[0]+(x-Bc[0])/d*hw,Bc[1]+(z-Bc[1])/d*hw]};
     return {o,ax,az,vx,vz,hw,Lw,M,Bc,out,inside,proj,jaws}});
   const inU=(x,z)=>PK.find(u=>u.inside(x,z));
+  // bort kengligi: luza chuqurining orqasi (teri yoy bilan) bort chetiga tegib turadi, ortida ortiqcha taxta qolmaydi
+  for(const u of PK)for(const [x,z] of u.out)O=Math.max(O,-x+0.004,x-1+0.004,-z+0.004,z-2+0.004);
+  {const ext=PK.map(u=>{const bx=u.Bc[0]+u.ax*(u.hw+0.013),bz=u.Bc[1]+u.az*(u.hw+0.013);return Math.max(-bx,bx-1,-bz,bz-2)});O=Math.max(O,...ext)}rw=O-cw;
   // ichki to'rtburchak chegarasi
   const Qp=[];{const st=0.002,C=[[-cw,-cw],[1+cw,-cw],[1+cw,2+cw],[-cw,2+cw],[-cw,-cw]];for(let i=0;i<4;i++){const [x1,z1]=C[i],[x2,z2]=C[i+1],n=Math.ceil(Math.hypot(x2-x1,z2-z1)/st);for(let k=0;k<n;k++)Qp.push([x1+(x2-x1)*k/n,z1+(z2-z1)*k/n])}}
   {const k=Qp.findIndex(([x,z])=>!inU(x,z));Qp.push(...Qp.splice(0,k))}
@@ -5314,10 +5317,12 @@ function blMake3D(v){
     const P4=[[ja[2],ja[3]],A,B,[jb[2],jb[3]],[ja[2],ja[3]]],pts=[];
     for(let e=0;e<4;e++){const [x1,z1]=P4[e],[x2,z2]=P4[e+1],n=Math.max(2,Math.ceil(Math.hypot(x2-x1,z2-z1)/0.002));for(let k=0;k<n;k++){let x=x1+(x2-x1)*k/n,z=z1+(z2-z1)*k/n;const u=inU(x,z);if(u){[x,z]=u.proj(x,z)}pts.push(V2(x,z))}}
     const g=new T.ExtrudeGeometry(new T.Shape(pts),{depth:chH,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,cushM);m.receiveShadow=true;m.castShadow=false;sc.add(m)}
-  // bort chizig'i (rezina movutga tegadigan joy): yorqin, luza og'ziga yetmasdan to'xtaydi
-  {const lm=new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.95,depthWrite:false}),gap=BL.r*0.9;for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],L=Math.hypot(bx-ax,bz-az)-2*gap;if(L<=0)continue;const g=new T.PlaneGeometry(L,0.0045);g.rotateX(-Math.PI/2);const m=new T.Mesh(g,lm);
-    const nx=ax===bx?(ax<0.5?0.0024:-0.0024):0,nz=az===bz?(az<1?0.0024:-0.0024):0;m.position.set((ax+bx)/2-0.5+nx,0.0008,(az+bz)/2-1+nz);if(ax===bx)m.rotation.y=Math.PI/2;sc.add(m)}}
-  box(-O-0.01,1+O+0.01,-0.24,-0.13,-O-0.01,2+O+0.01,darkM);
+  // bort chizig'i (rezina movutga tegadigan joy): yorqin, rezina tugaydigan joygacha — luza chuqurigacha
+  {const lm=new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.95,depthWrite:false});for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],L0=Math.hypot(bx-ax,bz-az);
+    let t0=0,t1=1;while(t0<0.5&&inU(ax+(bx-ax)*t0,az+(bz-az)*t0))t0+=0.0005/L0;while(t1>0.5&&inU(ax+(bx-ax)*t1,az+(bz-az)*t1))t1-=0.0005/L0;
+    const L=(t1-t0)*L0,g=new T.PlaneGeometry(L,0.0045);g.rotateX(-Math.PI/2);const m=new T.Mesh(g,lm),tm=(t0+t1)/2;
+    const nx=ax===bx?(ax<0.5?0.0024:-0.0024):0,nz=az===bz?(az<1?0.0024:-0.0024):0;m.position.set(ax+(bx-ax)*tm-0.5+nx,0.0008,az+(bz-az)*tm-1+nz);if(ax===bx)m.rotation.y=Math.PI/2;sc.add(m)}}
+  box(-O,1+O,-0.24,-0.13,-O,2+O,darkM);
   for(const [lx,lz] of [[-O+0.04,-O+0.06],[1+O-0.04,-O+0.06],[-O+0.04,2+O-0.06],[1+O-0.04,2+O-0.06],[-O+0.04,1],[1+O-0.04,1]])box(lx-0.045,lx+0.045,-0.9,-0.24,lz-0.045,lz+0.045,darkM);
   const floor=new T.Mesh(new T.PlaneGeometry(14,14),new T.MeshStandardMaterial({color:0x101316,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-0.9;sc.add(floor);
   const flat=(g,m,x,y,z)=>{g.rotateX(-Math.PI/2);const o=new T.Mesh(g,m);o.position.set(x-0.5,y,z-1);sc.add(o);return o};
