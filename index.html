@@ -759,6 +759,18 @@ body.bl-play nav.tabs{display:none}
 .bl-swb.w{border-radius:10px;background:repeating-linear-gradient(100deg,var(--a) 0 5px,var(--b) 5px 8px)}
 .bl-swb[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--sec) 35%,transparent)}
 .bl-ql{font-size:13px;color:var(--muted);align-self:center;margin-right:2px}
+#blpick.on,#blmove.on{background:#e3a234;color:#1a1300}
+.bl-stg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 12px}
+.bl-stg>div{background:var(--surface-2);border-radius:14px;padding:10px;text-align:center}
+.bl-stg b{display:block;font-size:20px;font-variant-numeric:tabular-nums}.bl-stg small{color:var(--muted);font-size:11.5px}
+.bl-ach{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.bl-ach>div{display:flex;gap:10px;align-items:center;opacity:.55}.bl-ach>div.ok{opacity:1}
+.bl-ach span{font-size:20px;width:36px;height:36px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;flex:none}
+.bl-ach p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.35}.bl-ach b{display:block;color:var(--ink);font-size:14px}
+.bl-games{grid-template-columns:1fr 1fr}
+.bl3-bot{flex-wrap:wrap}
+#blnew.on{background:#e3a234;color:#1a1300}
+@media (max-width:380px){.bl3-ib{min-width:38px;height:40px;padding:0 9px}.bl3-bot{gap:6px}}
 .mf-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
 .mf-h b{font-family:var(--display);font-size:17px}
 .mf-names{display:flex;flex-direction:column;gap:6px}
@@ -893,7 +905,7 @@ const HERO = {
   prava:['Prava imtihoni',"Imtihon rejimi, xatolar ustida ishlash va yo'l belgilari"],
   sert:['Milliy sertifikat',"8 fan: rasmiy format bo'yicha mashq, izohli savollar va imtihon rejimi"],
   mafia:['Mafiya',"Davrada o'ynash uchun: rollarni tarqatadi, kecha va ovoz berishda boshlovchiga yordam beradi"],
-  bilyard:['Bilyard',"8-shar bilyardi: bitta telefonda ikki kishi yoki kompyuterga qarshi"],
+  bilyard:['Bilyard',"Rus piramidasi, Amerikanka va 8-shar: ikki kishi, kompyuterga qarshi yoki mashq"],
   kkal:['Kaloriya hisoblagich',"Ovqatni suratga oling — AI taomni taniydi, kaloriya va kunlik normangizni hisoblaydi"]
 };
 let current = store.get('tab','home');
@@ -4557,13 +4569,15 @@ function mfRules(){
 // Stol: kengligi 1, uzunligi 2 (vertikal), birlik = stol kengligi. y pastga qarab o'sadi.
 // Fizika: sharlar avval sirpanadi, keyin dumalaydi (sirpanish va dumalash ishqalanishi), aylanish (vint): yuqori/past va yon,
 // bortlar luza jag'lari bilan (kesmalar), shar luza teshigi ustiga chiqqanda tushadi.
-const BL={W:1,H:2,stopV:0.004};
+const BL={W:1,H:2,stopV:0.004,cue:0};
+// Biton: odatda 0-shar; "Amerikanka"da istalgan shar biton bo'la oladi
+const blSetCue=id=>{BL.cue=id};
 BL.head={x:0.5,y:1.5};BL.foot={x:0.5,y:0.5};
 const blGroup=id=>id===0?'cue':id===8?'eight':id<8?'s':'t';
 // Haqiqiy o'lchamlar: Wm — stol kengligi (m), r — shar radiusi (stol birligida), mouthC/mouthS — burchak/o'rta luza og'zi (shar diametriga nisbatan)
-const BL_MODES={'8':{Wm:1.27,r:0.0225,mouthC:2.0,mouthS:2.25,cw:0.042},pyr:{Wm:1.775,r:0.01915,mouthC:1.18,mouthS:1.36,cw:0.034}};
+const BL_MODES={'8':{Wm:1.27,r:0.0225,mouthC:2.0,mouthS:2.25,cw:0.042},am:{Wm:1.775,r:0.01915,mouthC:1.18,mouthS:1.36,cw:0.034},pyr:{Wm:1.775,r:0.01915,mouthC:1.18,mouthS:1.36,cw:0.034}};
 function blSetMode(m){
-  const P=BL_MODES[m]||BL_MODES['8'];BL.mode=m==='pyr'?'pyr':'8';
+  const P=BL_MODES[m]||BL_MODES['8'];BL.mode=BL_MODES[m]?m:'8';BL.cue=BL.mode==='am'?16:0;
   const r=P.r,g=9.81/P.Wm,cw=P.cw;
   Object.assign(BL,{r,g,cw,maxV:8/P.Wm,mus:0.2,mur:0.015,spinDec:0.08*g/r,eb:0.95,ec:0.78,
     mouthC:P.mouthC*2*r,mouthS:P.mouthS*2*r});
@@ -4595,13 +4609,14 @@ function blRack(rand=Math.random){
   const pos=[];for(let i=0;i<5;i++)for(let j=0;j<=i;j++)pos.push({i,j,x:BL.foot.x+(j-i/2)*2*r*1.0005,y:BL.foot.y-i*r*Math.sqrt(3)*1.0005});
   const balls=[blNewBall(0,BL.head.x,BL.head.y)];
   if(BL.mode==='pyr'){pos.forEach(p=>balls.push(blNewBall(ids.length?ids.shift():8,p.x,p.y)));return balls}
+  if(BL.mode==='am'){const a=[...ids,8];for(let i=a.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return [blNewBall(16,BL.head.x,BL.head.y),...pos.map((p,k)=>blNewBall(a[k],p.x,p.y))]}
   const cs=ids.splice(ids.findIndex(x=>x<8),1)[0],ct=ids.splice(ids.findIndex(x=>x>8),1)[0];
   const fixed={4:8,10:cs,14:ct}; // 8 uchinchi qator o'rtasida, orqa burchaklarda har xil guruh
   pos.forEach((p,k)=>balls.push(blNewBall(fixed[k]||ids.shift(),p.x,p.y)));
   return balls;
 }
 const blOn=balls=>balls.filter(b=>!b.in);
-const blCue=balls=>balls.find(b=>b.id===0);
+const blCue=balls=>balls.find(b=>b.id===BL.cue);
 const blSlip=b=>Math.hypot(b.vx+BL.r*(b.wy||0),b.vy-BL.r*(b.wx||0));
 const blMoving=balls=>balls.some(b=>!b.in&&(b.vx||b.vy||blSlip(b)>1e-9));
 // Sirpanish/dumalash: kontakt nuqta tezligi u=v+ω×(0,0,R). Sirpanayotganda u chiziqli kamayadi (7/2·μg), keyin toza dumalash.
@@ -4652,7 +4667,7 @@ function blStep(balls,dt,ev){
       if(Math.abs(sl)>1e-9){const J=Math.sign(sl)*Math.min(0.06*k,Math.abs(sl)/7);a.vx-=J*tx;a.vy-=J*ty;c.vx+=J*tx;c.vy+=J*ty;a.wz=(a.wz||0)-2.5*J/r;c.wz=(c.wz||0)-2.5*J/r}}
     a.x+=a.vx*tb;a.y+=a.vy*tb;c.x+=c.vx*tb;c.y+=c.vy*tb;
     if(vrel<=0)continue;
-    if(ev.first==null&&(a.id===0||c.id===0))ev.first=a.id===0?c.id:a.id;
+    if(ev.first==null&&(a.id===BL.cue||c.id===BL.cue)){const o=a.id===BL.cue?c:a;ev.first=o.id;ev.firstY=o.y}
     ev.snd.push(['ball',vrel]);
   }
 }
@@ -4669,14 +4684,14 @@ function blShoot(balls,ang,power,spin={a:0,b:0}){
 // Zarbani oxirigacha hisoblaydi (bot va testlar uchun). Natija: ev.
 function blSimulate(balls,maxT=60){const ev={first:null,potted:[],snd:[],rail:false};const dt=1/480;for(let t=0;t<maxT&&blMoving(balls);t+=dt)blStep(balls,dt,ev);return ev}
 // Shar qo'yish joyi bo'shmi (sharni qo'lga olishda)
-function blFree(balls,x,y,ignore=0){
+function blFree(balls,x,y,ignore=BL.cue){
   if(x<BL.r||x>BL.W-BL.r||y<BL.r||y>BL.H-BL.r)return false;
   return blOn(balls).every(b=>b.id===ignore||Math.hypot(b.x-x,b.y-y)>=2*BL.r);
 }
 // Nishon: kiy shari yo'nalishda birinchi qaysi sharga tegadi va arvoh-shar qayerda bo'ladi
 function blAim(balls,ang){
   const c=blCue(balls),dx=Math.cos(ang),dy=Math.sin(ang),R=2*BL.r;let best=null;
-  for(const b of blOn(balls)){if(b.id===0)continue;
+  for(const b of blOn(balls)){if(b.id===BL.cue)continue;
     const ox=b.x-c.x,oy=b.y-c.y,t=ox*dx+oy*dy;if(t<=0)continue;
     const perp2=ox*ox+oy*oy-t*t;if(perp2>=R*R)continue;
     const tt=t-Math.sqrt(R*R-perp2);if(!best||tt<best.t)best={t:tt,ball:b}}
@@ -4692,6 +4707,7 @@ function blAim(balls,ang){
 const blLeft=(balls,g)=>blOn(balls).filter(b=>blGroup(b.id)===g).length;
 function blJudge(G,balls,ev){
   if(G.mode==='pyr')return blJudgePyr(G,ev);
+  if(G.mode==='am')return blJudgeAm(G,ev);
   const me=G.turn,op=1-me,cuePot=ev.potted.includes(0),pot=ev.potted.filter(id=>id!==0),eight=pot.includes(8);
   const mine=G.groups[me],cleared=!!mine&&blLeft(balls,mine)+pot.filter(id=>blGroup(id)===mine).length===0; // zarbadan oldin o'z guruhi tugaganmi
   const firstG=ev.first==null?null:blGroup(ev.first);
@@ -4720,7 +4736,7 @@ function blJudge(G,balls,ev){
 const BL_PYR_WIN=8;
 function blJudgePyr(G,ev){
   const me=G.turn,op=1-me,cuePot=ev.potted.includes(0),obj=ev.potted.filter(id=>id!==0);
-  const foul=ev.first==null?'miss':(!ev.potted.length&&ev.rail===false)?'norail':null;
+  const foul=ev.first==null?'miss':(G.mos&&ev.house&&ev.firstY>BL.head.y)?'house':(!ev.potted.length&&ev.rail===false)?'norail':null;
   const svoyak=!foul&&cuePot,pot=svoyak?ev.potted.slice():obj;
   const R={foul,cuePot,pot,svoyak,msg:null,next:me,back:[],penalty:0};
   if(foul){R.back=obj;R.penalty=G.score[me]>0?1:0;G.score[me]-=R.penalty;G.turn=op;R.next=op;G.hand=G.house=true}
@@ -4729,6 +4745,15 @@ function blJudgePyr(G,ev){
     else if(!pot.length){G.turn=op;R.next=op}}
   G.brk=false;
   return R;
+}
+// "Amerikanka": istalgan shar bilan uriladi, tushgan har bir shar (urilgan shar ham) ochko; 8 ta — g'alaba
+function blJudgeAm(G,ev){
+  const me=G.turn,op=1-me,pot=ev.potted.slice();
+  const foul=ev.first==null?'miss':(!pot.length&&ev.rail===false)?'norail':null;
+  const R={foul,cuePot:false,pot:foul?[]:pot,msg:null,next:me,back:[],penalty:0};
+  if(foul){R.back=pot;R.penalty=G.score[me]>0?1:0;G.score[me]-=R.penalty;G.turn=op;R.next=op}
+  else{G.score[me]+=pot.length;if(G.score[me]>=BL_PYR_WIN){G.over=true;G.winner=me;R.msg='winPyr'}else if(!pot.length){G.turn=op;R.next=op}}
+  G.brk=false;return R;
 }
 const blCanPlace=(G,balls,x,y)=>blFree(balls,x,y,0)&&(!G.house||y>=BL.head.y);
 function blRespot(balls,id,spot){
@@ -4742,7 +4767,7 @@ function blClear(balls,x1,y1,x2,y2,skip){
   return blOn(balls).every(b=>{if(skip.includes(b.id))return true;const t=((b.x-x1)*dx+(b.y-y1)*dy)/(L*L);if(t<0||t>1)return true;const px=x1+dx*t,py=y1+dy*t;return Math.hypot(b.x-px,b.y-py)>=2*BL.r*0.98});
 }
 function blTargets(G,balls){
-  if(G.mode==='pyr')return blOn(balls).filter(b=>b.id);
+  if(G.mode==='pyr'||G.mode==='am')return blOn(balls).filter(b=>b.id!==BL.cue&&!(G.mos&&G.house&&b.y>BL.head.y));
   const g=G.groups[G.turn];
   if(!g)return blOn(balls).filter(b=>b.id&&b.id!==8);
   const own=blOn(balls).filter(b=>blGroup(b.id)===g);
@@ -4751,6 +4776,12 @@ function blTargets(G,balls){
 // Kerakli tezliklar: obyekt shar sirpanib 5/7 tezlikda dumalaydi; kiy shari b=0.3 bilan deyarli darhol dumalaydi
 const BL_BOT_SPIN={a:0,b:0.3};
 function blPlan(G,balls){
+  if(G.mode==='am'&&!blPlan.inner){const keep=BL.cue;let best=null;blPlan.inner=true;
+    try{for(const c of blOn(balls)){BL.cue=c.id;const p=blPlanOne(G,balls);p.cue=c.id;if(!best||p.score>best.score)best=p}}finally{blPlan.inner=false;BL.cue=keep}
+    return best}
+  return blPlanOne(G,balls);
+}
+function blPlanOne(G,balls){
   const c=blCue(balls),R=2*BL.r,ar=BL.mur*BL.g;let best=null;
   for(const b of blTargets(G,balls))BL.pockets.forEach(([px,py],pi)=>{
     const hole=BL.holes[pi],tx=px-b.x,ty=py-b.y,td=Math.hypot(tx,ty),ux=tx/td,uy=ty/td;
@@ -4758,7 +4789,7 @@ function blPlan(G,balls){
     const gx=b.x-ux*R,gy=b.y-uy*R,ax=gx-c.x,ay=gy-c.y,ad=Math.hypot(ax,ay);if(ad<1e-6)return;
     if(gx<BL.r||gx>1-BL.r||gy<BL.r||gy>2-BL.r)return;
     const cut=Math.acos(Math.max(-1,Math.min(1,(ax*ux+ay*uy)/ad)));if(cut>1.2)return;
-    if(!blClear(balls,c.x,c.y,gx,gy,[0,b.id])||!blClear(balls,b.x,b.y,px,py,[b.id]))return;
+    if(!blClear(balls,c.x,c.y,gx,gy,[BL.cue,b.id])||!blClear(balls,b.x,b.y,px,py,[b.id]))return;
     const score=Math.cos(cut)*2-td*0.6-ad*0.3-enter*0.6;
     const vr=Math.sqrt(2*ar*td*1.15+0.3*0.3),vob=vr*1.4,vc=vob/(Math.max(0.3,Math.cos(cut))*(1+BL.eb)/2),v0=Math.sqrt(vc*vc+2*ar*ad)/0.93;
     if(!best||score>best.score)best={score,ang:Math.atan2(ay,ax),power:blPowerFor(v0),id:b.id,px,py};
@@ -4777,8 +4808,10 @@ function blRefine(balls,p,spin){
 }
 function blBotShot(G,balls,lvl,rand=Math.random){
   const L=BL_LVL[lvl]||BL_LVL.mid,p=blPlan(G,balls),brk=G.brk;
+  const keep=BL.cue;if(p.cue!=null)BL.cue=p.cue;
   if(!brk&&p.score>-9)p.ang=blRefine(balls,p,BL_BOT_SPIN);
-  return {ang:p.ang+(rand()*2-1)*L.err*(brk?3:1)*(BL.mode==='8'?3.5:1),power:brk?0.95:Math.max(0.05,Math.min(1,p.power*(1+(rand()*2-1)*L.pw))),spin:BL_BOT_SPIN};
+  const cue=BL.cue;BL.cue=keep;
+  return {ang:p.ang+(rand()*2-1)*L.err*(brk?3:1)*(BL.mode==='8'?3.5:1),power:brk?0.95:Math.max(0.05,Math.min(1,p.power*(1+(rand()*2-1)*L.pw))),spin:BL_BOT_SPIN,cue};
 }
 // Bot uchun sharni qo'lga olganda eng yaxshi joy
 function blBotPlace(G,balls){
@@ -4810,18 +4843,20 @@ const BL_WOOD={walnut:['#3d170a','#5a2410',"Yong'oq"],mahogany:['#4e130a','#8629
 const blFelt=()=>{const k=store.get('bl_felt','auto');return BL_FELT[k]||BL_FELT[blPyr()?'teal':'green']};
 const blWood=()=>BL_WOOD[store.get('bl_wood','walnut')]||BL_WOOD.walnut;
 let BLS=store.get('bl',null);if(BLS&&!BLS.game)BLS.game='8';
-let blFF=1,blRec=null,blSimT=0,blLast=null,blReplay=null,blSpin={a:0,b:0},blRAF=null,blAng=-Math.PI/2,blPow=0,blBusy=false,blEv=null,blMsg='',blAudio=null,blNB=null,blSc=1,blBotT=null,blR=null,blHandView=false,blStroke=null;
-const blPyr=()=>!!BLS&&BLS.game==='pyr';
-const blSave=()=>{try{store.set('bl',BLS&&{...BLS,balls:BLS.balls.map(b=>({id:b.id,x:b.x,y:b.y,vx:0,vy:0,in:b.in}))})}catch(e){}};
+let blHouse=false,blUndo=null,blRun=0,blTool=null,blFF=1,blRec=null,blSimT=0,blLast=null,blReplay=null,blSpin={a:0,b:0},blRAF=null,blAng=-Math.PI/2,blPow=0,blBusy=false,blEv=null,blMsg='',blAudio=null,blNB=null,blSc=1,blBotT=null,blR=null,blHandView=false,blStroke=null;
+const blPyr=()=>!!BLS&&['pyr','mos','am'].includes(BLS.game);
+const blAm=()=>!!BLS&&BLS.game==='am',blPrac=()=>!!BLS&&BLS.mode==='practice';
+const blEng=g=>g==='mos'?'pyr':g; // fizika/stol turi
+const blSave=()=>{try{if(BLS)BLS.cue=BL.cue;store.set('bl',BLS&&{...BLS,balls:BLS.balls.map(b=>({id:b.id,x:b.x,y:b.y,vx:0,vy:0,in:b.in}))})}catch(e){}};
 const blBot=()=>BLS&&BLS.mode==='bot';
 const blBotTurn=()=>blBot()&&BLS.G.turn===1&&!BLS.G.over;
 function blName(i){return blBot()?(i?KT('Kompyuter','Компьютер','Computer'):KT('Siz','Вы','You')):KT(`${i+1}-o'yinchi`,`Игрок ${i+1}`,`Player ${i+1}`)}
 function blGroupName(g){return g==='s'?KT('bir rangli (1–7)','сплошные (1–7)','solids (1–7)'):KT('polosali (9–15)','полосатые (9–15)','stripes (9–15)')}
-const blGameName=g=>g==='pyr'?KT('Rus piramidasi','Русская пирамида','Russian pyramid'):KT('8-shar','Восьмёрка','8-ball');
+const blGameName=g=>({pyr:KT('Erkin piramida','Свободная пирамида','Free pyramid'),mos:KT('Moskva piramidasi','Московская пирамида','Moscow pyramid'),am:KT('Amerikanka','Американка','Amerikanka')}[g]||KT('8-shar','Восьмёрка','8-ball'));
 function blDispose(){if(blR){try{blR.dispose()}catch(e){}blR=null}}
 function viewBilyard(){
   cancelAnimationFrame(blRAF);clearTimeout(blBotT);blDispose();blStroke=null;
-  if(BLS){blSetMode(BLS.game);BLS.balls.forEach(b=>{b.vx=b.vy=b.wx=b.wy=b.wz=0})}
+  if(BLS){blSetMode(blEng(BLS.game));if(BLS.cue!=null)blSetCue(BLS.cue);BLS.balls.forEach(b=>{b.vx=b.vy=b.wx=b.wy=b.wz=0})}
   if(BLS&&BLS.live){$('#hero').hidden=true;return blGameV()}
   document.body.classList.remove('bl-play');try{tg&&tg.enableVerticalSwipes&&tg.enableVerticalSwipes()}catch(e){}
   setHero('bilyard');blMenuV();
@@ -4832,39 +4867,53 @@ function blMenuV(){
     ${cont?`<button class="card pv-main" id="blcont" style="background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">▶</span><span><b>O'yinni davom ettirish</b><small data-notr>${blGameName(BLS.game)} · ${blBot()?KT('kompyuterga qarshi','против компьютера','vs computer'):KT('ikki kishi','два игрока','two players')}</small></span><span class="pv-go">→</span></button>`:''}
     <section class="card kk-goal"><div class="label">O'yin turi</div>
       <div class="bl-games" id="blgame">
-        <button class="bl-gm" data-g="pyr" aria-pressed="${T==='pyr'}"><span class="bl-gi"><i></i><i></i><i></i><i class="r"></i></span><b>Rus piramidasi</b><small>15 ta oq shar, qizil biton. 8 ta tushirgan yutadi</small></button>
-        <button class="bl-gm" data-g="8" aria-pressed="${T==='8'}"><span class="bl-gi e8"><i></i><i></i><i></i><i class="w"></i></span><b>8-shar</b><small>Rangli sharlar, guruhlar va qora 8</small></button>
+        <button class="bl-gm" data-g="pyr" aria-pressed="${T==='pyr'}"><span class="bl-gi"><i></i><i></i><i></i><i class="r"></i></span><b>Erkin piramida</b><small>Qizil biton bilan istalgan sharni. 8 ta tushirgan yutadi</small></button>
+        <button class="bl-gm" data-g="mos" aria-pressed="${T==='mos'}"><span class="bl-gi"><i></i><i></i><i class="r"></i><i></i></span><b>Moskva piramidasi</b><small>Erkin kabi, lekin uydan uyidagi sharga urib bo'lmaydi</small></button>
+        <button class="bl-gm" data-g="am" aria-pressed="${T==='am'}"><span class="bl-gi"><i></i><i></i><i></i><i></i></span><b>Amerikanka</b><small>16 ta oq shar, istalganini urasiz. 8 ta tushirgan yutadi</small></button>
+        <button class="bl-gm" data-g="8" aria-pressed="${T==='8'}"><span class="bl-gi e8"><i></i><i></i><i></i><i class="w"></i></span><b>8-shar</b><small>Amerikacha pul: rangli sharlar va qora 8</small></button>
       </div></section>
     <section class="card kk-goal"><div class="label">Kim bilan o'ynaysiz?</div>
       <button class="kk-opt" id="bl2p"><span><b>👥 Ikki kishi, bitta telefonda</b><small>Navbatma-navbat zarba berasiz</small></span></button>
       <button class="kk-opt" id="blbot"><span><b>🤖 Kompyuterga qarshi</b><small>Darajani tanlang va boshlang</small></span></button>
+      <button class="kk-opt" id="blprac"><span><b>🎯 Mashq</b><small>Yolg'iz, qoidasiz: zarbani qaytarish va sharlarni surish mumkin</small></span></button>
       <div class="kk-meals" id="bllvl">${[['easy','Oson'],['mid',"O'rta"],['hard','Qiyin']].map(([k,l])=>`<button class="chip" data-l="${k}" aria-pressed="${k===L}">${l}</button>`).join('')}</div></section>
     <section class="card kk-goal"><div class="label">Stol ko'rinishi</div>
       <div class="bl-sw" id="blfelt"><button class="bl-swb" data-f="auto" aria-pressed="${store.get('bl_felt','auto')==='auto'}" style="--a:${T==='pyr'?BL_FELT.teal[0]:BL_FELT.green[0]}">A</button>${Object.entries(BL_FELT).map(([k,v])=>`<button class="bl-swb" data-f="${k}" aria-pressed="${store.get('bl_felt','auto')===k}" style="--a:${v[0]}" aria-label="${v[2]}"></button>`).join('')}</div>
       <div class="bl-sw" id="blwood">${Object.entries(BL_WOOD).map(([k,v])=>`<button class="bl-swb w" data-w="${k}" aria-pressed="${store.get('bl_wood','walnut')===k}" style="--a:${v[1]};--b:${v[0]}" aria-label="${v[2]}"></button>`).join('')}</div>
       <div class="kk-meals" id="blq"><span class="bl-ql">Grafika:</span>${[['auto','Avto'],['high','Yuqori'],['low','Tejamkor']].map(([k,l])=>`<button class="chip" data-q="${k}" aria-pressed="${store.get('bl_q','auto')===k}">${l}</button>`).join('')}</div></section>
-    <button class="card pv-main" id="blhow" style="background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">?</span><span><b>O'yin qoidalari</b><small>${T==='pyr'?'Rus piramidasi: qisqacha':'8-shar bilyardi: qisqacha'}</small></span><span class="pv-go">→</span></button>`;
+    <button class="card pv-main" id="blstat" style="background:linear-gradient(135deg,#3b2a05,#a07a14)"><span class="pv-ic">🏆</span><span><b>Statistika va yutuqlar</b><small data-notr>${blAch().filter(a=>a.ok).length} / ${blAch().length} ${KT('yutuq','достижений','achievements')}</small></span><span class="pv-go">→</span></button>
+    <button class="card pv-main" id="blhow" style="background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">?</span><span><b>O'yin qoidalari</b><small data-notr>${blGameName(T)}</small></span><span class="pv-go">→</span></button>`;
   if(cont)$('#blcont').onclick=()=>{BLS.live=true;viewBilyard()};
   $('#blgame').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;store.set('bl_game',b.dataset.g);blMenuV()};
   $('#blfelt').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;store.set('bl_felt',b.dataset.f);blMenuV()};
   $('#blwood').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;store.set('bl_wood',b.dataset.w);blMenuV()};
   $('#blq').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;store.set('bl_q',b.dataset.q);store.set('bl_qlow',false);blMenuV()};
   $('#bllvl').onclick=e=>{const b=e.target.closest('[data-l]');if(!b)return;store.set('bl_lvl',b.dataset.l);blMenuV()};
-  $('#bl2p').onclick=()=>blNew('2p');$('#blbot').onclick=()=>blNew('bot');$('#blhow').onclick=()=>blRules(T);
+  $('#bl2p').onclick=()=>blNew('2p');$('#blprac').onclick=()=>blNew('practice');$('#blstat').onclick=blStatsV;$('#blbot').onclick=()=>blNew('bot');$('#blhow').onclick=()=>blRules(T);
 }
 function blNew(mode){
-  const game=BLS&&BLS.live&&BLS.game||store.get('bl_game','pyr');blSetMode(game);
-  const G=game==='pyr'?{mode:'pyr',turn:0,score:[0,0],hand:true,house:true,over:false,winner:null,brk:true}:{turn:0,groups:[null,null],hand:false,over:false,winner:null,brk:true};
-  BLS={game,mode,lvl:store.get('bl_lvl','mid'),balls:blRack(),G,live:true};
-  blAng=-Math.PI/2;blPow=0;blHandView=game==='pyr';
-  blMsg=game==='pyr'?KT(`${blName(0)} boshlaydi: bitonni uy ichida joylang va piramidani tarqating`,`Начинает ${blName(0)}: поставьте биток в доме и разбейте пирамиду`,`${blName(0)} breaks: place the cue ball in the house and break`)
+  const game=BLS&&BLS.live&&BLS.game||store.get('bl_game','pyr');blSetMode(blEng(game));
+  const G=game==='pyr'||game==='mos'?{mode:'pyr',mos:game==='mos',turn:0,score:[0,0],hand:true,house:true,over:false,winner:null,brk:true}
+    :game==='am'?{mode:'am',turn:0,score:[0,0],hand:true,house:true,over:false,winner:null,brk:true}
+    :{turn:0,groups:[null,null],hand:false,over:false,winner:null,brk:true};
+  BLS={game,mode,lvl:store.get('bl_lvl','mid'),balls:blRack(),G,live:true,cue:BL.cue};blLast=null;blUndo=null;blRun=0;
+  blAng=-Math.PI/2;blPow=0;blHandView=game!=='8';
+  if(mode==='practice')blMsg=KT("Mashq: xohlagancha uring. ↶ — zarbani qaytarish, ✋ — sharlarni surish","Тренировка: бейте сколько угодно. ↶ — отменить удар, ✋ — двигать шары","Practice: shoot freely. ↶ undoes a shot, ✋ moves balls");
+  else blMsg=game!=='8'?KT(`${blName(0)} boshlaydi: bitonni uy ichida joylang va piramidani tarqating`,`Начинает ${blName(0)}: поставьте биток в доме и разбейте пирамиду`,`${blName(0)} breaks: place the cue ball in the house and break`)
     :KT(`${blName(0)} boshlaydi: sharlarni tarqating`,`Начинает ${blName(0)}: разбейте пирамиду`,`${blName(0)} breaks`);
   blSave();statSec('bilyard_game');viewBilyard();window.scrollTo(0,0);
 }
 function blRules(T){
   const ctl=`<div><span>👆</span><p><b>Boshqaruv</b>Barmoqni chapga-o'ngga surib nishonga oling yoki sharga teging. O'ngdagi kuch chizig'ini pastga torting va qo'yib yuboring. 3D/2D tugmasi kamerani almashtiradi.</p></div>
     <div><span>🎯</span><p><b>Vint</b>Pastdagi shar tugmasi orqali bitonning qayeriga urishni tanlang: yuqorisiga — urilgandan keyin oldinga ketadi, pastiga — orqaga qaytadi, yoniga — bortdan burilib qaytadi.</p></div>`;
-  const s=kkSheet(T==='pyr'?`<h3>Rus piramidasi</h3><div class="mf-rules">
+  const s=kkSheet(T==='am'?`<h3>Amerikanka</h3><div class="mf-rules">
+    <div><span>🎯</span><p><b>Maqsad</b>Birinchi bo'lib 8 ta sharni luzaga tushirish.</p></div>
+    <div><span>⚪</span><p><b>Biton</b>Hamma 16 ta shar bir xil. Istalgan sharni biton qilib urasiz: pastdagi 🎱 tugmasini bosing va sharni tanlang.</p></div>
+    <div><span>✨</span><p><b>Ochko</b>Tushgan har bir shar hisoblanadi — urilgan shar ham. Shar tushirsangiz, yana urasiz.</p></div>
+    <div><span>⚠️</span><p><b>Fol</b>Urilgan shar hech bir sharga tegmasa yoki hech narsa tushmay, birorta shar bortga yetmasa — fol: bitta sharingiz stolga qaytadi, navbat raqibga o'tadi.</p></div>
+    ${ctl}</div><button class="btn" id="blrok">Tushunarli</button>`
+   :T==='pyr'||T==='mos'?`<h3>${T==='mos'?'Moskva piramidasi':'Erkin piramida'}</h3><div class="mf-rules">
+    ${T==='mos'?`<div><span>🏠</span><p><b>Moskva qoidasi</b>Bitonni uydan (qo'ldan) urganda uy ichidagi sharlarga to'g'ridan-to'g'ri urib bo'lmaydi — faqat chiziqdan narigi sharlarga.</p></div>`:''}
     <div><span>🎯</span><p><b>Maqsad</b>Birinchi bo'lib 8 ta sharni luzaga tushirish.</p></div>
     <div><span>🔴</span><p><b>Biton</b>Faqat qizil biton bilan urasiz. Istalgan oq sharni istalgan luzaga tushirish mumkin.</p></div>
     <div><span>🔁</span><p><b>Navbat</b>Shar tushirsangiz, yana urasiz. Tushmasa, navbat raqibga o'tadi.</p></div>
@@ -4909,19 +4958,22 @@ function blGameV(){
     <div class="bl3-top"><button class="bl3-ib" id="blmenu" aria-label="Menyu">←</button><div class="bl3-pls" id="blpls"></div><button class="bl3-ib" id="blsnd" aria-label="Ovoz">${store.get('bl_snd',true)?'🔊':'🔇'}</button></div>
     <div class="bl3-msg" id="blmsg" data-notr hidden></div>
     <div class="bl3-pow" id="blpow"><div class="bl3-pt"><i id="blpowi"></i></div><span>Zarba</span></div>
-    <div class="bl3-bot" id="blbotbar"><button class="bl3-ib" id="blcam" hidden></button><button class="bl3-ib bl3-spb" id="blspin" aria-label="Vint"><i id="blspd"></i></button><button class="bl3-ib" id="blL" aria-label="Chapga">◀</button><button class="bl3-ib" id="blR" aria-label="O'ngga">▶</button><button class="bl3-ib" id="blff" hidden aria-label="Tezlatish">⏩</button><button class="bl3-ib" id="blrep" hidden aria-label="Qayta ko'rish">🔁</button><button class="bl3-ib" id="blnew">Yangi o'yin</button></div>
+    <div class="bl3-bot" id="blbotbar"><button class="bl3-ib" id="blcam" hidden></button><button class="bl3-ib bl3-spb" id="blspin" aria-label="Vint"><i id="blspd"></i></button><button class="bl3-ib" id="blL" aria-label="Chapga">◀</button><button class="bl3-ib" id="blR" aria-label="O'ngga">▶</button><button class="bl3-ib" id="blpick" hidden aria-label="Bitonni tanlash">🎱</button><button class="bl3-ib" id="blundo" hidden aria-label="Qaytarish">↶</button><button class="bl3-ib" id="blmove" hidden aria-label="Sharni surish">✋</button><button class="bl3-ib" id="blff" hidden aria-label="Tezlatish">⏩</button><button class="bl3-ib" id="blrep" hidden aria-label="Qayta ko'rish">🔁</button><button class="bl3-ib" id="blnew" aria-label="Yangi o'yin">⟲</button></div>
     <div class="bl3-sp" id="blsp" hidden><div class="bl3-spc"><b>Vint: biton qayeriga urasiz?</b><div class="bl3-spball" id="blspball"><i class="bl3-splim"></i><i id="blspdot"></i></div>
       <div class="bl3-sph"><span>⬆ yuqori — biton oldinga ketadi</span><span>⬇ past — biton orqaga qaytadi</span><span>⬅ ➡ yon — bortdan burilib qaytadi</span></div>
       <div class="bl3-spa"><button class="chip" id="blsp0">Markaz</button><button class="btn" id="blspok">Tayyor</button></div></div></div>
     <div id="blend"></div></div>`;
   $('#blmenu').onclick=()=>{BLS.live=false;blSave();viewBilyard()};
-  $('#blnew').onclick=()=>{if(!confirmTap('blnew'))return;blNew(BLS.mode)};
+  $('#blnew').onclick=e=>{const b=e.currentTarget;if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('on');toast(trText("Yangi o'yin: yana bir marta bosing"));setTimeout(()=>{delete b.dataset.sure;b.classList.remove('on')},2500);return}blNew(BLS.mode)};
   $('#blsnd').onclick=()=>{store.set('bl_snd',!store.get('bl_snd',true));$('#blsnd').textContent=store.get('bl_snd',true)?'🔊':'🔇'};
   $('#blcam').onclick=()=>{store.set('bl_cam',store.get('bl_cam','3d')==='3d'?'top':'3d');blHandView=false;blCamLabel()};
   let rep=null;const hold=(id,d)=>{const b=$(id);b.onpointerdown=e=>{e.preventDefault();if(!blCanAim())return;blAng+=d;clearInterval(rep);let n=0;rep=setInterval(()=>{if(blCanAim())blAng+=d*Math.min(8,1+(n++)/8)},50)};b.onpointerup=b.onpointerleave=b.onpointercancel=()=>clearInterval(rep)};
   hold('#blL',-0.0008);hold('#blR',0.0008);
   $('#blspin').onclick=()=>{if(blCanAim())$('#blsp').hidden=false};
   $('#blff').onclick=()=>{blFF=blFF>1?1:4;blBtns()};
+  $('#blpick').onclick=()=>{if(!blCanAim())return;blTool=blTool==='pick'?null:'pick';if(blTool){blMsg=KT('Qaysi shar bilan urasiz? Sharga teging','Каким шаром бить? Коснитесь шара','Which ball will you strike? Tap it');blHud()}blBtns()};
+  $('#blmove').onclick=()=>{if(!blCanAim())return;blTool=blTool==='move'?null:'move';if(blTool){blMsg=KT('Istalgan sharni barmoq bilan suring','Перетаскивайте любой шар пальцем','Drag any ball with your finger');blHud()}blBtns()};
+  $('#blundo').onclick=()=>{if(!blUndo||blEv||blBusy)return;BLS.balls=blUndo.balls.map(b=>({...b,vx:0,vy:0,wx:0,wy:0,wz:0}));blSetCue(blUndo.cue);BLS.pots=blUndo.pots;blUndo=null;blMsg=KT('Zarba qaytarildi','Удар отменён','Shot undone');blSave();blHud();blBtns()};
   $('#blrep').onclick=()=>blStartReplay();
   $('#blspok').onclick=()=>{$('#blsp').hidden=true};$('#blsp').onclick=e=>{if(e.target.id==='blsp')$('#blsp').hidden=true};
   $('#blsp0').onclick=()=>{blSpin={a:0,b:0};blSpinUI()};
@@ -4944,6 +4996,7 @@ const blViewMode=()=>!blR||!blR.is3d?'top':(blHandView&&BLS.G.hand&&!blBotTurn()
 function blCamLabel(){const b=$('#blcam');if(!b||!blR)return;b.hidden=!blR.is3d;b.textContent=store.get('bl_cam','3d')==='3d'?'2D':'3D'}
 function blHud(){
   if(!$('#blstage'))return;const G=BLS.G,pyr=blPyr();
+  if(blPrac())$('#blpls').innerHTML=`<div class="bl3-pl on" style="grid-column:1/-1" data-notr><b>${KT('Mashq','Тренировка','Practice')} · ${blGameName(BLS.game)}</b><span class="bl3-sc">${BLS.pots||0}</span><small>${KT('tushgan sharlar','забито шаров','balls potted')}</small></div>`;else
   $('#blpls').innerHTML=[0,1].map(i=>`<div class="bl3-pl ${G.turn===i&&!G.over?'on':''}" data-notr><b>${esc(blName(i))}</b>${pyr
     ?`<span class="bl3-sc">${G.score[i]}</span><div class="bl3-dots">${Array.from({length:BL_PYR_WIN},(_,k)=>`<i class="${k<G.score[i]?'on':''}"></i>`).join('')}</div>`
     :`<small>${G.groups[i]?blGroupName(G.groups[i]):KT('guruh ochiq','группа не выбрана','table open')}</small><div class="bl-mini">${G.groups[i]?blMini(G.groups[i]):''}</div>`}</div>`).join('');
@@ -4955,7 +5008,33 @@ function blHud(){
     $('#blagain').onclick=()=>blNew(BLS.mode)}
   else end.innerHTML='';
 }
-function blBtns(){const f=$('#blff'),r=$('#blrep');if(!f)return;f.hidden=!blEv;f.classList.toggle('on',blFF>1);r.hidden=!!blEv||!blLast||blBusy&&!BLS.G.over||!!blReplay}
+function blAutoCue(){const on=blOn(BLS.balls);if(!on.length)return;on.sort((a,b)=>Math.hypot(a.x-BL.head.x,a.y-BL.head.y)-Math.hypot(b.x-BL.head.x,b.y-BL.head.y));blSetCue(on[0].id)}
+// ---- statistika va yutuqlar (faqat shu telefonda) ----
+const blSt=()=>store.get('bl_st',{});
+function blStSave(S){const before=blAch().filter(a=>a.ok).map(a=>a.k);store.set('bl_st',S);blAch().filter(a=>a.ok&&!before.includes(a.k)).forEach(a=>{toast('🏆 '+trText(a.t));haptic('done')})}
+function blStatShot(ev,n,R){const S=blSt();S.shots=(S.shots||0)+1;S.pots=(S.pots||0)+n;if(n>=2)S.multi=Math.max(S.multi||0,n);if(R&&R.svoyak)S.svoyak=(S.svoyak||0)+1;
+  if(n>0&&!blPrac()){blRun++;S.bestRun=Math.max(S.bestRun||0,blRun)}else if(!n)blRun=0;blStSave(S)}
+function blStatEnd(){const S=blSt(),G=BLS.G;S.games=(S.games||0)+1;if(blBot()&&G.winner===0){S.wins=(S.wins||0)+1;S['win_'+BLS.lvl]=(S['win_'+BLS.lvl]||0)+1}blStSave(S)}
+function blAch(){const S=blSt();return [
+  ['first',"Birinchi g'alaba","Kompyuterni bir marta yengish",(S.wins||0)>=1],
+  ['hard',"Usta","Qiyin darajadagi kompyuterni yengish",(S.win_hard||0)>=1],
+  ['run3',"Seriya ×3","Bir navbatda ketma-ket 3 ta shar",(S.bestRun||0)>=3],
+  ['run5',"Seriya ×5","Bir navbatda ketma-ket 5 ta shar",(S.bestRun||0)>=5],
+  ['run8',"Bir chiqishda 8","Bir navbatda 8 ta shar — o'yinni bitta chiqishda tugatish",(S.bestRun||0)>=8],
+  ['multi',"Dublet","Bir zarbada 2 ta shar tushirish",(S.multi||0)>=2],
+  ['svoyak',"Svoyak ustasi","10 ta svoyak",(S.svoyak||0)>=10],
+  ['pots100',"100 ta shar","Jami 100 ta shar tushirish",(S.pots||0)>=100],
+  ['games10',"Muxlis","10 ta o'yin o'ynash",(S.games||0)>=10]].map(([k,t,d,ok])=>({k,t,d,ok}))}
+function blStatsV(){
+  const S=blSt(),acc=S.shots?Math.round(100*(S.pots||0)/S.shots):0,A=blAch();
+  const sh=kkSheet(`<h3>Statistika va yutuqlar</h3>
+    <div class="bl-stg"><div><b data-notr>${S.games||0}</b><small>o'yin</small></div><div><b data-notr>${S.wins||0}</b><small>kompyuterni yutish</small></div><div><b data-notr>${S.pots||0}</b><small>tushgan shar</small></div>
+      <div><b data-notr>${acc}%</b><small>aniqlik</small></div><div><b data-notr>${S.bestRun||0}</b><small>eng uzun seriya</small></div><div><b data-notr>${S.win_hard||0}</b><small>qiyin darajada g'alaba</small></div></div>
+    <div class="bl-ach">${A.map(a=>`<div class="${a.ok?'ok':''}"><span>${a.ok?'🏆':'🔒'}</span><p><b>${a.t}</b>${a.d}</p></div>`).join('')}</div>
+    <button class="btn" id="blsok">Yopish</button>`);
+  $('#blsok').onclick=()=>sh.remove();
+}
+function blBtns(){const f=$('#blff'),r=$('#blrep');if(!f)return;const idle=!blEv&&!blBusy&&!BLS.G.over;$('#blpick').hidden=!(blAm()&&idle&&!blBotTurn());$('#blpick').classList.toggle('on',blTool==='pick');$('#blundo').hidden=!(blPrac()&&idle&&blUndo);$('#blmove').hidden=!(blPrac()&&idle);$('#blmove').classList.toggle('on',blTool==='move');f.hidden=!blEv;f.classList.toggle('on',blFF>1);r.hidden=!!blEv||!blLast||blBusy&&!BLS.G.over||!!blReplay}
 // ---- qayta ko'rish: oxirgi zarba sekinlashtirilgan holda ----
 function blStartReplay(){if(!blLast||blEv)return;const f0=blLast.f[0];blReplay={t:0,i:0,balls:blLast.ids.map((id,k)=>({id,x:f0.b[k][0],y:f0.b[k][1],in:f0.b[k][2],vx:0,vy:0,wx:0,wy:0,wz:0}))};$('#blmsg').hidden=true;blBtns()}
 function blStopReplay(){blReplay=null;blHud();blBtns()}
@@ -4985,10 +5064,13 @@ function blBindView(){
   const el=blR.dom;let st=null;const fill=v=>{const i=$('#blpowi');if(i)i.style.height=(v*100)+'%'};
   el.onpointerdown=e=>{if(blReplay){blStopReplay();return}if(!blCanAim())return;e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}
     const p=blR.pick(e.clientX,e.clientY),c=blCue(BLS.balls),now=performance.now();
+    if(blTool==='pick'){const b=blR.pickBall(e.clientX,e.clientY,true);if(b){blSetCue(b.id);blTool=null;blMsg='';blSave();blHud();blBtns()}return}
+    if(blTool==='move'&&p){let best=null;for(const b of blOn(BLS.balls)){const d=Math.hypot(b.x-p.x,b.y-p.y);if(d<BL.r*2.2&&(!best||d<best.d))best={d,b}}if(best){st={drag:best.b,mode:'drag'};return}}
     st={x:e.clientX,y:e.clientY,lx:e.clientX,lt:now,mode:null,place:BLS.G.hand&&!!p&&Math.hypot(p.x-c.x,p.y-c.y)<BL.r*3.2};
     if(!st.place&&blViewMode()==='top'){blAimAt(p);st.mode='point'}};
   el.onpointermove=e=>{if(!st)return;
     if(st.place){const p=blR.pick(e.clientX,e.clientY);if(p&&blCanPlace(BLS.G,BLS.balls,p.x,p.y)){const c=blCue(BLS.balls);c.x=p.x;c.y=p.y}return}
+    if(st.drag){const p=blR.pick(e.clientX,e.clientY);if(p&&blFree(BLS.balls,p.x,p.y,st.drag.id)){st.drag.x=p.x;st.drag.y=p.y}return}
     const dx=e.clientX-st.x,dy=e.clientY-st.y;
     if(!st.mode){if(Math.hypot(dx,dy)<10)return;st.mode=dy>Math.abs(dx)*1.2?'pull':'aim';st.y0=e.clientY;st.lx=e.clientX;st.lt=performance.now()}
     if(st.mode==='point'){blAimAt(blR.pick(e.clientX,e.clientY));return}
@@ -4996,7 +5078,7 @@ function blBindView(){
     const now=performance.now(),ddx=e.clientX-st.lx,sp=Math.abs(ddx)/Math.max(1,now-st.lt);st.lx=e.clientX;st.lt=now;
     blAng+=ddx*(sp<0.15?0.0005:sp<0.5?0.0016:0.003)};
   el.onpointerup=el.onpointercancel=e=>{if(!st)return;const s=st;st=null;
-    if(s.place){blSave();return}
+    if(s.place||s.drag){blSave();return}
     if(s.mode==='pull'){const p=blPow;fill(0);if(p>0.03&&e.type==='pointerup')blFire(blAng,p);else blPow=0;return}
     if(!s.mode&&blViewMode()==='3d'){const b=blR.pickBall(e.clientX,e.clientY);if(b)blAimAt(b)}
     if(blHandView){blHandView=false}};
@@ -5008,10 +5090,10 @@ function blBindPower(el){
   el.onpointerup=el.onpointercancel=()=>{if(!el.dataset.on)return;delete el.dataset.on;const p=blPow;fill(0);if(p>0.03)blFire(blAng,p);else blPow=0};
 }
 function blFire(ang,pow,spin){
-  const sp=spin||{...blSpin};blBusy=true;BLS.G.hand=false;BLS.G.house=false;blHandView=false;blMsg='';blHud();
+  const sp=spin||{...blSpin};blTool=null;blUndo={balls:BLS.balls.map(b=>({...b})),cue:BL.cue,pots:BLS.pots||0};blHouse=!!BLS.G.house;blBusy=true;BLS.G.hand=false;BLS.G.house=false;blHandView=false;blMsg='';blHud();
   if(blR&&blR.is3d){blPow=pow;blStroke={t0:performance.now(),ang,pow,sp}}else blShootNow(ang,pow,sp);
 }
-function blShootNow(ang,pow,sp){blPow=0;blFF=1;blSimT=0;blRec=[{t:0,b:BLS.balls.map(b=>[b.x,b.y,b.in])}];blEv={first:null,potted:[],snd:[],rail:false};blBtns();blShoot(BLS.balls,ang,pow,sp);if(!blBotTurn()){blSpin={a:0,b:0};blSpinUI()}blTone('cue',pow);haptic(pow>0.6?'medium':'light')}
+function blShootNow(ang,pow,sp){blPow=0;blFF=1;blSimT=0;blRec=[{t:0,b:BLS.balls.map(b=>[b.x,b.y,b.in])}];blEv={first:null,potted:[],snd:[],rail:false,house:blHouse};blBtns();blShoot(BLS.balls,ang,pow,sp);if(!blBotTurn()){blSpin={a:0,b:0};blSpinUI()}blTone('cue',pow);haptic(pow>0.6?'medium':'light')}
 function blLoop(){
   cancelAnimationFrame(blRAF);let last=performance.now();
   const f=now=>{if(current!=='bilyard'||!document.getElementById('blstage')){blDispose();return}
@@ -5027,15 +5109,20 @@ function blLoop(){
   blRAF=requestAnimationFrame(f);
 }
 function blSettle(){
-  const G=BLS.G,ev=blEv,B=BLS.balls;blEv=null;blBusy=false;blLast=blRec&&{ids:B.map(b=>b.id),f:blRec};blRec=null;blFF=1;const me=G.turn,R=blJudge(G,B,ev),opp=blName(G.turn);
+  const G=BLS.G,ev=blEv,B=BLS.balls;blEv=null;blBusy=false;ev.cue=BL.cue;blLast=blRec&&{ids:B.map(b=>b.id),f:blRec};blRec=null;blFF=1;
+  if(blPrac()){const n=ev.potted.length;blStatShot(ev,n);if(ev.potted.includes(BL.cue)&&!blAm())blRespot(B,BL.cue,BL.head);if(blAm()&&blCue(B).in)blAutoCue();
+    BLS.pots=(BLS.pots||0)+n;blMsg=n?KT(`Tushdi: ${n} · jami ${BLS.pots}`,`Забито: ${n} · всего ${BLS.pots}`,`Potted: ${n} · total ${BLS.pots}`):KT('Tushmadi. ↶ bilan qaytarib, qayta urib ko\'ring',"Мимо. Нажмите ↶ и попробуйте снова",'Missed. Tap ↶ and try again');
+    blSave();blHud();blBtns();return}const me=G.turn,human=!(blBot()&&me===1),R=blJudge(G,B,ev),opp=blName(G.turn);
+  if(human)blStatShot(ev,R.foul?0:(R.pot||[]).length,R);if(G.turn!==me||!human)blRun=0;
   const handTip=blBot()&&G.turn===1?'':blPyr()?KT(' — bitonni barmoq bilan suring',' — передвиньте биток пальцем',' — drag the cue ball with your finger'):KT(' — oq sharni barmoq bilan suring',' — передвиньте биток пальцем',' — drag the cue ball with your finger');
   if(blPyr()){
     for(const id of R.back)blRespot(B,id,BL.foot);
     for(let k=0;k<R.penalty;k++){const x=B.find(q=>q.in&&q.id);if(x)blRespot(B,x.id,BL.foot)}
     if(R.cuePot&&!G.over)blRespot(B,0,BL.head);
+    if(blAm()&&blCue(B).in&&!G.over)blAutoCue();
     if(G.over){blMsg=KT(`${blName(G.winner)} 8 ta shar tushirdi va g'alaba qozondi! 🎉`,`${blName(G.winner)} забивает 8 шаров и побеждает! 🎉`,`${blName(G.winner)} pots 8 balls and wins! 🎉`);haptic('done')}
-    else if(R.foul){const why=R.foul==='miss'?KT('Biton hech bir sharga tegmadi','Биток не задел ни одного шара','The cue ball hit nothing'):KT('Hech narsa tushmadi va birorta shar bortga yetmadi','Ничего не забито и ни один шар не коснулся борта','Nothing went in and no ball reached a cushion');
-      blMsg=why+'. '+KT(`Fol! ${opp} bitonni uydan qo'ldan uradi`,`Фол! ${opp} бьёт с руки из дома`,`Foul! ${opp} plays from the house`)+(R.penalty?KT(` · ${blName(me)}: 1 shar jarima`,` · ${blName(me)}: штраф 1 шар`,` · ${blName(me)}: 1 ball penalty`):'')+handTip}
+    else if(R.foul){const why=R.foul==='miss'?KT('Biton hech bir sharga tegmadi','Биток не задел ни одного шара','The cue ball hit nothing'):R.foul==='house'?KT("Uydan turib uy ichidagi sharga urildi","С руки нельзя бить по шару в доме","From the house you hit a ball inside the house"):KT('Hech narsa tushmadi va birorta shar bortga yetmadi','Ничего не забито и ни один шар не коснулся борта','Nothing went in and no ball reached a cushion');
+      blMsg=why+'. '+(blAm()?KT(`Fol! Navbat: ${opp}`,`Фол! Ход: ${opp}`,`Foul! ${opp}'s turn`):KT(`Fol! ${opp} bitonni uydan qo'ldan uradi`,`Фол! ${opp} бьёт с руки из дома`,`Foul! ${opp} plays from the house`))+(R.penalty?KT(` · ${blName(me)}: 1 shar jarima`,` · ${blName(me)}: штраф 1 шар`,` · ${blName(me)}: 1 ball penalty`):'')+(blAm()?'':handTip)}
     else if(R.svoyak)blMsg=KT(`${blName(me)}: svoyak! +${R.pot.length} — bitonni uydan qo'yib yana uradi`,`${blName(me)}: свояк! +${R.pot.length} — бьёт ещё с руки из дома`,`${blName(me)}: in-off! +${R.pot.length} — plays again from the house`)+(blBotTurn()?'':KT(' — bitonni barmoq bilan suring',' — передвиньте биток пальцем',' — drag the cue ball with your finger'));
     else if(R.pot.length)blMsg=KT(`${blName(me)}: +${R.pot.length} — yana uradi`,`${blName(me)}: +${R.pot.length} — бьёт ещё`,`${blName(me)}: +${R.pot.length} — shoots again`);
     else blMsg=KT(`Navbat: ${opp}`,`Ход: ${opp}`,`${opp}'s turn`);
@@ -5049,6 +5136,7 @@ function blSettle(){
     else blMsg=G.turn===me?KT(`${blName(me)} yana uradi`,`${blName(me)} бьёт ещё`,`${blName(me)} shoots again`):KT(`Navbat: ${opp}`,`Ход: ${opp}`,`${opp}'s turn`);
   }
   blHandView=G.hand&&!blBotTurn();
+  if(G.over)blStatEnd();
   blSave();blHud();blBtns();
   if(blBotTurn())blBotGo();
 }
@@ -5056,7 +5144,7 @@ function blBotGo(){
   blBusy=true;clearTimeout(blBotT);
   blBotT=setTimeout(()=>{if(current!=='bilyard'||!$('#blstage')||!blBotTurn())return;const G=BLS.G;
     if(G.hand)blBotPlace(G,BLS.balls);
-    const s=blBotShot(G,BLS.balls,BLS.lvl),from=blAng,d=Math.atan2(Math.sin(s.ang-from),Math.cos(s.ang-from)),t0=performance.now();
+    const s=blBotShot(G,BLS.balls,BLS.lvl);if(s.cue!=null)blSetCue(s.cue);const from=blAng,d=Math.atan2(Math.sin(s.ang-from),Math.cos(s.ang-from)),t0=performance.now();
     const turn=now=>{if(current!=='bilyard'||!$('#blstage'))return;const k=Math.min(1,(now-t0)/900);blAng=from+d*(1-Math.pow(1-Math.min(1,k*1.4),3));blPow=Math.max(0,(k-0.55)/0.45)*s.power;
       if(k<1)requestAnimationFrame(turn);else blFire(s.ang,s.power,s.spin)};
     requestAnimationFrame(turn)},800);
@@ -5210,7 +5298,7 @@ function blMake3D(v){
       if(pred&&a.hit){tanL.visible=false;const P2=pred.cue;let n=0;for(let i=1;i<P2.length&&n<dots.length;i++){const [x1,z1]=P2[i-1],[x2,z2]=P2[i];const L2=Math.hypot(x2-x1,z2-z1);for(let u=0;u<L2&&n<dots.length;u+=0.022){const dd=dots[n++];dd.visible=true;dd.position.set(x1+(x2-x1)*u/L2-0.5,0.0019,z1+(z2-z1)*u/L2-1)}}
         for(;n<dots.length;n++)dots[n].visible=false}else dots.forEach(d=>d.visible=false)}
     else dots.forEach(d=>d.visible=false);
-    handR.visible=G.hand&&human&&!c.in&&!G.over&&!blReplay;if(handR.visible){handR.position.set(c.x-0.5,0.002,c.y-1);handR.material.opacity=0.55+0.4*Math.sin(t*5)}
+    handR.visible=(G.hand&&human||blAm()&&showCue)&&!c.in&&!G.over&&!blReplay;if(handR.visible){handR.position.set(c.x-0.5,0.002,c.y-1);handR.material.opacity=G.hand?0.55+0.4*Math.sin(t*5):0.5}
     house.visible=!!G.house&&G.hand&&human&&!G.over;
     cue.visible=showCue;
     if(showCue){const el=0.09,gap=0.012+blPow*0.2;bd.set(-dx*Math.cos(el),Math.sin(el),-dz*Math.cos(el));cue.quaternion.setFromUnitVectors(Y,bd);const sa=blSpin.a*r,sb=blSpin.b*r;cue.position.set(c.x-0.5+bd.x*(r+gap)-dz*sa,r+bd.y*(r+gap)+sb,c.y-1+bd.z*(r+gap)+dx*sa)}
@@ -5302,7 +5390,7 @@ function viewHome(){
     <div class="tiles">${tiles.map(([k,l,s])=>`<button class="tile" data-go="${k==='qibla'||k==='tasbeh'?'namoz':k}" ${k==='qibla'||k==='tasbeh'?`data-pv="${k}"`:''}><span class="t-ic" style="background:linear-gradient(135deg,${TILE_COL[k][0]},${TILE_COL[k][1]})">${ICONS[k]||TOOLIC[k]}</span><span><b>${l}</b><small>${s}</small></span></button>`).join('')}</div>
     <button class="card pv-main" data-go="kkal" style="margin:0;background:linear-gradient(135deg,#0f5132,#2fa36b)"><span class="pv-ic">${ICONS.kkal}</span><span><b>Kaloriya hisoblagich</b><small>Ovqatni suratga oling · kunlik norma</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="mafia" style="margin:0;background:linear-gradient(135deg,#2b0f14,#8e1b2b)"><span class="pv-ic">${ICONS.mafia}</span><span><b>Mafiya o'yini</b><small>Davrada o'ynash · ilova boshlovchiga yordam beradi</small></span><span class="pv-go">→</span></button>
-    <button class="card pv-main" data-go="bilyard" style="margin:0;background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">${ICONS.bilyard}</span><span><b>Bilyard</b><small>8-shar · ikki kishi yoki kompyuterga qarshi</small></span><span class="pv-go">→</span></button>
+    <button class="card pv-main" data-go="bilyard" style="margin:0;background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">${ICONS.bilyard}</span><span><b>Bilyard</b><small>3D · Rus piramidasi, Amerikanka, 8-shar</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="prava" style="margin:0;background:linear-gradient(135deg,#4a3200,#d99a00)"><span class="pv-ic">${ICONS.prava}</span><span><b>Prava imtihoniga tayyorlaning</b><small>Imtihon rejimi · xatolar ustida ishlash · yo'l belgilari</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="sert" style="margin:0;background:linear-gradient(135deg,#2a1a6e,#6a4fd6)"><span class="pv-ic">∑</span><span><b>Milliy sertifikatga tayyorlaning</b><small>8 fan · imtihon rejimi · izohli savollar</small></span><span class="pv-go">→</span></button>
     ${STAT.admin?`<button class="card pv-main" data-go="admin" data-noi18n style="margin:0;background:linear-gradient(135deg,#14224d,#3563d4)"><span class="pv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg></span><span><b>Statistika</b><small>Admin panel · faqat siz ko'rasiz</small></span><span class="pv-go">→</span></button>`:''}
