@@ -776,6 +776,10 @@ body.bl-play nav.tabs{display:none}
 .bl3-msg{transition:opacity .4s}.bl3-msg.fade{opacity:0}
 .bl3-pow{width:40px;right:6px}
 .bl3-2d{inset:70px 54px 70px 8px}
+.bl3-ptxt{position:absolute;transform:translate(-50%,-50%);font-size:24px;font-weight:800;color:rgba(255,255,255,.28);letter-spacing:.5px;pointer-events:none;text-align:center;white-space:nowrap;text-shadow:0 1px 0 rgba(0,0,0,.15)}
+.bl3-place{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:18px;z-index:2}
+.bl3-place button{width:54px;height:54px;border-radius:50%;border:0;color:#fff;font-size:34px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.bl3-ok{background:#43a047}.bl3-no{background:#d32f2f}
 .mf-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
 .mf-h b{font-family:var(--display);font-size:17px}
 .mf-names{display:flex;flex-direction:column;gap:6px}
@@ -3988,7 +3992,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101o';
+const APP_VER='20261101p';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -4849,7 +4853,7 @@ const blFelt=()=>{const k=store.get('bl_felt','auto');return BL_FELT[k]||BL_FELT
 const blWood=()=>BL_WOOD[store.get('bl_wood','matte')]||BL_WOOD.matte;
 const blClassic=()=>store.get('bl_wood','matte')==='matte';
 let BLS=store.get('bl',null);if(BLS&&!BLS.game)BLS.game='8';
-let blHouse=false,blUndo=null,blRun=0,blTool=null,blFF=1,blRec=null,blSimT=0,blLast=null,blReplay=null,blSpin={a:0,b:0},blRAF=null,blAng=-Math.PI/2,blPow=0,blBusy=false,blEv=null,blMsg='',blAudio=null,blNB=null,blSc=1,blBotT=null,blR=null,blHandView=false,blStroke=null;
+let blPlaceStart=null,blHouse=false,blUndo=null,blRun=0,blTool=null,blFF=1,blRec=null,blSimT=0,blLast=null,blReplay=null,blSpin={a:0,b:0},blRAF=null,blAng=-Math.PI/2,blPow=0,blBusy=false,blEv=null,blMsg='',blAudio=null,blNB=null,blSc=1,blBotT=null,blR=null,blHandView=false,blStroke=null;
 const blPyr=()=>!!BLS&&['pyr','mos','am'].includes(BLS.game);
 const blAm=()=>!!BLS&&BLS.game==='am',blPrac=()=>!!BLS&&BLS.mode==='practice';
 const blEng=g=>g==='mos'?'pyr':g; // fizika/stol turi
@@ -4972,6 +4976,8 @@ function blGameV(){
     <div class="bl3-sp" id="blsp" hidden><div class="bl3-spc"><b>Vint: biton qayeriga urasiz?</b><div class="bl3-spball" id="blspball"><i class="bl3-splim"></i><i id="blspdot"></i></div>
       <div class="bl3-sph"><span>⬆ yuqori — biton oldinga ketadi</span><span>⬇ past — biton orqaga qaytadi</span><span>⬅ ➡ yon — bortdan burilib qaytadi</span></div>
       <div class="bl3-spa"><button class="chip" id="blsp0">Markaz</button><button class="btn" id="blspok">Tayyor</button></div></div></div>
+    <div class="bl3-ptxt" id="blptxt" data-notr hidden></div>
+    <div class="bl3-place" id="blplace" hidden><button class="bl3-ok" id="blpok" aria-label="Tayyor">✓</button><button class="bl3-no" id="blpno" aria-label="Bekor qilish">✕</button></div>
     <div id="blend"></div></div>`;
   $('#blmenu').onclick=()=>{BLS.live=false;blSave();viewBilyard()};
   $('#blnew').onclick=e=>{const b=e.currentTarget;if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('on');toast(trText("Yangi o'yin: yana bir marta bosing"));setTimeout(()=>{delete b.dataset.sure;b.classList.remove('on')},2500);return}blNew(BLS.mode)};
@@ -4981,6 +4987,8 @@ function blGameV(){
   hold('#blL',-0.0008);hold('#blR',0.0008);
   $('#blspin').onclick=()=>{if(blCanAim())$('#blsp').hidden=false};
   $('#blff').onclick=()=>{blFF=blFF>1?1:4;blBtns()};
+  $('#blpok').onclick=()=>{blHandView=false;blPlaceStart=null;blSave();blHud();blBtns();haptic('light')};
+  $('#blpno').onclick=()=>{if(blPlaceStart){const c=blCue(BLS.balls);c.x=blPlaceStart.x;c.y=blPlaceStart.y;blSave()}};
   $('#blpick').onclick=()=>{if(!blCanAim())return;blTool=blTool==='pick'?null:'pick';if(blTool){blMsg=KT('Qaysi shar bilan urasiz? Sharga teging','Каким шаром бить? Коснитесь шара','Which ball will you strike? Tap it');blHud()}blBtns()};
   $('#blmove').onclick=()=>{if(!blCanAim())return;blTool=blTool==='move'?null:'move';if(blTool){blMsg=KT('Istalgan sharni barmoq bilan suring','Перетаскивайте любой шар пальцем','Drag any ball with your finger');blHud()}blBtns()};
   $('#blundo').onclick=()=>{if(!blUndo||blEv||blBusy)return;BLS.balls=blUndo.balls.map(b=>({...b,vx:0,vy:0,wx:0,wy:0,wz:0}));blSetCue(blUndo.cue);BLS.pots=blUndo.pots;blUndo=null;blMsg=KT('Zarba qaytarildi','Удар отменён','Shot undone');blSave();blHud();blBtns()};
@@ -5012,6 +5020,7 @@ function blHud(){
   $('#blpls').innerHTML=[0,1].map(i=>`<div class="bl3-pl ${G.turn===i&&!G.over?'on':''}" data-notr><b>${esc(blName(i))}</b>${pyr
     ?`<span class="bl3-sc">${G.score[i]}</span><div class="bl3-dots">${Array.from({length:BL_PYR_WIN},(_,k)=>`<i class="${k<G.score[i]?'on':''}"></i>`).join('')}</div>`
     :`<small>${G.groups[i]?blGroupName(G.groups[i]):KT('guruh ochiq','группа не выбрана','table open')}</small><div class="bl-mini">${G.groups[i]?blMini(G.groups[i]):''}</div>`}</div>`).join('');
+  blPlaceUI();
   const m=$('#blmsg');m.textContent=blMsg;m.hidden=!blMsg;m.classList.remove('fade');clearTimeout(blHud.t);
   if(blMsg)blHud.t=setTimeout(()=>m.classList.add('fade'),Math.min(7000,2600+blMsg.length*45));
   $('#blpow').hidden=$('#blL').hidden=$('#blR').hidden=G.over;
@@ -5023,7 +5032,7 @@ function blHud(){
 }
 // HUD egallamagan joy: yuqori panel ostidan pastki tugmalar ustigacha, chapdan kuch chizig'igacha
 function blSafeRect(w,h){const st=$('#blstage');if(!st)return {cx:w/2,cy:h/2,w,h};const R=st.getBoundingClientRect(),g=el=>el&&!el.hidden&&el.offsetParent?el.getBoundingClientRect():null;
-  const tp=g($('.bl3-top')),bt=g($('#blbotbar')),pw=g($('#blpow'));
+  const tp=g($('.bl3-top')),bt=g($('#blbotbar')),pw=g($('#blpow'))||g($('#blplace'));
   const top=(tp?tp.bottom-R.top:0)+6,bottom=(bt?bt.top-R.top:h)-6,left=8,right=(pw?pw.left-R.left:w)-6;
   return {cx:(left+right)/2,cy:(top+bottom)/2,w:Math.max(80,right-left),h:Math.max(120,bottom-top)}}
 function blAutoCue(){const on=blOn(BLS.balls);if(!on.length)return;on.sort((a,b)=>Math.hypot(a.x-BL.head.x,a.y-BL.head.y)-Math.hypot(b.x-BL.head.x,b.y-BL.head.y));blSetCue(on[0].id)}
@@ -5052,7 +5061,12 @@ function blStatsV(){
     <button class="btn" id="blsok">Yopish</button>`);
   $('#blsok').onclick=()=>sh.remove();
 }
-function blBtns(){const f=$('#blff'),r=$('#blrep');if(!f)return;const idle=!blEv&&!blBusy&&!BLS.G.over;$('#blnew').hidden=blOnline()&&!BLS.G.over;$('#blpick').hidden=!(blAm()&&idle&&!blBotTurn());$('#blpick').classList.toggle('on',blTool==='pick');$('#blundo').hidden=!(blPrac()&&idle&&blUndo);$('#blmove').hidden=!(blPrac()&&idle);$('#blmove').classList.toggle('on',blTool==='move');f.hidden=!blEv;f.classList.toggle('on',blFF>1);r.hidden=!!blEv||!blLast||blBusy&&!BLS.G.over||!!blReplay}
+function blPlaceUI(){const on=blPlacing(),pl=$('#blplace'),tx=$('#blptxt');if(!pl)return;
+  if(on&&!blPlaceStart){const c=blCue(BLS.balls);blPlaceStart={x:c.x,y:c.y}}if(!on)blPlaceStart=null;
+  pl.hidden=tx.hidden=!on;$('#blpow').hidden=on||BLS.G.over;
+  if(on){tx.textContent=blPyr()?KT('Bitonni joylashtiring','Поставьте биток','Place the cue ball'):KT('Oq sharni joylashtiring','Поставьте биток','Place the cue ball');
+    const st=$('#blstage'),R=st.getBoundingClientRect(),S=blSafeRect(R.width,R.height);tx.style.left=S.cx+'px';tx.style.top=S.cy+'px'}}
+function blBtns(){blPlaceUI();const f=$('#blff'),r=$('#blrep');if(!f)return;const idle=!blEv&&!blBusy&&!BLS.G.over;$('#blnew').hidden=blOnline()&&!BLS.G.over;$('#blpick').hidden=!(blAm()&&idle&&!blBotTurn());$('#blpick').classList.toggle('on',blTool==='pick');$('#blundo').hidden=!(blPrac()&&idle&&blUndo);$('#blmove').hidden=!(blPrac()&&idle);$('#blmove').classList.toggle('on',blTool==='move');f.hidden=!blEv;f.classList.toggle('on',blFF>1);r.hidden=!!blEv||!blLast||blBusy&&!BLS.G.over||!!blReplay}
 // ---- qayta ko'rish: oxirgi zarba sekinlashtirilgan holda ----
 function blStartReplay(sp=0.5,end=null){if(!blLast||blEv)return;const f0=blLast.f[0];blReplay={sp,end,t:0,i:0,balls:blLast.ids.map((id,k)=>({id,x:f0.b[k][0],y:f0.b[k][1],in:f0.b[k][2],vx:0,vy:0,wx:0,wy:0,wz:0}))};$('#blmsg').hidden=true;blBtns()}
 function blStopReplay(){const e=blReplay&&blReplay.end;blReplay=null;blHud();blBtns();if(e)e()}
@@ -5076,11 +5090,14 @@ function blTutorial(i=0){
 }
 function blSpinUI(){const p=(id,sc)=>{const d=$(id);if(d){d.style.left=(50+blSpin.a*sc)+'%';d.style.top=(50-blSpin.b*sc)+'%'}};p('#blspd',50);p('#blspdot',50)}
 function blMini(g){const ids=g==='s'?[1,2,3,4,5,6,7]:[9,10,11,12,13,14,15];return ids.map(id=>{const b=BLS.balls.find(x=>x.id===id);return `<i class="${b.in?'off':''} ${g}" style="--c:${blColor(id)}"></i>`}).join('')}
-const blCanAim=()=>BLS&&!blReplay&&!(blOnline()&&!(BLS.names&&BLS.names[1]))&&!BLS.G.over&&!blBusy&&!blBotTurn()&&!blMoving(BLS.balls)&&!!blR;
+const blPlacing=()=>!!BLS&&blHandView&&BLS.G.hand&&!BLS.G.over&&!blBotTurn()&&!blEv&&!blBusy;
+const blCanAim=()=>BLS&&!blPlacing()&&!blReplay&&!(blOnline()&&!(BLS.names&&BLS.names[1]))&&!BLS.G.over&&!blBusy&&!blBotTurn()&&!blMoving(BLS.balls)&&!!blR;
 function blAimAt(p){const c=blCue(BLS.balls);if(p&&Math.hypot(p.x-c.x,p.y-c.y)>BL.r*0.5)blAng=Math.atan2(p.y-c.y,p.x-c.x)}
 function blBindView(){
   const el=blR.dom;let st=null;const fill=v=>{const i=$('#blpowi');if(i)i.style.height=(v*100)+'%'};
-  el.onpointerdown=e=>{const mm=$('#blmsg');if(mm)mm.classList.add('fade');if(blReplay){blStopReplay();return}if(!blCanAim())return;e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}
+  el.onpointerdown=e=>{const mm=$('#blmsg');if(mm)mm.classList.add('fade');if(blReplay){blStopReplay();return}
+    if(blPlacing()){e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}const p=blR.pick(e.clientX,e.clientY),c=blCue(BLS.balls);if(p)st={mode:'place',p0:p,c0:{x:c.x,y:c.y}};return}
+    if(!blCanAim())return;e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}
     const p=blR.pick(e.clientX,e.clientY),c=blCue(BLS.balls),now=performance.now();
     if(blTool==='pick'){const b=blR.pickBall(e.clientX,e.clientY,true);if(b){blSetCue(b.id);blTool=null;blMsg='';blSave();blHud();blBtns()}return}
     if(blTool==='move'&&p){let best=null;for(const b of blOn(BLS.balls)){const d=Math.hypot(b.x-p.x,b.y-p.y);if(d<BL.r*2.2&&(!best||d<best.d))best={d,b}}if(best){st={drag:best.b,mode:'drag'};return}}
@@ -5092,6 +5109,8 @@ function blBindView(){
       else{blAimAt(p);st.mode='point'}}
     else if(!st.place&&blR.proj){const q=blR.proj(c.x,c.y);st.sg=(e.clientY>q.y+18&&Math.abs(e.clientX-q.x)<80)?-1:1}};
   el.onpointermove=e=>{if(!st)return;
+    if(st.mode==='place'){const p=blR.pick(e.clientX,e.clientY);if(!p)return;const c=blCue(BLS.balls),nx=st.c0.x+(p.x-st.p0.x),ny=st.c0.y+(p.y-st.p0.y);
+      if(blCanPlace(BLS.G,BLS.balls,nx,ny)){c.x=nx;c.y=ny}else{const hx=Math.max(BL.r,Math.min(1-BL.r,nx)),hy=Math.max(BLS.G.house?BL.head.y:BL.r,Math.min(2-BL.r,ny));if(blCanPlace(BLS.G,BLS.balls,hx,hy)){c.x=hx;c.y=hy}}return}
     if(st.place){const p=blR.pick(e.clientX,e.clientY);if(p&&blCanPlace(BLS.G,BLS.balls,p.x,p.y)){const c=blCue(BLS.balls);c.x=p.x;c.y=p.y}return}
     if(st.drag){const p=blR.pick(e.clientX,e.clientY);if(p&&blFree(BLS.balls,p.x,p.y,st.drag.id)){st.drag.x=p.x;st.drag.y=p.y}return}
     const dx=e.clientX-st.x,dy=e.clientY-st.y;
@@ -5101,11 +5120,11 @@ function blBindView(){
     if(st.mode==='pull'){blPow=Math.max(0,Math.min(1,(e.clientY-st.y0)/(innerHeight*0.3)));fill(blPow);return}
     const now=performance.now(),ddx=e.clientX-st.lx,sp=Math.abs(ddx)/Math.max(1,now-st.lt);st.lx=e.clientX;st.lt=now;
     blAng+=(st.sg||1)*ddx*(sp<0.15?0.0005:sp<0.5?0.0016:0.003)};
-  el.onpointerup=el.onpointercancel=e=>{if(!st)return;const s=st;st=null;
+  el.onpointerup=el.onpointercancel=e=>{if(!st)return;const s=st;st=null;if(s.mode==='place'){blSave();return}
     if(s.place||s.drag){blSave();return}
     if(s.mode==='pull'){const p=blPow;fill(0);if(p>0.03&&e.type==='pointerup')blFire(blAng,p);else blPow=0;return}
     if(!s.mode&&blViewMode()==='3d'){const b=blR.pickBall(e.clientX,e.clientY);if(b)blAimAt(b)}
-    if(blHandView){blHandView=false}};
+    };
 }
 function blBindPower(el){
   let y0=0,h=1;const fill=v=>{const i=$('#blpowi');if(i)i.style.height=(v*100)+'%'};
@@ -5311,9 +5330,30 @@ function blMake3D(v){
   {const P=fg.attributes.position,uv=fg.attributes.uv;for(let i=0;i<P.count;i++)uv.setXY(i,(P.getX(i)+0.6)*0.9,(P.getZ(i)+1.2)*0.45);uv.needsUpdate=true}
   const sideM=new T.MeshStandardMaterial({color:0x1a0a04,roughness:0.55});
   const fr=new T.Mesh(fg,[woodM,sideM]);fr.receiveShadow=true;fr.position.y=-0.004;sc.add(fr);
+  // ---- haqiqiy bort ko'rinishi (namunadagidek): bo'ylama tolali yog'och usti, tashqi chetida profil (lab va ariqcha), luzalarda uziladi ----
+  const trimPoly=(poly,step=0.002)=>{const pts=[];for(let e=0;e<poly.length;e++){const [x1,z1]=poly[e],[x2,z2]=poly[(e+1)%poly.length],n=Math.max(2,Math.ceil(Math.hypot(x2-x1,z2-z1)/step));
+    for(let k=0;k<n;k++){let x=x1+(x2-x1)*k/n,z=z1+(z2-z1)*k/n;const u=inU(x,z);if(u)[x,z]=u.proj(x,z);pts.push([x,z])}}return pts};
+  const overlay=(poly,y,mat,uvf)=>{const pts=trimPoly(poly);const g=flatG(new T.ShapeGeometry(new T.Shape(pts.map(([x,z])=>V2(x,z)))));
+    if(uvf){const P=g.attributes.position,uv=g.attributes.uv;for(let i=0;i<P.count;i++){const q=uvf(P.getX(i)+0.5,P.getZ(i)+1);uv.setXY(i,q[0],q[1])}uv.needsUpdate=true}
+    const m=new T.Mesh(g,mat);m.position.y=y;m.receiveShadow=true;sc.add(m);return m};
+  if(classic){
+    const grainT=cvT(64,512,(x,w,h)=>{x.fillStyle='#1d1c1b';x.fillRect(0,0,w,h);for(let i=0;i<46;i++){const xx=Math.random()*w;x.strokeStyle=`rgba(${Math.random()<.55?'0,0,0':'95,85,72'},${0.12+Math.random()*0.25})`;x.lineWidth=0.5+Math.random()*1.3;x.beginPath();x.moveTo(xx,0);for(let yy=0;yy<=h;yy+=32)x.lineTo(xx+Math.sin(yy/70+i)*1.4,yy);x.stroke()}});
+    grainT.wrapS=grainT.wrapT=T.RepeatWrapping;const topM=new T.MeshStandardMaterial({map:grainT,roughness:0.55,metalness:0.05});
+    const lipM=new T.MeshStandardMaterial({color:0x0c0c0d,roughness:0.5}),hiM=new T.MeshBasicMaterial({color:0x3b3936}),grvM=new T.MeshBasicMaterial({color:0x050505});
+    const W=O-cw,y0=rTop+0.0003,lip=0.0075;
+    // to'rtta bort taxtasi, burchaklarda qiya birikadi; tola bort bo'ylab
+    overlay([[-O,-O],[-cw,-cw],[-cw,2+cw],[-O,2+O]],y0,topM,(x,z)=>[(x+O)/W*0.25,z*1.6]);
+    overlay([[1+O,-O],[1+O,2+O],[1+cw,2+cw],[1+cw,-cw]],y0,topM,(x,z)=>[(x-1-cw)/W*0.25,z*1.6]);
+    overlay([[-O,-O],[1+O,-O],[1+cw,-cw],[-cw,-cw]],y0,topM,(x,z)=>[(z+O)/W*0.25,x*1.6]);
+    overlay([[-O,2+O],[-cw,2+cw],[1+cw,2+cw],[1+O,2+O]],y0,topM,(x,z)=>[(z-2-O)/W*0.25,x*1.6]);
+    // tashqi lab (profil): to'q chiziq, uning ichida yorug' qirra va ingichka ariqcha
+    const band=(d1,d2,mat,yy)=>{for(const poly of [[[-O+d1,-O+d1],[-O+d2,-O+d2],[-O+d2,2+O-d2],[-O+d1,2+O-d1]],[[1+O-d1,-O+d1],[1+O-d1,2+O-d1],[1+O-d2,2+O-d2],[1+O-d2,-O+d2]],
+      [[-O+d1,-O+d1],[1+O-d1,-O+d1],[1+O-d2,-O+d2],[-O+d2,-O+d2]],[[-O+d1,2+O-d1],[-O+d2,2+O-d2],[1+O-d2,2+O-d2],[1+O-d1,2+O-d1]]])overlay(poly,yy,mat)};
+    band(0,lip,lipM,y0+0.0002);band(lip,lip+0.0012,hiM,y0+0.0003);band(lip+0.0012,lip+0.0026,grvM,y0+0.0003);
+  }
   // rezina bortlar: luza chuqurlari bilan kesilgan
   const S=BL.segs,near=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<1e-6;
-  const mouthM=new T.MeshBasicMaterial({color:0x111536,side:T.DoubleSide});
+  const mouthM=new T.MeshBasicMaterial({color:0x111536,side:T.DoubleSide}),noseM=new T.MeshStandardMaterial({color:0x00897c,roughness:0.9});
   // burchak luzasi: og'iz chizig'idan narigi butun burchak (taxta ko'rinmasin) — luza rangida
   for(const u of PK){if(!u.o.c)continue;const sx=u.ax<0?-1:1,sz=u.az<0?-1:1,cx=sx<0?0:1,cz=sz<0?0:2,j=BL.jawC;
     const sq=[[cx-sx*j,cz-sz*j],[cx+sx*cw,cz-sz*j],[cx+sx*cw,cz+sz*cw],[cx-sx*j,cz+sz*cw]],pts=[];
@@ -5327,7 +5367,8 @@ function blMake3D(v){
     for(const [tp,jw,bk] of [[A,ja,Ab],[B,jb,Bb]]){const tri=new T.Shape([V2(tp[0],tp[1]),V2(jw[2],jw[3]),V2(bk[0],bk[1])]);const m=new T.Mesh(flatG(new T.ShapeGeometry(tri)),mouthM);m.position.y=0.0004;sc.add(m)}
     const P4=[Ab,A,B,Bb,Ab],pts=[];
     for(let e=0;e<4;e++){const [x1,z1]=P4[e],[x2,z2]=P4[e+1],n=Math.max(2,Math.ceil(Math.hypot(x2-x1,z2-z1)/0.002));for(let k=0;k<n;k++){let x=x1+(x2-x1)*k/n,z=z1+(z2-z1)*k/n;const u=inU(x,z);if(u){[x,z]=u.proj(x,z)}pts.push(V2(x,z))}}
-    const g=new T.ExtrudeGeometry(new T.Shape(pts),{depth:chH,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,cushM);m.receiveShadow=true;m.castShadow=false;sc.add(m)}
+    const g=new T.ExtrudeGeometry(new T.Shape(pts),{depth:chH,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,cushM);m.receiveShadow=true;m.castShadow=false;sc.add(m);
+    if(classic){const nw=cw*0.42,Ai=[A[0]+onx/cw*nw,A[1]+onz/cw*nw],Bi=[B[0]+onx/cw*nw,B[1]+onz/cw*nw];overlay([A,B,Bi,Ai],chH+0.0003,noseM)}}
   // bort chizig'i (rezina movutga tegadigan joy): yorqin, rezina tugaydigan joygacha — luza chuqurigacha
   {const lm=new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.95,depthWrite:false});for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],L0=Math.hypot(bx-ax,bz-az);
     let t0=0,t1=1;while(t0<0.5&&inU(ax+(bx-ax)*t0,az+(bz-az)*t0))t0+=0.0005/L0;while(t1>0.5&&inU(ax+(bx-ax)*t1,az+(bz-az)*t1))t1-=0.0005/L0;
@@ -5385,6 +5426,10 @@ function blMake3D(v){
   const gr=new T.RingGeometry(r*0.86,r,32);gr.rotateX(-Math.PI/2);const ghostR=new T.Mesh(gr,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.9,depthWrite:false}));sc.add(ghostR);
   const hr=new T.RingGeometry(r*1.55,r*1.85,40);hr.rotateX(-Math.PI/2);const handR=new T.Mesh(hr,new T.MeshBasicMaterial({color:0xffd54a,transparent:true,opacity:0.9,depthWrite:false}));sc.add(handR);
   const hg=new T.PlaneGeometry(1,2-BL.head.y);hg.rotateX(-Math.PI/2);const house=new T.Mesh(hg,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.07,depthWrite:false}));house.position.set(0,0.0012,(BL.head.y+2)/2-1);sc.add(house);
+  // bitonni joylashtirishda 4 tomonga ko'rsatkich (namunadagidek)
+  const crossT=cvT(128,128,(x,w,h)=>{x.shadowColor='rgba(0,0,0,.65)';x.shadowBlur=6;x.fillStyle='#b9fff6';x.strokeStyle='#b9fff6';x.lineWidth=8;x.beginPath();x.moveTo(64,14);x.lineTo(64,114);x.moveTo(14,64);x.lineTo(114,64);x.stroke();
+    for(const [dx,dy] of [[0,-1],[0,1],[-1,0],[1,0]]){x.beginPath();const tx=64+dx*58,ty=64+dy*58;x.moveTo(tx,ty);x.lineTo(tx-dx*18+dy*14,ty-dy*18+dx*14);x.lineTo(tx-dx*18-dy*14,ty-dy*18-dx*14);x.closePath();x.fill()}});
+  const cg=new T.PlaneGeometry(r*6.6,r*6.6);cg.rotateX(-Math.PI/2);const cross=new T.Mesh(cg,new T.MeshBasicMaterial({map:crossT,transparent:true,depthWrite:false}));cross.renderOrder=2;cross.visible=false;sc.add(cross);
   let pred=null,pKey='',pT=-1;const dotG=new T.CircleGeometry(0.0032,10);dotG.rotateX(-Math.PI/2);const dotM=new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.75,depthWrite:false});
   const dots=Array.from({length:30},()=>{const m=new T.Mesh(dotG,dotM);m.visible=false;sc.add(m);return m});
   // kiy: uchi, oq halqa, zarang tanasi, metall bo'g'in, qora yog'och dastasi
@@ -5417,7 +5462,7 @@ function blMake3D(v){
         if(d<0.3){ax.set(b.wx||0,-(b.wz||0),b.wy||0);const w=ax.length();if(w>1e-6){q.setFromAxisAngle(ax.multiplyScalar(1/w),w*dt);m.quaternion.premultiply(q)}}m.position.set(nx,r,nz)}}
     for(const b of B){const m=meshes[b.id];const f=m&&m.userData.fall;if(b.in&&f&&f.rest&&holeTop[f.hi]===b.id)m.visible=mode!=='top'}
     // nishon
-    const human=!blBotTurn(),showCue=!G.over&&!c.in&&!moving&&(!blBusy||blStroke||blBotTurn()),showAim=showCue&&human&&!blStroke;
+    const placing=blPlacing(),human=!blBotTurn(),showCue=!placing&&!G.over&&!c.in&&!moving&&(!blBusy||blStroke||blBotTurn()),showAim=showCue&&human&&!blStroke;
     const dx=Math.cos(blAng),dz=Math.sin(blAng);
     aimL.visible=objL.visible=tanL.visible=ghost.visible=ghostR.visible=showAim;
     marks.forEach(m=>m.visible=false);
@@ -5431,7 +5476,8 @@ function blMake3D(v){
       if(pred&&a.hit){tanL.visible=false;const P2=pred.cue;let n=0;for(let i=1;i<P2.length&&n<dots.length;i++){const [x1,z1]=P2[i-1],[x2,z2]=P2[i];const L2=Math.hypot(x2-x1,z2-z1);for(let u=0;u<L2&&n<dots.length;u+=0.022){const dd=dots[n++];dd.visible=true;dd.position.set(x1+(x2-x1)*u/L2-0.5,0.0019,z1+(z2-z1)*u/L2-1)}}
         for(;n<dots.length;n++)dots[n].visible=false}else dots.forEach(d=>d.visible=false)}
     else dots.forEach(d=>d.visible=false);
-    handR.visible=(G.hand&&human||blAm()&&showCue)&&!c.in&&!G.over&&!blReplay;if(handR.visible){handR.position.set(c.x-0.5,0.002,c.y-1);handR.material.opacity=G.hand?0.55+0.4*Math.sin(t*5):0.5}
+    cross.visible=placing&&!c.in;if(cross.visible)cross.position.set(c.x-0.5,0.0016,c.y-1);
+    handR.visible=!placing&&(G.hand&&human||blAm()&&showCue)&&!c.in&&!G.over&&!blReplay;if(handR.visible){handR.position.set(c.x-0.5,0.002,c.y-1);handR.material.opacity=G.hand?0.55+0.4*Math.sin(t*5):0.5}
     house.visible=!!G.house&&G.hand&&human&&!G.over;
     cue.visible=showCue;
     if(showCue){const el=0.09,gap=0.012+blPow*0.2;bd.set(-dx*Math.cos(el),Math.sin(el),-dz*Math.cos(el));cue.quaternion.setFromUnitVectors(Y,bd);const sa=blSpin.a*r,sb=blSpin.b*r;cue.position.set(c.x-0.5+bd.x*(r+gap)-dz*sa,r+bd.y*(r+gap)+sb,c.y-1+bd.z*(r+gap)+dx*sa)}
