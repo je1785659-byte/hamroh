@@ -3992,7 +3992,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261101p';
+const APP_VER='20261101q';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -4847,11 +4847,11 @@ function blPredict(balls,ang,power,spin,len=0.45){
 const BL_COL={1:'#f4c20d',2:'#1e4fd6',3:'#d32f2f',4:'#6a1b9a',5:'#f57c00',6:'#2e7d32',7:'#8b1e1e',8:'#111111'};
 const blColor=id=>BL_COL[id>8?id-8:id];
 const BL_RAIL=0.075;
-const BL_FELT={classic:['#00a6a0','#009f99','Klassik'],green:['#1f8a55','#0d4f2f','Yashil'],teal:['#11867a','#08463f','Firuza'],blue:['#2368a8','#0e3561',"Ko'k"],wine:['#86222f','#43101a','Bordo'],gray:['#56616c','#272e35','Kulrang']};
-const BL_WOOD={matte:['#0b0b0d','#121215','Klassik qora'],walnut:['#3d170a','#5a2410',"Yong'oq"],mahogany:['#4e130a','#86291a','Qizil daraxt'],oak:['#7a5129','#a87a48','Dub'],black:['#111','#2b2b2b','Qora']};
-const blFelt=()=>{const k=store.get('bl_felt','auto');return BL_FELT[k]||BL_FELT[blPyr()?'classic':'green']};
-const blWood=()=>BL_WOOD[store.get('bl_wood','matte')]||BL_WOOD.matte;
-const blClassic=()=>store.get('bl_wood','matte')==='matte';
+const BL_FELT={real:['#17a46e','#139260','Bilyard yashil'],green:['#1f8a55','#0d4f2f','To\'q yashil'],teal:['#11867a','#08463f','Firuza'],blue:['#2368a8','#0e3561',"Ko'k"],wine:['#86222f','#43101a','Bordo'],gray:['#56616c','#272e35','Kulrang']};
+const BL_WOOD={lacq:['#2c1207','#4f2410','Lakli eman'],walnut:['#3d170a','#5a2410',"Yong'oq"],mahogany:['#4e130a','#86291a','Qizil daraxt'],oak:['#7a5129','#a87a48','Och dub'],black:['#111','#2b2b2b','Qora']};
+const blFelt=()=>BL_FELT[store.get('bl_felt2','real')]||BL_FELT.real;
+const blWood=()=>BL_WOOD[store.get('bl_wood2','lacq')]||BL_WOOD.lacq;
+
 let BLS=store.get('bl',null);if(BLS&&!BLS.game)BLS.game='8';
 let blPlaceStart=null,blHouse=false,blUndo=null,blRun=0,blTool=null,blFF=1,blRec=null,blSimT=0,blLast=null,blReplay=null,blSpin={a:0,b:0},blRAF=null,blAng=-Math.PI/2,blPow=0,blBusy=false,blEv=null,blMsg='',blAudio=null,blNB=null,blSc=1,blBotT=null,blR=null,blHandView=false,blStroke=null;
 const blPyr=()=>!!BLS&&['pyr','mos','am'].includes(BLS.game);
@@ -4892,15 +4892,15 @@ function blMenuV(){
       <button class="kk-opt" id="blprac"><span><b>🎯 Mashq</b><small>Yolg'iz, qoidasiz: zarbani qaytarish va sharlarni surish mumkin</small></span></button>
       <div class="kk-meals" id="bllvl">${[['easy','Oson'],['mid',"O'rta"],['hard','Qiyin']].map(([k,l])=>`<button class="chip" data-l="${k}" aria-pressed="${k===L}">${l}</button>`).join('')}</div></section>
     <section class="card kk-goal"><div class="label">Stol ko'rinishi</div>
-      <div class="bl-sw" id="blfelt"><button class="bl-swb" data-f="auto" aria-pressed="${store.get('bl_felt','auto')==='auto'}" style="--a:${T==='8'?BL_FELT.green[0]:BL_FELT.classic[0]}">A</button>${Object.entries(BL_FELT).map(([k,v])=>`<button class="bl-swb" data-f="${k}" aria-pressed="${store.get('bl_felt','auto')===k}" style="--a:${v[0]}" aria-label="${v[2]}"></button>`).join('')}</div>
-      <div class="bl-sw" id="blwood">${Object.entries(BL_WOOD).map(([k,v])=>`<button class="bl-swb w" data-w="${k}" aria-pressed="${store.get('bl_wood','matte')===k}" style="--a:${v[1]};--b:${v[0]}" aria-label="${v[2]}"></button>`).join('')}</div>
+      <div class="bl-sw" id="blfelt">${Object.entries(BL_FELT).map(([k,v])=>`<button class="bl-swb" data-f="${k}" aria-pressed="${store.get('bl_felt2','real')===k}" style="--a:${v[0]}" aria-label="${v[2]}"></button>`).join('')}</div>
+      <div class="bl-sw" id="blwood">${Object.entries(BL_WOOD).map(([k,v])=>`<button class="bl-swb w" data-w="${k}" aria-pressed="${store.get('bl_wood2','lacq')===k}" style="--a:${v[1]};--b:${v[0]}" aria-label="${v[2]}"></button>`).join('')}</div>
       <div class="kk-meals" id="blq"><span class="bl-ql">Grafika:</span>${[['auto','Avto'],['high','Yuqori'],['low','Tejamkor']].map(([k,l])=>`<button class="chip" data-q="${k}" aria-pressed="${store.get('bl_q','auto')===k}">${l}</button>`).join('')}</div></section>
     <button class="card pv-main" id="blstat" style="background:linear-gradient(135deg,#3b2a05,#a07a14)"><span class="pv-ic">🏆</span><span><b>Statistika va yutuqlar</b><small data-notr>${blAch().filter(a=>a.ok).length} / ${blAch().length} ${KT('yutuq','достижений','achievements')}</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" id="blhow" style="background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">?</span><span><b>O'yin qoidalari</b><small data-notr>${blGameName(T)}</small></span><span class="pv-go">→</span></button>`;
   if(cont)$('#blcont').onclick=()=>{BLS.live=true;viewBilyard()};
   $('#blgame').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;store.set('bl_game',b.dataset.g);blMenuV()};
-  $('#blfelt').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;store.set('bl_felt',b.dataset.f);blMenuV()};
-  $('#blwood').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;store.set('bl_wood',b.dataset.w);blMenuV()};
+  $('#blfelt').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;store.set('bl_felt2',b.dataset.f);blMenuV()};
+  $('#blwood').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;store.set('bl_wood2',b.dataset.w);blMenuV()};
   $('#blq').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;store.set('bl_q',b.dataset.q);store.set('bl_qlow',false);blMenuV()};
   $('#bllvl').onclick=e=>{const b=e.target.closest('[data-l]');if(!b)return;store.set('bl_lvl',b.dataset.l);blMenuV()};
   $('#bl2p').onclick=()=>blNew('2p');$('#blprac').onclick=()=>blNew('practice');$('#blonl').onclick=blOnlineNew;$('#blstat').onclick=blStatsV;$('#blbot').onclick=()=>blNew('bot');$('#blhow').onclick=()=>blRules(T);
@@ -5266,7 +5266,6 @@ function blMake3D(v){
   const sc=new T.Scene();
   {const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.fillStyle='#19191a';x.fillRect(0,0,256,256);for(let i=0;i<5000;i++){const v=Math.random();x.fillStyle=v<.5?'rgba(0,0,0,.35)':'rgba(255,255,255,.05)';x.fillRect(Math.random()*256,Math.random()*256,1+Math.random()*2,1+Math.random()*2)}
    const bt=new THREE.CanvasTexture(c);bt.colorSpace=THREE.SRGBColorSpace;bt.wrapS=bt.wrapT=THREE.RepeatWrapping;bt.repeat.set(3,6);sc.background=bt}
-  const classic=blClassic();if(classic){rd.toneMapping=T.LinearToneMapping;rd.toneMappingExposure=0.55}
   const cam=new T.PerspectiveCamera(50,lw/lh,0.01,40);
   // atrof-muhit aksi (sharlardagi yaltiroq chiroqlar)
   const pm=new T.PMREMGenerator(rd),env=new T.Scene();
@@ -5279,131 +5278,91 @@ function blMake3D(v){
   dl.castShadow=true;dl.shadow.mapSize.set(1024,1024);Object.assign(dl.shadow.camera,{left:-1.3,right:1.3,top:1.3,bottom:-1.3,near:0.5,far:6});dl.shadow.camera.updateProjectionMatrix();dl.shadow.bias=-0.0006;dl.shadow.radius=4;
   for(const z of [-0.62,0,0.62]){const s=new T.SpotLight(0xffefd2,2.2,0,0.85,0.8,2);s.position.set(0,1.35,z);s.target.position.set(0,0,z);sc.add(s,s.target)}
   const cvT=(w,h,draw)=>{const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.anisotropy=4;return t};
+  // ================= HAQIQIY RUS BILYARD STOLI =================
+  // yashil movut (bort rezinasi ham shu movut bilan o'ralgan), lakli to'q jigarrang yog'och bort,
+  // luzalar: bortni kesib o'tgan yumaloq teshik, orqasida jigarrang teri "taqa", ichida qora to'r, ikki yonida latun tayoqchalar.
+  rd.toneMapping=T.LinearToneMapping;rd.toneMappingExposure=0.62;
   const fc=blFelt(),wc=blWood();
-  const feltT=cvT(512,1024,(x,w,h)=>{const g=x.createRadialGradient(w/2,h/2,60,w/2,h/2,h*0.6);g.addColorStop(0,fc[0]);g.addColorStop(1,fc[1]);x.fillStyle=g;x.fillRect(0,0,w,h);
-    if(classic){x.fillStyle='rgba(255,255,255,.06)';for(let i=0;i<2500;i++)x.fillRect(Math.random()*w,Math.random()*h,1.5,1.5)}
-    const id=x.getImageData(0,0,w,h),d=id.data;for(let i=0;i<d.length;i+=4){const n=(Math.random()-0.5)*12;d[i]+=n;d[i+1]+=n;d[i+2]+=n}x.putImageData(id,0,0);
-    x.strokeStyle='rgba(255,255,255,.2)';x.lineWidth=2;const hy=BL.head.y/2*h;x.beginPath();x.moveTo(0,hy);x.lineTo(w,hy);x.stroke();
-    if(classic){const fy=BL.foot.y/2*h;x.beginPath();x.moveTo(0,fy);x.lineTo(w,fy);x.moveTo(w/2,0);x.lineTo(w/2,fy);x.stroke()}
-    else{x.fillStyle='rgba(255,255,255,.4)';for(const p of [BL.foot,BL.head]){x.beginPath();x.arc(p.x*w,p.y/2*h,4,0,7);x.fill()}}});
-  const woodT=cvT(256,1024,(x,w,h)=>{const g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,wc[0]);g.addColorStop(0.5,wc[1]);g.addColorStop(1,wc[0]);x.fillStyle=g;x.fillRect(0,0,w,h);
-    if(classic){for(let i=0;i<3000;i++){x.fillStyle=Math.random()<.5?'rgba(0,0,0,.25)':'rgba(255,255,255,.04)';x.fillRect(Math.random()*w,Math.random()*h,1.5,1.5)}return}
-    for(let i=0;i<160;i++){const xx=Math.random()*w;x.strokeStyle=`rgba(${Math.random()<.55?'18,5,0':'140,70,30'},${0.06+Math.random()*0.16})`;x.lineWidth=0.5+Math.random()*2.5;x.beginPath();x.moveTo(xx,0);for(let y=0;y<=h;y+=24)x.lineTo(xx+Math.sin(y/80+i)*5,y);x.stroke()}});
-  const woodM=classic?new T.MeshStandardMaterial({map:woodT,roughness:0.75}):new T.MeshPhysicalMaterial({map:woodT,roughness:0.45,clearcoat:0.35,clearcoatRoughness:0.35});
-  const darkM=new T.MeshStandardMaterial({color:classic?0x111112:0x1d0b04,roughness:0.6});
-  const cushM=new T.MeshStandardMaterial({color:classic?'#00bdb0':fc[1],roughness:0.9});
-  const black=new T.MeshBasicMaterial({color:0x030303});
-  const cw=BL.cw,chH=r*1.45,rTop=chH+0.012;let O=cw+0.047,rw=O-cw; // namunadagidek ingichka bort
-  // e* — stol koordinatalari (x: 0..1, z: 0..2), dunyoda markazlashtiriladi. Shakl tekisligi: (x-0.5, -(z-1)), keyin rotateX(-90°)
+  const feltT=cvT(512,1024,(x,w,h)=>{x.fillStyle=fc[0];x.fillRect(0,0,w,h);
+    const id=x.getImageData(0,0,w,h),d=id.data;for(let i=0;i<d.length;i+=4){const n=(Math.random()-0.5)*10;d[i]+=n;d[i+1]+=n;d[i+2]+=n}x.putImageData(id,0,0);
+    x.fillStyle='rgba(255,255,255,.55)';for(const p of [BL.foot,BL.head]){x.beginPath();x.arc(p.x*w,p.y/2*h,3,0,7);x.fill()}});
+  const feltM=new T.MeshStandardMaterial({map:feltT,roughness:0.95});
+  const cushM=new T.MeshStandardMaterial({color:fc[0],roughness:0.95});
+  const grainT=cvT(128,1024,(x,w,h)=>{const g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,wc[0]);g.addColorStop(0.5,wc[1]);g.addColorStop(1,wc[0]);x.fillStyle=g;x.fillRect(0,0,w,h);
+    for(let i=0;i<90;i++){const xx=Math.random()*w;x.strokeStyle=`rgba(${Math.random()<.6?'10,4,0':'150,95,55'},${0.08+Math.random()*0.22})`;x.lineWidth=0.4+Math.random()*1.6;x.beginPath();x.moveTo(xx,0);for(let yy=0;yy<=h;yy+=24)x.lineTo(xx+Math.sin(yy/60+i)*2.5,yy);x.stroke()}
+    for(let i=0;i<260;i++){x.fillStyle='rgba(230,200,160,.10)';x.fillRect(Math.random()*w,Math.random()*h,0.8,3+Math.random()*8)}});
+  grainT.wrapS=grainT.wrapT=T.RepeatWrapping;
+  const woodM=new T.MeshPhysicalMaterial({map:grainT,roughness:0.42,clearcoat:0.6,clearcoatRoughness:0.2,envMapIntensity:0.12});
+  const darkM=new T.MeshStandardMaterial({color:0x140b06,roughness:0.6});
+  const leatherT=cvT(64,64,(x,w,h)=>{x.fillStyle='#4a2c1d';x.fillRect(0,0,w,h);for(let i=0;i<400;i++){x.fillStyle=`rgba(${Math.random()<.5?'0,0,0':'255,220,190'},.07)`;x.fillRect(Math.random()*w,Math.random()*h,1.5,1.5)}});
+  const leatherM=new T.MeshStandardMaterial({map:leatherT,roughness:0.55,metalness:0.05});
+  const brassM=new T.MeshStandardMaterial({color:0xe6c56a,metalness:1,roughness:0.22,emissive:0x2a1e05});
+  const netT=cvT(128,128,(x,w,h)=>{x.fillStyle='#0b0b0c';x.fillRect(0,0,w,h);x.strokeStyle='rgba(120,120,125,.55)';x.lineWidth=2.2;
+    for(let i=0;i<4;i++)for(let j=0;j<4;j++){x.beginPath();x.ellipse(i*32+16+(j%2)*16,j*32+16,12,10,0,0,7);x.stroke()}});
+  netT.wrapS=netT.wrapT=T.RepeatWrapping;const netM=new T.MeshBasicMaterial({map:netT,side:T.DoubleSide}),pitM=new T.MeshBasicMaterial({color:0x050505});
+  const cw=BL.cw,chH=r*1.45,rTop=chH+0.014;let O=cw+0.072,rw=O-cw;
   const V2=(x,z)=>new T.Vector2(x-0.5,-(z-1));
   const box=(x1,x2,y1,y2,z1,z2,m)=>{const o=new T.Mesh(new T.BoxGeometry(x2-x1,y2-y1,z2-z1),m);o.position.set((x1+x2)/2-0.5,(y1+y2)/2,(z1+z2)/2-1);o.receiveShadow=true;sc.add(o);return o};
   const flatG=g=>{g.rotateX(-Math.PI/2);return g};
-  const inQ=(x,z)=>x>-cw&&x<1+cw&&z>-cw&&z<2+cw;
-  // ---- luzalar: "U" shaklidagi chuqur (rus stollaridagidek): og'izdan to'g'ri devorlar, orqasi yarim doira ----
-  const S6=BL.segs.slice(6),tips=[];for(const [ax,az,bx,bz] of BL.segs.slice(0,6))tips.push([ax,az],[bx,bz]);
-  const PK=BL.holes.map(o=>{const ax=o.ax,az=o.ay,vx=-az,vz=ax,hw=(o.c?BL.mouthC/2:BL.jawS+0.15*cw)*1.06,Lw=o.c?cw*Math.SQRT2:cw,M=[o.mx,o.my],Bc=[M[0]+ax*Lw,M[1]+az*Lw];
-    const jaws=tips.filter(([x,z])=>Math.hypot(x-o.mx,z-o.my)<BL.mouthS*1.2).map(([x,z])=>S6.find(q=>Math.hypot(q[0]-x,q[1]-z)<1e-6)).filter(Boolean);
-    const out=[];const P=(s,t)=>[M[0]+ax*s+vx*t,M[1]+az*s+vz*t];
-    for(let k=0;k<=12;k++)out.push(P(Lw*k/12,hw));
-    for(let k=1;k<24;k++){const th=Math.PI/2-Math.PI*k/24;out.push(P(Lw+Math.cos(th)*hw,Math.sin(th)*hw))}
-    for(let k=12;k>=0;k--)out.push(P(Lw*k/12,-hw));
-    const inside=(x,z)=>{const dx=x-M[0],dz=z-M[1],s1=dx*ax+dz*az,t1=dx*vx+dz*vz;return (s1>=-1e-6&&s1<=Lw&&Math.abs(t1)<hw)||(s1>Lw&&Math.hypot(x-Bc[0],z-Bc[1])<hw)};
-    const proj=(x,z)=>{const dx=x-M[0],dz=z-M[1],s1=dx*ax+dz*az,t1=dx*vx+dz*vz;if(s1<=Lw){const t2=Math.sign(t1||1)*hw;return P(s1,t2)}const d=Math.hypot(x-Bc[0],z-Bc[1])||1e-6;return [Bc[0]+(x-Bc[0])/d*hw,Bc[1]+(z-Bc[1])/d*hw]};
-    return {o,ax,az,vx,vz,hw,Lw,M,Bc,out,inside,proj,jaws}});
-  const inU=(x,z)=>PK.find(u=>u.inside(x,z));
-  // bort kengligi: luza chuqurining orqasi (teri yoy bilan) bort chetiga tegib turadi, ortida ortiqcha taxta qolmaydi
-  for(const u of PK)for(const [x,z] of u.out)O=Math.max(O,-x+0.004,x-1+0.004,-z+0.004,z-2+0.004);
-  {const ext=PK.map(u=>{const bx=u.Bc[0]+u.ax*(u.hw+0.013),bz=u.Bc[1]+u.az*(u.hw+0.013);return Math.max(-bx,bx-1,-bz,bz-2)});O=Math.max(O,...ext)}rw=O-cw;
-  // ichki to'rtburchak chegarasi
-  const Qp=[];{const st=0.002,C=[[-cw,-cw],[1+cw,-cw],[1+cw,2+cw],[-cw,2+cw],[-cw,-cw]];for(let i=0;i<4;i++){const [x1,z1]=C[i],[x2,z2]=C[i+1],n=Math.ceil(Math.hypot(x2-x1,z2-z1)/st);for(let k=0;k<n;k++)Qp.push([x1+(x2-x1)*k/n,z1+(z2-z1)*k/n])}}
-  {const k=Qp.findIndex(([x,z])=>!inU(x,z));Qp.push(...Qp.splice(0,k))}
-  const feltM=new T.MeshStandardMaterial({map:feltT,roughness:0.95});
-  const fp=new T.Mesh(flatG(new T.PlaneGeometry(1,2)),feltM);fp.receiveShadow=true;sc.add(fp);
-  // yog'och ramka: tashqi to'rtburchak, ichida (to'rtburchak ∪ luza chuqurlari) teshigi
-  const hp=[];{let i=0;const N=Qp.length;while(i<N){const [x,z]=Qp[i],u=inU(x,z);if(!u){hp.push(V2(x,z));i++;continue}
-      let j=i;while(j<N&&inU(Qp[j][0],Qp[j][1])===u)j++;
-      let seg=u.out.filter(([x2,z2])=>!inQ(x2,z2)||Math.abs(x2+cw)<1e-6||Math.abs(x2-1-cw)<1e-6||Math.abs(z2+cw)<1e-6||Math.abs(z2-2-cw)<1e-6);
-      const e0=Qp[Math.max(i-1,0)];if(seg.length&&Math.hypot(seg[0][0]-e0[0],seg[0][1]-e0[1])>Math.hypot(seg[seg.length-1][0]-e0[0],seg[seg.length-1][1]-e0[1]))seg=seg.reverse();
-      seg.forEach(([x2,z2])=>hp.push(V2(x2,z2)));i=j}}
-  const frame=new T.Shape([V2(-O,-O),V2(1+O,-O),V2(1+O,2+O),V2(-O,2+O)]);frame.holes.push(new T.Path(hp));
-  const fg=new T.ExtrudeGeometry(frame,{depth:rTop,bevelEnabled:true,bevelThickness:0.004,bevelSize:0.004,bevelSegments:2,curveSegments:24});fg.rotateX(-Math.PI/2);
-  {const P=fg.attributes.position,uv=fg.attributes.uv;for(let i=0;i<P.count;i++)uv.setXY(i,(P.getX(i)+0.6)*0.9,(P.getZ(i)+1.2)*0.45);uv.needsUpdate=true}
-  const sideM=new T.MeshStandardMaterial({color:0x1a0a04,roughness:0.55});
-  const fr=new T.Mesh(fg,[woodM,sideM]);fr.receiveShadow=true;fr.position.y=-0.004;sc.add(fr);
-  // ---- haqiqiy bort ko'rinishi (namunadagidek): bo'ylama tolali yog'och usti, tashqi chetida profil (lab va ariqcha), luzalarda uziladi ----
-  const trimPoly=(poly,step=0.002)=>{const pts=[];for(let e=0;e<poly.length;e++){const [x1,z1]=poly[e],[x2,z2]=poly[(e+1)%poly.length],n=Math.max(2,Math.ceil(Math.hypot(x2-x1,z2-z1)/step));
-    for(let k=0;k<n;k++){let x=x1+(x2-x1)*k/n,z=z1+(z2-z1)*k/n;const u=inU(x,z);if(u)[x,z]=u.proj(x,z);pts.push([x,z])}}return pts};
-  const overlay=(poly,y,mat,uvf)=>{const pts=trimPoly(poly);const g=flatG(new T.ShapeGeometry(new T.Shape(pts.map(([x,z])=>V2(x,z)))));
-    if(uvf){const P=g.attributes.position,uv=g.attributes.uv;for(let i=0;i<P.count;i++){const q=uvf(P.getX(i)+0.5,P.getZ(i)+1);uv.setXY(i,q[0],q[1])}uv.needsUpdate=true}
-    const m=new T.Mesh(g,mat);m.position.y=y;m.receiveShadow=true;sc.add(m);return m};
-  if(classic){
-    const grainT=cvT(64,512,(x,w,h)=>{x.fillStyle='#1d1c1b';x.fillRect(0,0,w,h);for(let i=0;i<46;i++){const xx=Math.random()*w;x.strokeStyle=`rgba(${Math.random()<.55?'0,0,0':'95,85,72'},${0.12+Math.random()*0.25})`;x.lineWidth=0.5+Math.random()*1.3;x.beginPath();x.moveTo(xx,0);for(let yy=0;yy<=h;yy+=32)x.lineTo(xx+Math.sin(yy/70+i)*1.4,yy);x.stroke()}});
-    grainT.wrapS=grainT.wrapT=T.RepeatWrapping;const topM=new T.MeshStandardMaterial({map:grainT,roughness:0.55,metalness:0.05});
-    const lipM=new T.MeshStandardMaterial({color:0x0c0c0d,roughness:0.5}),hiM=new T.MeshBasicMaterial({color:0x3b3936}),grvM=new T.MeshBasicMaterial({color:0x050505});
-    const W=O-cw,y0=rTop+0.0003,lip=0.0075;
-    // to'rtta bort taxtasi, burchaklarda qiya birikadi; tola bort bo'ylab
-    overlay([[-O,-O],[-cw,-cw],[-cw,2+cw],[-O,2+O]],y0,topM,(x,z)=>[(x+O)/W*0.25,z*1.6]);
-    overlay([[1+O,-O],[1+O,2+O],[1+cw,2+cw],[1+cw,-cw]],y0,topM,(x,z)=>[(x-1-cw)/W*0.25,z*1.6]);
-    overlay([[-O,-O],[1+O,-O],[1+cw,-cw],[-cw,-cw]],y0,topM,(x,z)=>[(z+O)/W*0.25,x*1.6]);
-    overlay([[-O,2+O],[-cw,2+cw],[1+cw,2+cw],[1+O,2+O]],y0,topM,(x,z)=>[(z-2-O)/W*0.25,x*1.6]);
-    // tashqi lab (profil): to'q chiziq, uning ichida yorug' qirra va ingichka ariqcha
-    const band=(d1,d2,mat,yy)=>{for(const poly of [[[-O+d1,-O+d1],[-O+d2,-O+d2],[-O+d2,2+O-d2],[-O+d1,2+O-d1]],[[1+O-d1,-O+d1],[1+O-d1,2+O-d1],[1+O-d2,2+O-d2],[1+O-d2,-O+d2]],
-      [[-O+d1,-O+d1],[1+O-d1,-O+d1],[1+O-d2,-O+d2],[-O+d2,-O+d2]],[[-O+d1,2+O-d1],[-O+d2,2+O-d2],[1+O-d2,2+O-d2],[1+O-d1,2+O-d1]]])overlay(poly,yy,mat)};
-    band(0,lip,lipM,y0+0.0002);band(lip,lip+0.0012,hiM,y0+0.0003);band(lip+0.0012,lip+0.0026,grvM,y0+0.0003);
-  }
-  // rezina bortlar: luza chuqurlari bilan kesilgan
-  const S=BL.segs,near=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<1e-6;
-  const mouthM=new T.MeshBasicMaterial({color:0x111536,side:T.DoubleSide}),noseM=new T.MeshStandardMaterial({color:0x00897c,roughness:0.9});
-  // burchak luzasi: og'iz chizig'idan narigi butun burchak (taxta ko'rinmasin) — luza rangida
-  for(const u of PK){if(!u.o.c)continue;const sx=u.ax<0?-1:1,sz=u.az<0?-1:1,cx=sx<0?0:1,cz=sz<0?0:2,j=BL.jawC;
-    const sq=[[cx-sx*j,cz-sz*j],[cx+sx*cw,cz-sz*j],[cx+sx*cw,cz+sz*cw],[cx-sx*j,cz+sz*cw]],pts=[];
-    const beyond=([x,z])=>(x-u.M[0])*u.ax+(z-u.M[1])*u.az>=-1e-6;
-    for(let i=0;i<4;i++){const p1=sq[i],p2=sq[(i+1)%4],b1=beyond(p1),b2=beyond(p2);if(b1)pts.push(p1);
-      if(b1!==b2){const d1=(p1[0]-u.M[0])*u.ax+(p1[1]-u.M[1])*u.az,d2=(p2[0]-u.M[0])*u.ax+(p2[1]-u.M[1])*u.az,t=d1/(d1-d2);pts.push([p1[0]+(p2[0]-p1[0])*t,p1[1]+(p2[1]-p1[1])*t])}}
-    if(pts.length>2){const m=new T.Mesh(flatG(new T.ShapeGeometry(new T.Shape(pts.map(([x,z])=>V2(x,z))))),mouthM);m.position.y=0.0005;sc.add(m)}}
-  for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],A=[ax,az],B=[bx,bz];const ja=S6.find(q=>near([q[0],q[1]],A)),jb=S6.find(q=>near([q[0],q[1]],B));
-    // rezina luza og'zida tik kesiladi (orqasida "burchak" qolmaydi); jag' uchburchagi luza og'zining bir qismi bo'ladi
-    const onx=ax===bx?(ax<0.5?-cw:cw):0,onz=az===bz?(az<1?-cw:cw):0,Ab=[ax+onx,az+onz],Bb=[bx+onx,bz+onz];
-    for(const [tp,jw,bk] of [[A,ja,Ab],[B,jb,Bb]]){const tri=new T.Shape([V2(tp[0],tp[1]),V2(jw[2],jw[3]),V2(bk[0],bk[1])]);const m=new T.Mesh(flatG(new T.ShapeGeometry(tri)),mouthM);m.position.y=0.0004;sc.add(m)}
-    const P4=[Ab,A,B,Bb,Ab],pts=[];
-    for(let e=0;e<4;e++){const [x1,z1]=P4[e],[x2,z2]=P4[e+1],n=Math.max(2,Math.ceil(Math.hypot(x2-x1,z2-z1)/0.002));for(let k=0;k<n;k++){let x=x1+(x2-x1)*k/n,z=z1+(z2-z1)*k/n;const u=inU(x,z);if(u){[x,z]=u.proj(x,z)}pts.push(V2(x,z))}}
-    const g=new T.ExtrudeGeometry(new T.Shape(pts),{depth:chH,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,cushM);m.receiveShadow=true;m.castShadow=false;sc.add(m);
-    if(classic){const nw=cw*0.42,Ai=[A[0]+onx/cw*nw,A[1]+onz/cw*nw],Bi=[B[0]+onx/cw*nw,B[1]+onz/cw*nw];overlay([A,B,Bi,Ai],chH+0.0003,noseM)}}
-  // bort chizig'i (rezina movutga tegadigan joy): yorqin, rezina tugaydigan joygacha — luza chuqurigacha
-  {const lm=new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.95,depthWrite:false});for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],L0=Math.hypot(bx-ax,bz-az);
-    let t0=0,t1=1;while(t0<0.5&&inU(ax+(bx-ax)*t0,az+(bz-az)*t0))t0+=0.0005/L0;while(t1>0.5&&inU(ax+(bx-ax)*t1,az+(bz-az)*t1))t1-=0.0005/L0;
-    const L=(t1-t0)*L0,g=new T.PlaneGeometry(L,0.0045);g.rotateX(-Math.PI/2);const m=new T.Mesh(g,lm),tm=(t0+t1)/2;
-    const nx=ax===bx?(ax<0.5?0.0024:-0.0024):0,nz=az===bz?(az<1?0.0024:-0.0024):0;m.position.set(ax+(bx-ax)*tm-0.5+nx,0.0008,az+(bz-az)*tm-1+nz);if(ax===bx)m.rotation.y=Math.PI/2;sc.add(m)}}
-  box(-O,1+O,-0.24,-0.13,-O,2+O,darkM);
-  for(const [lx,lz] of [[-O+0.04,-O+0.06],[1+O-0.04,-O+0.06],[-O+0.04,2+O-0.06],[1+O-0.04,2+O-0.06],[-O+0.04,1],[1+O-0.04,1]])box(lx-0.045,lx+0.045,-0.9,-0.24,lz-0.045,lz+0.045,darkM);
-  const floor=new T.Mesh(new T.PlaneGeometry(14,14),new T.MeshStandardMaterial({color:0x101316,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-0.9;sc.add(floor);
   const flat=(g,m,x,y,z)=>{g.rotateX(-Math.PI/2);const o=new T.Mesh(g,m);o.position.set(x-0.5,y,z-1);sc.add(o);return o};
-  // to'r: to'q ko'k, ichida och rombchalar; voronka devorlari tepadan ko'rinadi
-  const netT=cvT(128,128,(x,w,h)=>{x.fillStyle='#1a1d52';x.fillRect(0,0,w,h);x.fillStyle='#0b0c26';for(let i=0;i<8;i++)for(let j=0;j<8;j++){const cx=i*16+(j%2)*8,cy=j*16;x.beginPath();x.moveTo(cx,cy-5);x.lineTo(cx+5,cy);x.lineTo(cx,cy+5);x.lineTo(cx-5,cy);x.closePath();x.fill()}
-    x.strokeStyle='rgba(120,130,220,.35)';x.lineWidth=1;for(let i=-128;i<256;i+=16){x.beginPath();x.moveTo(i,0);x.lineTo(i+128,128);x.stroke();x.beginPath();x.moveTo(i,128);x.lineTo(i+128,0);x.stroke()}});
-  netT.wrapS=netT.wrapT=T.RepeatWrapping;
-  const netM=new T.MeshBasicMaterial({map:netT,side:T.DoubleSide}),botM=new T.MeshBasicMaterial({color:0x26262b});
-  const leaT=cvT(64,64,(x,w,h)=>{x.fillStyle='#b4b0a8';x.fillRect(0,0,w,h);for(let i=0;i<300;i++){x.fillStyle=`rgba(${Math.random()<.5?'255,255,255':'0,0,0'},.08)`;x.fillRect(Math.random()*w,Math.random()*h,2,2)}});
-  const leaM=new T.MeshStandardMaterial({map:leaT,roughness:0.85}),goldM=new T.MeshStandardMaterial({color:0xeedba8,metalness:0.6,roughness:0.3,emissive:0x2a2210});
-  const rimM=new T.MeshStandardMaterial({color:0xd9b25a,metalness:0.9,roughness:0.25,emissive:0x3a2a08});
+  // luzalar: fizikadagi teshik markazi, ko'rinadigan radiusi biroz kattaroq
+  const PKT=BL.holes.map(o=>{const R=o.r*1.12,ax=o.ax,az=o.ay;return {o,R,ax,az,vx:-az,vz:ax,cx:o.x,cz:o.y,c:o.c}});
+  const inHole=(x,z)=>PKT.find(p=>Math.hypot(x-p.cx,z-p.cz)<p.R);
+  // bort taxtasidan olib tashlanadigan joy: teshik + teshik markazidan orqadagi qism (burchakda — butun burchak, o'rtada — teshik kengligidagi kanal)
+  const cutOf=(x,z)=>PKT.find(p=>{const dx=x-p.cx,dz=z-p.cz,s1=dx*p.ax+dz*p.az,t1=dx*p.vx+dz*p.vz;return Math.hypot(dx,dz)<p.R||(s1>0&&(p.c||Math.abs(t1)<p.R))});
+  const projCut=(p,x,z)=>{const dx=x-p.cx,dz=z-p.cz,s1=dx*p.ax+dz*p.az,t1=dx*p.vx+dz*p.vz;
+    if(s1>0){if(p.c){if(Math.abs(t1)>=p.R)return [x-p.ax*s1,z-p.az*s1];}else{const t2=Math.sign(t1||1)*p.R;return [p.cx+p.ax*s1+p.vx*t2,p.cz+p.az*s1+p.vz*t2]}}
+    const d=Math.hypot(dx,dz)||1e-6;return [p.cx+dx/d*p.R,p.cz+dz/d*p.R]};
+  const trim=(poly,test,proj,step=0.0015)=>{const pts=[];for(let e=0;e<poly.length;e++){const [x1,z1]=poly[e],[x2,z2]=poly[(e+1)%poly.length],n=Math.max(2,Math.ceil(Math.hypot(x2-x1,z2-z1)/step));
+    for(let k=0;k<n;k++){let x=x1+(x2-x1)*k/n,z=z1+(z2-z1)*k/n;const p=test(x,z);if(p)[x,z]=proj(p,x,z);pts.push([x,z])}}return pts};
+  // movut maydoni
+  const fp=new T.Mesh(flatG(new T.PlaneGeometry(1,2)),feltM);fp.receiveShadow=true;sc.add(fp);
+  // jag'lar orasidagi og'iz (movut), teshik qismi kesilgan
+  const S=BL.segs,S6=S.slice(6),near=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<1e-6;
+  {const tips=[];for(const [ax,az,bx,bz] of S.slice(0,6))tips.push([ax,az],[bx,bz]);
+    for(const p of PKT){const o=p.o,tp=tips.filter(([x,z])=>Math.hypot(x-o.mx,z-o.my)<BL.mouthS*1.2);if(tp.length<2)continue;const [A,B]=tp,ja=S6.find(q=>near([q[0],q[1]],A)),jb=S6.find(q=>near([q[0],q[1]],B));
+      const pts=trim([A,B,[jb[2],jb[3]],[ja[2],ja[3]]],(x,z)=>Math.hypot(x-p.cx,z-p.cz)<p.R?p:null,(q,x,z)=>{const d=Math.hypot(x-q.cx,z-q.cz)||1e-6;return [q.cx+(x-q.cx)/d*q.R,q.cz+(z-q.cz)/d*q.R]});
+      const m=new T.Mesh(flatG(new T.ShapeGeometry(new T.Shape(pts.map(([x,z])=>V2(x,z))))),feltM);m.position.y=0.0002;m.receiveShadow=true;sc.add(m)}}
+  // rezina bortlar: movut bilan o'ralgan, uchlari qiya jag' bo'lib luzaga qaraydi; tepasi yumaloqlangan
+  for(let i=0;i<6;i++){const [ax,az,bx,bz]=S[i],A=[ax,az],B=[bx,bz];const ja=S6.find(q=>near([q[0],q[1]],A)),jb=S6.find(q=>near([q[0],q[1]],B));
+    const pts=trim([[ja[2],ja[3]],A,B,[jb[2],jb[3]]],inHole,(p,x,z)=>{const d=Math.hypot(x-p.cx,z-p.cz)||1e-6;return [p.cx+(x-p.cx)/d*p.R,p.cz+(z-p.cz)/d*p.R]});
+    const g=new T.ExtrudeGeometry(new T.Shape(pts.map(([x,z])=>V2(x,z))),{depth:chH-0.003,bevelEnabled:true,bevelThickness:0.003,bevelSize:0.002,bevelSegments:3});g.rotateX(-Math.PI/2);
+    const m=new T.Mesh(g,cushM);m.receiveShadow=true;sc.add(m)}
+  // yog'och bortlar: to'rtta taxta, burchakda qiya birikadi, luzalarda kesilgan; tola bort bo'ylab, qirralari yumaloq, lakli
+  const boards=[[[-O,-O],[-cw,-cw],[-cw,2+cw],[-O,2+O],'v'],[[1+O,-O],[1+O,2+O],[1+cw,2+cw],[1+cw,-cw],'v'],[[-O,-O],[1+O,-O],[1+cw,-cw],[-cw,-cw],'h'],[[-O,2+O],[-cw,2+cw],[1+cw,2+cw],[1+O,2+O],'h']];
+  for(const bd of boards){const dir=bd.pop();
+    // burchak luzasida taxta luza markazi chizig'ida to'g'ri (bortga tik) kesiladi; o'rta luzada — teshik kengligida kanal
+    const cut2=(x,z)=>PKT.find(p=>{if(Math.hypot(x-p.cx,z-p.cz)<p.R)return true;if(p.c){const bx=p.ax<0?x<p.cx:x>p.cx,bz=p.az<0?z<p.cz:z>p.cz;return bx&&bz}
+        const dx=x-p.cx,dz=z-p.cz,s1=dx*p.ax+dz*p.az,t1=dx*p.vx+dz*p.vz;return s1>0&&Math.abs(t1)<p.R});
+    const proj2=(p,x,z)=>{if(p.c&&Math.hypot(x-p.cx,z-p.cz)>=p.R)return dir==='v'?[x,p.cz]:[p.cx,z];return projCut(p,x,z)};
+    const pts=trim(bd,cut2,proj2);
+    const g=new T.ExtrudeGeometry(new T.Shape(pts.map(([x,z])=>V2(x,z))),{depth:rTop-0.006,bevelEnabled:true,bevelThickness:0.006,bevelSize:0.005,bevelSegments:4,curveSegments:8});g.rotateX(-Math.PI/2);
+    const P=g.attributes.position,uv=g.attributes.uv;for(let k=0;k<P.count;k++){const X=P.getX(k)+0.5,Z=P.getZ(k)+1;uv.setXY(k,dir==='v'?X*3:Z*3,dir==='v'?Z*0.9:X*0.9)}uv.needsUpdate=true;
+    const m=new T.Mesh(g,woodM);m.receiveShadow=true;m.castShadow=false;m.position.y=0.003;sc.add(m)}
+  // stol tanasi (bortlar ostida)
+  box(-O+0.004,1+O-0.004,-0.24,-0.002,-O+0.004,2+O-0.004,darkM);
+  for(const [lx,lz] of [[-O+0.05,-O+0.07],[1+O-0.05,-O+0.07],[-O+0.05,2+O-0.07],[1+O-0.05,2+O-0.07],[-O+0.05,1],[1+O-0.05,1]])box(lx-0.045,lx+0.045,-0.9,-0.24,lz-0.045,lz+0.045,darkM);
+  const floor=new T.Mesh(new T.PlaneGeometry(14,14),new T.MeshStandardMaterial({color:0x101316,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-0.9;sc.add(floor);
+  // luza: qora chuqur, ichida to'r; orqasida teri taqa; ikki yonda latun tayoqchalar
   const marks=[],vis=[];
-  for(const u of PK){vis.push(u.Bc);
-    // voronka: yuqori kontur (movut sathi) -> ichkariga torayib pastga
-    const top=u.out,n=top.length,dep=0.05,shr=0.62,pos=[],uvs=[],idx=[];let L=0;
-    top.forEach(([x,z],k)=>{if(k)L+=Math.hypot(x-top[k-1][0],z-top[k-1][1]);const bx=u.Bc[0]+(x-u.Bc[0])*shr,bz=u.Bc[1]+(z-u.Bc[1])*shr;pos.push(x-0.5,0.0004,z-1,bx-0.5,-dep,bz-1);uvs.push(L/0.02,0,L/0.02,2.2)});
-    for(let k=0;k<n-1;k++){const a=k*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}
-    const fgm=new T.BufferGeometry();fgm.setAttribute('position',new T.Float32BufferAttribute(pos,3));fgm.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));fgm.setIndex(idx);fgm.computeVertexNormals();sc.add(new T.Mesh(fgm,netM));
-    const bot=new T.Shape(top.map(([x,z])=>V2(u.Bc[0]+(x-u.Bc[0])*shr,u.Bc[1]+(z-u.Bc[1])*shr)));const bm=new T.Mesh(flatG(new T.ShapeGeometry(bot)),botM);bm.position.y=-dep;sc.add(bm);
-    // luza chetidagi oltinrang metall halqa (avvalgi ko'rinish): bort ustida, chuqurning tashqi yoyi bo'ylab
-    {const R=u.hw+0.005,N=180,out=[];for(let k=0;k<N;k++){const a=k/N*Math.PI*2;out.push(!inQ(u.Bc[0]+Math.cos(a)*R,u.Bc[1]+Math.sin(a)*R))}
-      let st=out.findIndex((v,k)=>v&&!out[(k+N-1)%N]),n=0;if(st<0)st=0;while(n<N&&out[(st+n)%N])n++;
-      const tg2=new T.TorusGeometry(R,0.0058,8,40,n/N*Math.PI*2);tg2.rotateZ(st/N*Math.PI*2);tg2.rotateX(Math.PI/2);
-      const rim=new T.Mesh(tg2,rimM);rim.position.set(u.Bc[0]-0.5,rTop,u.Bc[1]-1);sc.add(rim)}
-    const mg=new T.RingGeometry(u.hw+0.014,u.hw+0.021,40);mg.rotateX(-Math.PI/2);const mk=new T.Mesh(mg,new T.MeshBasicMaterial({color:0xffd54a,transparent:true,opacity:0.9,depthWrite:false}));mk.position.set(u.Bc[0]-0.5,rTop+0.002,u.Bc[1]-1);mk.visible=false;sc.add(mk);marks.push(mk)}
-  // bort ustidagi marvarid belgilar
-  const dmM=new T.MeshStandardMaterial({color:0xf3ead2,roughness:0.3});
-  if(!classic)for(const z of [0.25,0.5,0.75,1.25,1.5,1.75])for(const x of [-cw-rw/2,1+cw+rw/2])flat(new T.CircleGeometry(0.0075,14),dmM,x,rTop+0.0005,z);
-  if(!classic)for(const x of [0.25,0.5,0.75])for(const z of [-cw-rw/2,2+cw+rw/2])flat(new T.CircleGeometry(0.0075,14),dmM,x,rTop+0.0005,z);
+  for(const p of PKT){vis.push([p.cx,p.cz]);
+    // to'r: teshik chetidan pastga torayadigan voronka
+    {const N=40,dep=0.06,pos=[],uvs=[],idx=[];for(let k=0;k<=N;k++){const a=k/N*Math.PI*2,c=Math.cos(a),sn=Math.sin(a);pos.push(p.cx+c*p.R-0.5,0.0004,p.cz+sn*p.R-1,p.cx+c*p.R*0.55-0.5,-dep,p.cz+sn*p.R*0.55-1);uvs.push(k/N*4,0,k/N*4,1.6)}
+      for(let k=0;k<N;k++){const a=k*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));g.setIndex(idx);sc.add(new T.Mesh(g,netM));
+      flat(new T.CircleGeometry(p.R*0.56,24),pitM,p.cx,-dep,p.cz)}
+    // teri taqa: teshikning orqa yarmi bo'ylab, bort ustidan ko'tarilib turadi
+    {const phi=Math.atan2(p.az,p.ax),tg=new T.TorusGeometry(p.R+0.006,0.0085,10,36,Math.PI);tg.rotateZ(-phi-Math.PI/2);tg.rotateX(Math.PI/2);
+      const m=new T.Mesh(tg,leatherM);m.position.set(p.cx-0.5,rTop-0.002,p.cz-1);m.castShadow=true;sc.add(m);
+      // taqaning ikki uchi bort bo'ylab latun tayoqchagacha
+      for(const sg of [-1,1]){const ex=p.cx+p.vx*sg*(p.R+0.006),ez=p.cz+p.vz*sg*(p.R+0.006);const cg=new T.SphereGeometry(0.0085,12,8);const cm=new T.Mesh(cg,leatherM);cm.position.set(ex-0.5,rTop-0.002,ez-1);sc.add(cm)}}
+    // latun tayoqchalar: teshikning ikki yonida, bort ustida, bort bo'ylab
+    for(const sg of [-1,1]){
+      const qx=p.cx+p.vx*sg*(p.R+0.006),qz=p.cz+p.vz*sg*(p.R+0.006);let dx,dz;
+      if(p.c){const kx=p.ax<0?0:1,kz=p.az<0?0:2;if(Math.abs(qx-kx)>Math.abs(qz-kz)){dx=0;dz=kz?-1:1}else{dx=kx?-1:1;dz=0}}else{dx=p.vx*sg;dz=p.vz*sg}
+      const L=0.05,g=new T.CapsuleGeometry(0.0055,L,6,12);g.rotateZ(Math.PI/2);const m=new T.Mesh(g,brassM);m.castShadow=true;
+      m.position.set(qx+dx*(L/2+0.006)-0.5,rTop+0.006,qz+dz*(L/2+0.006)-1);m.rotation.y=-Math.atan2(dz,dx);sc.add(m)}
+    const mg=new T.RingGeometry(p.R+0.016,p.R+0.023,40);mg.rotateX(-Math.PI/2);const mk=new T.Mesh(mg,new T.MeshBasicMaterial({color:0xffd54a,transparent:true,opacity:0.9,depthWrite:false}));mk.position.set(p.cx-0.5,rTop+0.004,p.cz-1);mk.visible=false;sc.add(mk);marks.push(mk)}
+  O+=0.012; // teri taqa bort chetidan chiqib turadi — kamera hisobi uchun
   // sharlar
   const bTex=id=>cvT(512,256,(x,w,h)=>{x.textAlign='center';x.textBaseline='middle';x.scale(2,2);w/=2;h/=2;
     if(pyr){x.fillStyle=id?'#f2ead3':'#c3122b';x.fillRect(0,0,w,h);if(id){x.fillStyle='rgba(90,70,40,.45)';for(let i=0;i<22;i++)x.fillRect(Math.random()*w,Math.random()*h,1.2,1.2)}
