@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.10.2026-9
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 01.11.2026-10
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -155,6 +155,62 @@ async function handleSend(req,env){
   return J({ok:false,error:'empty'},400);
 }
 
+// ---- Onlayn bilyard (D1: blroom). Navbat bilan: zarba egasi natijani yuboradi, raqib so'rab (poll) oladi ----
+const BL_MAX=120000,BL_NUDGE=60000,BL_TTL=2*864e5;
+async function blCtx(req,env){
+  let f;try{f=await req.formData()}catch(e){return [null,J({ok:false},400)]}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return [null,J({ok:false,error:'auth'},403)];
+  const db=await D(env);if(!db)return [null,J({ok:false,error:'nodb'},503)];
+  return [{f,u,db}];
+}
+async function blRoom(c){
+  const id=String(c.f.get('room')||'').replace(/[^a-z0-9]/g,'').slice(0,8);
+  const r=id&&await c.db.prepare('SELECT * FROM blroom WHERE id=?1').bind(id).first();
+  if(!r)return [null,J({ok:false,error:'room'},404)];
+  const you=r.p0===c.u.id?0:r.p1===c.u.id?1:-1;
+  return [r,null,you];
+}
+const blName=u=>String(u.first_name||u.username||'Do‘st').slice(0,40);
+async function handleBlNew(c,env){
+  const id=[...crypto.getRandomValues(new Uint8Array(8))].map(x=>'abcdefghijkmnpqrstuvwxyz23456789'[x%32]).join(''),now=Date.now();
+  const game=String(c.f.get('game')||'pyr').replace(/[^a-z0-9]/g,'').slice(0,6),init=String(c.f.get('init')||'').slice(0,BL_MAX);
+  await c.db.batch([c.db.prepare('DELETE FROM blroom WHERE updated<?1').bind(now-BL_TTL),
+    c.db.prepare('INSERT INTO blroom(id,game,p0,n0,init,created,updated,lp0) VALUES(?1,?2,?3,?4,?5,?6,?6,?6)').bind(id,game,c.u.id,blName(c.u),init,now)]);
+  return J({ok:true,room:id});
+}
+async function handleBlJoin(c,env){
+  let [r,err,you]=await blRoom(c);if(err)return err;
+  if(you<0){
+    if(r.p1)return J({ok:false,error:'full'},409);
+    await c.db.prepare('UPDATE blroom SET p1=?2,n1=?3,lp1=?4,updated=?4 WHERE id=?1 AND p1 IS NULL').bind(r.id,c.u.id,blName(c.u),Date.now()).run();
+    r=await c.db.prepare('SELECT * FROM blroom WHERE id=?1').bind(r.id).first();if(r.p1!==c.u.id)return J({ok:false,error:'full'},409);you=1;
+    try{await tg(env,'sendMessage',{chat_id:r.p0,text:`🎱 ${r.n1} bilyard xonangizga qo‘shildi! Ilovani ochib o‘yinni boshlang.`,reply_markup:{inline_keyboard:[[appBtn('🎱 O‘ynash',APP_URL+'?t=bilyard')]]}})}catch(e){}
+  }
+  return J({ok:true,you,game:r.game,names:[r.n0,r.n1||null],init:r.init,seq:r.seq,data:r.seq?r.data:undefined});
+}
+async function handleBlPush(c,env){
+  const [r,err,you]=await blRoom(c);if(err)return err;if(you<0)return J({ok:false},403);
+  const data=String(c.f.get('data')||'');if(data.length>BL_MAX)return J({ok:false,error:'big'},413);
+  const seq=parseInt(c.f.get('seq'))||0,now=Date.now();
+  const r2=await c.db.prepare(`UPDATE blroom SET seq=seq+1,data=?3,updated=?4,lp${you}=?4 WHERE id=?1 AND seq=?2 RETURNING seq,p0,p1,lp0,lp1,n0,n1`).bind(r.id,seq,data,now).first();
+  if(!r2)return J({ok:false,error:'seq',seq:r.seq},409);
+  await blNudge(env,r2,you,now);
+  return J({ok:true,seq:seq+1});
+}
+// raqib bir daqiqadan beri ilovaga qaramagan bo'lsa, botdan eslatma
+async function blNudge(env,r,you,now){
+  const op=1-you,id=op?r.p1:r.p0;if(!id||now-(op?r.lp1:r.lp0)<=BL_NUDGE)return;
+  try{await tg(env,'sendMessage',{chat_id:id,text:`🎱 ${you?r.n1:r.n0} zarba berdi — navbat sizda!`,reply_markup:{inline_keyboard:[[appBtn('🎱 Davom etish',APP_URL+'?t=bilyard')]]}})}catch(e){}
+}
+async function handleBlPoll(c,env){
+  const [r,err,you]=await blRoom(c);if(err)return err;if(you<0)return J({ok:false},403);
+  const since=parseInt(c.f.get('since'))||0;
+  await c.db.prepare(`UPDATE blroom SET lp${you}=?2 WHERE id=?1`).bind(r.id,Date.now()).run();
+  return J({ok:true,seq:r.seq,names:[r.n0,r.n1||null],data:r.seq>since?r.data:undefined});
+}
+const BL_ROUTES={'/bl/new':handleBlNew,'/bl/join':handleBlJoin,'/bl/push':handleBlPush,'/bl/poll':handleBlPoll};
+async function handleBl(path,req,env){const [c,err]=await blCtx(req,env);return err||BL_ROUTES[path](c,env)}
+
 // ---- Statistika (D1 binding: DB) ----
 const ADMIN_HASH='60d77ba2cd142ddb9fd953dac7446bacdd2c8bf561d793f4dc8fcd0169f6315c'; // bir martalik admin kodi xeshi (kodning o'zi bu yerda yo'q)
 const TZMS=5*3600e3, DAY=864e5;
@@ -169,6 +225,7 @@ async function D(env){
       env.DB.prepare('CREATE TABLE IF NOT EXISTS sections(day TEXT,sec TEXT,n INTEGER DEFAULT 0,PRIMARY KEY(day,sec))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY,v TEXT)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS food(day TEXT,uid INTEGER,n INTEGER DEFAULT 0,PRIMARY KEY(day,uid))'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS blroom(id TEXT PRIMARY KEY,game TEXT,p0 INTEGER,p1 INTEGER,n0 TEXT,n1 TEXT,seq INTEGER DEFAULT 0,data TEXT,init TEXT,created INTEGER,updated INTEGER,lp0 INTEGER DEFAULT 0,lp1 INTEGER DEFAULT 0)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS foodfix(day TEXT,k TEXT,a TEXT,u TEXT,n INTEGER DEFAULT 0,r REAL DEFAULT 0,PRIMARY KEY(day,k,a,u))'),
       env.DB.prepare("INSERT OR IGNORE INTO meta(k,v) VALUES('since',?1)").bind(String(Date.now()))
     ]);
@@ -480,6 +537,7 @@ export default {
     if(path==='/admin/check'&&req.method==='POST')return handleCheck(req,env);
     if(path==='/food'&&req.method==='POST')return handleFood(req,env);
     if(path==='/food/fix'&&req.method==='POST')return handleFoodFix(req,env);
+    if(BL_ROUTES[path]&&req.method==='POST')return handleBl(path,req,env);
     if(req.method!=='POST') return new Response('Hamroh bot ishlayapti ✅');
     if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
     const u=await req.json().catch(()=>({}));

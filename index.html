@@ -771,6 +771,8 @@ body.bl-play nav.tabs{display:none}
 .bl3-bot{flex-wrap:wrap}
 #blnew.on{background:#e3a234;color:#1a1300}
 @media (max-width:380px){.bl3-ib{min-width:38px;height:40px;padding:0 9px}.bl3-bot{gap:6px}}
+.bl-code{font:700 22px/1 ui-monospace,monospace;letter-spacing:3px;background:rgba(255,255,255,.08);padding:10px 14px;border-radius:12px;margin:2px 0 6px}
+#bliback{background:transparent;color:#fff;border-color:rgba(255,255,255,.25)}
 .mf-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
 .mf-h b{font-family:var(--display);font-size:17px}
 .mf-names{display:flex;flex-direction:column;gap:6px}
@@ -2203,7 +2205,7 @@ function viewSaved(){
 }
 // open a shared recipe: t.me/bot/app?startapp=r_osh
 (function(){try{const tq=new URLSearchParams(location.search).get('t');if(tq){current=tq;store.set('tab',tq)}}catch(e){}})();
-(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'||sp==='bilyard'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
+(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'||sp==='bilyard'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('bl_')){store.set('tab','bilyard');current='bilyard';store.set('bl_join',sp.slice(3).replace(/[^a-z0-9]/g,''))}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
 
 const TOOLIC={qibla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
  tasbeh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="17.5" cy="15" r="2"/><circle cx="12" cy="18.5" r="2"/><circle cx="6.5" cy="15" r="2"/><circle cx="6.5" cy="8.5" r="2"/></svg>',
@@ -4849,14 +4851,17 @@ const blAm=()=>!!BLS&&BLS.game==='am',blPrac=()=>!!BLS&&BLS.mode==='practice';
 const blEng=g=>g==='mos'?'pyr':g; // fizika/stol turi
 const blSave=()=>{try{if(BLS)BLS.cue=BL.cue;store.set('bl',BLS&&{...BLS,balls:BLS.balls.map(b=>({id:b.id,x:b.x,y:b.y,vx:0,vy:0,in:b.in}))})}catch(e){}};
 const blBot=()=>BLS&&BLS.mode==='bot';
-const blBotTurn=()=>blBot()&&BLS.G.turn===1&&!BLS.G.over;
-function blName(i){return blBot()?(i?KT('Kompyuter','Компьютер','Computer'):KT('Siz','Вы','You')):KT(`${i+1}-o'yinchi`,`Игрок ${i+1}`,`Player ${i+1}`)}
+const blOnline=()=>!!BLS&&BLS.mode==='online';
+// "boshqaning navbati": kompyuter yoki onlayn raqib
+const blBotTurn=()=>!!BLS&&!BLS.G.over&&(blBot()&&BLS.G.turn===1||blOnline()&&BLS.G.turn!==BLS.me);
+function blName(i){if(blOnline())return i===BLS.me?KT('Siz','Вы','You'):(BLS.names&&BLS.names[i])||KT("Do'st",'Друг','Friend');return blBot()?(i?KT('Kompyuter','Компьютер','Computer'):KT('Siz','Вы','You')):KT(`${i+1}-o'yinchi`,`Игрок ${i+1}`,`Player ${i+1}`)}
 function blGroupName(g){return g==='s'?KT('bir rangli (1–7)','сплошные (1–7)','solids (1–7)'):KT('polosali (9–15)','полосатые (9–15)','stripes (9–15)')}
 const blGameName=g=>({pyr:KT('Erkin piramida','Свободная пирамида','Free pyramid'),mos:KT('Moskva piramidasi','Московская пирамида','Moscow pyramid'),am:KT('Amerikanka','Американка','Amerikanka')}[g]||KT('8-shar','Восьмёрка','8-ball'));
 function blDispose(){if(blR){try{blR.dispose()}catch(e){}blR=null}}
 function viewBilyard(){
   cancelAnimationFrame(blRAF);clearTimeout(blBotT);blDispose();blStroke=null;
   if(BLS){blSetMode(blEng(BLS.game));if(BLS.cue!=null)blSetCue(BLS.cue);BLS.balls.forEach(b=>{b.vx=b.vy=b.wx=b.wy=b.wz=0})}
+  const jn=store.get('bl_join',null);if(jn){store.set('bl_join',null);if(!(BLS&&BLS.room===jn&&BLS.live)){setHero('bilyard');blMenuV();blOnlineJoin(jn);return}}
   if(BLS&&BLS.live){$('#hero').hidden=true;return blGameV()}
   document.body.classList.remove('bl-play');try{tg&&tg.enableVerticalSwipes&&tg.enableVerticalSwipes()}catch(e){}
   setHero('bilyard');blMenuV();
@@ -4864,7 +4869,7 @@ function viewBilyard(){
 function blMenuV(){
   const L=store.get('bl_lvl','mid'),T=store.get('bl_game','pyr'),cont=BLS&&!BLS.G.over;
   $('#screen').innerHTML=`
-    ${cont?`<button class="card pv-main" id="blcont" style="background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">▶</span><span><b>O'yinni davom ettirish</b><small data-notr>${blGameName(BLS.game)} · ${blBot()?KT('kompyuterga qarshi','против компьютера','vs computer'):KT('ikki kishi','два игрока','two players')}</small></span><span class="pv-go">→</span></button>`:''}
+    ${cont?`<button class="card pv-main" id="blcont" style="background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">▶</span><span><b>O'yinni davom ettirish</b><small data-notr>${blGameName(BLS.game)} · ${blOnline()?KT('onlayn','онлайн','online')+(BLS.names&&BLS.names[1-BLS.me]?' · '+esc(BLS.names[1-BLS.me]):''):blBot()?KT('kompyuterga qarshi','против компьютера','vs computer'):blPrac()?KT('mashq','тренировка','practice'):KT('ikki kishi','два игрока','two players')}</small></span><span class="pv-go">→</span></button>`:''}
     <section class="card kk-goal"><div class="label">O'yin turi</div>
       <div class="bl-games" id="blgame">
         <button class="bl-gm" data-g="pyr" aria-pressed="${T==='pyr'}"><span class="bl-gi"><i></i><i></i><i></i><i class="r"></i></span><b>Erkin piramida</b><small>Qizil biton bilan istalgan sharni. 8 ta tushirgan yutadi</small></button>
@@ -4875,6 +4880,7 @@ function blMenuV(){
     <section class="card kk-goal"><div class="label">Kim bilan o'ynaysiz?</div>
       <button class="kk-opt" id="bl2p"><span><b>👥 Ikki kishi, bitta telefonda</b><small>Navbatma-navbat zarba berasiz</small></span></button>
       <button class="kk-opt" id="blbot"><span><b>🤖 Kompyuterga qarshi</b><small>Darajani tanlang va boshlang</small></span></button>
+      <button class="kk-opt" id="blonl"><span><b>🌐 Do'st bilan onlayn</b><small>Har kim o'z telefonida: havola yuborasiz, do'stingiz bosib kiradi</small></span></button>
       <button class="kk-opt" id="blprac"><span><b>🎯 Mashq</b><small>Yolg'iz, qoidasiz: zarbani qaytarish va sharlarni surish mumkin</small></span></button>
       <div class="kk-meals" id="bllvl">${[['easy','Oson'],['mid',"O'rta"],['hard','Qiyin']].map(([k,l])=>`<button class="chip" data-l="${k}" aria-pressed="${k===L}">${l}</button>`).join('')}</div></section>
     <section class="card kk-goal"><div class="label">Stol ko'rinishi</div>
@@ -4889,7 +4895,7 @@ function blMenuV(){
   $('#blwood').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;store.set('bl_wood',b.dataset.w);blMenuV()};
   $('#blq').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;store.set('bl_q',b.dataset.q);store.set('bl_qlow',false);blMenuV()};
   $('#bllvl').onclick=e=>{const b=e.target.closest('[data-l]');if(!b)return;store.set('bl_lvl',b.dataset.l);blMenuV()};
-  $('#bl2p').onclick=()=>blNew('2p');$('#blprac').onclick=()=>blNew('practice');$('#blstat').onclick=blStatsV;$('#blbot').onclick=()=>blNew('bot');$('#blhow').onclick=()=>blRules(T);
+  $('#bl2p').onclick=()=>blNew('2p');$('#blprac').onclick=()=>blNew('practice');$('#blonl').onclick=blOnlineNew;$('#blstat').onclick=blStatsV;$('#blbot').onclick=()=>blNew('bot');$('#blhow').onclick=()=>blRules(T);
 }
 function blNew(mode){
   const game=BLS&&BLS.live&&BLS.game||store.get('bl_game','pyr');blSetMode(blEng(game));
@@ -4974,7 +4980,7 @@ function blGameV(){
   $('#blpick').onclick=()=>{if(!blCanAim())return;blTool=blTool==='pick'?null:'pick';if(blTool){blMsg=KT('Qaysi shar bilan urasiz? Sharga teging','Каким шаром бить? Коснитесь шара','Which ball will you strike? Tap it');blHud()}blBtns()};
   $('#blmove').onclick=()=>{if(!blCanAim())return;blTool=blTool==='move'?null:'move';if(blTool){blMsg=KT('Istalgan sharni barmoq bilan suring','Перетаскивайте любой шар пальцем','Drag any ball with your finger');blHud()}blBtns()};
   $('#blundo').onclick=()=>{if(!blUndo||blEv||blBusy)return;BLS.balls=blUndo.balls.map(b=>({...b,vx:0,vy:0,wx:0,wy:0,wz:0}));blSetCue(blUndo.cue);BLS.pots=blUndo.pots;blUndo=null;blMsg=KT('Zarba qaytarildi','Удар отменён','Shot undone');blSave();blHud();blBtns()};
-  $('#blrep').onclick=()=>blStartReplay();
+  $('#blrep').onclick=()=>blStartReplay(0.5);
   $('#blspok').onclick=()=>{$('#blsp').hidden=true};$('#blsp').onclick=e=>{if(e.target.id==='blsp')$('#blsp').hidden=true};
   $('#blsp0').onclick=()=>{blSpin={a:0,b:0};blSpinUI()};
   const sb=$('#blspball');const setSp=e=>{const R=sb.getBoundingClientRect(),cx=R.left+R.width/2,cy=R.top+R.height/2;let a=(e.clientX-cx)/(R.width/2),b=-(e.clientY-cy)/(R.height/2);const m=Math.hypot(a,b);if(m>0.6){a*=0.6/m;b*=0.6/m}blSpin={a,b};blSpinUI()};
@@ -4985,7 +4991,9 @@ function blGameV(){
     if(!$('#blstage')||blR)return;const v=$('#blview');v.innerHTML='';
     let r=null;if(ok){try{r=blMake3D(v)}catch(e){r=null;v.innerHTML=''}}
     blR=r||blMake2D(v);blCamLabel();blBindView();blLoop();blBtns();
-    if(!store.get('bl_tut',false))blTutorial();else if(blBotTurn())blBotGo();
+    if(blOnline()&&BLS.me===0&&!(BLS.names&&BLS.names[1]))blInvite(true);
+    if(!store.get('bl_tut',false))blTutorial();else if(blBotTurn())blOtherGo();
+    if(blOnline())blOnlineWatch();
   });
 }
 function blLoad3(){
@@ -5005,7 +5013,7 @@ function blHud(){
   const end=$('#blend');
   if(G.over){const w=G.winner,me=blBot()?w===0:true;
     end.innerHTML=`<section class="card mf-big mf-end bl3-end ${me?'mf-t':'mf-m'}"><div class="mf-ic">${me?'🏆':'🤖'}</div><h3 data-notr>${KT(`${blName(w)} g'alaba qozondi`,`Победа: ${blName(w)}`,`${blName(w)} wins`)}</h3>${pyr?`<div class="bl3-fin" data-notr>${G.score[0]} : ${G.score[1]}</div>`:''}<button class="btn alt" id="blagain">Yana o'ynash</button></section>`;
-    $('#blagain').onclick=()=>blNew(BLS.mode)}
+    $('#blagain').onclick=()=>blOnline()?blOnlineNew():blNew(BLS.mode)}
   else end.innerHTML='';
 }
 function blAutoCue(){const on=blOn(BLS.balls);if(!on.length)return;on.sort((a,b)=>Math.hypot(a.x-BL.head.x,a.y-BL.head.y)-Math.hypot(b.x-BL.head.x,b.y-BL.head.y));blSetCue(on[0].id)}
@@ -5014,7 +5022,7 @@ const blSt=()=>store.get('bl_st',{});
 function blStSave(S){const before=blAch().filter(a=>a.ok).map(a=>a.k);store.set('bl_st',S);blAch().filter(a=>a.ok&&!before.includes(a.k)).forEach(a=>{toast('🏆 '+trText(a.t));haptic('done')})}
 function blStatShot(ev,n,R){const S=blSt();S.shots=(S.shots||0)+1;S.pots=(S.pots||0)+n;if(n>=2)S.multi=Math.max(S.multi||0,n);if(R&&R.svoyak)S.svoyak=(S.svoyak||0)+1;
   if(n>0&&!blPrac()){blRun++;S.bestRun=Math.max(S.bestRun||0,blRun)}else if(!n)blRun=0;blStSave(S)}
-function blStatEnd(){const S=blSt(),G=BLS.G;S.games=(S.games||0)+1;if(blBot()&&G.winner===0){S.wins=(S.wins||0)+1;S['win_'+BLS.lvl]=(S['win_'+BLS.lvl]||0)+1}blStSave(S)}
+function blStatEnd(){const S=blSt(),G=BLS.G;S.games=(S.games||0)+1;if((blBot()||blOnline())&&G.winner===(blOnline()?BLS.me:0)){if(blOnline())S.onl=(S.onl||0)+1;S.wins=(S.wins||0)+1;S['win_'+BLS.lvl]=(S['win_'+BLS.lvl]||0)+1}blStSave(S)}
 function blAch(){const S=blSt();return [
   ['first',"Birinchi g'alaba","Kompyuterni bir marta yengish",(S.wins||0)>=1],
   ['hard',"Usta","Qiyin darajadagi kompyuterni yengish",(S.win_hard||0)>=1],
@@ -5034,14 +5042,14 @@ function blStatsV(){
     <button class="btn" id="blsok">Yopish</button>`);
   $('#blsok').onclick=()=>sh.remove();
 }
-function blBtns(){const f=$('#blff'),r=$('#blrep');if(!f)return;const idle=!blEv&&!blBusy&&!BLS.G.over;$('#blpick').hidden=!(blAm()&&idle&&!blBotTurn());$('#blpick').classList.toggle('on',blTool==='pick');$('#blundo').hidden=!(blPrac()&&idle&&blUndo);$('#blmove').hidden=!(blPrac()&&idle);$('#blmove').classList.toggle('on',blTool==='move');f.hidden=!blEv;f.classList.toggle('on',blFF>1);r.hidden=!!blEv||!blLast||blBusy&&!BLS.G.over||!!blReplay}
+function blBtns(){const f=$('#blff'),r=$('#blrep');if(!f)return;const idle=!blEv&&!blBusy&&!BLS.G.over;$('#blnew').hidden=blOnline()&&!BLS.G.over;$('#blpick').hidden=!(blAm()&&idle&&!blBotTurn());$('#blpick').classList.toggle('on',blTool==='pick');$('#blundo').hidden=!(blPrac()&&idle&&blUndo);$('#blmove').hidden=!(blPrac()&&idle);$('#blmove').classList.toggle('on',blTool==='move');f.hidden=!blEv;f.classList.toggle('on',blFF>1);r.hidden=!!blEv||!blLast||blBusy&&!BLS.G.over||!!blReplay}
 // ---- qayta ko'rish: oxirgi zarba sekinlashtirilgan holda ----
-function blStartReplay(){if(!blLast||blEv)return;const f0=blLast.f[0];blReplay={t:0,i:0,balls:blLast.ids.map((id,k)=>({id,x:f0.b[k][0],y:f0.b[k][1],in:f0.b[k][2],vx:0,vy:0,wx:0,wy:0,wz:0}))};$('#blmsg').hidden=true;blBtns()}
-function blStopReplay(){blReplay=null;blHud();blBtns()}
-function blReplayStep(dt){const R=blReplay,F=blLast.f,r=BL.r;R.t+=dt*0.5;while(R.i<F.length-1&&F[R.i+1].t<=R.t)R.i++;
+function blStartReplay(sp=0.5,end=null){if(!blLast||blEv)return;const f0=blLast.f[0];blReplay={sp,end,t:0,i:0,balls:blLast.ids.map((id,k)=>({id,x:f0.b[k][0],y:f0.b[k][1],in:f0.b[k][2],vx:0,vy:0,wx:0,wy:0,wz:0}))};$('#blmsg').hidden=true;blBtns()}
+function blStopReplay(){const e=blReplay&&blReplay.end;blReplay=null;blHud();blBtns();if(e)e()}
+function blReplayStep(dt){const R=blReplay,F=blLast.f,r=BL.r;R.t+=dt*R.sp;while(R.i<F.length-1&&F[R.i+1].t<=R.t)R.i++;
   const fr=F[R.i],nx=F[Math.min(F.length-1,R.i+1)],span=Math.max(1e-4,nx.t-fr.t),k=Math.max(0,Math.min(1,(R.t-fr.t)/span));
-  R.balls.forEach((b,j)=>{const x=fr.b[j][0]+(nx.b[j][0]-fr.b[j][0])*k,y=fr.b[j][1]+(nx.b[j][1]-fr.b[j][1])*k,vx=(x-b.x)/Math.max(dt*0.5,1e-4),vy=(y-b.y)/Math.max(dt*0.5,1e-4);
-    b.wx=vy/r*0.5;b.wy=-vx/r*0.5;b.x=x;b.y=y;b.in=fr.b[j][2]&&nx.b[j][2]?true:k>0.5?nx.b[j][2]:fr.b[j][2]});
+  R.balls.forEach((b,j)=>{const x=fr.b[j][0]+(nx.b[j][0]-fr.b[j][0])*k,y=fr.b[j][1]+(nx.b[j][1]-fr.b[j][1])*k,vx=(x-b.x)/Math.max(dt*R.sp,1e-4),vy=(y-b.y)/Math.max(dt*R.sp,1e-4);
+    b.wx=vy/r*R.sp;b.wy=-vx/r*R.sp;b.x=x;b.y=y;b.in=fr.b[j][2]&&nx.b[j][2]?true:k>0.5?nx.b[j][2]:fr.b[j][2]});
   if(R.t>F[F.length-1].t+1)blStopReplay()}
 // ---- o'rgatuvchi ----
 function blTutorial(i=0){
@@ -5053,12 +5061,12 @@ function blTutorial(i=0){
   const st=$('#blstage');if(!st)return;let o=$('#bltut');if(!o){o=document.createElement('div');o.id='bltut';o.className='bl3-tut';st.appendChild(o)}
   const [ic,h,t]=S[i],last=i===S.length-1;
   o.innerHTML=`<div class="bl3-tutc"><div class="bl3-tuti">${ic}</div><small data-notr>${i+1} / ${S.length}</small><b>${h}</b><p>${t}</p><div class="bl3-spa"><button class="chip" id="bltsk">O'tkazib yuborish</button><button class="btn" id="bltnx">${last?'Boshladik':'Keyingi'}</button></div></div>`;
-  const done=()=>{store.set('bl_tut',true);o.remove();if(blBotTurn())blBotGo()};
+  const done=()=>{store.set('bl_tut',true);o.remove();if(blBotTurn())blOtherGo()};
   $('#bltsk').onclick=done;$('#bltnx').onclick=()=>last?done():blTutorial(i+1);
 }
 function blSpinUI(){const p=(id,sc)=>{const d=$(id);if(d){d.style.left=(50+blSpin.a*sc)+'%';d.style.top=(50-blSpin.b*sc)+'%'}};p('#blspd',50);p('#blspdot',50)}
 function blMini(g){const ids=g==='s'?[1,2,3,4,5,6,7]:[9,10,11,12,13,14,15];return ids.map(id=>{const b=BLS.balls.find(x=>x.id===id);return `<i class="${b.in?'off':''} ${g}" style="--c:${blColor(id)}"></i>`}).join('')}
-const blCanAim=()=>BLS&&!blReplay&&!BLS.G.over&&!blBusy&&!blBotTurn()&&!blMoving(BLS.balls)&&!!blR;
+const blCanAim=()=>BLS&&!blReplay&&!(blOnline()&&!(BLS.names&&BLS.names[1]))&&!BLS.G.over&&!blBusy&&!blBotTurn()&&!blMoving(BLS.balls)&&!!blR;
 function blAimAt(p){const c=blCue(BLS.balls);if(p&&Math.hypot(p.x-c.x,p.y-c.y)>BL.r*0.5)blAng=Math.atan2(p.y-c.y,p.x-c.x)}
 function blBindView(){
   const el=blR.dom;let st=null;const fill=v=>{const i=$('#blpowi');if(i)i.style.height=(v*100)+'%'};
@@ -5112,7 +5120,7 @@ function blSettle(){
   const G=BLS.G,ev=blEv,B=BLS.balls;blEv=null;blBusy=false;ev.cue=BL.cue;blLast=blRec&&{ids:B.map(b=>b.id),f:blRec};blRec=null;blFF=1;
   if(blPrac()){const n=ev.potted.length;blStatShot(ev,n);if(ev.potted.includes(BL.cue)&&!blAm())blRespot(B,BL.cue,BL.head);if(blAm()&&blCue(B).in)blAutoCue();
     BLS.pots=(BLS.pots||0)+n;blMsg=n?KT(`Tushdi: ${n} · jami ${BLS.pots}`,`Забито: ${n} · всего ${BLS.pots}`,`Potted: ${n} · total ${BLS.pots}`):KT('Tushmadi. ↶ bilan qaytarib, qayta urib ko\'ring',"Мимо. Нажмите ↶ и попробуйте снова",'Missed. Tap ↶ and try again');
-    blSave();blHud();blBtns();return}const me=G.turn,human=!(blBot()&&me===1),R=blJudge(G,B,ev),opp=blName(G.turn);
+    blSave();blHud();blBtns();return}const me=G.turn,human=blOnline()?me===BLS.me:!(blBot()&&me===1),R=blJudge(G,B,ev),opp=blName(G.turn);
   if(human)blStatShot(ev,R.foul?0:(R.pot||[]).length,R);if(G.turn!==me||!human)blRun=0;
   const handTip=blBot()&&G.turn===1?'':blPyr()?KT(' — bitonni barmoq bilan suring',' — передвиньте биток пальцем',' — drag the cue ball with your finger'):KT(' — oq sharni barmoq bilan suring',' — передвиньте биток пальцем',' — drag the cue ball with your finger');
   if(blPyr()){
@@ -5138,7 +5146,68 @@ function blSettle(){
   blHandView=G.hand&&!blBotTurn();
   if(G.over)blStatEnd();
   blSave();blHud();blBtns();
-  if(blBotTurn())blBotGo();
+  if(blOnline()&&me===BLS.me)blOnlinePush();
+  else if(blBotTurn())blOtherGo();
+}
+const blOtherGo=()=>{if(blBot())blBotGo();else if(blOnline())blOnlineWatch()};
+// ---- onlayn: zarbani yuborish, raqib zarbasini olish ----
+let blPollT=null,blPushing=false;
+function blApi(path,f){const fd=new FormData();fd.append('initData',(tg&&tg.initData)||'');for(const k in f)fd.append(k,f[k]);
+  return fetch(BOT_API+path,{method:'POST',body:fd}).then(r=>r.json().then(j=>({st:r.status,...j}))).catch(()=>({ok:false,st:0}))}
+function blEnc(L){if(!L)return null;const out=[],prev=[];let lt=-1;L.f.forEach((fr,i)=>{if(i&&i<L.f.length-1&&fr.t-lt<1/30)return;lt=fr.t;const it=[];
+  fr.b.forEach(([x,y,inn],j)=>{const q=[Math.round(x*1e4),Math.round(y*1e4),inn?1:0];if(!prev[j]||q[0]!==prev[j][0]||q[1]!==prev[j][1]||q[2]!==prev[j][2]){it.push(j,...q);prev[j]=q}});out.push([Math.round(fr.t*1000),it])});return {ids:L.ids,f:out}}
+function blDec(E){const cur=E.ids.map(()=>[0,0,false]);return {ids:E.ids,f:E.f.map(([t,it])=>{for(let k=0;k<it.length;k+=4)cur[it[k]]=[it[k+1]/1e4,it[k+2]/1e4,!!it[k+3]];return {t:t/1000,b:cur.map(q=>q.slice())}})}}
+const blSnap=()=>({balls:BLS.balls.map(b=>[b.id,+b.x.toFixed(5),+b.y.toFixed(5),b.in?1:0]),G:BLS.G,cue:BL.cue,msg:blMsg});
+function blApplySnap(S){BLS.balls=S.balls.map(([id,x,y,inn])=>({id,x,y,in:!!inn,vx:0,vy:0,wx:0,wy:0,wz:0}));BLS.G=S.G;blSetCue(S.cue);blMsg=S.msg||'';blHandView=BLS.G.hand&&!blBotTurn()}
+function blOnlinePush(tries=0){
+  if(blPushing)return;blPushing=true;const data=JSON.stringify({...blSnap(),rec:blEnc(blLast)});
+  blApi('/bl/push',{room:BLS.room,seq:String(BLS.seq),data}).then(j=>{blPushing=false;
+    if(j.ok){BLS.seq=j.seq;blSave();if(blBotTurn())blOnlineWatch();return}
+    if(j.st===409)return blOnlineWatch(true); // raqib allaqachon yuborgan — sinxronlash
+    if(tries<4)setTimeout(()=>blOnlinePush(tries+1),2000*(tries+1));else{blMsg=KT("Internet yo'q: zarba yuborilmadi. Qayta urinish uchun o'yinni qayta oching","Нет связи: удар не отправлен. Откройте игру заново","No connection: shot not sent. Reopen the game to retry");blHud()}});
+}
+function blOnlineWatch(force){
+  clearTimeout(blPollT);if(!blOnline()||!$('#blstage'))return;
+  const waitJoin=!BLS.names||!BLS.names[1];if(!force&&!waitJoin&&!blBotTurn())return;
+  blPollT=setTimeout(()=>{if(!blOnline()||!$('#blstage'))return;
+    blApi('/bl/poll',{room:BLS.room,since:String(BLS.seq)}).then(j=>{if(!blOnline()||!$('#blstage'))return;
+      if(j.ok&&j.names){const was=BLS.names&&BLS.names[1];BLS.names=j.names;if(!was&&j.names[1]){blInvite(false);blMsg=KT(`${j.names[1]} qo'shildi! Siz boshlaysiz`,`${j.names[1]} присоединился! Вы начинаете`,`${j.names[1]} joined! You break`);blSave();blHud()}}
+      if(j.ok&&j.data&&j.seq>BLS.seq){let D=null;try{D=JSON.parse(j.data)}catch(e){}
+        if(D){const seq=j.seq,fin=()=>{blApplySnap(D);BLS.seq=seq;blSave();blHud();blBtns();haptic('light');if(blBotTurn())blOnlineWatch()};
+          if(D.rec&&D.rec.f&&D.rec.f.length>1&&!blEv){blLast=blDec(D.rec);blStartReplay(1,fin)}else fin();return}}
+      blOnlineWatch(force)})},force?300:1500);
+}
+function blInvite(show){
+  const st=$('#blstage');if(!st)return;let o=$('#blinv');if(!show){if(o)o.remove();return}
+  if(!o){o=document.createElement('div');o.id='blinv';o.className='bl3-tut';st.appendChild(o)}
+  const link=BOT_LINK+'?startapp=bl_'+BLS.room;
+  o.innerHTML=`<div class="bl3-tutc"><div class="bl3-tuti">🌐</div><b>Do'stingizni taklif qiling</b><p>Havolani do'stingizga yuboring. U bosib kirishi bilan o'yin boshlanadi — siz birinchi urasiz.</p>
+    <div class="bl-code" data-noi18n>${BLS.room}</div><div class="bl3-spa"><button class="chip" id="blicopy">Nusxalash</button><button class="btn" id="blishare">Yuborish</button></div><button class="chip" id="bliback" style="margin-top:4px">← Menyu</button></div>`;
+  $('#blishare').onclick=()=>{const u=`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(trText("🎱 Keling, bilyard o'ynaymiz! Xona ochdim — havolani bosing"))}`;tg&&tg.openTelegramLink?tg.openTelegramLink(u):window.open(u,'_blank')};
+  $('#blicopy').onclick=()=>{try{navigator.clipboard.writeText(link);toast(trText('Havola nusxalandi'))}catch(e){}};
+  $('#bliback').onclick=()=>{BLS.live=false;blSave();viewBilyard()};
+}
+function blOnlineNew(){
+  if(!(tg&&tg.initData)){toast(trText('Onlayn o\'yin faqat Telegram ichida ishlaydi'));return}
+  const game=store.get('bl_game','pyr');blSetMode(blEng(game));
+  const G=game==='8'?{turn:0,groups:[null,null],hand:false,over:false,winner:null,brk:true}:{mode:game==='am'?'am':'pyr',mos:game==='mos',turn:0,score:[0,0],hand:true,house:true,over:false,winner:null,brk:true};
+  const balls=blRack(),me=(tg.initDataUnsafe&&tg.initDataUnsafe.user)||{};
+  const init=JSON.stringify({balls:balls.map(b=>[b.id,b.x,b.y,0]),G,cue:BL.cue});
+  toast(trText('Xona ochilmoqda…'));
+  blApi('/bl/new',{game,init}).then(j=>{if(!j.ok){toast(trText(j.st===404||j.st===0?"Server hali yangilanmagan yoki internet yo'q":"Xona ochilmadi"));return}
+    BLS={game,mode:'online',room:j.room,me:0,names:[me.first_name||'',null],seq:0,balls,G,live:true,cue:BL.cue};blLast=null;blUndo=null;blRun=0;
+    blAng=-Math.PI/2;blHandView=game!=='8';blMsg='';blSave();statSec('bilyard_online');viewBilyard()});
+}
+function blOnlineJoin(room){
+  blApi('/bl/join',{room}).then(j=>{
+    if(!j.ok){toast(trText(j.st===409?"Bu xonada allaqachon ikki kishi o'ynayapti":j.st===404?"Xona topilmadi yoki eskirgan":"Ulanib bo'lmadi"));return}
+    let I=null;try{I=JSON.parse(j.init)}catch(e){}if(!I)return;
+    const game=j.game;blSetMode(blEng(game));
+    BLS={game,mode:'online',room,me:j.you,names:j.names,seq:0,balls:[],G:I.G,live:true,cue:I.cue};blApplySnap({...I,msg:''});
+    if(j.seq&&j.data){try{blApplySnap(JSON.parse(j.data));BLS.seq=j.seq}catch(e){}}
+    blLast=null;blUndo=null;blRun=0;blAng=-Math.PI/2;
+    if(!blMsg)blMsg=j.you===1?KT(`${j.names[0]} bilan o'yin. U birinchi uradi`,`Игра с ${j.names[0]}. Он(а) разбивает`,`Playing ${j.names[0]}. They break`):'';
+    blSave();statSec('bilyard_online');viewBilyard()});
 }
 function blBotGo(){
   blBusy=true;clearTimeout(blBotT);
