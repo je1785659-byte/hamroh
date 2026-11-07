@@ -4084,7 +4084,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108a';
+const APP_VER='20261108b';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -6185,7 +6185,7 @@ function huAmb(){
 function huStopAmb(){clearTimeout(huAmbT);try{huWindN&&huWindN.stop()}catch(e){}huWindN=null}
 
 /* ---------- YUGUR (runner): yo'l, harakat, to'siqlar, bonuslar — DOM'siz ---------- */
-const RN={lanes:[-2.2,0,2.2],g:-38,jumpV:13.2,shoeV:19,laneSpd:14,pw:0.36,ph:1.75,prh:0.85,roll:0.62,
+const RN={lanes:[2.2,0,-2.2],g:-38,jumpV:13.2,shoeV:19,laneSpd:14,pw:0.36,ph:1.75,prh:0.85,roll:0.62,
   trainH:3.6,tw:1.0,bw:0.95,low:0.95,highY:1.3,highTop:3.2,blockH:2.9,jetY:9,gapSw:15.6,car:12.5,
   dur:{magnet:12,jet:8,shoe:12,x2:15}};
 function rnRng(s){s=(s>>>0)||1;return()=>{s=(s*16807)%2147483647;return s/2147483647}}
@@ -6199,7 +6199,7 @@ function rnInput(s,k){
   if(!s.alive)return;
   if(k==='left'&&s.lane>0){s.prevLane=s.lane;s.lane--;s.ev.push({k:'swipe'})}
   else if(k==='right'&&s.lane<2){s.prevLane=s.lane;s.lane++;s.ev.push({k:'swipe'})}
-  else if(k==='up'){if(s.pw.jet>0)return;const h=rnSurf(s,s.x,s.z);if(s.y<=h+0.05&&s.vy<=0){s.vy=s.pw.shoe>0?RN.shoeV:RN.jumpV;s.roll=0;s.ev.push({k:'jump'})}}
+  else if(k==='up'){if(s.pw.jet>0)return;const h=rnSurf(s,s.x,s.z);if(s.y<=h+0.05&&s.vy<=0){s.vy=s.pw.shoe>0?RN.shoeV:RN.jumpV;s.roll=0;s.jbuf=0;s.ev.push({k:'jump'})}else s.jbuf=0.18}
   else if(k==='down'){if(s.pw.jet>0)return;const h=rnSurf(s,s.x,s.z);if(s.y>h+0.2){s.dive=true;s.vy=Math.min(s.vy,-18)}s.roll=RN.roll;s.ev.push({k:'roll'})}
 }
 const rnLX=l=>RN.lanes[l];
@@ -6219,13 +6219,13 @@ function rnStep(s,dt){
   if(!s.alive)return;s.t+=dt;
   const v=rnSpeed(s.t)*(s.pw.jet>0?1.12:1);s.v=v;const pz=s.z,px=s.x;s.z+=v*dt;
   for(const o of s.obs)if(o.type==='mtrain'&&o.z0-s.z<(o.trig||1e9)){o.z0-=o.v*dt;o.z1-=o.v*dt}
-  const tx=rnLX(s.lane),dx=tx-s.x,mx=RN.laneSpd*dt;s.x=Math.abs(dx)<=mx?tx:s.x+Math.sign(dx)*mx;
+  const tx=rnLX(s.lane),dx=tx-s.x,mx=Math.min(26,Math.max(5,Math.abs(dx)*17))*dt;s.x=Math.abs(dx)<=mx||Math.abs(dx)<0.01?tx:s.x+Math.sign(dx)*mx;s.vx=(s.x-px)/dt;
   for(const k of ['magnet','jet','shoe','x2'])if(s.pw[k]>0){s.pw[k]=Math.max(0,s.pw[k]-dt);if(!s.pw[k]){s.ev.push({k:'pwEnd',p:k});if(k==='jet')s.inv=2.2}}
-  s.roll=Math.max(0,s.roll-dt);s.inv=Math.max(0,s.inv-dt);if(s.guard>0)s.guard=Math.max(0,s.guard-dt);
+  s.roll=Math.max(0,s.roll-dt);if(s.jbuf>0)s.jbuf=Math.max(0,s.jbuf-dt);s.inv=Math.max(0,s.inv-dt);if(s.guard>0)s.guard=Math.max(0,s.guard-dt);
   // tik harakat
   const h=rnSurf(s,s.x,s.z);
   if(s.pw.jet>0){const d=RN.jetY-s.y;s.y+=Math.sign(d)*Math.min(Math.abs(d),9*dt);s.vy=0}
-  else if(s.vy>0||s.y>h+1e-3){s.vy+=RN.g*dt*(s.dive?2.2:1);s.y+=s.vy*dt;if(s.y<=h&&s.vy<=0){s.y=h;s.vy=0;s.dive=false;s.ev.push({k:'land'})}}
+  else if(s.vy>0||s.y>h+1e-3){s.vy+=RN.g*dt*(s.dive?2.2:1);s.y+=s.vy*dt;if(s.y<=h&&s.vy<=0){s.y=h;s.vy=0;s.dive=false;s.ev.push({k:'land'});if(s.jbuf>0){s.jbuf=0;rnInput(s,'up')}}}
   else if(h-s.y<0.6){s.y=h;s.vy=0}
   // to'qnashuvlar
   if(s.pw.jet<=0&&s.inv<=0){
@@ -6383,7 +6383,7 @@ function rnLeave(){rnDispose();viewYugur()}
 function rnBind(el){
   let sx=0,sy=0,id=null,done=false;
   el.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;id=e.pointerId;sx=e.clientX;sy=e.clientY;done=false});
-  el.addEventListener('pointermove',e=>{if(e.pointerId!==id||done)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.hypot(dx,dy)<26)return;done=true;
+  el.addEventListener('pointermove',e=>{if(e.pointerId!==id||done)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.hypot(dx,dy)<20)return;done=true;
     rnKey(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy<0?'up':'down'))});
   el.addEventListener('pointerup',()=>{id=null});
   const kd=e=>{if(!$('#rnstage')){removeEventListener('keydown',kd);return}const m={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',a:'left',d:'right',w:'up',s:'down',' ':'up'}[e.key];if(m){e.preventDefault();rnKey(m)}};
@@ -6431,7 +6431,7 @@ function rnLoop(){
       else if(e.k==='crash'){rnSnd('crash');rnTrauma=1;rnOver()}}
     rnTrauma=Math.max(0,rnTrauma-dt*1.6);
     hudT-=dt;if(hudT<=0){hudT=0.1;rnHud()}
-    rnR.frame(dt,rnSt==='run'||rnSt==='over');
+    rnR.frame(dt,rnSt==='run'||rnSt==='over',rnSt==='run'&&RNS.alive?acc:0);
     rnRAF=requestAnimationFrame(f)};
   rnRAF=requestAnimationFrame(f);
 }
@@ -6595,9 +6595,10 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
     else if(e.k==='shield'){spark(s.x,s.y+1,1.2,14,0x8fe8ff,0.9);const m=OM.get(e.id);if(m)m.visible=false}
     else if(e.k==='stumble')spark(s.x,s.y+1,0.3,6,0xffffff,0.6);
   }
-  const camP=new T.Vector3(0,4.3,-7.2),look=new T.Vector3(0,1.5,6);
-  function frame(dt,live){
-    const s=RNS,pz=s.z;U.uCZ.value=-7;
+  const camP=new T.Vector3(0,4.3,-7.2),look=new T.Vector3(0,1.5,12),lookT=new T.Vector3(0,1.5,12);
+  function frame(dt,live,ex=0){
+    // fizika 120 Hz; kadrlar orasini silliqlash uchun qolgan vaqtga oldinga suriladi
+    const s=RNS,pz=s.z+s.v*ex,hx=s.x+(s.vx||0)*ex,hy=Math.max(rnSurf(s,s.x,s.z),s.y+s.vy*ex);U.uCZ.value=-7;
     // egilish: yo'l uzoqda yon tomonga ham sekin buriladi
     U.uBX.value=Math.sin(pz/260)*0.0012;
     trackT.offset.y=(pz/TL)%1;sideT.offset.y=(pz/6)%1;
@@ -6617,8 +6618,8 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
     for(const [id,m] of IM)if(!seen.has(id)){sc.remove(m);IM.delete(id)}
     // qahramon
     const air=s.y>rnSurf(s,s.x,s.z)+0.05||s.pw.jet>0;
-    hero.position.set(s.x,s.y,0);
-    lean+=((RN.lanes[s.lane]-s.x)*-0.18-lean)*Math.min(1,dt*10);body.rotation.z=lean;
+    hero.position.set(hx,hy,0);hero.rotation.y+=((s.vx||0)*0.02-hero.rotation.y)*Math.min(1,dt*12);
+    lean+=((RN.lanes[s.lane]-s.x)*0.16-lean)*Math.min(1,dt*14);body.rotation.z=lean;
     squash+=(0-squash)*Math.min(1,dt*9);body.scale.set(1+squash*0.4,1-squash,1+squash*0.4);
     if(s.roll>0&&!s.pw.jet){body.rotation.x=(1-s.roll/RN.roll)*Math.PI*2;body.position.y=0.15;body.scale.multiplyScalar(0.72)}
     else{body.rotation.x=air?-0.12:0.12;body.position.y=0}
@@ -6631,15 +6632,15 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
     if(!s.alive&&s.crash!=='caught'){body.rotation.x=-1.2;body.position.y=0.3}
     jet.visible=s.pw.jet>0;flames.forEach(f=>f.scale.set(1,0.8+Math.random()*0.6,1));
     bubble.visible=!!s.pw.shield||s.inv>0;bubble.material.opacity=s.inv>0?0.1+0.15*Math.abs(Math.sin(spin*6)):0.18;
-    blob.position.set(s.x,rnSurf(s,s.x,s.z)+0.02,0);blob.scale.setScalar(Math.max(0.3,1-(s.y-rnSurf(s,s.x,s.z))*0.12));
+    blob.position.set(hx,rnSurf(s,s.x,s.z)+0.02,0);blob.scale.setScalar(Math.max(0.3,1-(s.y-rnSurf(s,s.x,s.z))*0.12));
     // qorovul
     const gt=!s.alive&&s.crash==='caught'?-1.1:s.guard>0?-3.6-(8-s.guard)*0.3:-16;gZ+=(gt-gZ)*Math.min(1,dt*(s.guard>0?2.5:1));guard.position.set(s.x*0.9,rnSurf(s,s.x,s.z+gZ),gZ);guard.visible=gZ>-15;
     guard.children[1].rotation.x=Math.sin(phase*1.1)*0.3;
     // kamera
     const top=Math.min(s.y,RN.trainH+0.5);
-    camP.set(s.x*0.7,4.3+top*0.85+(s.pw.jet>0?1.5:0),-7.2);look.set(s.x*0.8,1.0+top*0.8,12);
-    if(s.pw.jet>0){camP.y=s.y+3.6;camP.z=-8;look.y=s.y-3}
-    cam.position.lerp(camP,Math.min(1,dt*7));
+    camP.set(hx*0.7,4.3+top*0.85+(s.pw.jet>0?1.5:0),-7.2);lookT.set(hx*0.8,1.0+top*0.8,12);
+    if(s.pw.jet>0){camP.y=s.y+3.6;camP.z=-8;lookT.y=s.y-3}look.x+=(lookT.x-look.x)*Math.min(1,dt*12);look.y+=(lookT.y-look.y)*Math.min(1,dt*6);look.z=lookT.z;
+    cam.position.x+=(camP.x-cam.position.x)*Math.min(1,dt*11);cam.position.y+=(camP.y-cam.position.y)*Math.min(1,dt*6);cam.position.z+=(camP.z-cam.position.z)*Math.min(1,dt*6);
     const sh=rnTrauma*rnTrauma,tt=performance.now()/1000;cam.position.x+=sh*0.35*Math.sin(tt*37);cam.position.y+=sh*0.25*Math.sin(tt*29+1);
     cam.lookAt(look);cam.fov=62+Math.min(10,(s.v-11)*0.6);cam.aspect=W()/H();cam.updateProjectionMatrix();
     // effektlar
