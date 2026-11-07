@@ -4084,7 +4084,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108b';
+const APP_VER='20261108c';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -6245,10 +6245,15 @@ function rnStep(s,dt){
   }
   // tanga va bonuslar
   const hgt=s.roll>0?RN.prh:RN.ph,mag=s.pw.magnet>0;
-  for(const c of s.coinsL){if(c.got)continue;const cx=rnLX(c.lane);
+  for(const c of s.coinsL){if(c.got)continue;
+    if(c.fly){ // magnitga uchib kelayotgan tanga
+      const tx=s.x,ty=s.y+1.0,tz=s.z+0.4,rx=tx-c.fx,ry=ty-c.y,rz=tz-c.z,L=Math.hypot(rx,ry,rz);c.fv=Math.min(46,c.fv+70*dt);
+      const st=Math.min(L,c.fv*dt);if(L<0.6||st>=L){c.got=true;s.coins++;s.score+=5*(s.pw.x2>0?2:1);s.ev.push({k:'coin',id:c.id,mag:true});continue}
+      c.fx+=rx/L*st;c.y+=ry/L*st+Math.min(L,4)*0.9*dt*(c.fv<20?1:0);c.z+=rz/L*st;continue}
+    const cx=rnLX(c.lane);
     const near=Math.abs(cx-s.x)<0.9&&Math.abs(c.z-s.z)<1.0&&c.y>s.y-0.4&&c.y<s.y+hgt+0.5;
-    const pull=mag&&c.z-s.z<9&&c.z>s.z-1&&Math.abs(c.y-s.y)<5;
-    if(near||pull){c.got=true;s.coins++;s.score+=5*(s.pw.x2>0?2:1);s.ev.push({k:'coin',id:c.id,mag:!near})}}
+    if(near){c.got=true;s.coins++;s.score+=5*(s.pw.x2>0?2:1);s.ev.push({k:'coin',id:c.id});continue}
+    if(mag&&c.z-s.z<16&&c.z>s.z-1&&Math.abs(c.y-s.y)<6){c.fly=true;c.fx=cx;c.fv=8;s.ev.push({k:'magPull',id:c.id})}}
   for(const it of s.items){if(it.got)continue;
     if(Math.abs(rnLX(it.lane)-s.x)<0.95&&Math.abs(it.z-s.z)<1.1&&Math.abs((it.y||1)-(s.y+0.9))<1.6){it.got=true;
       if(it.kind==='shield')s.pw.shield=1;else s.pw[it.kind]=RN.dur[it.kind];if(it.kind==='jet'){s.vy=0;s.roll=0;let l=s.lane;const v0=rnSpeed(s.t)*1.12;for(let z=s.z+12;z<s.z+v0*RN.dur.jet-6;z+=2.6){if(s.R()<0.06)l=Math.max(0,Math.min(2,l+(s.R()<0.5?-1:1)));s.coinsL.push({id:s.nid++,lane:l,z,y:RN.jetY+0.6})}}s.ev.push({k:'item',p:it.kind,id:it.id})}}
@@ -6329,7 +6334,7 @@ function rnBot(s){
 }
 
 /* ---------- YUGUR: 3D shahar, egilgan dunyo, qahramon, boshqaruv ---------- */
-let RNS=null,rnR=null,rnRAF=null,rnSt='menu',rnAud=null,rnTrauma=0,rnHint=0;
+let rnStreak=0,rnStreakT=0,RNS=null,rnR=null,rnRAF=null,rnSt='menu',rnAud=null,rnTrauma=0,rnHint=0;
 const rnProg=()=>store.get('rn_p',{best:0,coins:0,games:0});
 const RN_PW={magnet:['🧲',()=>KT('Magnit','Магнит','Magnet')],jet:['🚀',()=>KT('Reaktiv ryukzak','Реактивный ранец','Jetpack')],shoe:['👟',()=>KT('Sakrovchi krossovka','Супер-кроссовки','Super sneakers')],x2:['✖2',()=>KT('2× ochko','2× очки','2× score')],shield:['🛡',()=>KT('Qalqon','Щит','Shield')]};
 function rnDispose(){cancelAnimationFrame(rnRAF);if(rnR){try{rnR.dispose()}catch(e){}rnR=null}}
@@ -6424,7 +6429,7 @@ function rnLoop(){
     if(rnSt==='run'){acc+=dt;while(acc>=1/120){rnStep(RNS,1/120);acc-=1/120;if(!RNS.alive)break}}
     // hodisalar: ovoz, effekt
     for(const e of RNS.ev.splice(0)){rnR.fx(e);
-      if(e.k==='coin')rnSnd('coin');else if(e.k==='jump')rnSnd('jump');else if(e.k==='roll')rnSnd('roll');else if(e.k==='land')rnSnd('land');
+      if(e.k==='coin'){const n=performance.now();rnStreak=n-rnStreakT<350?Math.min(12,rnStreak+1):0;rnStreakT=n;rnSnd('coin',rnStreak)}else if(e.k==='magPull'){}else if(e.k==='jump')rnSnd('jump');else if(e.k==='roll')rnSnd('roll');else if(e.k==='land')rnSnd('land');
       else if(e.k==='item'){rnSnd('item');rnToast(RN_PW[e.p][0]+' '+RN_PW[e.p][1]());haptic('light')}
       else if(e.k==='stumble'){rnSnd('stumble');rnTrauma=Math.min(1,rnTrauma+0.55);haptic('medium')}
       else if(e.k==='shield'){rnSnd('shield');rnTrauma=Math.min(1,rnTrauma+0.5)}
@@ -6574,6 +6579,11 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
   const legL=limb(-0.15,0.86,0.42,pants,0.19,true),legR=limb(0.15,0.86,0.42,pants,0.19,true),armL=limb(-0.36,1.44,0.3,hood,0.15,false),armR=limb(0.36,1.44,0.3,hood,0.15,false);
   const jet=new T.Group();jet.position.set(0,1.15,-0.38);body.add(jet);part(new T.CylinderGeometry(1,1,1,10),ML({color:0x9aa3ad}),0.11,0.5,0.11,-0.13,0,0,jet);part(new T.CylinderGeometry(1,1,1,10),ML({color:0x9aa3ad}),0.11,0.5,0.11,0.13,0,0,jet);
   const flameM=bend(new T.MeshBasicMaterial({color:0xffa22e,transparent:true,opacity:0.9}));const flames=[-0.13,0.13].map(x=>{const f=new T.Mesh(new T.ConeGeometry(0.1,0.5,8),flameM);f.rotation.x=Math.PI;f.position.set(x,-0.5,0);jet.add(f);return f});jet.visible=false;
+  const magG=new T.Group();{const mr=ML({color:0xd8322a}),mt=ML({color:0xdfe4ea});const u=new T.Mesh(new T.TorusGeometry(0.16,0.065,8,18,Math.PI),mr);u.rotation.z=Math.PI;magG.add(u);
+    for(const sg of [-1,1]){const t=new T.Mesh(rbox,mt);t.scale.set(0.13,0.12,0.13);t.position.set(sg*0.16,0.05,0);magG.add(t)}}
+  magG.position.set(0,-0.42,0.12);magG.rotation.x=-1.2;armR.k.add(magG);magG.visible=false;
+  const waveM=bend(new T.MeshBasicMaterial({color:0xff5a4a,transparent:true,opacity:0.5,depthWrite:false,side:T.DoubleSide}));
+  const waves=[0,1,2].map(i=>{const w=new T.Mesh(new T.RingGeometry(0.9,1.0,32),waveM.clone());w.rotation.x=-Math.PI/2;w.position.y=0.15;hero.add(w);return w});
   const bubble=new T.Mesh(new T.SphereGeometry(1.15,20,14),bend(new T.MeshBasicMaterial({color:0x6fe0ff,transparent:true,opacity:0.18,depthWrite:false})));bubble.position.y=0.95;hero.add(bubble);
   const blob=new T.Mesh(new T.CircleGeometry(0.5,20),bend(new T.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.3,depthWrite:false})));blob.rotation.x=-Math.PI/2;sc.add(blob);
   // qorovul
@@ -6609,7 +6619,7 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
     for(const [id,m] of OM)if(!alive.has(id)&&!(s.obs.find(o=>o.id===id&&!o.dead&&o.z0-pz>240))){sc.remove(m);OM.delete(id)}
     // tangalar
     let ci=0;const spin=performance.now()/1000*3;
-    for(const c of s.coinsL){if(c.got||c.z-pz>200||c.z-pz<-5)continue;if(ci>=coinPool.length)break;const m=coinPool[ci++];m.visible=true;m.position.set(RN.lanes[c.lane],c.y,c.z-pz);m.rotation.y=spin+c.z*0.3}
+    for(const c of s.coinsL){if(c.got||c.z-pz>200||c.z-pz<-5)continue;if(ci>=coinPool.length)break;const m=coinPool[ci++];m.visible=true;if(c.fly){m.position.set(c.fx,c.y,c.z-pz);m.rotation.y=spin*4;m.scale.setScalar(0.85);if(Math.random()<0.35)spark(c.fx,c.y,c.z-pz,1,0xffe27a,0.35)}else{m.position.set(RN.lanes[c.lane],c.y,c.z-pz);m.rotation.y=spin+c.z*0.3;m.scale.setScalar(1)}}
     for(;ci<coinPool.length;ci++)coinPool[ci].visible=false;
     // bonuslar
     const seen=new Set();
@@ -6630,7 +6640,8 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
     else{legL.p.rotation.x=-a*k;legR.p.rotation.x=a*k;legL.k.rotation.x=Math.max(0,a)*1.3+0.1;legR.k.rotation.x=Math.max(0,-a)*1.3+0.1;
       armL.p.rotation.x=a*0.9;armR.p.rotation.x=-a*0.9;armL.k.rotation.x=-0.9;armR.k.rotation.x=-0.9;body.position.y+=Math.abs(Math.cos(phase))*0.06}
     if(!s.alive&&s.crash!=='caught'){body.rotation.x=-1.2;body.position.y=0.3}
-    jet.visible=s.pw.jet>0;flames.forEach(f=>f.scale.set(1,0.8+Math.random()*0.6,1));
+    jet.visible=s.pw.jet>0;const mgOn=s.pw.magnet>0;magG.visible=mgOn;if(mgOn){armR.p.rotation.x=-1.3;armR.k.rotation.x=-0.2}
+    waves.forEach((w,i)=>{w.visible=mgOn;const k=((spin*0.45+i/3)%1);w.scale.setScalar(0.6+k*4.5);w.material.opacity=0.45*(1-k)*(s.pw.magnet<2?(Math.sin(spin*8)>0?1:0.2):1)});flames.forEach(f=>f.scale.set(1,0.8+Math.random()*0.6,1));
     bubble.visible=!!s.pw.shield||s.inv>0;bubble.material.opacity=s.inv>0?0.1+0.15*Math.abs(Math.sin(spin*6)):0.18;
     blob.position.set(hx,rnSurf(s,s.x,s.z)+0.02,0);blob.scale.setScalar(Math.max(0.3,1-(s.y-rnSurf(s,s.x,s.z))*0.12));
     // qorovul
@@ -6652,11 +6663,11 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
 }
 // ---------------- ovoz ----------------
 function rnCtx(){if(!store.get('rn_snd',true))return null;try{rnAud=rnAud||new (window.AudioContext||window.webkitAudioContext)();if(rnAud.state==='suspended')rnAud.resume();return rnAud}catch(e){return null}}
-function rnSnd(k){
+function rnSnd(k,n=0){
   const a=rnCtx();if(!a)return;const t=a.currentTime;
   const tone=(t0,f0,f1,dur,g,type='sine')=>{const o=a.createOscillator(),gn=a.createGain();o.type=type;o.frequency.setValueAtTime(f0,t0);o.frequency.exponentialRampToValueAtTime(f1,t0+dur);gn.gain.setValueAtTime(g,t0);gn.gain.exponentialRampToValueAtTime(0.001,t0+dur);o.connect(gn);gn.connect(a.destination);o.start(t0);o.stop(t0+dur+0.02)};
   const noise=(t0,dur,f,g)=>{const n=Math.floor(a.sampleRate*dur),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;const s=a.createBufferSource();s.buffer=b;const fl=a.createBiquadFilter();fl.type='lowpass';fl.frequency.value=f;const gn=a.createGain();gn.gain.setValueAtTime(g,t0);gn.gain.exponentialRampToValueAtTime(0.001,t0+dur);s.connect(fl);fl.connect(gn);gn.connect(a.destination);s.start(t0)};
-  if(k==='coin'){tone(t,1320,1320,0.07,0.12,'square');tone(t+0.06,1980,1980,0.12,0.1,'square')}
+  if(k==='coin'){const f=Math.pow(2,n/12);tone(t,1320*f,1320*f,0.06,0.1,'square');tone(t+0.05,1980*f,1980*f,0.1,0.08,'square')}
   else if(k==='jump')tone(t,320,760,0.18,0.18,'triangle');
   else if(k==='roll')noise(t,0.22,900,0.22);
   else if(k==='land')noise(t,0.08,400,0.25);
