@@ -4084,7 +4084,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108g';
+const APP_VER='20261108h';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -6339,6 +6339,7 @@ const rnProg=()=>store.get('rn_p',{best:0,coins:0,games:0});
 const RN_PW={magnet:['🧲',()=>KT('Magnit','Магнит','Magnet')],jet:['🚀',()=>KT('Reaktiv ryukzak','Реактивный ранец','Jetpack')],shoe:['👟',()=>KT('Sakrovchi krossovka','Супер-кроссовки','Super sneakers')],x2:['✖2',()=>KT('2× ochko','2× очки','2× score')],shield:['🛡',()=>KT('Qalqon','Щит','Shield')]};
 // ---- tayyor 3D modellar (Kenney, CC0): bir marta yuklanadi ----
 let RNA=null,RNAp=null,RN_FROT=0,RN_BROT=1,RN_HROT=0,RN_HBACK=1;
+const RN_MN=['cab','car','low','high','block','ramp','coin','magnet','jet','shoe','shield','apart','bazaar','mahalla','madrasa','choy','chinar','lamp','cart'];
 function rnHalf(h){const s=(h&0x8000)?-1:1,e=(h>>10)&31,f=h&1023;return e===0?s*Math.pow(2,-14)*(f/1024):e===31?(f?NaN:s*Infinity):s*Math.pow(2,e-15)*(1+f/1024)}
 function rnLoadAssets(){
   if(RNA)return Promise.resolve(RNA);if(RNAp)return RNAp;
@@ -6355,7 +6356,17 @@ function rnLoadAssets(){
   const scr=u=>new Promise((res,rej)=>{if(window.THREE_GLTFLoader)return res();const el=document.createElement('script');el.src=u+'?v='+APP_VER;el.onload=res;el.onerror=rej;document.head.appendChild(el)});
   // qahramon: Quaternius Universal Animation Library (CC0) — skelet va tayyor harakatlar
   const hero=scr('lib/three-gltf.js').then(()=>new window.THREE_GLTFLoader().loadAsync('rn/kid.glb?v='+APP_VER).then(g=>(g.kid=true,g),()=>new window.THREE_GLTFLoader().loadAsync('rn/hero.glb?v='+APP_VER))).catch(e=>{console.warn('hero',e);return null});
-  RNAp=Promise.all([kit('train'),kit('city'),hero]).then(([t,c,h])=>(RNA={t,c,hero:h}),e=>{RNAp=null;throw e});
+  // Toshkent to'plami (Meshy): poyezd, to'siqlar, tanga, bonuslar, binolar — yagona uslubda
+  const MROT={cab:-Math.PI/2,car:-Math.PI/2,ramp:Math.PI},CEN={coin:1,magnet:1,jet:1,shoe:1,shield:1};
+  const toF=a=>{const it=a.itemSize,f=new Float32Array(a.count*it);for(let i=0;i<a.count;i++){f[i*it]=a.getX(i);if(it>1)f[i*it+1]=a.getY(i);if(it>2)f[i*it+2]=a.getZ(i);if(it>3)f[i*it+3]=a.getW(i)}return new T.BufferAttribute(f,it)};
+  const mods=scr('lib/three-gltf.js').then(()=>{const L=new window.THREE_GLTFLoader();if(window.THREE_Meshopt)L.setMeshoptDecoder(window.THREE_Meshopt);
+    return Promise.all(RN_MN.map(k=>L.loadAsync('rn/m/'+k+'.glb?v='+APP_VER).then(g=>{let me=null;g.scene.updateMatrixWorld(true);g.scene.traverse(o=>{if(o.isMesh&&!me)me=o});
+      const geo=new T.BufferGeometry();for(const n of ['position','normal','uv'])if(me.geometry.attributes[n])geo.setAttribute(n,toF(me.geometry.attributes[n]));geo.setIndex(me.geometry.index?Array.from(me.geometry.index.array):null);
+      geo.applyMatrix4(me.matrixWorld);if(MROT[k])geo.rotateY(MROT[k]);if(!geo.attributes.normal)geo.computeVertexNormals();geo.computeBoundingBox();let b=geo.boundingBox;
+      geo.translate(-(b.min.x+b.max.x)/2,CEN[k]?-(b.min.y+b.max.y)/2:-b.min.y,-(b.min.z+b.max.z)/2);geo.computeBoundingBox();geo.computeBoundingSphere();
+      const sz=new T.Vector3();geo.boundingBox.getSize(sz);const map=me.material&&me.material.map;if(map){map.colorSpace=T.SRGBColorSpace;map.anisotropy=4}
+      return [k,{geo,map,s:sz}]},e=>{console.warn('rn/m',k,e);return [k,null]}))).then(a=>{const M={};for(const [k,v] of a)if(v)M[k]=v;return M})}).catch(()=>({}));
+  RNAp=Promise.all([kit('train'),kit('city'),hero,mods]).then(([t,c,h,m])=>(RNA={t,c,hero:h,m}),e=>{RNAp=null;throw e});
   return RNAp;
 }
 function rnDispose(){cancelAnimationFrame(rnRAF);if(rnR){try{rnR.dispose()}catch(e){}rnR=null}}
@@ -6491,6 +6502,11 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
 #endif`)};m.customProgramCacheKey=()=>'bend';return m};
   const cvT=(w,h,draw,rx=1,ry=1)=>{const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=4;return t};
   const ML=(o)=>bend(new T.MeshLambertMaterial(o)),MS=(o)=>bend(new T.MeshStandardMaterial(o));
+  // Meshy modellari: o'lchamga moslab joylash (har biri bitta tekstura, bitta material)
+  const RM=(RNA&&RNA.m)||{},MMc={};
+  const mMat=(k,o={})=>MMc[k]||(MMc[k]=ML(Object.assign({map:RM[k].map},o)));
+  const mm=(k,w,h,d)=>{const a=RM[k],m=new T.Mesh(a.geo,mMat(k));m.scale.set(w/a.s.x,h/a.s.y,d/a.s.z);return m};
+  const mmU=(k,size,ax='y')=>{const a=RM[k],m=new T.Mesh(a.geo,mMat(k));m.scale.setScalar(size/a.s[ax]);return m};
   // osmon
   {const g=new T.SphereGeometry(400,24,12),c=[],top=new T.Color(0x4f9be0),hor=new T.Color(FOG),p=g.attributes.position;
    for(let i=0;i<p.count;i++){const y=Math.max(0,p.getY(i)/400),cc=hor.clone().lerp(top,Math.pow(y,0.6));c.push(cc.r,cc.g,cc.b)}
@@ -6539,7 +6555,19 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   const pool=[],SPAN=260;
   function makeProp(i){const g=new T.Group(),sg=i%2?1:-1,R=Math.random;g.userData.sg=sg;
     const kind=R();
-    if(kind<0.16){ // gumbazli bino (madrasa uslubi)
+    if(RM.apart&&RM.chinar){
+      if(kind<0.3){ // chinorlar, fonar, meva aravasi
+        for(let k=0;k<2;k++){const t=mmU('chinar',6.5+R()*2.5);t.rotation.y=R()*6.3;t.position.set(-sg*k*2.2,0,k*4.5);g.add(t)}
+        if(RM.lamp){const l=mmU('lamp',5.2);l.position.set(-sg*3.4,0,2);g.add(l)}
+        if(RM.cart&&R()<0.5){const c=mmU('cart',2.8,'x');c.rotation.y=Math.PI/2*(R()<0.5?1:-1);c.position.set(-sg*2.6,0,7.5);g.add(c)}
+        g.userData.w=10;
+      }else{ // Toshkent binolari: madrasa, bozor, mahalla uyi, choyxona, ko'p qavatli uy
+        const list=['apart','bazaar','mahalla','madrasa','choy','apart','mahalla','madrasa'].filter(k=>RM[k]),k=list[(R()*list.length)|0],a=RM[k];
+        const fw={apart:9,bazaar:13,mahalla:11,madrasa:14,choy:9}[k]*(0.9+R()*0.2),sc0=fw/a.s.x;
+        const b=new T.Mesh(a.geo,mMat(k));b.scale.setScalar(sc0);b.rotation.y=-sg*Math.PI/2;g.add(b);
+        g.userData.w=a.s.x*sc0+1.5;g.userData.wd=a.s.z*sc0;
+      }
+    }else if(kind<0.16){ // gumbazli bino (madrasa uslubi)
       const b=new T.Mesh(boxG,FAC[1]);b.scale.set(7,7,9);b.position.y=3.5;g.add(b);
       const dr=new T.Mesh(cylG,ML({color:0xf2efe8}));dr.scale.set(2.6,1.6,2.6);dr.position.y=7.8;g.add(dr);
       const d=new T.Mesh(sphG,domeM);d.scale.set(2.6,3.2,2.6);d.position.y=8.6;g.add(d);
@@ -6580,7 +6608,11 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     for(let i=0;i<n;i++){const k=i===0?set[0]:i===n-1?set[2]:set[1];const m=new T.Mesh(RNA.t.G[k],KT_);m.scale.set(sx,sy,sz);m.position.z=(i+0.5)*seg*sz;if(i===0)m.rotation.y=RN_FROT;if(i===n-1&&n>1)m.rotation.y=RN_FROT+Math.PI;g.add(m)}
     if(o.type==='mtrain')for(const sg of [-1,1]){const l=new T.Mesh(new T.CircleGeometry(0.16,14),glow);l.position.set(sg*0.6,1.0,-0.05);l.rotation.y=Math.PI;g.add(l)}
     return shadowy(g)}
-  function trainMesh(o){if(RNA)return trainK(o);const g=new T.Group(),[c1,c2]=trainCol[o.id%trainCol.length],L=o.z1-o.z0,cars=Math.max(1,Math.round(L/RN.car)),cl=L/cars;
+  function trainM(o){const g=new T.Group(),L=o.z1-o.z0,n=Math.max(1,Math.round(L/10.5)),cl=L/n;
+    for(let i=0;i<n;i++){const end=i===0||i===n-1,m=mm(end?'cab':'car',1.98,RN.trainH,cl-0.3);m.position.z=i*cl+cl/2;if(i===n-1&&n>1)m.rotation.y=Math.PI;g.add(m)}
+    if(o.type==='mtrain')for(const sg of [-1,1]){const l=new T.Mesh(new T.CircleGeometry(0.17,14),glow);l.position.set(sg*0.62,1.0,-0.08);l.rotation.y=Math.PI;g.add(l)}
+    return shadowy(g)}
+  function trainMesh(o){if(RM.cab&&RM.car)return trainM(o);if(RNA)return trainK(o);const g=new T.Group(),[c1,c2]=trainCol[o.id%trainCol.length],L=o.z1-o.z0,cars=Math.max(1,Math.round(L/RN.car)),cl=L/cars;
     const bodyM=MS({color:c1,roughness:0.45,metalness:0.15}),strM=MS({color:c2,roughness:0.5});
     for(let i=0;i<cars;i++){const cz=i*cl+cl/2,len=cl-0.45;
       const b=new T.Mesh(rbx(1.94,2.9,len,0.32),bodyM);b.position.set(0,2.05,cz);g.add(b);
@@ -6598,12 +6630,16 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     return shadowy(g)}
   const rampT=cvT(64,256,(x,w,h)=>{x.fillStyle='#d9a21a';x.fillRect(0,0,w,h);x.fillStyle='#2b2b2b';for(let y=0;y<h;y+=32)x.fillRect(0,y,w,12)});
   function rampMesh(o){const L=o.z1-o.z0,a=Math.atan2(RN.trainH,L),g=new T.Group();
+    if(RM.ramp){const m=mm('ramp',1.95,RN.trainH,L);m.position.z=L/2;g.add(m);return shadowy(g)}
     const m=new T.Mesh(boxG,ML({map:rampT}));m.scale.set(1.9,0.2,Math.hypot(L,RN.trainH));m.rotation.x=-a;m.position.set(0,RN.trainH/2,L/2);g.add(m);
     const s=new T.Mesh(new T.BufferGeometry(),ML({color:0x7a6a4a}));const sh=new T.Shape();sh.moveTo(0,0);sh.lineTo(L,0);sh.lineTo(L,RN.trainH);sh.closePath();
     const eg=new T.ExtrudeGeometry(sh,{depth:1.7,bevelEnabled:false});eg.rotateY(-Math.PI/2);eg.translate(0.85,0,0);s.geometry=eg;g.add(s);return shadowy(g)}
   const stripeT=cvT(128,32,(x,w,h)=>{for(let i=0;i<8;i++){x.fillStyle=i%2?'#ffffff':'#e03a2f';x.beginPath();x.moveTo(i*16,0);x.lineTo(i*16+16,0);x.lineTo(i*16,h);x.lineTo(i*16-16,h);x.fill()}x.fillStyle='#e03a2f';x.fillRect(0,0,6,h)});
   const stripeM=ML({map:stripeT}),postM=ML({color:0xdedede});
   function barMesh(o){const g=new T.Group();
+    if(o.type==='low'&&RM.low){g.add(mm('low',1.98,1.05,0.6));return shadowy(g)}
+    if(o.type==='high'&&RM.high){g.add(mm('high',2.08,2.45,0.35));return shadowy(g)}
+    if(o.type==='block'&&RM.block){g.add(mm('block',1.98,RN.blockH,0.95));return shadowy(g)}
     if(o.type==='low'){const b=new T.Mesh(boxG,stripeM);b.scale.set(1.9,0.45,0.18);b.position.y=RN.low-0.25;g.add(b);
       for(const sg of [-1,1]){const p=new T.Mesh(boxG,postM);p.scale.set(0.12,RN.low,0.12);p.position.set(sg*0.85,RN.low/2,0);g.add(p);const ft=new T.Mesh(boxG,postM);ft.scale.set(0.15,0.08,0.7);ft.position.set(sg*0.85,0.04,0);g.add(ft)}}
     else if(o.type==='high'){const b=new T.Mesh(boxG,stripeM);b.scale.set(1.95,0.55,0.2);b.position.y=RN.highY+0.32;g.add(b);
@@ -6619,7 +6655,15 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   // tangalar (hovuz)
   const coinG=new T.CylinderGeometry(0.42,0.42,0.09,22);coinG.rotateZ(Math.PI/2);
   const coinM=MS({color:0xffcf2e,metalness:0.3,roughness:0.35,emissive:0xb07a00,emissiveIntensity:0.55});const coinRim=ML({color:0xffe680,emissive:0x8a5a00});
-  const coinPool=[];for(let i=0;i<180;i++){const m=new T.Mesh(coinG,coinM);m.visible=false;sc.add(m);coinPool.push(m)}
+  const coinPool=[];let coinIM=null;const cO=new T.Object3D();
+  if(RM.coin){coinIM=new T.InstancedMesh(RM.coin.geo,mMat('coin',{emissive:0x8a6c00}),180);coinIM.count=0;coinIM.frustumCulled=false;sc.add(coinIM)}
+  else for(let i=0;i<180;i++){const m=new T.Mesh(coinG,coinM);m.visible=false;sc.add(m);coinPool.push(m)}
+  const coinSc=RM.coin?0.9/RM.coin.s.x:1;
+  // bonuslar: 3D model + porlash
+  const glowT=cvT(128,128,(x)=>{const g=x.createRadialGradient(64,64,6,64,64,62);g.addColorStop(0,'rgba(255,246,200,.95)');g.addColorStop(0.55,'rgba(255,190,60,.55)');g.addColorStop(1,'rgba(255,140,0,0)');x.fillStyle=g;x.fillRect(0,0,128,128)});
+  const itemMesh=k=>{const key={magnet:'magnet',jet:'jet',shoe:'shoe',shield:'shield'}[k];if(!key||!RM[key])return null;const g=new T.Group(),a=RM[key],m=new T.Mesh(a.geo,mMat(key,{emissive:0x222222}));
+    m.scale.setScalar(1.15/Math.max(a.s.x,a.s.y,a.s.z));if(key==='magnet')m.rotation.x=Math.PI/2;g.add(m);
+    const gl=new T.Sprite(new T.SpriteMaterial({map:glowT,transparent:true,depthWrite:false}));gl.scale.setScalar(1.9);gl.position.z=0.3;g.add(gl);return g};
   // bonus belgilari
   const itemT={};for(const k of Object.keys(RN_PW))itemT[k]=cvT(128,128,(x,w,h)=>{const g=x.createRadialGradient(64,64,10,64,64,62);g.addColorStop(0,'#fff6c8');g.addColorStop(0.7,'#ffb52e');g.addColorStop(1,'rgba(255,140,0,0)');x.fillStyle=g;x.beginPath();x.arc(64,64,62,0,7);x.fill();
     x.font='bold 64px system-ui,Apple Color Emoji,Segoe UI Emoji';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#3b2400';x.fillText(RN_PW[k][0],64,68)});
@@ -6723,13 +6767,15 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     for(const o of s.obs){if(o.dead||o.z1-pz<-20||o.z0-pz>240)continue;alive.add(o.id);const m=objMesh(o);m.position.z=o.z0-pz}
     for(const [id,m] of OM)if(!alive.has(id)&&!(s.obs.find(o=>o.id===id&&!o.dead&&o.z0-pz>240))){sc.remove(m);OM.delete(id)}
     // tangalar
-    let ci=0;const spin=performance.now()/1000*3;
-    for(const c of s.coinsL){if(c.got||c.z-pz>200||c.z-pz<-5)continue;if(ci>=coinPool.length)break;const m=coinPool[ci++];m.visible=true;if(c.fly){m.position.set(c.fx,c.y,c.z-pz);m.rotation.y=spin*4;m.scale.setScalar(0.85);if(Math.random()<0.35)spark(c.fx,c.y,c.z-pz,1,0xffe27a,0.35)}else{m.position.set(RN.lanes[c.lane],c.y,c.z-pz);m.rotation.y=spin+c.z*0.3;m.scale.setScalar(1)}}
-    for(;ci<coinPool.length;ci++)coinPool[ci].visible=false;
+    let ci=0;const spin=performance.now()/1000*3,cap=coinIM?180:coinPool.length;
+    for(const c of s.coinsL){if(c.got||c.z-pz>200||c.z-pz<-5)continue;if(ci>=cap)break;const m=coinIM?cO:coinPool[ci];ci++;m.visible=true;
+      if(c.fly){m.position.set(c.fx,c.y,c.z-pz);m.rotation.y=spin*4;m.scale.setScalar(0.85*coinSc);if(Math.random()<0.35)spark(c.fx,c.y,c.z-pz,1,0xffe27a,0.35)}else{m.position.set(RN.lanes[c.lane],c.y,c.z-pz);m.rotation.y=spin+c.z*0.3;m.scale.setScalar(coinSc)}
+      if(coinIM){cO.updateMatrix();coinIM.setMatrixAt(ci-1,cO.matrix)}}
+    if(coinIM){coinIM.count=ci;coinIM.instanceMatrix.needsUpdate=true}else for(;ci<coinPool.length;ci++)coinPool[ci].visible=false;
     // bonuslar
     const seen=new Set();
-    for(const it of s.items){if(it.got)continue;seen.add(it.id);let m=IM.get(it.id);if(!m){m=new T.Sprite(new T.SpriteMaterial({map:itemT[it.kind],transparent:true}));m.scale.setScalar(1.3);sc.add(m);IM.set(it.id,m)}
-      m.position.set(RN.lanes[it.lane],1.1+Math.sin(spin*1.3)*0.15,it.z-pz)}
+    for(const it of s.items){if(it.got)continue;seen.add(it.id);let m=IM.get(it.id);if(!m){m=itemMesh(it.kind)||new T.Sprite(new T.SpriteMaterial({map:itemT[it.kind],transparent:true}));if(m.isSprite)m.scale.setScalar(1.3);sc.add(m);IM.set(it.id,m)}
+      m.position.set(RN.lanes[it.lane],1.1+Math.sin(spin*1.3)*0.15,it.z-pz);if(!m.isSprite){m.children[0].rotation.y=spin*0.9}}
     for(const [id,m] of IM)if(!seen.has(id)){sc.remove(m);IM.delete(id)}
     // qahramon
     const air=s.y>rnSurf(s,s.x,s.z)+0.05||s.pw.jet>0;
