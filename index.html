@@ -4084,7 +4084,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108d';
+const APP_VER='20261108e';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -6337,6 +6337,24 @@ function rnBot(s){
 let rnStreak=0,rnStreakT=0,RNS=null,rnR=null,rnRAF=null,rnSt='menu',rnAud=null,rnTrauma=0,rnHint=0;
 const rnProg=()=>store.get('rn_p',{best:0,coins:0,games:0});
 const RN_PW={magnet:['🧲',()=>KT('Magnit','Магнит','Magnet')],jet:['🚀',()=>KT('Reaktiv ryukzak','Реактивный ранец','Jetpack')],shoe:['👟',()=>KT('Sakrovchi krossovka','Супер-кроссовки','Super sneakers')],x2:['✖2',()=>KT('2× ochko','2× очки','2× score')],shield:['🛡',()=>KT('Qalqon','Щит','Shield')]};
+// ---- tayyor 3D modellar (Kenney, CC0): bir marta yuklanadi ----
+let RNA=null,RNAp=null,RN_FROT=0,RN_BROT=1;
+function rnHalf(h){const s=(h&0x8000)?-1:1,e=(h>>10)&31,f=h&1023;return e===0?s*Math.pow(2,-14)*(f/1024):e===31?(f?NaN:s*Infinity):s*Math.pow(2,e-15)*(1+f/1024)}
+function rnLoadAssets(){
+  if(RNA)return Promise.resolve(RNA);if(RNAp)return RNAp;
+  const T=window.THREE,get=(u,t)=>fetch(u+'?v='+APP_VER).then(r=>{if(!r.ok)throw 0;return t==='j'?r.json():r.arrayBuffer()});
+  const tex=u=>new Promise((res,rej)=>new T.TextureLoader().load(u+'?v='+APP_VER,t=>{t.colorSpace=T.SRGBColorSpace;t.flipY=false;t.magFilter=T.LinearFilter;res(t)},undefined,rej));
+  const kit=n=>Promise.all([get('rn/'+n+'.json','j'),get('rn/'+n+'.bin'),tex('rn/'+n+'.png')]).then(([idx,bin,tx])=>{const G={};
+    for(const [k,e] of Object.entries(idx)){const g=new T.BufferGeometry();
+      g.setAttribute('position',new T.BufferAttribute(new Float32Array(bin,e.p,e.v*3),3));
+      g.setAttribute('normal',new T.BufferAttribute(new Int8Array(bin,e.n,e.v*3),3,true));
+      const h=new Uint16Array(bin,e.u,e.v*2),uv=new Float32Array(e.v*2);for(let i=0;i<uv.length;i++)uv[i]=rnHalf(h[i]);g.setAttribute('uv',new T.BufferAttribute(uv,2));
+      g.setIndex(new T.BufferAttribute(e.b===32?new Uint32Array(bin,e.x,e.i):new Uint16Array(bin,e.x,e.i),1));
+      g.userData={min:e.min,max:e.max};G[k]=g}
+    return {G,tx}});
+  RNAp=Promise.all([kit('train'),kit('city')]).then(([t,c])=>(RNA={t,c}),e=>{RNAp=null;throw e});
+  return RNAp;
+}
 function rnDispose(){cancelAnimationFrame(rnRAF);if(rnR){try{rnR.dispose()}catch(e){}rnR=null}}
 function viewYugur(){
   rnDispose();document.body.classList.remove('rn-play');try{tg&&tg.enableVerticalSwipes&&tg.enableVerticalSwipes()}catch(e){}
@@ -6368,7 +6386,7 @@ function rnGameV(){
     <div id="rnend"></div></div>`;
   $('#rnback').onclick=()=>rnPause();
   rnHud();
-  blLoad3().then(ok=>{
+  blLoad3().then(ok=>ok?rnLoadAssets().then(()=>ok,()=>ok):ok).then(ok=>{
     if(!$('#rnstage')||rnR)return;const v=$('#rnview');v.innerHTML='';
     if(!ok){v.innerHTML=`<div class="rn-load">${KT("Qurilmangiz 3D ni qo'llamaydi",'Устройство не поддерживает 3D','3D is not supported')}</div>`;return}
     try{rnR=rnMake3D(v)}catch(e){console.error(e);v.innerHTML='<div class="rn-load">3D xato</div>';return}
@@ -6490,9 +6508,15 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   const trackT=cvT(512,256,(x,w,h)=>{x.fillStyle='#8c7b66';x.fillRect(0,0,w,h);
     for(let i=0;i<5000;i++){const v=110+Math.random()*90|0;x.fillStyle=`rgb(${v},${v-8},${v-20})`;x.fillRect(Math.random()*w,Math.random()*h,2+Math.random()*3,2+Math.random()*3)}
     const lx=l=>(0.5+RN.lanes[l]/9)*w;
-    for(const l of [0,1,2]){for(let j=0;j<4;j++){const y=j*h/4+8;x.fillStyle='#5a4130';x.fillRect(lx(l)-46,y,92,22);x.fillStyle='rgba(0,0,0,.25)';x.fillRect(lx(l)-46,y+18,92,4)}
+    if(!RNA)for(const l of [0,1,2]){for(let j=0;j<4;j++){const y=j*h/4+8;x.fillStyle='#5a4130';x.fillRect(lx(l)-46,y,92,22);x.fillStyle='rgba(0,0,0,.25)';x.fillRect(lx(l)-46,y+18,92,4)}
       for(const sg of [-1,1]){x.fillStyle='#55585e';x.fillRect(lx(l)+sg*26-4,0,8,h);x.fillStyle='#d8dde3';x.fillRect(lx(l)+sg*26-2,0,3,h)}}});
   trackT.repeat.set(1,1);
+  const KT_=RNA?ML({map:RNA.t.tx}):null,KC=RNA?ML({map:RNA.c.tx}):null;
+  // Kenney rels plitkalari (har yo'lakka), yo'l bilan birga suriladi
+  const TK=2.2;let rails=null;
+  if(RNA){const n=124,im=new T.InstancedMesh(RNA.t.G['track-detailed'],KT_,n*3),o=new T.Object3D();let k=0;
+    for(const l of [0,1,2])for(let i=0;i<n;i++){o.position.set(RN.lanes[l],0.01,-20+i*TK);o.scale.set(1.9,1.3,TK);o.updateMatrix();im.setMatrixAt(k++,o.matrix)}
+    im.receiveShadow=true;rails=new T.Group();rails.add(im);sc.add(rails)}
   const trackG=new T.PlaneGeometry(9,300,1,60);trackG.rotateX(-Math.PI/2);trackG.translate(0,0,140);
   // UV ni metrga moslash
   {const uv=trackG.attributes.uv,p=trackG.attributes.position;for(let i=0;i<uv.count;i++)uv.setY(i,p.getZ(i)/TL)}
@@ -6524,6 +6548,10 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
         const c=new T.Mesh(icoG,leafM);const s=2.2+R()*1.2;c.scale.set(s,s*1.1,s);c.position.set(-sg*k*2,4.2+s*0.4,k*4);g.add(c)}
       const p=new T.Mesh(cylG,poleM);p.scale.set(0.08,5,0.08);p.position.set(-sg*3.2,2.5,2);g.add(p);
       const l=new T.Mesh(boxG,lampM);l.scale.set(0.9,0.2,0.4);l.position.set(-sg*2.8,5,2);g.add(l);g.userData.w=9;
+    }else if(RNA){ // Kenney binolari
+      const sky=R()<0.22,ks=sky?['a','b','c','d','e'].map(x=>'building-skyscraper-'+x):'abcdefghijklmn'.split('').map(x=>'building-'+x),key=ks[(R()*ks.length)|0],G=RNA.c.G[key],sc0=sky?7:9.5;
+      const b=new T.Mesh(G,KC);b.scale.setScalar(sc0);b.rotation.y=sg*Math.PI/2*RN_BROT;g.add(b);
+      const mn=G.userData.min,mx=G.userData.max;g.userData.w=(mx[0]-mn[0])*sc0+1;g.userData.wd=(mx[2]-mn[2])*sc0;
     }else{ // ko'p qavatli bino
       const hgt=6+R()*14,wd=6+R()*4,dp=7+R()*6;const b=new T.Mesh(boxG,FAC[(R()*FAC.length)|0]);b.scale.set(wd,hgt,dp);b.position.y=hgt/2;g.add(b);
       const r=new T.Mesh(boxG,roofM);r.scale.set(wd+0.4,0.5,dp+0.4);r.position.y=hgt+0.25;g.add(r);
@@ -6544,7 +6572,12 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     x.fillStyle='#222';x.fillRect(96,150,64,58);x.fillStyle='#ffde59';x.fillRect(104,158,48,12);});
   const blackM=ML({color:0x23262b}),steelM=MS({color:0xa9b1ba,metalness:0.6,roughness:0.4}),sideMat=ML({map:sideTr,transparent:true}),faceM=ML({map:faceT,transparent:true}),glow=bend(new T.MeshBasicMaterial({color:0xfff6c0})),redL=bend(new T.MeshBasicMaterial({color:0xff4a3a}));
   const wheelG=new T.CylinderGeometry(0.36,0.36,0.18,16);wheelG.rotateZ(Math.PI/2);
-  function trainMesh(o){const g=new T.Group(),[c1,c2]=trainCol[o.id%trainCol.length],L=o.z1-o.z0,cars=Math.max(1,Math.round(L/RN.car)),cl=L/cars;
+  function trainK(o){const g=new T.Group(),L=o.z1-o.z0,seg=2.6,sy=RN.trainH/1.5712,sx=1.95/1.1,n=Math.max(2,Math.round(L/(seg*sy))),sz=L/(n*seg);
+    const set=o.id%2?['train-electric-subway-a','train-electric-subway-b','train-electric-subway-c']:['train-electric-city-a','train-electric-city-b','train-electric-city-c'];
+    for(let i=0;i<n;i++){const k=i===0?set[0]:i===n-1?set[2]:set[1];const m=new T.Mesh(RNA.t.G[k],KT_);m.scale.set(sx,sy,sz);m.position.z=(i+0.5)*seg*sz;if(i===0)m.rotation.y=RN_FROT;if(i===n-1&&n>1)m.rotation.y=RN_FROT+Math.PI;g.add(m)}
+    if(o.type==='mtrain')for(const sg of [-1,1]){const l=new T.Mesh(new T.CircleGeometry(0.16,14),glow);l.position.set(sg*0.6,1.0,-0.05);l.rotation.y=Math.PI;g.add(l)}
+    return shadowy(g)}
+  function trainMesh(o){if(RNA)return trainK(o);const g=new T.Group(),[c1,c2]=trainCol[o.id%trainCol.length],L=o.z1-o.z0,cars=Math.max(1,Math.round(L/RN.car)),cl=L/cars;
     const bodyM=MS({color:c1,roughness:0.45,metalness:0.15}),strM=MS({color:c2,roughness:0.5});
     for(let i=0;i<cars;i++){const cz=i*cl+cl/2,len=cl-0.45;
       const b=new T.Mesh(rbx(1.94,2.9,len,0.32),bodyM);b.position.set(0,2.05,cz);g.add(b);
@@ -6648,7 +6681,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     const s=RNS,pz=s.z+s.v*ex,hx=s.x+(s.vx||0)*ex,hy=Math.max(rnSurf(s,s.x,s.z),s.y+s.vy*ex);U.uCZ.value=-7;
     // egilish: yo'l uzoqda yon tomonga ham sekin buriladi
     U.uBX.value=Math.sin(pz/260)*0.0012;
-    trackT.offset.y=(pz/TL)%1;sideT.offset.y=(pz/6)%1;
+    trackT.offset.y=(pz/TL)%1;if(rails)rails.position.z=-(pz%TK);sideT.offset.y=(pz/6)%1;
     for(const g of pool){let z=g.userData.z-pz;if(z<-30){g.userData.z+=propSpan;z+=propSpan}g.position.z=z}
     // to'siqlar
     const alive=new Set();
