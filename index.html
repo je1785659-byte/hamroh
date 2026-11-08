@@ -747,6 +747,8 @@ body.rn-play nav.tabs{display:none}
 @keyframes rnpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 .rn-done span{color:#2ea44f}
 .rn-bd .btn{width:auto;flex:none;padding:10px 16px}.rn-bd>div:nth-child(2){min-width:0}
+.rn-q{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.rn-q .chip{padding:9px 4px;font-size:13px}.rn-q .chip.on{background:var(--accent,#1fa7b8);color:#fff;border-color:transparent}
+.rn-qh{display:block;margin-top:8px;font-size:12px;opacity:.65}
 body[data-sec="ov"]{--sec-a:#1f2d16;--sec-b:#5a6b2a;--sec:#6b7d2e}
 body.hu-play nav.tabs{display:none}
 .hu-lvls{display:grid;gap:8px}
@@ -4103,7 +4105,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108l';
+const APP_VER='20261108m';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -6388,7 +6390,7 @@ function rnLogin(st,day){
 }
 
 /* ---------- YUGUR: 3D shahar, egilgan dunyo, qahramon, boshqaruv ---------- */
-let rnStreak=0,rnStreakT=0,RNS=null,rnR=null,rnRAF=null,rnSt='menu',rnAud=null,rnTrauma=0,rnHint=0;
+let rnPerfSent=0,rnLoadMs=0,rnLoadT0=0,rnStreak=0,rnStreakT=0,RNS=null,rnR=null,rnRAF=null,rnSt='menu',rnAud=null,rnTrauma=0,rnHint=0;
 const rnProg=()=>store.get('rn_p',{best:0,coins:0,games:0});
 // qahramonlar do'koni: tangalarga yangi qahramon
 const RN_SK=[{id:'kid',p:0,n:()=>'Jasur',d:()=>KT("Doppili bola — sizning birinchi qahramoningiz",'Мальчик в тюбетейке — ваш первый герой','Boy in a doppi — your first hero')},
@@ -6405,14 +6407,15 @@ const rnSkin=()=>{const k=store.get('rn_skin','kid');return rnOwn().includes(k)&
 const RN_PW={board:['🛹',()=>KT('Skeyt','Скейт','Skateboard')],magnet:['🧲',()=>KT('Magnit','Магнит','Magnet')],jet:['🚀',()=>KT('Reaktiv ryukzak','Реактивный ранец','Jetpack')],shoe:['👟',()=>KT('Sakrovchi krossovka','Супер-кроссовки','Super sneakers')],x2:['✖2',()=>KT('2× ochko','2× очки','2× score')],shield:['🛡',()=>KT('Qalqon','Щит','Shield')]};
 // ---- tayyor 3D modellar (Kenney, CC0): bir marta yuklanadi ----
 let RNA=null,RNAp=null,RN_FROT=0,RN_BROT=1,RN_HROT=0,RN_HBACK=1;
+const RN_AV='m4',RN_LO=['coin','cab','car','apart','bazaar','mahalla','madrasa','choy','chinar','cart','low','high','block','ramp'];
 const RN_MN=['board','cab','car','low','high','block','ramp','coin','magnet','jet','shoe','shield','apart','bazaar','mahalla','madrasa','choy','chinar','lamp','cart'];
 function rnHalf(h){const s=(h&0x8000)?-1:1,e=(h>>10)&31,f=h&1023;return e===0?s*Math.pow(2,-14)*(f/1024):e===31?(f?NaN:s*Infinity):s*Math.pow(2,e-15)*(1+f/1024)}
 function rnLoadAssets(){
   if(RNA&&RNA.skin!==rnSkin()){ // boshqa qahramon tanlangan: faqat uni yuklaymiz
-    const sk=rnSkin();return RNAp=new window.THREE_GLTFLoader().loadAsync('rn/'+sk+'.glb?v='+APP_VER).then(g=>{g.kid=true;RNA.hero=g;RNA.skin=sk;return RNA},()=>RNA)}
+    const sk=rnSkin();return RNAp=new window.THREE_GLTFLoader().loadAsync('rn/'+sk+'.glb?v='+RN_AV).then(g=>{g.kid=true;RNA.hero=g;RNA.skin=sk;return RNA},()=>RNA)}
   if(RNA)return Promise.resolve(RNA);if(RNAp)return RNAp;
-  const T=window.THREE,get=(u,t)=>fetch(u+'?v='+APP_VER).then(r=>{if(!r.ok)throw 0;return t==='j'?r.json():r.arrayBuffer()});
-  const tex=u=>new Promise((res,rej)=>new T.TextureLoader().load(u+'?v='+APP_VER,t=>{t.colorSpace=T.SRGBColorSpace;t.flipY=false;t.magFilter=T.LinearFilter;res(t)},undefined,rej));
+  const T=window.THREE,get=(u,t)=>fetch(u+'?v='+RN_AV).then(r=>{if(!r.ok)throw 0;return t==='j'?r.json():r.arrayBuffer()});
+  const tex=u=>new Promise((res,rej)=>new T.TextureLoader().load(u+'?v='+RN_AV,t=>{t.colorSpace=T.SRGBColorSpace;t.flipY=false;t.magFilter=T.LinearFilter;res(t)},undefined,rej));
   const kit=n=>Promise.all([get('rn/'+n+'.json','j'),get('rn/'+n+'.bin'),tex('rn/'+n+'.png')]).then(([idx,bin,tx])=>{const G={};
     for(const [k,e] of Object.entries(idx)){const g=new T.BufferGeometry();
       g.setAttribute('position',new T.BufferAttribute(new Float32Array(bin,e.p,e.v*3),3));
@@ -6425,22 +6428,28 @@ function rnLoadAssets(){
   const scr=u=>new Promise((res,rej)=>{if(window.THREE_GLTFLoader)return res();const el=document.createElement('script');el.src=u+'?v='+APP_VER;el.onload=res;el.onerror=rej;document.head.appendChild(el)});
   // qahramon: Quaternius Universal Animation Library (CC0) — skelet va tayyor harakatlar
   const sk=rnSkin();
-  const opt=n=>scr('lib/three-gltf.js').then(()=>new window.THREE_GLTFLoader().loadAsync('rn/'+n+'.glb?v='+APP_VER)).catch(e=>{console.warn(n,e);return null});
+  const opt=n=>scr('lib/three-gltf.js').then(()=>new window.THREE_GLTFLoader().loadAsync('rn/'+n+'.glb?v='+RN_AV)).catch(e=>{console.warn(n,e);return null});
   const guardP=opt('guard'),dogP=opt('dog');
-  const L0=()=>new window.THREE_GLTFLoader(),hero=scr('lib/three-gltf.js').then(()=>L0().loadAsync('rn/'+sk+'.glb?v='+APP_VER).catch(()=>L0().loadAsync('rn/kid.glb?v='+APP_VER)).then(g=>(g.kid=true,g),()=>L0().loadAsync('rn/hero.glb?v='+APP_VER))).catch(e=>{console.warn('hero',e);return null});
+  const L0=()=>new window.THREE_GLTFLoader(),hero=scr('lib/three-gltf.js').then(()=>L0().loadAsync('rn/'+sk+'.glb?v='+RN_AV).catch(()=>L0().loadAsync('rn/kid.glb?v='+RN_AV)).then(g=>(g.kid=true,g),()=>L0().loadAsync('rn/hero.glb?v='+RN_AV))).catch(e=>{console.warn('hero',e);return null});
   // Toshkent to'plami (Meshy): poyezd, to'siqlar, tanga, bonuslar, binolar — yagona uslubda
   const MROT={cab:-Math.PI/2,car:-Math.PI/2,ramp:Math.PI},CEN={coin:1,magnet:1,jet:1,shoe:1,shield:1};
   const toF=a=>{const it=a.itemSize,f=new Float32Array(a.count*it);for(let i=0;i<a.count;i++){f[i*it]=a.getX(i);if(it>1)f[i*it+1]=a.getY(i);if(it>2)f[i*it+2]=a.getZ(i);if(it>3)f[i*it+3]=a.getW(i)}return new T.BufferAttribute(f,it)};
-  const mods=scr('lib/three-gltf.js').then(()=>{const L=new window.THREE_GLTFLoader();if(window.THREE_Meshopt)L.setMeshoptDecoder(window.THREE_Meshopt);
-    return Promise.all(RN_MN.map(k=>L.loadAsync('rn/m/'+k+'.glb?v='+APP_VER).then(g=>{let me=null;g.scene.updateMatrixWorld(true);g.scene.traverse(o=>{if(o.isMesh&&!me)me=o});
-      const geo=new T.BufferGeometry();for(const n of ['position','normal','uv'])if(me.geometry.attributes[n])geo.setAttribute(n,toF(me.geometry.attributes[n]));geo.setIndex(me.geometry.index?Array.from(me.geometry.index.array):null);
+  const prep=(k,me,ref)=>{ // geometriyani bir xil holatga keltirish (LOD juftlari bir xil siljish bilan)
+      const geo=new T.BufferGeometry();for(const n of ['position','normal','uv','color'])if(me.geometry.attributes[n])geo.setAttribute(n,toF(me.geometry.attributes[n]));geo.setIndex(me.geometry.index?Array.from(me.geometry.index.array):null);
       geo.applyMatrix4(me.matrixWorld);if(MROT[k])geo.rotateY(MROT[k]);if(!geo.attributes.normal)geo.computeVertexNormals();
-      {const nr=geo.attributes.normal.array,ps=geo.attributes.position.array;for(let i=0;i<nr.length;i+=3){const l=Math.hypot(nr[i],nr[i+1],nr[i+2]);if(!(l>1e-4)){nr[i]=0;nr[i+1]=1;nr[i+2]=0}else{nr[i]/=l;nr[i+1]/=l;nr[i+2]/=l}}for(let i=0;i<ps.length;i++)if(!isFinite(ps[i]))ps[i]=0}geo.computeBoundingBox();let b=geo.boundingBox;
-      geo.translate(-(b.min.x+b.max.x)/2,CEN[k]?-(b.min.y+b.max.y)/2:-b.min.y,-(b.min.z+b.max.z)/2);geo.computeBoundingBox();geo.computeBoundingSphere();
+      {const nr=geo.attributes.normal.array,ps=geo.attributes.position.array;for(let i=0;i<nr.length;i+=3){const l=Math.hypot(nr[i],nr[i+1],nr[i+2]);if(!(l>1e-4)){nr[i]=0;nr[i+1]=1;nr[i+2]=0}else{nr[i]/=l;nr[i+1]/=l;nr[i+2]/=l}}for(let i=0;i<ps.length;i++)if(!isFinite(ps[i]))ps[i]=0}
+      geo.computeBoundingBox();const b=geo.boundingBox,tr=ref?ref.tr:[-(b.min.x+b.max.x)/2,CEN[k]?-(b.min.y+b.max.y)/2:-b.min.y,-(b.min.z+b.max.z)/2];
+      geo.translate(tr[0],tr[1],tr[2]);geo.computeBoundingBox();geo.computeBoundingSphere();
       const sz=new T.Vector3();geo.boundingBox.getSize(sz);const map=me.material&&me.material.map;if(map){map.colorSpace=T.SRGBColorSpace;map.anisotropy=4}
-      return [k,{geo,map,s:sz}]},e=>{console.warn('rn/m',k,e);return [k,null]}))).then(a=>{const M={};for(const [k,v] of a)if(v)M[k]=v;return M})}).catch(()=>({}));
+      return {geo,map,s:ref?ref.s:sz,tr}};
+  const mods=scr('lib/three-gltf.js').then(()=>{const L=new window.THREE_GLTFLoader();if(window.THREE_Meshopt)L.setMeshoptDecoder(window.THREE_Meshopt);
+    const one=n=>L.loadAsync('rn/m/'+n+'.glb?v='+RN_AV).then(g=>{let me=null;g.scene.updateMatrixWorld(true);g.scene.traverse(o=>{if(o.isMesh&&!me)me=o});return me});
+    return Promise.all(RN_MN.map(k=>one(k).then(me=>{const hi=prep(k,me);if(!RN_LO.includes(k))return [[k,hi]];
+        return one(k+'_lo').then(m2=>[[k,hi],[k+'_lo',prep(k,m2,hi)]],()=>[[k,hi]])},e=>{console.warn('rn/m',k,e);return []}))).then(a=>{const M={};for(const l of a)for(const [k,v] of l)M[k]=v;return M})}).catch(()=>({}));
   const post=scr2('lib/three-post.js').catch(()=>null);
-  RNAp=Promise.all([kit('train'),kit('city'),hero,mods,post,guardP,dogP]).then(([t,c,h,m,_,gd,dg])=>(RNA={t,c,hero:h,m,guard:gd,dog:dg,skin:sk}),e=>{RNAp=null;throw e});
+  RNAp=Promise.all([kit('track'),hero,mods,post,guardP,dogP]).then(([t,h,m,_,gd,dg])=>{const base={t,c:null,hero:h,m,guard:gd,dog:dg,skin:sk};
+    if(m.cab&&m.apart)return RNA=base; // Meshy to'plami bor — Kenney shahri kerak emas
+    return Promise.all([kit('train'),kit('city')]).then(([t2,c])=>(RNA=Object.assign(base,{t:{G:Object.assign({},t2.G,t.G),tx:t2.tx},c})),()=>RNA=base)},e=>{RNAp=null;throw e});
   return RNAp;
 }
 function rnDispose(){cancelAnimationFrame(rnRAF);if(rnR){try{rnR.dispose()}catch(e){}rnR=null}}
@@ -6460,6 +6469,8 @@ function viewYugur(){
     <section class="card" data-notr><div class="label">${KT('Qahramonlar','Герои','Heroes')}</div><div class="rn-sk">${RN_SK.map(k=>{const own=rnOwn().includes(k.id),cur=rnSkin()===k.id;
       return `<div class="rn-skc${cur?' on':''}"><img src="rn/sk/${k.id}.png?v=${APP_VER}" alt="" loading="lazy"><b>${k.n()}</b><small>${k.d()}</small>
       <button class="${cur?'chip':own?'chip':'btn'}" data-sk="${k.id}" ${cur||(!own&&P.coins<k.p)?'disabled':''}>${cur?'✓ '+KT('Tanlangan','Выбран','Selected'):own?KT('Tanlash','Выбрать','Select'):'🪙 '+k.p.toLocaleString()}</button></div>`}).join('')}</div></section>
+    <section class="card" data-notr><div class="label">${KT('Grafika','Графика','Graphics')}</div><div class="rn-q">${[['auto',KT('Avto','Авто','Auto')],['2',KT('Yuqori','Высокая','High')],['1',KT("O'rta",'Средняя','Medium')],['0',KT('Past','Низкая','Low')]].map(([k,t])=>`<button class="chip${String(store.get('rn_qset','auto'))===k?' on':''}" data-q="${k}">${t}</button>`).join('')}</div>
+      <small class="rn-qh">${KT("O'yin qotsa — «Past»ni tanlang. «Avto» telefoningizga qarab o'zi sozlaydi.",'Если игра тормозит — выберите «Низкая». «Авто» подстроится само.','If the game lags, choose Low. Auto adapts to your phone.')}</small></section>
     <section class="card" data-notr><div class="label">${KT('Boshqaruv','Управление','Controls')}</div><div class="rn-how">
       <p>⬅️ ➡️ ${KT("Chapga/o'ngga suring — yo'lak almashtirish",'Свайп влево/вправо — смена пути','Swipe left/right — change lane')}</p>
       <p>⬆️ ${KT("Tepaga — sakrash (past to'siqlardan)",'Вверх — прыжок (через низкие барьеры)','Up — jump (over low barriers)')}</p>
@@ -6467,6 +6478,9 @@ function viewYugur(){
       <p>🚆 ${KT("Poyezdga rampadan chiqing. Poyezd yoniga urilsangiz qorovul yaqinlashadi — ikkinchi marta ushlaydi!",'На поезд — по рампе. Удар о бок поезда — охранник ближе, второй раз — поймает!','Climb trains by ramps. Bump a side — the guard gets closer, twice and you are caught!')}</p>
       <p>🧲 🚀 👟 ✖2 🛡 ${KT('Bonuslarni yig\'ing','Собирайте бонусы','Grab power-ups')}</p></div></section>`;
   $('#rngo').onclick=()=>rnStart();
+  // menyu ochilganda 3D fayllarni oldindan yuklab qo'yamiz — «Yugurish» bosilganda kutish qisqaradi
+  setTimeout(()=>{if(current==='yugur')blLoad3().then(ok=>ok&&rnLoadAssets()).catch(()=>{})},700);
+  document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{store.set('rn_qset',b.dataset.q);if(b.dataset.q!=='auto')store.set('rn_q',+b.dataset.q);viewYugur()});
   document.querySelectorAll('[data-ms]').forEach(b=>b.onclick=()=>{const st=rnMS(),r=rnMissionClaim(st,+b.dataset.ms);if(!r)return;store.set('rn_ms',st);const P=rnProg();P.coins+=r;store.set('rn_p',P);haptic('done');rnToastG('+'+r+' 🪙');viewYugur()});
   if($('#rnchest'))$('#rnchest').onclick=()=>{const st=rnMS(),r=rnChest(st);if(!r)return;store.set('rn_ms',st);const P=rnProg();P.coins+=r;store.set('rn_p',P);haptic('done');rnToastG('🎁 +'+r+' 🪙');viewYugur()};
   $('#rnbuyb').onclick=()=>{const P=rnProg();if(P.coins<RN_BOARD_P)return;P.coins-=RN_BOARD_P;store.set('rn_p',P);store.set('rn_boards',store.get('rn_boards',0)+1);haptic('light');viewYugur()};
@@ -6493,8 +6507,9 @@ function rnGameV(){
   $('#rnback').onclick=()=>rnPause();
   $('#rnboard').onclick=e=>{e.stopPropagation();if(rnSt==='ready'){rnSt='run';$('#rnmsg').hidden=true}if(rnSt==='run')rnInput(RNS,'board')};
   rnHud();
+  rnLoadT0=performance.now();
   blLoad3().then(ok=>ok?rnLoadAssets().then(()=>ok,()=>ok):ok).then(ok=>{
-    if(!$('#rnstage')||rnR)return;const v=$('#rnview');v.innerHTML='';
+    if(!$('#rnstage')||rnR)return;rnLoadMs=performance.now()-rnLoadT0;const v=$('#rnview');v.innerHTML='';
     if(!ok){v.innerHTML=`<div class="rn-load">${KT("Qurilmangiz 3D ni qo'llamaydi",'Устройство не поддерживает 3D','3D is not supported')}</div>`;return}
     try{rnR=rnMake3D(v)}catch(e){console.error(e);v.innerHTML='<div class="rn-load">3D xato</div>';return}
     rnBind($('#rnstage'));rnReady();rnLoop();
@@ -6605,13 +6620,16 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   // Meshy modellari: o'lchamga moslab joylash (har biri bitta tekstura, bitta material)
   const RM=(RNA&&RNA.m)||{},MMc={};
   const mMat=(k,o={})=>MMc[k]||(MMc[k]=ML(Object.assign({map:RM[k].map},o)));
-  const mm=(k,w,h,d)=>{const a=RM[k],m=new T.Mesh(a.geo,mMat(k));m.scale.set(w/a.s.x,h/a.s.y,d/a.s.z);return m};
+  // LOD: yaqinda teksturali model, uzoqda yengil (rangli) nusxa — telefon uchun uchburchaklar kamayadi
+  const loMat=ML({vertexColors:true}),LODD={cab:60,car:60,low:40,high:40,block:45,ramp:45,coin:30};
+  const mesh=(k,mat)=>{const a=RM[k],lo=RM[k+'_lo'];if(!lo)return new T.Mesh(a.geo,mat||mMat(k));const L=new T.LOD();L.addLevel(new T.Mesh(a.geo,mat||mMat(k)),0);L.addLevel(new T.Mesh(lo.geo,loMat),LODD[k]||70);return L};
+  const mm=(k,w,h,d)=>{const a=RM[k],m=mesh(k);m.scale.set(w/a.s.x,h/a.s.y,d/a.s.z);return m};
   const glowTx=cvT(128,128,(x)=>{const g=x.createRadialGradient(64,64,4,64,64,62);g.addColorStop(0,'rgba(255,248,220,1)');g.addColorStop(0.3,'rgba(255,214,130,.55)');g.addColorStop(1,'rgba(255,170,60,0)');x.fillStyle=g;x.fillRect(0,0,128,128)});
   const glowPG=new T.PlaneGeometry(1,1);
   const glowMat=(col,op)=>bend(new T.MeshBasicMaterial({map:glowTx,color:col,transparent:true,opacity:op,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,fog:false}));
   const lampGM=glowMat(0xffd88a,0),headGM=glowMat(0xfff4d0,0);
   const glowP=(m,sz)=>{const g=new T.Mesh(glowPG,m);g.scale.setScalar(sz);return g};
-  const mmU=(k,size,ax='y')=>{const a=RM[k],m=new T.Mesh(a.geo,mMat(k));m.scale.setScalar(size/a.s[ax]);return m};
+  const mmU=(k,size,ax='y')=>{const a=RM[k],m=mesh(k);m.scale.setScalar(size/a.s[ax]);return m};
   // osmon
   // osmon: gradient + quyosh/oy gardishi (shader)
   const skyU={top:{value:new T.Color()},hor:{value:new T.Color()},sunC:{value:new T.Color()},sunDir:{value:new T.Vector3(0,1,0)}};
@@ -6642,7 +6660,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     if(!RNA)for(const l of [0,1,2]){for(let j=0;j<4;j++){const y=j*h/4+8;x.fillStyle='#5a4130';x.fillRect(lx(l)-46,y,92,22);x.fillStyle='rgba(0,0,0,.25)';x.fillRect(lx(l)-46,y+18,92,4)}
       for(const sg of [-1,1]){x.fillStyle='#55585e';x.fillRect(lx(l)+sg*26-4,0,8,h);x.fillStyle='#d8dde3';x.fillRect(lx(l)+sg*26-2,0,3,h)}}});
   trackT.repeat.set(1,1);
-  const KT_=RNA?ML({map:RNA.t.tx}):null,KC=RNA?ML({map:RNA.c.tx}):null;
+  const KT_=RNA?ML({map:RNA.t.tx}):null,KC=RNA&&RNA.c?ML({map:RNA.c.tx}):null;
   // Kenney rels plitkalari (har yo'lakka), yo'l bilan birga suriladi
   const TK=2.2;let rails=null;
   if(RNA){const n=124,im=new T.InstancedMesh(RNA.t.G['track-detailed'],KT_,n*3),o=new T.Object3D();let k=0;
@@ -6676,7 +6694,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
       }else{ // Toshkent binolari: madrasa, bozor, mahalla uyi, choyxona, ko'p qavatli uy
         const list=['apart','bazaar','mahalla','madrasa','choy','apart','mahalla','madrasa'].filter(k=>RM[k]),k=list[(R()*list.length)|0],a=RM[k];
         const fw={apart:9,bazaar:13,mahalla:11,madrasa:14,choy:9}[k]*(0.9+R()*0.2),sc0=fw/a.s.x;
-        const b=new T.Mesh(a.geo,mMat(k));b.scale.setScalar(sc0);b.rotation.y=-sg*Math.PI/2;g.add(b);
+        const b=mesh(k);b.scale.setScalar(sc0);b.rotation.y=-sg*Math.PI/2;g.add(b);
         g.userData.w=a.s.x*sc0+1.5;g.userData.wd=a.s.z*sc0;
       }
     }else if(kind<0.16){ // gumbazli bino (madrasa uslubi)
@@ -6691,7 +6709,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
         const c=new T.Mesh(icoG,leafM);const s=2.2+R()*1.2;c.scale.set(s,s*1.1,s);c.position.set(-sg*k*2,4.2+s*0.4,k*4);g.add(c)}
       const p=new T.Mesh(cylG,poleM);p.scale.set(0.08,5,0.08);p.position.set(-sg*3.2,2.5,2);g.add(p);
       const l=new T.Mesh(boxG,lampM);l.scale.set(0.9,0.2,0.4);l.position.set(-sg*2.8,5,2);g.add(l);g.userData.w=9;
-    }else if(RNA){ // Kenney binolari
+    }else if(RNA&&RNA.c){ // Kenney binolari
       const sky=R()<0.22,ks=sky?['a','b','c','d','e'].map(x=>'building-skyscraper-'+x):'abcdefghijklmn'.split('').map(x=>'building-'+x),key=ks[(R()*ks.length)|0],G=RNA.c.G[key],sc0=sky?7:9.5;
       const b=new T.Mesh(G,KC);b.scale.setScalar(sc0);b.rotation.y=sg*Math.PI/2*RN_BROT;g.add(b);
       const mn=G.userData.min,mx=G.userData.max;g.userData.w=(mx[0]-mn[0])*sc0+1;g.userData.wd=(mx[2]-mn[2])*sc0;
@@ -6707,16 +6725,16 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   const tableM=ML({color:0x8a5a34}),clothT=cvT(64,64,(x,w,h)=>{for(let i=0;i<8;i++){x.fillStyle=i%2?'#f4ede0':['#d6402f','#1f8fa0','#e3a21a'][(Math.random()*3)|0];x.fillRect(i*8,0,8,h)}});
   const coneG=new T.ConeGeometry(0.28,0.42,10),spM=spiceC.map(c=>ML({color:c}));
   function makeBazaar(i,sg){const g=new T.Group(),R=Math.random,kind=R();
-    if(kind<0.22&&RM.bazaar){const a=RM.bazaar,s0=(17+R()*4)/a.s.x,b=new T.Mesh(a.geo,mMat('bazaar'));b.scale.setScalar(s0);b.rotation.y=-sg*Math.PI/2;g.add(b);g.userData.w=a.s.x*s0+1.5;g.userData.wd=a.s.z*s0}
+    if(kind<0.22&&RM.bazaar){const a=RM.bazaar,s0=(17+R()*4)/a.s.x,b=mesh('bazaar');b.scale.setScalar(s0);b.rotation.y=-sg*Math.PI/2;g.add(b);g.userData.w=a.s.x*s0+1.5;g.userData.wd=a.s.z*s0}
     else if(kind<0.62){ // ziravor rastalari
       const n=2+((R()*2)|0);for(let k=0;k<n;k++){const st=new T.Group();st.position.set(0,0,k*3.4);g.add(st);
         const t=new T.Mesh(boxG,tableM);t.scale.set(1.5,0.9,2.8);t.position.y=0.45;st.add(t);
         for(let j=0;j<6;j++){const c=new T.Mesh(coneG,spM[(R()*spM.length)|0]);c.position.set(-0.35+(j%2)*0.7,1.1,-0.95+((j/2)|0)*0.95);c.scale.setScalar(0.9+R()*0.3);st.add(c)}
         const aw=new T.Mesh(boxG,ML({map:clothT}));aw.scale.set(2.6,0.08,3.1);aw.position.set(sg*0.3,2.75,0);aw.rotation.z=sg*0.28;st.add(aw);
         for(const z of [-1.4,1.4])for(const x of [-0.85,0.95]){const p=new T.Mesh(boxG,tableM);p.scale.set(0.08,2.6,0.08);p.position.set(x*sg,1.3,z);st.add(p)}}
-      if(RM.apart&&R()<0.6){const k=['mahalla','madrasa','apart'][(R()*3)|0],a=RM[k],s0=10/a.s.x,b=new T.Mesh(a.geo,mMat(k));b.scale.setScalar(s0);b.rotation.y=-sg*Math.PI/2;b.position.set(sg*(4+a.s.z*s0/2),0,n*1.7-1.7);g.add(b)}
+      if(RM.apart&&R()<0.6){const k=['mahalla','madrasa','apart'][(R()*3)|0],a=RM[k],s0=10/a.s.x,b=mesh(k);b.scale.setScalar(s0);b.rotation.y=-sg*Math.PI/2;b.position.set(sg*(4+a.s.z*s0/2),0,n*1.7-1.7);g.add(b)}
       g.userData.w=n*3.4+1;g.userData.wd=2.2}
-    else if(kind<0.82&&RM.choy){const a=RM.choy,s0=9/a.s.x,b=new T.Mesh(a.geo,mMat('choy'));b.scale.setScalar(s0);b.rotation.y=-sg*Math.PI/2;g.add(b);
+    else if(kind<0.82&&RM.choy){const a=RM.choy,s0=9/a.s.x,b=mesh('choy');b.scale.setScalar(s0);b.rotation.y=-sg*Math.PI/2;g.add(b);
       if(RM.cart){const c=mmU('cart',2.8,'x');c.rotation.y=Math.PI/2;c.position.set(-sg*(a.s.z*s0/2+1.4),0,a.s.x*s0/2+1);g.add(c)}
       g.userData.w=a.s.x*s0+2.5;g.userData.wd=a.s.z*s0}
     else{ // meva aravalari va chinor
@@ -6803,7 +6821,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     if(o.type==='mtrain')for(const sg of [-1,1]){const l=new T.Mesh(new T.CircleGeometry(0.17,14),glow);l.position.set(sg*0.62,1.0,-0.08);l.rotation.y=Math.PI;g.add(l)}
     shadowy(g);for(const sg of [-1,1]){const h=glowP(headGM,o.type==='mtrain'?2.2:1.4);h.position.set(sg*0.55,1.05,-0.2);g.add(h)}
     return g}
-  function trainMesh(o){if(RM.cab&&RM.car)return trainM(o);if(RNA)return trainK(o);const g=new T.Group(),[c1,c2]=trainCol[o.id%trainCol.length],L=o.z1-o.z0,cars=Math.max(1,Math.round(L/RN.car)),cl=L/cars;
+  function trainMesh(o){if(RM.cab&&RM.car)return trainM(o);if(RNA&&RNA.t.G['train-electric-city-a'])return trainK(o);const g=new T.Group(),[c1,c2]=trainCol[o.id%trainCol.length],L=o.z1-o.z0,cars=Math.max(1,Math.round(L/RN.car)),cl=L/cars;
     const bodyM=MS({color:c1,roughness:0.45,metalness:0.15}),strM=MS({color:c2,roughness:0.5});
     for(let i=0;i<cars;i++){const cz=i*cl+cl/2,len=cl-0.45;
       const b=new T.Mesh(rbx(1.94,2.9,len,0.32),bodyM);b.position.set(0,2.05,cz);g.add(b);
@@ -6846,8 +6864,9 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   // tangalar (hovuz)
   const coinG=new T.CylinderGeometry(0.42,0.42,0.09,22);coinG.rotateZ(Math.PI/2);
   const coinM=MS({color:0xffcf2e,metalness:0.3,roughness:0.35,emissive:0xb07a00,emissiveIntensity:0.55});const coinRim=ML({color:0xffe680,emissive:0x8a5a00});
-  const coinPool=[];let coinIM=null;const cO=new T.Object3D();
-  if(RM.coin){coinIM=new T.InstancedMesh(RM.coin.geo,mMat('coin',{emissive:0x8a6c00}),180);coinIM.count=0;coinIM.frustumCulled=false;sc.add(coinIM)}
+  const coinPool=[];let coinIM=null,coinLo=null;const cO=new T.Object3D();
+  if(RM.coin){coinIM=new T.InstancedMesh(RM.coin.geo,mMat('coin',{emissive:0x8a6c00}),180);coinIM.count=0;coinIM.frustumCulled=false;sc.add(coinIM);
+    if(RM.coin_lo){coinLo=new T.InstancedMesh(RM.coin_lo.geo,ML({vertexColors:true,emissive:0x8a6c00}),180);coinLo.count=0;coinLo.frustumCulled=false;sc.add(coinLo)}}
   else for(let i=0;i<180;i++){const m=new T.Mesh(coinG,coinM);m.visible=false;sc.add(m);coinPool.push(m)}
   const coinSc=RM.coin?0.9/RM.coin.s.x:1;
   // bonuslar: 3D model + porlash
@@ -6967,7 +6986,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   const hr=new Date().getHours(),tod0=window.RN_TOD!=null?window.RN_TOD:hr>=6&&hr<10?0:hr>=10&&hr<17?1:hr>=17&&hr<20?2:3;
   const cA=new T.Color(),cB=new T.Color(),v3a=new T.Vector3(),TODL=900,TODT=160;
   const mixC=(o,ka,kb,t)=>o.copy(cA.setHex(ka)).lerp(cB.setHex(kb),t);
-  let bloom=null,comp=null,QL=store.get('rn_q',2),fpsN=0,fpsT=0;
+  const QSET=store.get('rn_qset','auto');let bloom=null,comp=null,QL=QSET==='auto'?store.get('rn_q',2):+QSET,fpsN=0,fpsT=0;
   function tod(pz){const u=Math.max(0,pz)/TODL,k=Math.floor(u),f=u-k,a=TOD[(tod0+k)%4],b=TOD[(tod0+k+1)%4],e=(f-(1-TODT/TODL))/(TODT/TODL),t=e<=0?0:e*e*(3-2*e),L=(x,y)=>x+(y-x)*t;
     mixC(skyU.top.value,a.top,b.top,t);mixC(skyU.hor.value,a.hor,b.hor,t);mixC(sc.fog.color,a.fog,b.fog,t);mixC(skyU.sunC.value,a.sunc,b.sunc,t);
     mixC(hemi.color,a.hs,b.hs,t);mixC(hemi.groundColor,a.hg,b.hg,t);hemi.intensity=L(a.hi,b.hi);mixC(sun.color,a.sc,b.sc,t);sun.intensity=L(a.si,b.si);
@@ -6977,9 +6996,13 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   // porlash (bloom): faqat kuchli qurilmalarda; FPS past bo'lsa o'zi o'chadi
   const mkBloom=()=>{const P=window.THREE_POST;if(!P||QL<2||comp)return;try{comp=new P.EffectComposer(rd);comp.addPass(new P.RenderPass(sc,cam));bloom=new P.UnrealBloomPass(new T.Vector2(W(),H()),0.3,0.45,0.82);comp.addPass(bloom);comp.addPass(new P.OutputPass());comp.setSize(W(),H())}catch(e){console.warn('bloom',e);comp=null;bloom=null}};
   mkBloom();
-  if(QL<1){rd.shadowMap.enabled=false;sun.castShadow=false;rd.setPixelRatio(1)}
+  if(QL<1){rd.shadowMap.enabled=false;sun.castShadow=false;rd.setPixelRatio(1)}else if(QL<2)rd.setPixelRatio(Math.min(1.5,devicePixelRatio||1));
   const quality=dt=>{if(fpsT>=0){fpsT+=dt;fpsN++;if(fpsT>5){const fps=fpsN/fpsT;fpsT=-1;
-    if(fps<40&&QL>=2){QL=1;comp=null;bloom=null}if(fps<27&&QL>=1){QL=0;rd.shadowMap.enabled=false;sun.castShadow=false;rd.setPixelRatio(1);rd.setSize(W(),H())}store.set('rn_q',QL)}}};
+    // anonim statistika: qurilmalarda o'yin qanchalik silliq (kuniga bir marta)
+    try{if(!rnPerfSent){rnPerfSent=1;statSec('p-rn'+(fps<20?'00':fps<30?'20':fps<40?'30':fps<50?'40':'50')+'q'+QL);if(rnLoadMs)statSec('p-ld'+Math.min(30,Math.round(rnLoadMs/1000)))}}catch(e){}
+    if(QSET!=='auto')return;
+    if(fps>56&&QL<2){store.set('rn_q',QL+1);return} // keyingi safar sifatni bir pog'ona oshiramiz
+    if(fps<40&&QL>=2){QL=1;comp=null;bloom=null;rd.setPixelRatio(Math.min(1.5,devicePixelRatio||1));rd.setSize(W(),H())}if(fps<27&&QL>=1){QL=0;rd.shadowMap.enabled=false;sun.castShadow=false;rd.setPixelRatio(1);rd.setSize(W(),H())}store.set('rn_q',QL)}}};
   const camP=new T.Vector3(0,4.3,-7.2),look=new T.Vector3(0,1.5,12),lookT=new T.Vector3(0,1.5,12);
   function frame(dt,live,ex=0){
     // fizika 120 Hz; kadrlar orasini silliqlash uchun qolgan vaqtga oldinga suriladi
@@ -6995,10 +7018,11 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     for(const o of s.obs){if(o.dead||o.z1-pz<-20||o.z0-pz>240)continue;alive.add(o.id);const m=objMesh(o);m.position.z=o.z0-pz}
     for(const [id,m] of OM)if(!alive.has(id)&&!(s.obs.find(o=>o.id===id&&!o.dead&&o.z0-pz>240))){sc.remove(m);OM.delete(id)}
     // tangalar
-    let ci=0;const spin=performance.now()/1000*3,cap=coinIM?180:coinPool.length;
-    for(const c of s.coinsL){if(c.got||c.z-pz>200||c.z-pz<-5)continue;if(ci>=cap)break;const m=coinIM?cO:coinPool[ci];ci++;m.visible=true;
+    let ci=0,cl=0;const spin=performance.now()/1000*3,cap=coinIM?180:coinPool.length;
+    for(const c of s.coinsL){if(c.got||c.z-pz>150||c.z-pz<-5)continue;if(ci>=cap)break;const far=coinLo&&!c.fly&&c.z-pz>28;if(far&&cl>=180)continue;const m=coinIM?cO:coinPool[ci];if(!far)ci++;m.visible=true;
       if(c.fly){m.position.set(c.fx,c.y,c.z-pz);m.rotation.y=spin*4;m.scale.setScalar(0.85*coinSc);if(Math.random()<0.35)spark(c.fx,c.y,c.z-pz,1,0xffe27a,0.35)}else{m.position.set(RN.lanes[c.lane],c.y,c.z-pz);m.rotation.y=spin+c.z*0.3;m.scale.setScalar(coinSc)}
-      if(coinIM){cO.updateMatrix();coinIM.setMatrixAt(ci-1,cO.matrix)}}
+      if(coinIM){cO.updateMatrix();if(far)coinLo.setMatrixAt(cl++,cO.matrix);else coinIM.setMatrixAt(ci-1,cO.matrix)}}
+    if(coinLo){coinLo.count=cl;coinLo.instanceMatrix.needsUpdate=true}
     if(coinIM){coinIM.count=ci;coinIM.instanceMatrix.needsUpdate=true}else for(;ci<coinPool.length;ci++)coinPool[ci].visible=false;
     // bonuslar
     const seen=new Set();
@@ -7053,7 +7077,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     if(comp)comp.render(dt);else rd.render(sc,cam);
   }
   const onR=()=>{rd.setSize(W(),H());if(comp)comp.setSize(W(),H())};addEventListener('resize',onR);
-  return {frame,fx,get heroM(){return heroM},get guard(){return guard},dispose(){removeEventListener('resize',onR);rd.dispose();try{rd.forceContextLoss()}catch(e){}rd.domElement.remove()}};
+  return {frame,fx,get heroM(){return heroM},get guard(){return guard},get info(){return {calls:rd.info.render.calls,tris:rd.info.render.triangles,geos:rd.info.memory.geometries,tex:rd.info.memory.textures,q:QL,bloom:!!comp}},dispose(){removeEventListener('resize',onR);rd.dispose();try{rd.forceContextLoss()}catch(e){}rd.domElement.remove()}};
 }
 // ---------------- ovoz ----------------
 function rnCtx(){if(!store.get('rn_snd',true))return null;try{rnAud=rnAud||new (window.AudioContext||window.webkitAudioContext)();if(rnAud.state==='suspended')rnAud.resume();return rnAud}catch(e){return null}}
@@ -7195,6 +7219,7 @@ function renderAdmin(j){
   <section class="card"><span class="label">Yangi qo'shilganlar · 30 kun</span>${adBars('adc2',nw,days,v=>fmt(v)+' kishi')}</section>
   <section class="card"><span class="label">O'rtacha vaqt · 30 kun</span>${adBars('adc3',mins,days,v=>String(v).replace('.',',')+' daq')}</section>
   <section class="card"><span class="label">Eng ko'p ochilgan bo'limlar · 30 kun</span>${adList(j.sections,k=>AD_SEC[k]||k)}</section>
+  ${(j.perf||[]).length?`<section class="card"><span class="label">Yugur! — telefonlarda tezlik · 30 kun</span>${adList(j.perf,k=>{let m=k.match(/^p-rn(\d\d)q(\d)$/);if(m)return (m[1]==='00'?'20 FPS dan past':m[1]==='50'?'50+ FPS':m[1]+'–'+(+m[1]+10)+' FPS')+' · grafika '+['past',"o'rta",'yuqori'][+m[2]];m=k.match(/^p-ld(\d+)$/);return m?'Yuklanish ~'+m[1]+' s':k})}<p class="note">Har o'yinchi kuniga 1 marta. 30 FPS dan pastlar ko'p bo'lsa — grafikani yengillashtirish kerak.</p></section>`:''}
   <section class="card"><span class="label">Qayerdan kelgan</span>${adList(adGroup(j.sources,adSrc),k=>k)}</section>
   <section class="card"><span class="label">Ilova tili</span>${adList(adGroup(j.langs,k=>AD_LANG[k]||k),k=>k)}</section>
   <section class="card"><span class="label">Qurilma</span>${adList(adGroup(j.platforms,k=>AD_PF[k]||k),k=>k)}</section>

@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 01.11.2026-10
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 08.11.2026-11
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -284,7 +284,7 @@ async function computeStats(db,env){
     q('SELECT COUNT(DISTINCT uid) n FROM daily WHERE day>=?1',d30),
     q('SELECT day,COUNT(*) u,SUM(secs) s,SUM(secs>0) au,SUM(opens) o,SUM(msgs) m FROM daily WHERE day>=?1 GROUP BY day ORDER BY day',d60),
     q("SELECT strftime('%Y-%m-%d',(first_seen+?2)/1000,'unixepoch') day,COUNT(*) n FROM users WHERE first_seen>=?1 GROUP BY day",now-60*DAY,TZMS),
-    q('SELECT sec k,SUM(n) n FROM sections WHERE day>=?1 GROUP BY sec ORDER BY n DESC LIMIT 16',d30),
+    q("SELECT sec k,SUM(n) n FROM sections WHERE day>=?1 AND sec NOT LIKE 'p-%' GROUP BY sec ORDER BY n DESC LIMIT 16",d30),
     q("SELECT COALESCE(app_lang,tg_lang,'?') k,COUNT(*) n FROM users GROUP BY k ORDER BY n DESC LIMIT 8"),
     q("SELECT COALESCE(platform,'?') k,COUNT(*) n FROM users GROUP BY k ORDER BY n DESC LIMIT 8"),
     q("SELECT COALESCE(src,'?') k,COUNT(*) n FROM users GROUP BY k ORDER BY n DESC LIMIT 30"),
@@ -292,14 +292,15 @@ async function computeStats(db,env){
     q('SELECT COUNT(*) n,SUM(EXISTS(SELECT 1 FROM daily d WHERE d.uid=users.id AND d.day>=?3)) back FROM users WHERE first_seen<?1 AND first_seen>=?2',t7,t7-7*DAY,d7),
     q('SELECT SUM(secs) s,SUM(secs>0) au FROM daily WHERE day>=?1',d7),
     q('SELECT COALESCE(SUM(CASE WHEN day=?1 THEN n END),0) d1,COALESCE(SUM(n),0) d7,COUNT(DISTINCT uid) u7 FROM food WHERE day>=?2',today,d7),
-    q("SELECT k,a,u,SUM(n) n,SUM(r) r FROM foodfix WHERE day>=?1 GROUP BY k,a,u ORDER BY (k='photo') DESC,n DESC LIMIT 25",d30)
+    q("SELECT k,a,u,SUM(n) n,SUM(r) r FROM foodfix WHERE day>=?1 GROUP BY k,a,u ORDER BY (k='photo') DESC,n DESC LIMIT 25",d30),
+    q("SELECT sec k,SUM(n) n FROM sections WHERE day>=?1 AND sec LIKE 'p-%' GROUP BY sec ORDER BY k LIMIT 40",d30)
   ]);
   const one=i=>r[i].results[0]||{}, all=i=>r[i].results||[];
   const meta=Object.fromEntries(all(10).map(x=>[x.k,x.v]));
   let wh=null;try{const w=await tg(env,'getWebhookInfo',{});if(w.ok){wh={pending:w.result.pending_update_count||0,error:w.result.last_error_message||null,fixed:false};
     const au=w.result.allowed_updates;if(au&&au.length&&!au.includes('my_chat_member')&&w.result.url){await tg(env,'setWebhook',{url:w.result.url,allowed_updates:[...au,'my_chat_member'],...(env.WEBHOOK_SECRET?{secret_token:env.WEBHOOK_SECRET}:{})});wh.fixed=true}}}catch(e){}
   return {now,today,users:one(0),dau:one(1).n||0,wau:one(2).n||0,mau:one(3).n||0,days:all(4),newDays:all(5),sections:all(6),langs:all(7),platforms:all(8),sources:all(9),
-    since:+meta.since||null,checked:+meta.checked||null,ret:one(11),avg7:one(12),food:one(13),fixes:all(14),wh};
+    since:+meta.since||null,checked:+meta.checked||null,ret:one(11),avg7:one(12),food:one(13),fixes:all(14),perf:all(15),wh};
 }
 async function adminReq(req,env){
   let f;try{f=await req.formData()}catch(e){return [null,J({ok:false,error:'form'},400)]}
