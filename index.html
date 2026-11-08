@@ -4084,7 +4084,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108i';
+const APP_VER='20261108j';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -6605,8 +6605,86 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
       g.userData.w=dp+1;g.userData.wd=wd;
     }
     return g}
-  {let zz=-20;for(let i=0;i<34;i++){const g=makeProp(i);const sg=g.userData.sg;g.position.set(sg*(g.userData.wd?7.2+g.userData.wd/2:9.5),0.45,zz+(i%2)*3);g.userData.z=zz+(i%2)*3;if(i%2)zz+=g.userData.w+1+Math.random()*3;sc.add(g);pool.push(g)}}
+  // ---- Chorsu bozori: gumbaz, ziravor rastalari, choyxona, aravalar ----
+  const spiceC=[0xc8321e,0xe8a317,0xd96b1c,0x7a4a24,0x6f8f2a,0xb5462a,0xf2c94c];
+  const tableM=ML({color:0x8a5a34}),clothT=cvT(64,64,(x,w,h)=>{for(let i=0;i<8;i++){x.fillStyle=i%2?'#f4ede0':['#d6402f','#1f8fa0','#e3a21a'][(Math.random()*3)|0];x.fillRect(i*8,0,8,h)}});
+  const coneG=new T.ConeGeometry(0.28,0.42,10),spM=spiceC.map(c=>ML({color:c}));
+  function makeBazaar(i,sg){const g=new T.Group(),R=Math.random,kind=R();
+    if(kind<0.22&&RM.bazaar){const a=RM.bazaar,s0=(17+R()*4)/a.s.x,b=new T.Mesh(a.geo,mMat('bazaar'));b.scale.setScalar(s0);b.rotation.y=-sg*Math.PI/2;g.add(b);g.userData.w=a.s.x*s0+1.5;g.userData.wd=a.s.z*s0}
+    else if(kind<0.62){ // ziravor rastalari
+      const n=2+((R()*2)|0);for(let k=0;k<n;k++){const st=new T.Group();st.position.set(0,0,k*3.4);g.add(st);
+        const t=new T.Mesh(boxG,tableM);t.scale.set(1.5,0.9,2.8);t.position.y=0.45;st.add(t);
+        for(let j=0;j<6;j++){const c=new T.Mesh(coneG,spM[(R()*spM.length)|0]);c.position.set(-0.35+(j%2)*0.7,1.1,-0.95+((j/2)|0)*0.95);c.scale.setScalar(0.9+R()*0.3);st.add(c)}
+        const aw=new T.Mesh(boxG,ML({map:clothT}));aw.scale.set(2.6,0.08,3.1);aw.position.set(sg*0.3,2.75,0);aw.rotation.z=sg*0.28;st.add(aw);
+        for(const z of [-1.4,1.4])for(const x of [-0.85,0.95]){const p=new T.Mesh(boxG,tableM);p.scale.set(0.08,2.6,0.08);p.position.set(x*sg,1.3,z);st.add(p)}}
+      if(RM.apart&&R()<0.6){const k=['mahalla','madrasa','apart'][(R()*3)|0],a=RM[k],s0=10/a.s.x,b=new T.Mesh(a.geo,mMat(k));b.scale.setScalar(s0);b.rotation.y=-sg*Math.PI/2;b.position.set(sg*(4+a.s.z*s0/2),0,n*1.7-1.7);g.add(b)}
+      g.userData.w=n*3.4+1;g.userData.wd=2.2}
+    else if(kind<0.82&&RM.choy){const a=RM.choy,s0=9/a.s.x,b=new T.Mesh(a.geo,mMat('choy'));b.scale.setScalar(s0);b.rotation.y=-sg*Math.PI/2;g.add(b);
+      if(RM.cart){const c=mmU('cart',2.8,'x');c.rotation.y=Math.PI/2;c.position.set(-sg*(a.s.z*s0/2+1.4),0,a.s.x*s0/2+1);g.add(c)}
+      g.userData.w=a.s.x*s0+2.5;g.userData.wd=a.s.z*s0}
+    else{ // meva aravalari va chinor
+      if(RM.cart)for(let k=0;k<2;k++){const c=mmU('cart',2.8,'x');c.rotation.y=Math.PI/2*(k?1:-1);c.position.set(-sg*0.3,0,k*3.5);g.add(c)}
+      if(RM.chinar){const t=mmU('chinar',7.5+R()*2);t.position.set(sg*3,0,1.7);g.add(t)}
+      g.userData.w=8;g.userData.wd=3}
+    return g}
+  {let zz=-20;for(let i=0;i<34;i++){const sg=i%2?1:-1,W=new T.Group(),a=makeProp(i),b=makeBazaar(i,sg);
+    a.position.x=sg*(a.userData.wd?7.2+a.userData.wd/2:9.5);b.position.x=sg*(b.userData.wd?6.2+b.userData.wd/2:9);W.add(a,b);b.visible=false;
+    W.userData={sg,z:zz+(i%2)*3,w:Math.max(a.userData.w,b.userData.w),a,b};W.position.y=0.45;if(i%2)zz+=W.userData.w+1+Math.random()*3;sc.add(W);pool.push(W)}}
   let propSpan=pool.reduce((m,g)=>Math.max(m,g.userData.z),0)+14;
+  // ---- zonalar: shahar → metro tunneli → Chorsu bozori (yo'l bo'ylab takrorlanadi) ----
+  const ZC=1500,Z0=150,ZT0=600,ZT1=860;
+  const zoneAt=z=>{if(z<Z0)return 0;const u=(z-Z0)%ZC;return u<ZT0?0:u<ZT1?1:2};
+  const tunK=pz=>Math.max(0,Math.ceil((pz-40-Z0-ZT1)/ZC)),tun0=k=>Z0+k*ZC+ZT0,tun1=k=>Z0+k*ZC+ZT1;
+  // tunnel: marmar devorlar, naqshli gumbaz shift, devor chiroqlari, bekat ustunlari va qandillar
+  const wallT=cvT(256,256,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#efe6d6');g.addColorStop(1,'#d9cbb2');x.fillStyle=g;x.fillRect(0,0,w,h);
+    x.strokeStyle='rgba(150,130,100,.35)';x.lineWidth=2;for(let i=0;i<=4;i++){x.beginPath();x.moveTo(i*64,0);x.lineTo(i*64,h);x.stroke()}
+    x.fillStyle='#145f7a';x.fillRect(0,h*0.36,w,h*0.13);x.fillStyle='#e8c25a';x.fillRect(0,h*0.35,w,4);x.fillRect(0,h*0.49,w,4);
+    for(let i=0;i<8;i++){const cx=i*32+16,cy=h*0.425;x.fillStyle=i%2?'#f1f1e6':'#36b0c4';x.beginPath();for(let k=0;k<16;k++){const r=k%2?5:12,a=k*Math.PI/8;x.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r)}x.fill()}
+    x.fillStyle='#6b5a44';x.fillRect(0,h*0.93,w,h*0.07)});
+  const vaultT=cvT(256,256,(x,w,h)=>{x.fillStyle='#0f3f66';x.fillRect(0,0,w,h);for(let r=0;r<4;r++)for(let c=0;c<4;c++){const cx=c*64+32,cy=r*64+32;x.fillStyle='#f3efe2';x.beginPath();for(let k=0;k<16;k++){const rr=k%2?11:26,a=k*Math.PI/8;x.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr)}x.fill();x.fillStyle='#d9a93b';x.beginPath();x.arc(cx,cy,7,0,7);x.fill()}
+    x.strokeStyle='rgba(217,169,59,.6)';x.lineWidth=2;for(let i=0;i<=4;i++){x.beginPath();x.moveTo(0,i*64);x.lineTo(w,i*64);x.stroke()}},2,1);
+  const SEG=10,NSEG=29,TW=6,TH=6,bulbG=new T.SphereGeometry(1,8,6);
+  const wallG=new T.PlaneGeometry(SEG,TH);const vaultG=new T.CylinderGeometry(TW,TW,SEG,24,1,true,-Math.PI/2,Math.PI);vaultG.rotateX(-Math.PI/2);vaultG.translate(0,TH,0);
+  const wallM=ML({map:wallT,side:T.DoubleSide}),vaultM=ML({map:vaultT,side:T.DoubleSide}),tlampGM=glowMat(0xffe0a0,0.9),chandGM=glowMat(0xfff0c0,0.95);
+  const colG=new T.CylinderGeometry(0.42,0.5,TH,14),colM=ML({map:cvT(64,256,(x,w,h)=>{x.fillStyle='#ede4d2';x.fillRect(0,0,w,h);x.fillStyle='#1d7f95';for(let y=20;y<h;y+=48)x.fillRect(0,y,w,10);x.fillStyle='#d9a93b';x.fillRect(0,0,w,14)})}),capG=new T.CylinderGeometry(0.75,0.45,0.6,14);
+  const segs=[];for(let i=0;i<NSEG;i++){const g=new T.Group();
+    for(const sg of [-1,1]){const w=new T.Mesh(wallG,wallM);w.rotation.y=-sg*Math.PI/2;w.position.set(sg*TW,TH/2,SEG/2);w.receiveShadow=true;g.add(w);
+      const l=glowP(tlampGM,1.6);l.rotation.y=-sg*Math.PI/2;l.position.set(sg*(TW-0.08),4.4,SEG/2);g.add(l)}
+    const v=new T.Mesh(vaultG,vaultM);v.position.z=SEG/2;g.add(v);
+    const st=new T.Group();g.add(st);g.userData.st=st;
+    for(const sg of [-1,1]){const c=new T.Mesh(colG,colM);c.position.set(sg*4.95,TH/2,SEG/2);st.add(c);const cp=new T.Mesh(capG,goldM);cp.position.set(sg*4.95,TH-0.1,SEG/2);st.add(cp)}
+    {const ch=new T.Group();ch.position.set(0,9.6,SEG/2);st.add(ch);const ring=new T.Mesh(new T.TorusGeometry(0.9,0.07,6,20),goldM);ring.rotation.x=Math.PI/2;ch.add(ring);
+     const rod=new T.Mesh(cylG,goldM);rod.scale.set(0.04,2.4,0.04);rod.position.y=1.2;ch.add(rod);
+     for(let k=0;k<8;k++){const b=new T.Mesh(bulbG,lampM);b.scale.setScalar(0.13);b.position.set(Math.cos(k*Math.PI/4)*0.9,0.12,Math.sin(k*Math.PI/4)*0.9);ch.add(b)}
+     const gl=glowP(chandGM,4.2);ch.add(gl)}
+    g.visible=false;sc.add(g);segs.push(g)}
+  // portal (tunnel kirish/chiqish) — arkali peshtoq, «METRO» yozuvi
+  const portT=cvT(256,256,(x,w,h)=>{x.fillStyle='#e7d7b8';x.fillRect(0,0,w,h);x.strokeStyle='rgba(140,110,70,.4)';x.lineWidth=2;for(let y=0;y<h;y+=16){x.beginPath();x.moveTo(0,y);x.lineTo(w,y);x.stroke();for(let xx=(y/16%2)*16;xx<w;xx+=32){x.beginPath();x.moveTo(xx,y);x.lineTo(xx,y+16);x.stroke()}}},0.12,0.12);
+  const signT=(txt,bg,fg)=>{const t=cvT(512,128,(x,w,h)=>{x.fillStyle=bg;x.fillRect(0,0,w,h);x.strokeStyle='#e8c25a';x.lineWidth=8;x.strokeRect(6,6,w-12,h-12);x.fillStyle=fg;x.font='bold 74px system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,w/2,h/2+4)});t.wrapS=t.wrapT=T.ClampToEdgeWrapping;return t};
+  const mkPortal=()=>{const g=new T.Group(),sh=new T.Shape();sh.moveTo(-15,0);sh.lineTo(15,0);sh.lineTo(15,16);sh.lineTo(-15,16);sh.closePath();
+    const hole=new T.Path();hole.moveTo(-TW,0);hole.lineTo(TW,0);hole.lineTo(TW,TH);hole.absarc(0,TH,TW,0,Math.PI,false);hole.lineTo(-TW,0);sh.holes.push(hole);
+    const eg=new T.ExtrudeGeometry(sh,{depth:2,bevelEnabled:false,curveSegments:20});const m=new T.Mesh(eg,ML({map:portT}));m.position.z=-1;g.add(m);
+    const band=new T.Mesh(new T.TorusGeometry(TW+0.35,0.35,6,28,Math.PI),ML({color:0x1d7f95}));band.position.set(0,TH,-1.05);g.add(band);
+    const sg=new T.Mesh(new T.PlaneGeometry(9,2.25),ML({map:signT('METRO','#16557e','#ffffff')}));sg.position.set(0,13.6,-1.06);sg.rotation.y=Math.PI;g.add(sg);
+    g.traverse(o=>{if(o.isMesh)o.material.side=T.DoubleSide});sc.add(g);g.visible=false;return g};
+  const portIn=mkPortal(),portOut=mkPortal();
+  // Chorsu darvozasi va bayroqchalar
+  const gate=new T.Group();{const pm=ML({map:portT});for(const sg of [-1,1]){const p=new T.Mesh(boxG,pm);p.scale.set(1.4,14,1.4);p.position.set(sg*7.6,7,0);gate.add(p);const d=new T.Mesh(sphG,domeM);d.scale.setScalar(1.1);d.position.set(sg*7.6,14,0);gate.add(d)}
+    const b=new T.Mesh(boxG,ML({color:0x1d7f95}));b.scale.set(16.6,1.2,1.2);b.position.y=12.6;gate.add(b);
+    const s1=new T.Mesh(new T.PlaneGeometry(10,2.5),ML({map:signT('CHORSU','#f3ead6','#14506f'),side:T.DoubleSide}));s1.position.set(0,12.6,-0.65);s1.rotation.y=Math.PI;gate.add(s1);sc.add(gate);gate.visible=false}
+  const buntG=(()=>{const P=[],C=[],cols=[[0.85,0.2,0.15],[0.95,0.75,0.1],[0.1,0.6,0.7],[0.95,0.95,0.9],[0.2,0.55,0.25]];for(let i=0;i<24;i++){const x0=-10+i*20/24,x1=x0+20/24*0.8,y=xx=>11.6-1.4*(1-(xx/10)**2);const c=cols[i%5];
+    P.push(x0,y(x0),0,x1,y(x1),0,(x0+x1)/2,y((x0+x1)/2)-0.9,0);C.push(...c,...c,...c)}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('color',new T.Float32BufferAttribute(C,3));return g})();
+  const buntM=bend(new T.MeshBasicMaterial({vertexColors:true,side:T.DoubleSide}));const bunts=[];for(let i=0;i<12;i++){const b=new T.Mesh(buntG,buntM);b.visible=false;sc.add(b);bunts.push(b)}
+  const fogC=new T.Color(),TUNF=new T.Color(0x16120e),TUNH=new T.Color(0xffe2b8);
+  function world(pz){
+    for(let i=0;i<NSEG;i++){const g=segs[i],zs=Math.floor((pz-20)/SEG)*SEG+i*SEG,on=zoneAt(zs+SEG/2)===1;g.visible=on;if(on){g.position.z=zs-pz;g.userData.st.visible=Math.round(zs/SEG)%6===0}}
+    const k=tunK(pz),a=tun0(k),b=tun1(k);portIn.visible=a-pz<300;portIn.position.z=a-pz;portOut.visible=b-pz<300&&b-pz>-30;portOut.position.z=b-pz;portOut.rotation.y=Math.PI;
+    const gz=b+30;gate.visible=gz-pz<300&&gz-pz>-20;gate.position.z=gz-pz;
+    for(let i=0;i<bunts.length;i++){const zs=Math.floor(pz/22)*22+i*22,on=zoneAt(zs)===2&&zs>b+50;bunts[i].visible=on;bunts[i].position.z=zs-pz}
+    // tunnel ichida yorug'lik: quyosh so'nadi, chiroqlar, qorong'i tuman
+    const d=Math.min(pz-a,b-pz),tf=Math.max(0,Math.min(1,(d+3)/14));
+    if(tf>0){sun.intensity*=1-tf*0.92;hemi.intensity+=(0.62-hemi.intensity)*tf;hemi.color.lerp(TUNH,tf);sc.fog.color.lerp(TUNF,tf);starM.opacity*=1-tf;rd.toneMappingExposure+=(1.2-rd.toneMappingExposure)*tf;if(bloom)bloom.strength=Math.max(bloom.strength,0.75*tf)}
+    sc.fog.near=70-45*tf;sc.fog.far=230-90*tf;return tf}
   // ---- poyezd, rampa, to'siqlar ----
   const trainCol=[[0x2f6fb5,0xf2f2f2],[0xc8382f,0xf3efe6],[0x2f9a6b,0xf2f2f2],[0xe0a21f,0x2d2d2d]];
   // vagon yon tomoni: derazalar, eshiklar, chiziq
@@ -6800,7 +6878,9 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     // egilish: yo'l uzoqda yon tomonga ham sekin buriladi
     U.uBX.value=Math.sin(pz/260)*0.0012;tod(pz);if(live&&s.alive)quality(dt);
     trackT.offset.y=(pz/TL)%1;if(rails)rails.position.z=-(pz%TK);sideT.offset.y=(pz/6)%1;
-    for(const g of pool){let z=g.userData.z-pz;if(z<-30){g.userData.z+=propSpan;z+=propSpan}g.position.z=z}
+    world(pz);
+    for(const g of pool){const u=g.userData;let z=u.z-pz;if(z<-30){u.z+=propSpan;z+=propSpan}g.position.z=z;const zn=zoneAt(u.z),k=tunK(u.z-20);
+      g.visible=zn!==1&&!(u.z+u.w>tun0(k)-8&&u.z<tun1(k)+8);u.b.visible=zn===2;u.a.visible=zn!==2}
     // to'siqlar
     const alive=new Set();
     for(const o of s.obs){if(o.dead||o.z1-pz<-20||o.z0-pz>240)continue;alive.add(o.id);const m=objMesh(o);m.position.z=o.z0-pz}
