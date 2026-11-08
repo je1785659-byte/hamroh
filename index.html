@@ -734,6 +734,19 @@ body.rn-play nav.tabs{display:none}
 .rn-skc img{width:100%;max-width:120px;aspect-ratio:4/5;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
 .rn-skc b{font-size:15px}.rn-skc small{font-size:11px;opacity:.7;min-height:28px;line-height:1.25}
 .rn-skc button{width:100%;padding:8px 4px;font-size:13px;margin-top:2px}.rn-skc button[disabled]{opacity:.55}
+.rn-streak{float:right;font-weight:700;opacity:.9}
+.rn-ms{display:flex;flex-direction:column;gap:8px}
+.rn-m{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:var(--card2,rgba(127,127,127,.07))}
+.rn-m>div{flex:1;min-width:0}.rn-m b{display:block;font-size:14px}
+.rn-m i{display:block;height:6px;border-radius:4px;background:rgba(127,127,127,.2);margin:6px 0 3px;overflow:hidden}.rn-m i u{display:block;height:100%;background:linear-gradient(90deg,#1fa7b8,#4fd18b);border-radius:4px}
+.rn-m small{font-size:11px;opacity:.65}.rn-m button{white-space:nowrap;padding:8px 12px}.rn-m.ok{opacity:.6}.rn-m>span{font-size:20px;color:#2ea44f}
+.rn-chest{width:100%;text-align:center;padding:10px;border-radius:14px;font-size:14px}.rn-chest.dim{opacity:.6;background:var(--card2,rgba(127,127,127,.07))}
+.rn-bd{display:flex;align-items:center;gap:12px}.rn-bdi{font-size:34px}.rn-bd>div:nth-child(2){flex:1}.rn-bd b{display:block}.rn-bd small{font-size:12px;opacity:.7}.rn-bd button{white-space:nowrap}
+.rn-board{position:absolute;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));width:64px;height:64px;border-radius:50%;border:3px solid #fff;background:radial-gradient(circle at 35% 30%,#4fe0ef,#1588a8);font-size:30px;box-shadow:0 6px 16px rgba(0,0,0,.35);z-index:5;animation:rnpulse 1.4s infinite}
+.rn-board b{position:absolute;right:-4px;top:-4px;min-width:22px;height:22px;border-radius:11px;background:#f26a1b;color:#fff;font-size:12px;line-height:22px}
+@keyframes rnpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.rn-done span{color:#2ea44f}
+.rn-bd .btn{width:auto;flex:none;padding:10px 16px}.rn-bd>div:nth-child(2){min-width:0}
 body[data-sec="ov"]{--sec-a:#1f2d16;--sec-b:#5a6b2a;--sec:#6b7d2e}
 body.hu-play nav.tabs{display:none}
 .hu-lvls{display:grid;gap:8px}
@@ -4090,7 +4103,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108k';
+const APP_VER='20261108l';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -6193,12 +6206,12 @@ function huStopAmb(){clearTimeout(huAmbT);try{huWindN&&huWindN.stop()}catch(e){}
 /* ---------- YUGUR (runner): yo'l, harakat, to'siqlar, bonuslar — DOM'siz ---------- */
 const RN={lanes:[2.2,0,-2.2],g:-38,jumpV:13.2,shoeV:19,laneSpd:14,pw:0.36,ph:1.75,prh:0.85,roll:0.62,
   trainH:3.6,tw:1.0,bw:0.95,low:0.95,highY:1.3,highTop:3.2,blockH:2.9,jetY:9,gapSw:15.6,car:12.5,
-  dur:{magnet:12,jet:8,shoe:12,x2:15}};
+  dur:{magnet:12,jet:8,shoe:12,x2:15,board:30}};
 function rnRng(s){s=(s>>>0)||1;return()=>{s=(s*16807)%2147483647;return s/2147483647}}
 const rnSpeed=t=>11+15*(1-Math.exp(-t/150));
 function rnNew(seed){
   return {seed,t:0,z:0,v:11,lane:1,prevLane:1,x:0,y:0,vy:0,roll:0,dive:false,alive:true,crash:null,coins:0,score:0,guard:0,inv:0,
-    pw:{magnet:0,jet:0,shoe:0,x2:0,shield:0},obs:[],coinsL:[],items:[],ev:[],nid:1,R:rnRng(seed*7919+13),
+    pw:{magnet:0,jet:0,shoe:0,x2:0,shield:0,board:0},boards:0,obs:[],coinsL:[],items:[],ev:[],nid:1,R:rnRng(seed*7919+13),
     genZ:30,wallsUntil:[-99,-99,-99],pf:1,lastItem:0,genLog:[]};
 }
 function rnInput(s,k){
@@ -6206,6 +6219,7 @@ function rnInput(s,k){
   if(k==='left'&&s.lane>0){s.prevLane=s.lane;s.lane--;s.ev.push({k:'swipe'})}
   else if(k==='right'&&s.lane<2){s.prevLane=s.lane;s.lane++;s.ev.push({k:'swipe'})}
   else if(k==='up'){if(s.pw.jet>0)return;const h=rnSurf(s,s.x,s.z);if(s.y<=h+0.05&&s.vy<=0){s.vy=s.pw.shoe>0?RN.shoeV:RN.jumpV;s.roll=0;s.jbuf=0;s.ev.push({k:'jump'})}else s.jbuf=0.18}
+  else if(k==='board'){if(s.boards>0&&!(s.pw.board>0)){s.boards--;s.pw.board=RN.dur.board;s.ev.push({k:'board'})}}
   else if(k==='down'){if(s.pw.jet>0)return;const h=rnSurf(s,s.x,s.z);if(s.y>h+0.2){s.dive=true;s.vy=Math.min(s.vy,-18)}s.roll=RN.roll;s.ev.push({k:'roll'})}
 }
 const rnLX=l=>RN.lanes[l];
@@ -6226,7 +6240,7 @@ function rnStep(s,dt){
   const v=rnSpeed(s.t)*(s.pw.jet>0?1.12:1);s.v=v;const pz=s.z,px=s.x;s.z+=v*dt;
   for(const o of s.obs)if(o.type==='mtrain'&&o.z0-s.z<(o.trig||1e9)){o.z0-=o.v*dt;o.z1-=o.v*dt}
   const tx=rnLX(s.lane),dx=tx-s.x,mx=Math.min(26,Math.max(5,Math.abs(dx)*17))*dt;s.x=Math.abs(dx)<=mx||Math.abs(dx)<0.01?tx:s.x+Math.sign(dx)*mx;s.vx=(s.x-px)/dt;
-  for(const k of ['magnet','jet','shoe','x2'])if(s.pw[k]>0){s.pw[k]=Math.max(0,s.pw[k]-dt);if(!s.pw[k]){s.ev.push({k:'pwEnd',p:k});if(k==='jet')s.inv=2.2}}
+  for(const k of ['magnet','jet','shoe','x2','board'])if(s.pw[k]>0){s.pw[k]=Math.max(0,s.pw[k]-dt);if(!s.pw[k]){s.ev.push({k:'pwEnd',p:k});if(k==='jet')s.inv=2.2}}
   s.roll=Math.max(0,s.roll-dt);if(s.jbuf>0)s.jbuf=Math.max(0,s.jbuf-dt);s.inv=Math.max(0,s.inv-dt);if(s.guard>0)s.guard=Math.max(0,s.guard-dt);
   // tik harakat
   const h=rnSurf(s,s.x,s.z);
@@ -6246,6 +6260,7 @@ function rnStep(s,dt){
         s.lane=s.prevLane;s.x=px;
         if(s.guard>0){s.alive=false;s.crash='caught';s.ev.push({k:'crash',c:'caught'});return}
         s.guard=8;s.ev.push({k:'stumble'});break}
+      if(s.pw.board>0){s.pw.board=0;o.dead=true;s.inv=2;s.ev.push({k:'boardBreak',id:o.id});continue}
       if(s.pw.shield>0){s.pw.shield=0;o.dead=true;s.inv=1;s.ev.push({k:'shield',id:o.id});continue}
       s.alive=false;s.crash=o.type;s.ev.push({k:'crash',c:o.type});return}
   }
@@ -6339,19 +6354,58 @@ function rnBot(s){
     if(o.type==='high'&&dz>0&&dz<v*0.2+0.6&&s.roll<0.2&&!air)rnInput(s,'down')}
 }
 
+/* ---------- YUGUR: kunlik vazifalar va kunlik kirish mukofoti (DOM'siz) ---------- */
+// t: tur, one: bitta yugurishdagi eng yaxshi natija (aks holda kun davomida yig'iladi), lv: [maqsad, mukofot]
+const RN_MT={
+  coins:{one:true,lv:[[60,120],[120,200],[220,350]]},
+  dist:{one:true,lv:[[600,120],[1200,220],[2200,400]]},
+  score:{one:true,lv:[[2500,150],[6000,260],[12000,450]]},
+  jumps:{one:false,lv:[[25,100],[50,180],[90,300]]},
+  rolls:{one:false,lv:[[15,100],[35,180],[60,300]]},
+  items:{one:false,lv:[[3,120],[6,220],[10,350]]},
+  games:{one:false,lv:[[3,100],[5,160],[8,260]]}};
+const RN_LOGIN=[100,150,200,300,400,600,1000];
+function rnHashDay(d){let h=2166136261;for(let i=0;i<d.length;i++){h^=d.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rnMissions(st,day){
+  if(st&&st.day===day&&st.list)return st;
+  let h=rnHashDay(day);const nx=()=>{h=Math.imul(h^(h>>>15),2246822519)>>>0;h=(h^(h>>>13))>>>0;return h/4294967296};
+  const ts=Object.keys(RN_MT),pick=[];while(pick.length<3){const t=ts[(nx()*ts.length)|0];if(!pick.includes(t))pick.push(t)}
+  const list=pick.map((t,i)=>{const L=RN_MT[t].lv,[n,r]=L[Math.min(L.length-1,(nx()*L.length)|0)];return {t,n,r,p:0}});
+  return Object.assign(st||{},{day,list,chest:false});
+}
+function rnMissionRun(st,run){
+  for(const m of st.list){if(m.p>=m.n)continue;const one=RN_MT[m.t].one,v=m.t==='games'?1:(run[m.t]||0);
+    m.p=Math.min(m.n,one?Math.max(m.p,v):m.p+v)}
+  return st;
+}
+function rnMissionClaim(st,i){const m=st.list[i];if(!m||m.claimed||m.p<m.n)return 0;m.claimed=true;return m.r}
+function rnChest(st){if(st.chest||!st.list||!st.list.every(m=>m.claimed))return 0;st.chest=true;return 500}
+function rnLogin(st,day){
+  if(st.last===day)return 0;
+  const prev=new Date(day+'T00:00:00Z');prev.setUTCDate(prev.getUTCDate()-1);const y=prev.toISOString().slice(0,10);
+  st.streak=st.last===y?(st.streak||0)+1:1;st.last=day;
+  return RN_LOGIN[Math.min(st.streak,RN_LOGIN.length)-1];
+}
+
 /* ---------- YUGUR: 3D shahar, egilgan dunyo, qahramon, boshqaruv ---------- */
 let rnStreak=0,rnStreakT=0,RNS=null,rnR=null,rnRAF=null,rnSt='menu',rnAud=null,rnTrauma=0,rnHint=0;
 const rnProg=()=>store.get('rn_p',{best:0,coins:0,games:0});
 // qahramonlar do'koni: tangalarga yangi qahramon
 const RN_SK=[{id:'kid',p:0,n:()=>'Jasur',d:()=>KT("Doppili bola — sizning birinchi qahramoningiz",'Мальчик в тюбетейке — ваш первый герой','Boy in a doppi — your first hero')},
   {id:'girl',p:1500,n:()=>'Malika',d:()=>KT('Atlas kofta, ikki o\'rim soch','Худи из атласа, две косы','Atlas hoodie, two braids')},
-  {id:'skater',p:3000,n:()=>'Sardor',d:()=>KT('Skeytchi, quloqchinli','Скейтер в наушниках','Skater with headphones')}];
+  {id:'skater',p:3000,n:()=>'Sardor',d:()=>KT('Skeytchi: har yugurishda 1 bepul skeyt','Скейтер: 1 бесплатный скейт за забег','Skater: 1 free board per run')},
+  {id:'afandi',p:6000,n:()=>'Afandi',d:()=>KT("Ertaklardagi hazilkash chol",'Весёлый мудрец из сказок','The witty sage of folk tales')},
+  {id:'cosmo',p:10000,n:()=>'Kosmonavt',d:()=>KT('Skafandrli jasur bola','Отважный мальчик в скафандре','Brave kid in a space suit')}];
+const RN_BOARD_P=300,rnDay=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const rnMS=()=>rnMissions(store.get('rn_ms',{}),rnDay());
+const RN_MTXT={coins:n=>KT(`Bir yugurishda ${n} ta tanga`,`${n} монет за забег`,`${n} coins in one run`),dist:n=>KT(`Bir yugurishda ${n} m`,`${n} м за забег`,`Run ${n} m in one go`),score:n=>KT(`Bir yugurishda ${n.toLocaleString()} ochko`,`${n.toLocaleString()} очков за забег`,`${n.toLocaleString()} points in one run`),
+  jumps:n=>KT(`${n} marta sakrang`,`Прыгните ${n} раз`,`Jump ${n} times`),rolls:n=>KT(`${n} marta sirpaning`,`Подкат ${n} раз`,`Roll ${n} times`),items:n=>KT(`${n} ta bonus yig'ing`,`Соберите ${n} бонусов`,`Grab ${n} power-ups`),games:n=>KT(`${n} marta yuguring`,`Сыграйте ${n} забега`,`Play ${n} runs`)};
 const rnOwn=()=>{const o=store.get('rn_own',['kid']);return o.includes('kid')?o:['kid',...o]};
 const rnSkin=()=>{const k=store.get('rn_skin','kid');return rnOwn().includes(k)&&RN_SK.some(x=>x.id===k)?k:'kid'};
-const RN_PW={magnet:['🧲',()=>KT('Magnit','Магнит','Magnet')],jet:['🚀',()=>KT('Reaktiv ryukzak','Реактивный ранец','Jetpack')],shoe:['👟',()=>KT('Sakrovchi krossovka','Супер-кроссовки','Super sneakers')],x2:['✖2',()=>KT('2× ochko','2× очки','2× score')],shield:['🛡',()=>KT('Qalqon','Щит','Shield')]};
+const RN_PW={board:['🛹',()=>KT('Skeyt','Скейт','Skateboard')],magnet:['🧲',()=>KT('Magnit','Магнит','Magnet')],jet:['🚀',()=>KT('Reaktiv ryukzak','Реактивный ранец','Jetpack')],shoe:['👟',()=>KT('Sakrovchi krossovka','Супер-кроссовки','Super sneakers')],x2:['✖2',()=>KT('2× ochko','2× очки','2× score')],shield:['🛡',()=>KT('Qalqon','Щит','Shield')]};
 // ---- tayyor 3D modellar (Kenney, CC0): bir marta yuklanadi ----
 let RNA=null,RNAp=null,RN_FROT=0,RN_BROT=1,RN_HROT=0,RN_HBACK=1;
-const RN_MN=['cab','car','low','high','block','ramp','coin','magnet','jet','shoe','shield','apart','bazaar','mahalla','madrasa','choy','chinar','lamp','cart'];
+const RN_MN=['board','cab','car','low','high','block','ramp','coin','magnet','jet','shoe','shield','apart','bazaar','mahalla','madrasa','choy','chinar','lamp','cart'];
 function rnHalf(h){const s=(h&0x8000)?-1:1,e=(h>>10)&31,f=h&1023;return e===0?s*Math.pow(2,-14)*(f/1024):e===31?(f?NaN:s*Infinity):s*Math.pow(2,e-15)*(1+f/1024)}
 function rnLoadAssets(){
   if(RNA&&RNA.skin!==rnSkin()){ // boshqa qahramon tanlangan: faqat uni yuklaymiz
@@ -6392,10 +6446,17 @@ function rnLoadAssets(){
 function rnDispose(){cancelAnimationFrame(rnRAF);if(rnR){try{rnR.dispose()}catch(e){}rnR=null}}
 function viewYugur(){
   rnDispose();document.body.classList.remove('rn-play');try{tg&&tg.enableVerticalSwipes&&tg.enableVerticalSwipes()}catch(e){}
-  setHero('yugur');const P=rnProg();
+  setHero('yugur');
+  {const L=store.get('rn_login',{}),r=rnLogin(L,rnDay());if(r){store.set('rn_login',L);const P0=rnProg();P0.coins+=r;store.set('rn_p',P0);setTimeout(()=>rnToastG(KT(`🎁 ${L.streak}-kun mukofoti: +${r} tanga`,`🎁 Награда за ${L.streak}-й день: +${r} монет`,`🎁 Day ${L.streak} reward: +${r} coins`)),400)}}
+  const P=rnProg(),MS=rnMS();store.set('rn_ms',MS);const nb=store.get('rn_boards',0);
   $('#screen').innerHTML=`<section class="card rn-menu" data-notr>
       <div class="rn-stats"><div><small>${KT('Rekord','Рекорд','Best')}</small><b>${P.best.toLocaleString()}</b></div><div><small>${KT('Tangalar','Монеты','Coins')}</small><b>🪙 ${P.coins.toLocaleString()}</b></div><div><small>${KT("O'yinlar",'Игры','Games')}</small><b>${P.games}</b></div></div>
       <button class="btn rn-go" id="rngo">▶ ${KT('Yugurish','Бежать','Run')}</button></section>
+    <section class="card" data-notr><div class="label">${KT('Bugungi vazifalar','Задания на сегодня','Today\'s missions')} <small class="rn-streak">🔥 ${store.get('rn_login',{}).streak||1}</small></div><div class="rn-ms">${MS.list.map((m,i)=>`<div class="rn-m${m.claimed?' ok':''}"><div><b>${RN_MTXT[m.t](m.n)}</b><i><u style="width:${Math.round(100*m.p/m.n)}%"></u></i><small>${Math.floor(m.p).toLocaleString()} / ${m.n.toLocaleString()}</small></div>
+      ${m.claimed?'<span>✓</span>':`<button class="${m.p>=m.n?'btn':'chip'}" data-ms="${i}" ${m.p>=m.n?'':'disabled'}>🪙 ${m.r}</button>`}</div>`).join('')}
+      ${MS.list.every(m=>m.claimed)?(MS.chest?`<div class="rn-chest">🎉 ${KT('Bugungi sandiq ochildi. Ertaga yangi vazifalar!','Сундук открыт. Завтра новые задания!','Chest opened. New missions tomorrow!')}</div>`:`<button class="btn rn-chest" id="rnchest">🎁 ${KT('Sandiqni ochish: +500','Открыть сундук: +500','Open chest: +500')}</button>`):`<div class="rn-chest dim">🎁 ${KT('Uchala vazifa — sandiq (+500)','Все три задания — сундук (+500)','All three — chest (+500)')}</div>`}</div></section>
+    <section class="card" data-notr><div class="rn-bd"><div class="rn-bdi">🛹</div><div><b>${KT('Skeyt','Скейт','Skateboard')} · ${nb}</b><small>${KT("30 soniya minasiz; urilsangiz skeyt sinadi, siz emas. O'yinda 🛹 tugmasi.",'30 секунд езды; при ударе ломается скейт, а не вы. Кнопка 🛹 в игре.','Ride for 30 s; a crash breaks the board, not you. 🛹 button in game.')}</small></div>
+      <button class="btn" id="rnbuyb" ${P.coins<RN_BOARD_P?'disabled':''}>🪙 ${RN_BOARD_P}</button></div></section>
     <section class="card" data-notr><div class="label">${KT('Qahramonlar','Герои','Heroes')}</div><div class="rn-sk">${RN_SK.map(k=>{const own=rnOwn().includes(k.id),cur=rnSkin()===k.id;
       return `<div class="rn-skc${cur?' on':''}"><img src="rn/sk/${k.id}.png?v=${APP_VER}" alt="" loading="lazy"><b>${k.n()}</b><small>${k.d()}</small>
       <button class="${cur?'chip':own?'chip':'btn'}" data-sk="${k.id}" ${cur||(!own&&P.coins<k.p)?'disabled':''}>${cur?'✓ '+KT('Tanlangan','Выбран','Selected'):own?KT('Tanlash','Выбрать','Select'):'🪙 '+k.p.toLocaleString()}</button></div>`}).join('')}</div></section>
@@ -6406,13 +6467,16 @@ function viewYugur(){
       <p>🚆 ${KT("Poyezdga rampadan chiqing. Poyezd yoniga urilsangiz qorovul yaqinlashadi — ikkinchi marta ushlaydi!",'На поезд — по рампе. Удар о бок поезда — охранник ближе, второй раз — поймает!','Climb trains by ramps. Bump a side — the guard gets closer, twice and you are caught!')}</p>
       <p>🧲 🚀 👟 ✖2 🛡 ${KT('Bonuslarni yig\'ing','Собирайте бонусы','Grab power-ups')}</p></div></section>`;
   $('#rngo').onclick=()=>rnStart();
+  document.querySelectorAll('[data-ms]').forEach(b=>b.onclick=()=>{const st=rnMS(),r=rnMissionClaim(st,+b.dataset.ms);if(!r)return;store.set('rn_ms',st);const P=rnProg();P.coins+=r;store.set('rn_p',P);haptic('done');rnToastG('+'+r+' 🪙');viewYugur()});
+  if($('#rnchest'))$('#rnchest').onclick=()=>{const st=rnMS(),r=rnChest(st);if(!r)return;store.set('rn_ms',st);const P=rnProg();P.coins+=r;store.set('rn_p',P);haptic('done');rnToastG('🎁 +'+r+' 🪙');viewYugur()};
+  $('#rnbuyb').onclick=()=>{const P=rnProg();if(P.coins<RN_BOARD_P)return;P.coins-=RN_BOARD_P;store.set('rn_p',P);store.set('rn_boards',store.get('rn_boards',0)+1);haptic('light');viewYugur()};
   document.querySelectorAll('[data-sk]').forEach(b=>b.onclick=()=>{const k=RN_SK.find(x=>x.id===b.dataset.sk),P=rnProg(),own=rnOwn();
     if(!own.includes(k.id)){if(P.coins<k.p)return;P.coins-=k.p;store.set('rn_p',P);own.push(k.id);store.set('rn_own',own);haptic('done');rnToastG(KT(`${k.n()} sizniki!`,`${k.n()} теперь ваш!`,`${k.n()} is yours!`))}
     store.set('rn_skin',k.id);viewYugur()});
 }
 function rnToastG(t){try{toast(t)}catch(e){}}
 function rnStart(){
-  RNS=rnNew((Date.now()%1e6)|0);rnSt='ready';rnTrauma=0;statSec('yugur_game');rnGameV();window.scrollTo(0,0);
+  RNS=rnNew((Date.now()%1e6)|0);RNS.free=rnSkin()==='skater'?1:0;RNS.boards=store.get('rn_boards',0)+RNS.free;RNS.st={jumps:0,rolls:0,items:0};rnSt='ready';rnTrauma=0;statSec('yugur_game');rnGameV();window.scrollTo(0,0);
 }
 function rnGameV(){
   document.body.classList.add('rn-play');try{tg&&tg.disableVerticalSwipes&&tg.disableVerticalSwipes()}catch(e){}
@@ -6422,10 +6486,12 @@ function rnGameV(){
     <div class="rn-top"><button class="rn-ib" id="rnback" aria-label="${KT('Orqaga','Назад','Back')}">⏸</button>
       <div class="rn-sc"><b id="rnscore">0</b><small id="rnmul"></small></div><div class="rn-coin">🪙 <b id="rncoins">0</b></div></div>
     <div class="rn-pws" id="rnpws"></div>
+    <button class="rn-board" id="rnboard" hidden>🛹<b id="rnbn"></b></button>
     <div class="rn-guard" id="rnguard" hidden>👮 ${KT('Qorovul ortingizda!','Охранник сзади!','Guard is behind you!')}</div>
     <div class="rn-msg" id="rnmsg"></div>
     <div id="rnend"></div></div>`;
   $('#rnback').onclick=()=>rnPause();
+  $('#rnboard').onclick=e=>{e.stopPropagation();if(rnSt==='ready'){rnSt='run';$('#rnmsg').hidden=true}if(rnSt==='run')rnInput(RNS,'board')};
   rnHud();
   blLoad3().then(ok=>ok?rnLoadAssets().then(()=>ok,()=>ok):ok).then(ok=>{
     if(!$('#rnstage')||rnR)return;const v=$('#rnview');v.innerHTML='';
@@ -6450,10 +6516,11 @@ function rnBind(el){
   el.addEventListener('pointermove',e=>{if(e.pointerId!==id||done)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.hypot(dx,dy)<20)return;done=true;
     rnKey(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy<0?'up':'down'))});
   el.addEventListener('pointerup',()=>{id=null});
-  const kd=e=>{if(!$('#rnstage')){removeEventListener('keydown',kd);return}const m={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',a:'left',d:'right',w:'up',s:'down',' ':'up'}[e.key];if(m){e.preventDefault();rnKey(m)}};
+  const kd=e=>{if(!$('#rnstage')){removeEventListener('keydown',kd);return}const m={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',a:'left',d:'right',w:'up',s:'down',' ':'up',b:'board',Shift:'board'}[e.key];if(m){e.preventDefault();rnKey(m)}};
   addEventListener('keydown',kd);
 }
 function rnKey(k){
+  if(rnSt==='ready'&&k==='board')return;
   if(rnSt==='ready'){rnSt='run';$('#rnmsg').hidden=true;rnSnd('go')}
   if(rnSt!=='run')return;rnInput(RNS,k);
 }
@@ -6461,12 +6528,15 @@ function rnHud(){
   if(!$('#rnstage')||!RNS)return;const s=RNS;
   $('#rnscore').textContent=Math.floor(s.score).toLocaleString();$('#rncoins').textContent=s.coins;
   $('#rnmul').textContent=s.pw.x2>0?'×2':'';
-  $('#rnpws').innerHTML=['magnet','jet','shoe','x2'].filter(k=>s.pw[k]>0).map(k=>`<div class="rn-pw"><span>${RN_PW[k][0]}</span><i style="transform:scaleX(${s.pw[k]/RN.dur[k]})"></i></div>`).join('')+(s.pw.shield?`<div class="rn-pw"><span>🛡</span></div>`:'');
+  $('#rnpws').innerHTML=['magnet','jet','shoe','x2','board'].filter(k=>s.pw[k]>0).map(k=>`<div class="rn-pw"><span>${RN_PW[k][0]}</span><i style="transform:scaleX(${s.pw[k]/RN.dur[k]})"></i></div>`).join('')+(s.pw.shield?`<div class="rn-pw"><span>🛡</span></div>`:'');
   $('#rnguard').hidden=!(s.guard>0&&s.alive);
+  {const bb=$('#rnboard');if(bb){bb.hidden=!(s.boards>0)||s.pw.board>0||!s.alive;$('#rnbn').textContent=s.boards}}
 }
 function rnOver(){
   rnSt='over';const s=RNS,P=rnProg(),sc=Math.floor(s.score),nb=sc>P.best;
   P.best=Math.max(P.best,sc);P.coins+=s.coins;P.games++;store.set('rn_p',P);haptic(nb?'done':'heavy');
+  const MS=rnMS(),before=MS.list.map(m=>m.p>=m.n);rnMissionRun(MS,{coins:s.coins,dist:Math.round(s.z),score:sc,jumps:s.st?s.st.jumps:0,rolls:s.st?s.st.rolls:0,items:s.st?s.st.items:0});store.set('rn_ms',MS);
+  const newDone=MS.list.filter((m,i)=>m.p>=m.n&&!before[i]);
   const why={caught:KT('Qorovul ushlab oldi!','Охранник поймал!','The guard caught you!'),train:KT('Poyezdga urildingiz!','Врезались в поезд!','Hit a train!'),mtrain:KT('Poyezdga urildingiz!','Врезались в поезд!','Hit a train!'),block:KT("To'siqqa urildingiz!",'Врезались в барьер!','Hit a barrier!'),low:KT("Past to'siq — sakrash kerak edi",'Низкий барьер — надо было прыгать','Low barrier — jump!'),high:KT("Baland to'siq — sirpanish kerak edi",'Высокий барьер — надо было подкатиться','High bar — roll!')}[s.crash]||'';
   setTimeout(()=>{if(!$('#rnstage'))return;
     $('#rnend').innerHTML=`<div class="rn-end"><div class="rn-endc"><small>${why}</small>
@@ -6475,6 +6545,7 @@ function rnOver(){
       <div class="rn-row"><span>🪙 ${KT('Tangalar','Монеты','Coins')}</span><b>+${s.coins}</b></div>
       <div class="rn-row"><span>📏 ${KT('Masofa','Дистанция','Distance')}</span><b>${Math.round(s.z)} m</b></div>
       <div class="rn-row"><span>🏆 ${KT('Rekord','Рекорд','Best')}</span><b>${P.best.toLocaleString()}</b></div>
+      ${newDone.map(m=>`<div class="rn-row rn-done"><span>✅ ${RN_MTXT[m.t](m.n)}</span><b>🪙 ${m.r}</b></div>`).join('')}
       <div class="rn-ea"><button class="btn" id="rnagain">↻ ${KT('Yana yugurish','Ещё раз','Run again')}</button>
       <button class="chip" id="rnshare">📤 ${KT("Do'stlarga",'Друзьям','Share')}</button><button class="chip" id="rnmenu">${KT('Menyu','Меню','Menu')}</button></div></div></div>`;
     $('#rnagain').onclick=()=>{rnDispose();rnStart()};$('#rnmenu').onclick=()=>rnLeave();
@@ -6488,8 +6559,10 @@ function rnLoop(){
     if(rnSt==='run'){acc+=dt;while(acc>=1/120){rnStep(RNS,1/120);acc-=1/120;if(!RNS.alive)break}}
     // hodisalar: ovoz, effekt
     for(const e of RNS.ev.splice(0)){rnR.fx(e);
-      if(e.k==='coin'){const n=performance.now();rnStreak=n-rnStreakT<350?Math.min(12,rnStreak+1):0;rnStreakT=n;rnSnd('coin',rnStreak)}else if(e.k==='magPull'){}else if(e.k==='jump')rnSnd('jump');else if(e.k==='roll')rnSnd('roll');else if(e.k==='land')rnSnd('land');
-      else if(e.k==='item'){rnSnd('item');rnToast(RN_PW[e.p][0]+' '+RN_PW[e.p][1]());haptic('light')}
+      if(e.k==='coin'){const n=performance.now();rnStreak=n-rnStreakT<350?Math.min(12,rnStreak+1):0;rnStreakT=n;rnSnd('coin',rnStreak)}else if(e.k==='magPull'){}else if(e.k==='jump'){RNS.st.jumps++;rnSnd('jump')}else if(e.k==='roll'){RNS.st.rolls++;rnSnd('roll')}else if(e.k==='land')rnSnd('land');
+      else if(e.k==='board'){rnSnd('item');haptic('light');if(RNS.free>0)RNS.free--;else store.set('rn_boards',Math.max(0,store.get('rn_boards',0)-1))}
+      else if(e.k==='boardBreak'){rnSnd('shield');rnTrauma=Math.min(1,rnTrauma+0.5);haptic('medium');rnToast('🛹 '+KT('Skeyt sindi — siz omon qoldingiz!','Скейт сломан — вы спасены!','Board broke — you survived!'))}
+      else if(e.k==='item'){RNS.st.items++;rnSnd('item');rnToast(RN_PW[e.p][0]+' '+RN_PW[e.p][1]());haptic('light')}
       else if(e.k==='stumble'){rnSnd('stumble');rnTrauma=Math.min(1,rnTrauma+0.55);haptic('medium')}
       else if(e.k==='shield'){rnSnd('shield');rnTrauma=Math.min(1,rnTrauma+0.5)}
       else if(e.k==='crash'){rnSnd('crash');rnTrauma=1;rnOver()}}
@@ -6852,6 +6925,10 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
       acts[c.name]=mixer.clipAction(c)}}
   const play=(n,fade=0.12,once=false)=>{if(!mixer||curA===n||!acts[n])return;const a=acts[n];a.reset();a.setLoop(once?T.LoopOnce:T.LoopRepeat);a.clampWhenFinished=once;a.enabled=true;
     if(curA&&acts[curA])a.crossFadeFrom(acts[curA],fade,false);a.play();curA=n;aT=0};
+  // skeyt (oyoq ostida)
+  const boardG=new T.Group();hero.add(boardG);boardG.visible=false;
+  if(RM.board){const a=RM.board,long=a.s.x>a.s.z,m=new T.Mesh(a.geo,mMat('board',{emissive:0x111111}));m.scale.setScalar(1.25/Math.max(a.s.x,a.s.z));if(long)m.rotation.y=Math.PI/2;boardG.add(m);shadowy(boardG,false)}
+  else{const d=new T.Mesh(rbx(0.5,0.08,1.25,0.04),ML({color:0x1fa7b8}));d.position.y=0.12;boardG.add(d);for(const z of [-0.4,0.4])for(const x of [-0.2,0.2]){const w=new T.Mesh(new T.CylinderGeometry(0.07,0.07,0.06,10),ML({color:0xf26a1b}));w.rotation.z=Math.PI/2;w.position.set(x,0.06,z);boardG.add(w)}}
   const blob=new T.Mesh(new T.CircleGeometry(0.5,20),bend(new T.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.3,depthWrite:false})));blob.rotation.x=-Math.PI/2;sc.add(blob);
   // qorovul
   const guard=new T.Group();sc.add(guard);{const uni=ML({color:0x2b4a7a}),cap=ML({color:0x1b2a44});
@@ -6876,6 +6953,8 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     else if(e.k==='land'){squash=0.25;spark(s.x,s.y+0.1,0,5,0xcab89a,0.7)}
     else if(e.k==='jump')squash=-0.2;
     else if(e.k==='item')spark(s.x,s.y+1.2,0.5,10,0xffd060,0.8);
+    else if(e.k==='boardBreak'){spark(s.x,s.y+0.4,0.4,16,0x6fe0ff,0.8);const m=OM.get(e.id);if(m)m.visible=false}
+    else if(e.k==='board')spark(s.x,s.y+0.3,0.2,10,0x6fe0ff,0.6);
     else if(e.k==='shield'){spark(s.x,s.y+1,1.2,14,0x8fe8ff,0.9);const m=OM.get(e.id);if(m)m.visible=false}
     else if(e.k==='stumble')spark(s.x,s.y+1,0.3,6,0xffffff,0.6);
   }
@@ -6954,6 +7033,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
       if(A[N.run])A[N.run].timeScale=Math.min(1.35,Math.max(0.8,s.v/(KID?18:16)));
       mixer.update(live||!s.alive?dt:dt);
     }
+    {const on=s.pw.board>0&&s.pw.jet<=0;boardG.visible=on&&(s.pw.board>3||Math.sin(spin*9)>-0.3);if(on){body.position.y+=0.3;boardG.rotation.z=-lean*0.6;boardG.rotation.x=s.vy>0.5?-0.25:0}}
     jet.visible=s.pw.jet>0;const mgOn=s.pw.magnet>0;magG.visible=mgOn;if(mgOn){armR.p.rotation.x=-1.3;armR.k.rotation.x=-0.2}
     waves.forEach((w,i)=>{w.visible=mgOn;const k=((spin*0.45+i/3)%1);w.scale.setScalar(0.6+k*4.5);w.material.opacity=0.45*(1-k)*(s.pw.magnet<2?(Math.sin(spin*8)>0?1:0.2):1)});flames.forEach(f=>f.scale.set(1,0.8+Math.random()*0.6,1));
     bubble.visible=!!s.pw.shield||s.inv>0;bubble.material.opacity=s.inv>0?0.1+0.15*Math.abs(Math.sin(spin*6)):0.18;
