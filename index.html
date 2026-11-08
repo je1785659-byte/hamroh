@@ -728,6 +728,12 @@ body.rn-play nav.tabs{display:none}
 .rn-ea{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
 .rn-ea .btn{flex:1 1 100%;font-size:16px}
 .rn-ea .chip{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);padding:10px 16px;border-radius:12px;font-weight:700}
+.rn-sk{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rn-skc{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:8px 6px 10px;border-radius:16px;background:var(--card2,rgba(127,127,127,.07));border:2px solid transparent}
+.rn-skc.on{border-color:var(--accent,#1fa7b8)}
+.rn-skc img{width:100%;max-width:120px;aspect-ratio:4/5;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
+.rn-skc b{font-size:15px}.rn-skc small{font-size:11px;opacity:.7;min-height:28px;line-height:1.25}
+.rn-skc button{width:100%;padding:8px 4px;font-size:13px;margin-top:2px}.rn-skc button[disabled]{opacity:.55}
 body[data-sec="ov"]{--sec-a:#1f2d16;--sec-b:#5a6b2a;--sec:#6b7d2e}
 body.hu-play nav.tabs{display:none}
 .hu-lvls{display:grid;gap:8px}
@@ -4084,7 +4090,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108j';
+const APP_VER='20261108k';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -6336,12 +6342,20 @@ function rnBot(s){
 /* ---------- YUGUR: 3D shahar, egilgan dunyo, qahramon, boshqaruv ---------- */
 let rnStreak=0,rnStreakT=0,RNS=null,rnR=null,rnRAF=null,rnSt='menu',rnAud=null,rnTrauma=0,rnHint=0;
 const rnProg=()=>store.get('rn_p',{best:0,coins:0,games:0});
+// qahramonlar do'koni: tangalarga yangi qahramon
+const RN_SK=[{id:'kid',p:0,n:()=>'Jasur',d:()=>KT("Doppili bola — sizning birinchi qahramoningiz",'Мальчик в тюбетейке — ваш первый герой','Boy in a doppi — your first hero')},
+  {id:'girl',p:1500,n:()=>'Malika',d:()=>KT('Atlas kofta, ikki o\'rim soch','Худи из атласа, две косы','Atlas hoodie, two braids')},
+  {id:'skater',p:3000,n:()=>'Sardor',d:()=>KT('Skeytchi, quloqchinli','Скейтер в наушниках','Skater with headphones')}];
+const rnOwn=()=>{const o=store.get('rn_own',['kid']);return o.includes('kid')?o:['kid',...o]};
+const rnSkin=()=>{const k=store.get('rn_skin','kid');return rnOwn().includes(k)&&RN_SK.some(x=>x.id===k)?k:'kid'};
 const RN_PW={magnet:['🧲',()=>KT('Magnit','Магнит','Magnet')],jet:['🚀',()=>KT('Reaktiv ryukzak','Реактивный ранец','Jetpack')],shoe:['👟',()=>KT('Sakrovchi krossovka','Супер-кроссовки','Super sneakers')],x2:['✖2',()=>KT('2× ochko','2× очки','2× score')],shield:['🛡',()=>KT('Qalqon','Щит','Shield')]};
 // ---- tayyor 3D modellar (Kenney, CC0): bir marta yuklanadi ----
 let RNA=null,RNAp=null,RN_FROT=0,RN_BROT=1,RN_HROT=0,RN_HBACK=1;
 const RN_MN=['cab','car','low','high','block','ramp','coin','magnet','jet','shoe','shield','apart','bazaar','mahalla','madrasa','choy','chinar','lamp','cart'];
 function rnHalf(h){const s=(h&0x8000)?-1:1,e=(h>>10)&31,f=h&1023;return e===0?s*Math.pow(2,-14)*(f/1024):e===31?(f?NaN:s*Infinity):s*Math.pow(2,e-15)*(1+f/1024)}
 function rnLoadAssets(){
+  if(RNA&&RNA.skin!==rnSkin()){ // boshqa qahramon tanlangan: faqat uni yuklaymiz
+    const sk=rnSkin();return RNAp=new window.THREE_GLTFLoader().loadAsync('rn/'+sk+'.glb?v='+APP_VER).then(g=>{g.kid=true;RNA.hero=g;RNA.skin=sk;return RNA},()=>RNA)}
   if(RNA)return Promise.resolve(RNA);if(RNAp)return RNAp;
   const T=window.THREE,get=(u,t)=>fetch(u+'?v='+APP_VER).then(r=>{if(!r.ok)throw 0;return t==='j'?r.json():r.arrayBuffer()});
   const tex=u=>new Promise((res,rej)=>new T.TextureLoader().load(u+'?v='+APP_VER,t=>{t.colorSpace=T.SRGBColorSpace;t.flipY=false;t.magFilter=T.LinearFilter;res(t)},undefined,rej));
@@ -6356,7 +6370,10 @@ function rnLoadAssets(){
   const scr2=u=>new Promise((res,rej)=>{if(window.THREE_POST)return res();const el=document.createElement('script');el.src=u+'?v='+APP_VER;el.onload=res;el.onerror=rej;document.head.appendChild(el)});
   const scr=u=>new Promise((res,rej)=>{if(window.THREE_GLTFLoader)return res();const el=document.createElement('script');el.src=u+'?v='+APP_VER;el.onload=res;el.onerror=rej;document.head.appendChild(el)});
   // qahramon: Quaternius Universal Animation Library (CC0) — skelet va tayyor harakatlar
-  const hero=scr('lib/three-gltf.js').then(()=>new window.THREE_GLTFLoader().loadAsync('rn/kid.glb?v='+APP_VER).then(g=>(g.kid=true,g),()=>new window.THREE_GLTFLoader().loadAsync('rn/hero.glb?v='+APP_VER))).catch(e=>{console.warn('hero',e);return null});
+  const sk=rnSkin();
+  const opt=n=>scr('lib/three-gltf.js').then(()=>new window.THREE_GLTFLoader().loadAsync('rn/'+n+'.glb?v='+APP_VER)).catch(e=>{console.warn(n,e);return null});
+  const guardP=opt('guard'),dogP=opt('dog');
+  const L0=()=>new window.THREE_GLTFLoader(),hero=scr('lib/three-gltf.js').then(()=>L0().loadAsync('rn/'+sk+'.glb?v='+APP_VER).catch(()=>L0().loadAsync('rn/kid.glb?v='+APP_VER)).then(g=>(g.kid=true,g),()=>L0().loadAsync('rn/hero.glb?v='+APP_VER))).catch(e=>{console.warn('hero',e);return null});
   // Toshkent to'plami (Meshy): poyezd, to'siqlar, tanga, bonuslar, binolar — yagona uslubda
   const MROT={cab:-Math.PI/2,car:-Math.PI/2,ramp:Math.PI},CEN={coin:1,magnet:1,jet:1,shoe:1,shield:1};
   const toF=a=>{const it=a.itemSize,f=new Float32Array(a.count*it);for(let i=0;i<a.count;i++){f[i*it]=a.getX(i);if(it>1)f[i*it+1]=a.getY(i);if(it>2)f[i*it+2]=a.getZ(i);if(it>3)f[i*it+3]=a.getW(i)}return new T.BufferAttribute(f,it)};
@@ -6369,7 +6386,7 @@ function rnLoadAssets(){
       const sz=new T.Vector3();geo.boundingBox.getSize(sz);const map=me.material&&me.material.map;if(map){map.colorSpace=T.SRGBColorSpace;map.anisotropy=4}
       return [k,{geo,map,s:sz}]},e=>{console.warn('rn/m',k,e);return [k,null]}))).then(a=>{const M={};for(const [k,v] of a)if(v)M[k]=v;return M})}).catch(()=>({}));
   const post=scr2('lib/three-post.js').catch(()=>null);
-  RNAp=Promise.all([kit('train'),kit('city'),hero,mods,post]).then(([t,c,h,m])=>(RNA={t,c,hero:h,m}),e=>{RNAp=null;throw e});
+  RNAp=Promise.all([kit('train'),kit('city'),hero,mods,post,guardP,dogP]).then(([t,c,h,m,_,gd,dg])=>(RNA={t,c,hero:h,m,guard:gd,dog:dg,skin:sk}),e=>{RNAp=null;throw e});
   return RNAp;
 }
 function rnDispose(){cancelAnimationFrame(rnRAF);if(rnR){try{rnR.dispose()}catch(e){}rnR=null}}
@@ -6379,6 +6396,9 @@ function viewYugur(){
   $('#screen').innerHTML=`<section class="card rn-menu" data-notr>
       <div class="rn-stats"><div><small>${KT('Rekord','Рекорд','Best')}</small><b>${P.best.toLocaleString()}</b></div><div><small>${KT('Tangalar','Монеты','Coins')}</small><b>🪙 ${P.coins.toLocaleString()}</b></div><div><small>${KT("O'yinlar",'Игры','Games')}</small><b>${P.games}</b></div></div>
       <button class="btn rn-go" id="rngo">▶ ${KT('Yugurish','Бежать','Run')}</button></section>
+    <section class="card" data-notr><div class="label">${KT('Qahramonlar','Герои','Heroes')}</div><div class="rn-sk">${RN_SK.map(k=>{const own=rnOwn().includes(k.id),cur=rnSkin()===k.id;
+      return `<div class="rn-skc${cur?' on':''}"><img src="rn/sk/${k.id}.png?v=${APP_VER}" alt="" loading="lazy"><b>${k.n()}</b><small>${k.d()}</small>
+      <button class="${cur?'chip':own?'chip':'btn'}" data-sk="${k.id}" ${cur||(!own&&P.coins<k.p)?'disabled':''}>${cur?'✓ '+KT('Tanlangan','Выбран','Selected'):own?KT('Tanlash','Выбрать','Select'):'🪙 '+k.p.toLocaleString()}</button></div>`}).join('')}</div></section>
     <section class="card" data-notr><div class="label">${KT('Boshqaruv','Управление','Controls')}</div><div class="rn-how">
       <p>⬅️ ➡️ ${KT("Chapga/o'ngga suring — yo'lak almashtirish",'Свайп влево/вправо — смена пути','Swipe left/right — change lane')}</p>
       <p>⬆️ ${KT("Tepaga — sakrash (past to'siqlardan)",'Вверх — прыжок (через низкие барьеры)','Up — jump (over low barriers)')}</p>
@@ -6386,7 +6406,11 @@ function viewYugur(){
       <p>🚆 ${KT("Poyezdga rampadan chiqing. Poyezd yoniga urilsangiz qorovul yaqinlashadi — ikkinchi marta ushlaydi!",'На поезд — по рампе. Удар о бок поезда — охранник ближе, второй раз — поймает!','Climb trains by ramps. Bump a side — the guard gets closer, twice and you are caught!')}</p>
       <p>🧲 🚀 👟 ✖2 🛡 ${KT('Bonuslarni yig\'ing','Собирайте бонусы','Grab power-ups')}</p></div></section>`;
   $('#rngo').onclick=()=>rnStart();
+  document.querySelectorAll('[data-sk]').forEach(b=>b.onclick=()=>{const k=RN_SK.find(x=>x.id===b.dataset.sk),P=rnProg(),own=rnOwn();
+    if(!own.includes(k.id)){if(P.coins<k.p)return;P.coins-=k.p;store.set('rn_p',P);own.push(k.id);store.set('rn_own',own);haptic('done');rnToastG(KT(`${k.n()} sizniki!`,`${k.n()} теперь ваш!`,`${k.n()} is yours!`))}
+    store.set('rn_skin',k.id);viewYugur()});
 }
+function rnToastG(t){try{toast(t)}catch(e){}}
 function rnStart(){
   RNS=rnNew((Date.now()%1e6)|0);rnSt='ready';rnTrauma=0;statSec('yugur_game');rnGameV();window.scrollTo(0,0);
 }
@@ -6835,7 +6859,13 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     gp(uni,0.64,0.7,0.4,0,1.2,0);gp(ML({color:0x23262b}),0.5,0.85,0.3,0,0.45,0);const hd=new T.Mesh(sph,skin);hd.scale.setScalar(0.25);hd.position.y=1.8;guard.add(hd);gp(cap,0.5,0.12,0.5,0,2.02,0.04);gp(ML({color:0xf2c230}),0.12,0.12,0.04,0.16,1.38,0.21);
     const dog=new T.Group();dog.position.set(0.9,0,0.4);guard.add(dog);const dm=ML({color:0x8a5a2b});const d1=new T.Mesh(sph,dm);d1.scale.set(0.2,0.2,0.4);d1.position.y=0.42;dog.add(d1);const d2=new T.Mesh(sph,dm);d2.scale.setScalar(0.16);d2.position.set(0,0.6,0.38);dog.add(d2)}
   shadowy(guard,false);
-  let gZ=-14;
+  let gZ=-14,gMix=null,dMix=null;
+  const skinned=(src,s0)=>{const m=SK?SK.clone(src.scene):src.scene;m.traverse(o=>{if(!o.isMesh)return;o.frustumCulled=false;const mp=o.material.map;o.material=ML({map:mp||null,color:mp?0xffffff:0xbbbbbb});o.castShadow=true;o.customDepthMaterial=depthB});m.scale.setScalar(s0);return m};
+  if(RNA&&RNA.guard){guard.children.forEach(c=>c.visible=false);const gm=skinned(RNA.guard,1.12);guard.add(gm);gMix=new T.AnimationMixer(gm);
+    const cl=RNA.guard.animations.find(c=>c.name==='RunFast')||RNA.guard.animations[0];if(cl)gMix.clipAction(cl).play()}
+  if(RNA&&RNA.dog){const dm=skinned(RNA.dog,1);const b=new T.Box3().setFromObject(dm),sz=b.getSize(new T.Vector3());dm.scale.setScalar(0.85/Math.max(0.01,sz.y));
+    // it yon tomonga qarab yaratilgan: oldinga (+z) buriladi
+    dm.rotation.y=sz.x>sz.z?Math.PI/2:0;const dg=new T.Group();dg.add(dm);dg.position.set(1.0,0,0.5);guard.add(dg);dMix=new T.AnimationMixer(dm);const cl=RNA.dog.animations[0];if(cl){const a=dMix.clipAction(cl);a.timeScale=2.2;a.play()}}
   // effektlar: tanga uchqunlari, chang
   const sparkT=cvT(64,64,(x)=>{const g=x.createRadialGradient(32,32,1,32,32,30);g.addColorStop(0,'rgba(255,250,200,1)');g.addColorStop(1,'rgba(255,200,40,0)');x.fillStyle=g;x.fillRect(0,0,64,64)});
   const fxL=[];
@@ -6929,8 +6959,8 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     bubble.visible=!!s.pw.shield||s.inv>0;bubble.material.opacity=s.inv>0?0.1+0.15*Math.abs(Math.sin(spin*6)):0.18;
     blob.position.set(hx,rnSurf(s,s.x,s.z)+0.02,0);blob.scale.setScalar(Math.max(0.3,1-(s.y-rnSurf(s,s.x,s.z))*0.12));
     // qorovul
-    const gt=!s.alive&&s.crash==='caught'?-1.1:s.guard>0?-3.6-(8-s.guard)*0.3:-16;gZ+=(gt-gZ)*Math.min(1,dt*(s.guard>0?2.5:1));guard.position.set(s.x*0.9,rnSurf(s,s.x,s.z+gZ),gZ);guard.visible=gZ>-15;
-    guard.children[1].rotation.x=Math.sin(phase*1.1)*0.3;
+    const gt=!s.alive&&s.crash==='caught'?-1.1:s.guard>0?-2.5-(8-s.guard)*0.3:-16;gZ+=(gt-gZ)*Math.min(1,dt*(s.guard>0?2.5:1));guard.position.set(s.x*0.9,rnSurf(s,s.x,s.z+gZ),gZ);guard.visible=gZ>-15;
+    guard.children[1].rotation.x=Math.sin(phase*1.1)*0.3;if(guard.visible){if(gMix)gMix.update(dt*(s.alive?1.05:0.5));if(dMix)dMix.update(dt*(s.alive?1:0.5))}
     // kamera
     const top=Math.min(s.y,RN.trainH+0.5);
     camP.set(hx*0.7,4.3+top*0.85+(s.pw.jet>0?1.5:0),-7.2);lookT.set(hx*0.8,1.0+top*0.8,12);
@@ -6943,7 +6973,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     if(comp)comp.render(dt);else rd.render(sc,cam);
   }
   const onR=()=>{rd.setSize(W(),H());if(comp)comp.setSize(W(),H())};addEventListener('resize',onR);
-  return {frame,fx,get heroM(){return heroM},dispose(){removeEventListener('resize',onR);rd.dispose();try{rd.forceContextLoss()}catch(e){}rd.domElement.remove()}};
+  return {frame,fx,get heroM(){return heroM},get guard(){return guard},dispose(){removeEventListener('resize',onR);rd.dispose();try{rd.forceContextLoss()}catch(e){}rd.domElement.remove()}};
 }
 // ---------------- ovoz ----------------
 function rnCtx(){if(!store.get('rn_snd',true))return null;try{rnAud=rnAud||new (window.AudioContext||window.webkitAudioContext)();if(rnAud.state==='suspended')rnAud.resume();return rnAud}catch(e){return null}}
