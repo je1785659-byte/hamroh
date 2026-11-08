@@ -4084,7 +4084,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108c';
+const APP_VER='20261108d';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 /* ---------- KALORIYA HISOBLAGICH ---------- */
@@ -6445,7 +6445,7 @@ let rnToastT=null;function rnToast(t){const m=$('#rnmsg');if(!m)return;m.innerHT
 function rnMake3D(v){
   const T=window.THREE,W=()=>v.clientWidth||innerWidth,H=()=>v.clientHeight||innerHeight;
   const rd=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-  rd.setPixelRatio(Math.min(1.75,devicePixelRatio||1));rd.setSize(W(),H());rd.outputColorSpace=T.SRGBColorSpace;rd.toneMapping=T.ACESFilmicToneMapping;rd.toneMappingExposure=1.1;
+  rd.setPixelRatio(Math.min(1.75,devicePixelRatio||1));rd.setSize(W(),H());rd.shadowMap.enabled=true;rd.shadowMap.type=T.PCFSoftShadowMap;rd.outputColorSpace=T.SRGBColorSpace;rd.toneMapping=T.ACESFilmicToneMapping;rd.toneMappingExposure=1.1;
   v.appendChild(rd.domElement);
   const sc=new T.Scene(),FOG=0xbfdcf0;sc.fog=new T.Fog(FOG,70,230);
   const cam=new T.PerspectiveCamera(62,W()/H(),0.1,600);
@@ -6459,15 +6459,32 @@ function rnMake3D(v){
 #endif
 vec4 wPos = modelMatrix * mvPosition; float bz = max(0.0, wPos.z - uCZ);
 wPos.y -= bz*bz*uBY; wPos.x += bz*bz*uBX;
-mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};m.customProgramCacheKey=()=>'bend';return m};
+mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`).replace('#include <worldpos_vertex>',
+`#if defined( USE_ENVMAP ) || defined( USE_DEPTH_PACKING ) || defined ( USE_SHADOWMAP ) || defined ( USE_TRANSMISSION ) || NUM_SPOT_LIGHT_COORDS > 0
+vec4 worldPosition = vec4( transformed, 1.0 );
+#ifdef USE_INSTANCING
+ worldPosition = instanceMatrix * worldPosition;
+#endif
+worldPosition = modelMatrix * worldPosition; float bz2 = max(0.0, worldPosition.z - uCZ);
+worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
+#endif`)};m.customProgramCacheKey=()=>'bend';return m};
   const cvT=(w,h,draw,rx=1,ry=1)=>{const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=4;return t};
   const ML=(o)=>bend(new T.MeshLambertMaterial(o)),MS=(o)=>bend(new T.MeshStandardMaterial(o));
   // osmon
   {const g=new T.SphereGeometry(400,24,12),c=[],top=new T.Color(0x4f9be0),hor=new T.Color(FOG),p=g.attributes.position;
    for(let i=0;i<p.count;i++){const y=Math.max(0,p.getY(i)/400),cc=hor.clone().lerp(top,Math.pow(y,0.6));c.push(cc.r,cc.g,cc.b)}
    g.setAttribute('color',new T.Float32BufferAttribute(c,3));const sky=new T.Mesh(g,new T.MeshBasicMaterial({vertexColors:true,side:T.BackSide,fog:false}));sc.add(sky);var skyM=sky}
-  sc.add(new T.HemisphereLight(0xdff0ff,0x8a7a62,1.15));
-  const sun=new T.DirectionalLight(0xfff1d6,1.5);sun.position.set(-6,10,4);sc.add(sun);
+  sc.add(new T.HemisphereLight(0xd8ecff,0x7a6a52,0.95));
+  const sun=new T.DirectionalLight(0xfff0d0,2.1);sun.position.set(-9,18,-4);sun.target.position.set(0,0,14);sc.add(sun,sun.target);
+  sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-11,right:11,top:24,bottom:-16,near:1,far:60});sun.shadow.camera.updateProjectionMatrix();sun.shadow.bias=-0.0008;sun.shadow.normalBias=0.02;sun.shadow.radius=3;
+  const depthB=bend(new T.MeshDepthMaterial({depthPacking:T.RGBADepthPacking}));
+  const shadowy=(g,recv=true)=>{g.traverse(o=>{if(o.isMesh&&!o.material.transparent){o.castShadow=true;o.receiveShadow=recv;o.customDepthMaterial=depthB}});return g};
+  // yumaloq qirrali quti (Subway uslubidagi silliq shakllar uchun)
+  const RBC=new Map();
+  const rbx=(w,h,d,r=0.08,sg=3)=>{const k=[w,h,d,r].join();if(RBC.has(k))return RBC.get(k);r=Math.min(r,w/2-1e-3,h/2-1e-3,d/2-1e-3);
+    const g=new T.BoxGeometry(w,h,d,sg*2,sg*2,sg*2),p=g.attributes.position,hw=w/2-r,hh=h/2-r,hd=d/2-r,v=new T.Vector3(),c=new T.Vector3();
+    for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i);c.set(Math.max(-hw,Math.min(hw,v.x)),Math.max(-hh,Math.min(hh,v.y)),Math.max(-hd,Math.min(hd,v.z)));v.sub(c);if(v.lengthSq()>0)v.normalize().multiplyScalar(r);v.add(c);p.setXYZ(i,v.x,v.y,v.z)}
+    g.computeVertexNormals();RBC.set(k,g);return g};
   // ---- yo'l: shpal va relslar teksturasi, harakatlanadi ----
   const TL=6; // tekstura plitkasi uzunligi (m)
   const trackT=cvT(512,256,(x,w,h)=>{x.fillStyle='#8c7b66';x.fillRect(0,0,w,h);
@@ -6479,12 +6496,12 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
   const trackG=new T.PlaneGeometry(9,300,1,60);trackG.rotateX(-Math.PI/2);trackG.translate(0,0,140);
   // UV ni metrga moslash
   {const uv=trackG.attributes.uv,p=trackG.attributes.position;for(let i=0;i<uv.count;i++)uv.setY(i,p.getZ(i)/TL)}
-  const track=new T.Mesh(trackG,ML({map:trackT}));sc.add(track);
+  const track=new T.Mesh(trackG,ML({map:trackT}));track.receiveShadow=true;sc.add(track);
   // yon tomonlar: tosh devor va trotuar
   const sideT=cvT(256,256,(x,w,h)=>{x.fillStyle='#c9b79a';x.fillRect(0,0,w,h);x.strokeStyle='rgba(90,70,50,.35)';x.lineWidth=3;for(let y=0;y<h;y+=32){x.beginPath();x.moveTo(0,y);x.lineTo(w,y);x.stroke();for(let xx=(y/32%2)*32;xx<w;xx+=64){x.beginPath();x.moveTo(xx,y);x.lineTo(xx,y+32);x.stroke()}}});
   const walkG=new T.PlaneGeometry(10,300,1,60);walkG.rotateX(-Math.PI/2);{const uv=walkG.attributes.uv,p=walkG.attributes.position;for(let i=0;i<uv.count;i++){uv.setY(i,p.getZ(i)/6);uv.setX(i,uv.getX(i)*1.6)}}
   const walkM=ML({map:sideT});
-  for(const sg of [-1,1]){const m=new T.Mesh(walkG,walkM);m.position.set(sg*9.5,0.45,140);sc.add(m);
+  for(const sg of [-1,1]){const m=new T.Mesh(walkG,walkM);m.receiveShadow=true;m.position.set(sg*9.5,0.45,140);sc.add(m);
     const cur=new T.Mesh(new T.BoxGeometry(0.5,0.6,300),ML({color:0x9a9184}));cur.position.set(sg*4.75,0.15,140);sc.add(cur)}
   // ---- shahar: binolar, gumbazlar, chinorlar (qayta ishlatiladigan hovuz) ----
   const winT=(base,frame)=>cvT(128,256,(x,w,h)=>{x.fillStyle=base;x.fillRect(0,0,w,h);for(let r=0;r<8;r++)for(let c=0;c<3;c++){x.fillStyle=frame;x.fillRect(12+c*38,14+r*30,30,22);x.fillStyle=Math.random()<0.25?'#ffe6a6':'#7fb6d9';x.fillRect(15+c*38,17+r*30,24,16)}});
@@ -6518,26 +6535,36 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
   let propSpan=pool.reduce((m,g)=>Math.max(m,g.userData.z),0)+14;
   // ---- poyezd, rampa, to'siqlar ----
   const trainCol=[[0x2f6fb5,0xf2f2f2],[0xc8382f,0xf3efe6],[0x2f9a6b,0xf2f2f2],[0xe0a21f,0x2d2d2d]];
-  const winTr=cvT(256,64,(x,w,h)=>{x.fillStyle='#e9eef2';x.fillRect(0,0,w,h);for(let i=0;i<6;i++){x.fillStyle='#22313d';x.fillRect(8+i*42,12,32,26);x.fillStyle='rgba(255,255,255,.25)';x.fillRect(10+i*42,14,10,22)}});
-  const faceT=cvT(128,128,(x,w,h)=>{x.fillStyle='#e9eef2';x.fillRect(0,0,w,h);x.fillStyle='#1b2a36';x.fillRect(14,14,100,52);x.fillStyle='rgba(255,255,255,.3)';x.fillRect(20,18,30,44);
-    x.fillStyle='#fff8c8';x.beginPath();x.arc(28,96,10,0,7);x.fill();x.beginPath();x.arc(100,96,10,0,7);x.fill();x.fillStyle='#333';x.fillRect(50,84,28,24)});
-  const blackM=ML({color:0x23262b}),winMat=ML({map:winTr}),faceM=ML({map:faceT}),glow=bend(new T.MeshBasicMaterial({color:0xfff6c0}));
+  // vagon yon tomoni: derazalar, eshiklar, chiziq
+  const sideTr=cvT(512,128,(x,w,h)=>{x.fillStyle='#000';x.fillRect(0,0,w,h);x.clearRect(0,0,w,h);
+    for(let i=0;i<4;i++){const ox=i*128;x.fillStyle='rgba(20,32,44,.95)';x.fillRect(ox+14,26,46,42);x.fillRect(ox+70,26,46,42);x.fillStyle='rgba(255,255,255,.28)';x.fillRect(ox+18,30,12,34);x.fillRect(ox+74,30,12,34)}
+    for(const dx of [0,256]){x.fillStyle='rgba(30,40,52,.9)';x.fillRect(dx+122,18,14,96);x.fillStyle='rgba(255,255,255,.35)';x.fillRect(dx+128,18,2,96)}});
+  const faceT=cvT(256,256,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle='rgba(18,30,42,.96)';x.beginPath();x.moveTo(30,40);x.lineTo(226,40);x.lineTo(214,130);x.lineTo(42,130);x.closePath();x.fill();
+    x.fillStyle='rgba(255,255,255,.32)';x.beginPath();x.moveTo(44,48);x.lineTo(90,48);x.lineTo(70,122);x.lineTo(50,122);x.closePath();x.fill();
+    x.fillStyle='#222';x.fillRect(96,150,64,58);x.fillStyle='#ffde59';x.fillRect(104,158,48,12);});
+  const blackM=ML({color:0x23262b}),steelM=MS({color:0xa9b1ba,metalness:0.6,roughness:0.4}),sideMat=ML({map:sideTr,transparent:true}),faceM=ML({map:faceT,transparent:true}),glow=bend(new T.MeshBasicMaterial({color:0xfff6c0})),redL=bend(new T.MeshBasicMaterial({color:0xff4a3a}));
+  const wheelG=new T.CylinderGeometry(0.36,0.36,0.18,16);wheelG.rotateZ(Math.PI/2);
   function trainMesh(o){const g=new T.Group(),[c1,c2]=trainCol[o.id%trainCol.length],L=o.z1-o.z0,cars=Math.max(1,Math.round(L/RN.car)),cl=L/cars;
-    const bodyM=ML({color:c1}),strM=ML({color:c2});
-    for(let i=0;i<cars;i++){const cz=i*cl+cl/2;
-      const b=new T.Mesh(boxG,bodyM);b.scale.set(1.95,3.0,cl-0.5);b.position.set(0,2.0,cz);g.add(b);
-      const st=new T.Mesh(boxG,strM);st.scale.set(1.97,0.9,cl-0.5);st.position.set(0,2.35,cz);g.add(st);
-      for(const sg of [-1,1]){const w=new T.Mesh(new T.PlaneGeometry(cl-1.4,0.75),winMat);w.position.set(sg*0.99,2.4,cz);w.rotation.y=sg*Math.PI/2;g.add(w)}
-      const top=new T.Mesh(boxG,ML({color:0xb8bec5}));top.scale.set(1.8,0.12,cl-0.6);top.position.set(0,RN.trainH-0.06,cz);g.add(top);
-      const un=new T.Mesh(boxG,blackM);un.scale.set(1.7,0.55,cl-1.2);un.position.set(0,0.35,cz);g.add(un)}
-    const f=new T.Mesh(new T.PlaneGeometry(1.95,3),faceM);f.position.set(0,2.0,-0.01);f.rotation.y=Math.PI;g.add(f);
-    if(o.type==='mtrain'){for(const sg of [-1,1]){const l=new T.Mesh(new T.CircleGeometry(0.16,12),glow);l.position.set(sg*0.55,0.9,-0.03);l.rotation.y=Math.PI;g.add(l)}}
-    return g}
+    const bodyM=MS({color:c1,roughness:0.45,metalness:0.15}),strM=MS({color:c2,roughness:0.5});
+    for(let i=0;i<cars;i++){const cz=i*cl+cl/2,len=cl-0.45;
+      const b=new T.Mesh(rbx(1.94,2.9,len,0.32),bodyM);b.position.set(0,2.05,cz);g.add(b);
+      const st=new T.Mesh(rbx(1.97,0.62,len-0.3,0.12),strM);st.position.set(0,1.25,cz);g.add(st);
+      const rf=new T.Mesh(rbx(1.6,0.25,len-0.8,0.1),MS({color:0xc9cfd6,roughness:0.5}));rf.position.set(0,RN.trainH-0.12,cz);g.add(rf);
+      const ac=new T.Mesh(rbx(1.0,0.28,2.2,0.1),steelM);ac.position.set(0,RN.trainH,cz+len*0.25);g.add(ac);
+      for(const sg of [-1,1]){const w=new T.Mesh(new T.PlaneGeometry(len-0.8,1.5),sideMat);sideTr.repeat.set(1,1);w.position.set(sg*0.985,2.35,cz);w.rotation.y=sg*Math.PI/2;g.add(w)}
+      for(const bz of [-len*0.32,len*0.32]){const bg=new T.Mesh(rbx(1.5,0.5,2.4,0.1),blackM);bg.position.set(0,0.42,cz+bz);g.add(bg);
+        for(const wz of [-0.7,0.7])for(const sg of [-1,1]){const wh=new T.Mesh(wheelG,steelM);wh.position.set(sg*0.78,0.36,cz+bz+wz);g.add(wh)}}
+      if(i<cars-1){const cn=new T.Mesh(rbx(1.3,2.2,0.7,0.1),blackM);cn.position.set(0,1.9,cz+cl/2);g.add(cn)}}
+    // old tomon (o'yinchiga qaragan): oyna, faralar
+    const nose=new T.Mesh(rbx(1.94,2.9,0.6,0.3),bodyM);nose.position.set(0,2.05,0.25);g.add(nose);
+    const f=new T.Mesh(new T.PlaneGeometry(1.8,1.8),faceM);f.position.set(0,2.35,-0.06);f.rotation.y=Math.PI;g.add(f);
+    for(const sg of [-1,1]){const l=new T.Mesh(new T.CircleGeometry(0.13,14),o.type==='mtrain'?glow:redL);l.position.set(sg*0.62,1.15,-0.07);l.rotation.y=Math.PI;g.add(l)}
+    return shadowy(g)}
   const rampT=cvT(64,256,(x,w,h)=>{x.fillStyle='#d9a21a';x.fillRect(0,0,w,h);x.fillStyle='#2b2b2b';for(let y=0;y<h;y+=32)x.fillRect(0,y,w,12)});
   function rampMesh(o){const L=o.z1-o.z0,a=Math.atan2(RN.trainH,L),g=new T.Group();
     const m=new T.Mesh(boxG,ML({map:rampT}));m.scale.set(1.9,0.2,Math.hypot(L,RN.trainH));m.rotation.x=-a;m.position.set(0,RN.trainH/2,L/2);g.add(m);
     const s=new T.Mesh(new T.BufferGeometry(),ML({color:0x7a6a4a}));const sh=new T.Shape();sh.moveTo(0,0);sh.lineTo(L,0);sh.lineTo(L,RN.trainH);sh.closePath();
-    const eg=new T.ExtrudeGeometry(sh,{depth:1.7,bevelEnabled:false});eg.rotateY(-Math.PI/2);eg.translate(0.85,0,0);s.geometry=eg;g.add(s);return g}
+    const eg=new T.ExtrudeGeometry(sh,{depth:1.7,bevelEnabled:false});eg.rotateY(-Math.PI/2);eg.translate(0.85,0,0);s.geometry=eg;g.add(s);return shadowy(g)}
   const stripeT=cvT(128,32,(x,w,h)=>{for(let i=0;i<8;i++){x.fillStyle=i%2?'#ffffff':'#e03a2f';x.beginPath();x.moveTo(i*16,0);x.lineTo(i*16+16,0);x.lineTo(i*16,h);x.lineTo(i*16-16,h);x.fill()}x.fillStyle='#e03a2f';x.fillRect(0,0,6,h)});
   const stripeM=ML({map:stripeT}),postM=ML({color:0xdedede});
   function barMesh(o){const g=new T.Group();
@@ -6550,7 +6577,7 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
       const t=new T.Mesh(boxG,stripeM);t.scale.set(1.97,0.4,0.95);t.position.y=RN.blockH-0.2;g.add(t);
       const sg=new T.Mesh(new T.CircleGeometry(0.45,20),ML({color:0xd8322a}));sg.position.set(0,1.5,-0.46);sg.rotation.y=Math.PI;g.add(sg);
       const wb=new T.Mesh(boxG,ML({color:0xffffff}));wb.scale.set(0.6,0.14,0.02);wb.position.set(0,1.5,-0.48);g.add(wb)}
-    return g}
+    return shadowy(g)}
   const OM=new Map();
   function objMesh(o){let m=OM.get(o.id);if(m)return m;m=o.type==='train'||o.type==='mtrain'?trainMesh(o):o.type==='ramp'?rampMesh(o):barMesh(o);m.position.x=RN.lanes[o.lane];sc.add(m);OM.set(o.id,m);return m}
   // tangalar (hovuz)
@@ -6566,17 +6593,26 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
   const skin=ML({color:0xe2a87a}),hood=ML({color:0x17a8a0}),pants=ML({color:0x2d3a5a}),shoe=ML({color:0xffffff}),sole=ML({color:0xf26a1b}),capM=ML({map:cvT(256,64,(x,w,h)=>{x.fillStyle='#111';x.fillRect(0,0,w,h);x.fillStyle='#f4f1ea';for(let i=0;i<4;i++){const cx=i*64+32;x.beginPath();x.moveTo(cx-18,h*0.7);x.quadraticCurveTo(cx-14,h*0.1,cx+4,h*0.2);x.quadraticCurveTo(cx+18,h*0.45,cx-18,h*0.7);x.fill()}x.fillStyle='#f4f1ea';x.fillRect(0,h-6,w,3)})}),bagM=ML({color:0xf2a23a}),hairM=ML({color:0x1c120c});
   const part=(geo,m,sx,sy,sz,x,y,z,par=body)=>{const o=new T.Mesh(geo,m);o.scale.set(sx,sy,sz);o.position.set(x,y,z);par.add(o);return o};
   const sph=new T.SphereGeometry(1,14,10),rbox=new T.BoxGeometry(1,1,1,1,1,1);
-  part(rbox,hood,0.56,0.62,0.34,0,1.18,0);part(sph,hood,0.3,0.14,0.2,0,0.88,0);
-  part(rbox,bagM,0.44,0.5,0.2,0,1.2,-0.27);
-  const head=new T.Group();head.position.set(0,1.66,0.02);body.add(head);
-  part(sph,skin,0.24,0.26,0.24,0,0,0,head);part(sph,hairM,0.245,0.2,0.245,0,0.06,-0.02,head);
-  {const cg=new T.CylinderGeometry(0.9,1,1,4);cg.rotateY(Math.PI/4);part(cg,capM,0.27,0.16,0.27,0,0.2,0,head)}
-  part(sph,skin,0.05,0.06,0.04,0.22,0,0,head);part(sph,skin,0.05,0.06,0.04,-0.22,0,0,head);
-  const limb=(x,y,len,m,w,isLeg)=>{const p=new T.Group();p.position.set(x,y,0);body.add(p);const u=part(rbox,m,w,len,w,0,-len/2,0,p);
-    const k=new T.Group();k.position.y=-len;p.add(k);const l=part(rbox,isLeg?pants:skin,w*0.9,len,w*0.9,0,-len/2,0,k);
-    if(isLeg){part(rbox,shoe,w*1.1,0.12,w*1.9,0,-len-0.02,0.07,k);part(rbox,sole,w*1.15,0.05,w*1.95,0,-len-0.1,0.07,k)}else part(sph,skin,w*0.6,w*0.6,w*0.6,0,-len-0.04,0,k);
+  const cap=(r,l)=>new T.CapsuleGeometry(r,l,4,10);
+  // tana: kapyushonli kofta, yumaloq shakllar
+  part(rbx(0.58,0.64,0.36,0.14),hood,1,1,1,0,1.17,0);
+  part(rbx(0.5,0.12,0.32,0.05),ML({color:0x0f7f79}),1,1,1,0,0.86,0);
+  part(new T.TorusGeometry(0.17,0.07,8,16),ML({color:0x0f8f88}),1,1,1,0,1.5,-0.1).rotation.x=1.2;
+  part(rbx(0.34,0.3,0.06,0.03),ML({color:0x0f8f88}),1,1,1,0,1.05,0.18);
+  part(rbx(0.46,0.54,0.24,0.1),bagM,1,1,1,0,1.2,-0.29);part(rbx(0.34,0.2,0.1,0.05),ML({color:0xd9861f}),1,1,1,0,1.06,-0.42);
+  for(const sg of [-1,1])part(rbx(0.05,0.55,0.05,0.02),ML({color:0x7a4a12}),1,1,1,sg*0.17,1.22,-0.16);
+  const head=new T.Group();head.position.set(0,1.68,0.02);body.add(head);
+  part(sph,skin,0.235,0.255,0.235,0,0,0,head);part(sph,hairM,0.245,0.19,0.245,0,0.07,-0.03,head);
+  {const cg=new T.CylinderGeometry(0.9,1,1,4);cg.rotateY(Math.PI/4);part(cg,capM,0.27,0.15,0.27,0,0.2,0,head)}
+  part(sph,skin,0.05,0.065,0.04,0.225,0,0,head);part(sph,skin,0.05,0.065,0.04,-0.225,0,0,head);
+  part(sph,ML({color:0x1a1a1a}),0.03,0.04,0.02,0.08,0.03,0.22,head);part(sph,ML({color:0x1a1a1a}),0.03,0.04,0.02,-0.08,0.03,0.22,head);
+  const limb=(x,y,len,m,w,isLeg)=>{const p=new T.Group();p.position.set(x,y,0);body.add(p);part(cap(w*0.5,len*0.75),m,1,1,1,0,-len/2,0,p);
+    const k=new T.Group();k.position.y=-len;p.add(k);part(cap(w*0.45,len*0.75),isLeg?pants:hood,1,1,1,0,-len/2,0,k);
+    if(isLeg){part(rbx(w*1.15,0.16,w*2.0,0.06),shoe,1,1,1,0,-len-0.04,0.07,k);part(rbx(w*1.2,0.06,w*2.05,0.03),sole,1,1,1,0,-len-0.12,0.07,k)}
+    else part(sph,skin,w*0.55,w*0.6,w*0.55,0,-len-0.06,0,k);
     return {p,k}};
-  const legL=limb(-0.15,0.86,0.42,pants,0.19,true),legR=limb(0.15,0.86,0.42,pants,0.19,true),armL=limb(-0.36,1.44,0.3,hood,0.15,false),armR=limb(0.36,1.44,0.3,hood,0.15,false);
+  const legL=limb(-0.15,0.86,0.42,pants,0.2,true),legR=limb(0.15,0.86,0.42,pants,0.2,true),armL=limb(-0.37,1.44,0.3,hood,0.16,false),armR=limb(0.37,1.44,0.3,hood,0.16,false);
+  shadowy(hero,false);
   const jet=new T.Group();jet.position.set(0,1.15,-0.38);body.add(jet);part(new T.CylinderGeometry(1,1,1,10),ML({color:0x9aa3ad}),0.11,0.5,0.11,-0.13,0,0,jet);part(new T.CylinderGeometry(1,1,1,10),ML({color:0x9aa3ad}),0.11,0.5,0.11,0.13,0,0,jet);
   const flameM=bend(new T.MeshBasicMaterial({color:0xffa22e,transparent:true,opacity:0.9}));const flames=[-0.13,0.13].map(x=>{const f=new T.Mesh(new T.ConeGeometry(0.1,0.5,8),flameM);f.rotation.x=Math.PI;f.position.set(x,-0.5,0);jet.add(f);return f});jet.visible=false;
   const magG=new T.Group();{const mr=ML({color:0xd8322a}),mt=ML({color:0xdfe4ea});const u=new T.Mesh(new T.TorusGeometry(0.16,0.065,8,18,Math.PI),mr);u.rotation.z=Math.PI;magG.add(u);
@@ -6591,6 +6627,7 @@ mvPosition = viewMatrix * wPos; gl_Position = projectionMatrix * mvPosition;`)};
     const gp=(m,sx,sy,sz,x,y,z)=>{const o=new T.Mesh(rbox,m);o.scale.set(sx,sy,sz);o.position.set(x,y,z);guard.add(o);return o};
     gp(uni,0.64,0.7,0.4,0,1.2,0);gp(ML({color:0x23262b}),0.5,0.85,0.3,0,0.45,0);const hd=new T.Mesh(sph,skin);hd.scale.setScalar(0.25);hd.position.y=1.8;guard.add(hd);gp(cap,0.5,0.12,0.5,0,2.02,0.04);gp(ML({color:0xf2c230}),0.12,0.12,0.04,0.16,1.38,0.21);
     const dog=new T.Group();dog.position.set(0.9,0,0.4);guard.add(dog);const dm=ML({color:0x8a5a2b});const d1=new T.Mesh(sph,dm);d1.scale.set(0.2,0.2,0.4);d1.position.y=0.42;dog.add(d1);const d2=new T.Mesh(sph,dm);d2.scale.setScalar(0.16);d2.position.set(0,0.6,0.38);dog.add(d2)}
+  shadowy(guard,false);
   let gZ=-14;
   // effektlar: tanga uchqunlari, chang
   const sparkT=cvT(64,64,(x)=>{const g=x.createRadialGradient(32,32,1,32,32,30);g.addColorStop(0,'rgba(255,250,200,1)');g.addColorStop(1,'rgba(255,200,40,0)');x.fillStyle=g;x.fillRect(0,0,64,64)});
