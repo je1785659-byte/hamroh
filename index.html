@@ -6417,6 +6417,8 @@ function rnEvent(day){
 }
 // trafikni tejash: o'yinchi tanlamagan bo'lsa — telefondagi "Data Saver" sozlamasiga qaraymiz
 function rnLite(stored,saveData){return stored==null?!!saveData:!!stored}
+// skeyt: har 2.8 soniyada 0.7 soniya oyoq bilan itaradi (0 — sirpanib ketyapti, 0..1 — itarish fazasi)
+function rnSkatePush(t){const u=t%2.8;return t<2.8||u>=0.7?0:u/0.7}
 
 /* ---------- YUGUR: 3D shahar, egilgan dunyo, qahramon, boshqaruv ---------- */
 let rnPerfSent=0,rnLoadMs=0,rnLoadT0=0,rnStreak=0,rnStreakT=0,RNS=null,rnR=null,rnRAF=null,rnSt='menu',rnAud=null,rnTrauma=0,rnHint=0;
@@ -6434,6 +6436,24 @@ const RN_SK=[{id:'kid',p:0,n:()=>'Jasur',d:()=>KT("Doppili bola — sizning biri
 const RN_CITY=[{n:'Toshkent',r:'Ташкент',e:'Tashkent',g:'CHORSU'},{n:'Samarqand',r:'Самарканд',e:'Samarkand',g:'SIYOB'},{n:'Buxoro',r:'Бухару',e:'Bukhara',g:'TOQI ZARGARON'},{n:'Xiva',r:'Хиву',e:'Khiva',g:"ICHAN QAL'A"},{n:"Farg'ona",r:'Фергану',e:'Fergana',g:"MARG'ILON"}];
 const rnTx=t=>typeof LANG!=='undefined'&&LANG==='uzc'&&typeof cyrSafe==='function'?cyrSafe(t):t;
 const RN_LITE=()=>rnLite(store.get('rn_lite',null),navigator.connection&&navigator.connection.saveData);
+// skeyt holati: suyaklarga qo'lda poza (Mixamo skeleti)
+function rnSkateRig(sk,T){const B=n=>sk.bones.find(b=>b.name==='mixamorig'+n||b.name==='mixamorig:'+n);const R={T,v:new T.Vector3(),w:new T.Vector3()};
+  for(const n of ['Hips','Spine','Spine1','Spine2','Neck','Head','LeftUpLeg','LeftLeg','LeftFoot','RightUpLeg','RightLeg','RightFoot','LeftArm','LeftForeArm','RightArm','RightForeArm']){const b=B(n);if(!b)return null;R[n]=b;b.userData.q0=b.quaternion.clone();b.userData.p0=b.position.clone()}
+  R.e=new T.Euler();R.q=new T.Quaternion();return R}
+// t — vaqt, push — itarish fazasi (0..1, 0 = yo'q), air — havoda (0..1), lean — burilish
+function rnSkatePose(R,t,push,air){const S=(n,x,y,z)=>{const b=R[n];R.e.set(x,y,z);R.q.setFromEuler(R.e);b.quaternion.copy(b.userData.q0).multiply(R.q)};
+  const ck=0.42+air*0.45,sw=Math.sin(t*2.3),pp=push>0?Math.sin(push*Math.PI):0;
+  
+  R.Hips.position.copy(R.Hips.userData.p0);S('Hips',0,0,0);
+  S('Spine',0.22+pp*0.15,0,0);S('Spine1',0.06,0,0);S('Spine2',0,0.35,0);S('Neck',0,0.45,0);S('Head',0.05,0.55,0);
+  // oldingi oyoq (chap) — taxta oldida, orqa oyoq (o'ng) — orqada; itarganda o'ng oyoq yerga tushib orqaga tepadi
+  S('LeftUpLeg',-ck-pp*0.25,0.15,-0.28);S('LeftLeg',ck*2.1+pp*0.5,0,0);S('LeftFoot',-ck*0.9,0.2,0);
+  S('RightUpLeg',-ck*(1-pp)+pp*0.15,-0.15,0.28+pp*0.55);S('RightLeg',ck*2.1*(1-pp)+pp*0.15,0,0);S('RightFoot',-ck*0.9*(1-pp),-0.2,0);
+  S('LeftArm',0.15,0,0.35+sw*0.08+air*0.4);S('LeftForeArm',0,0,0.35);S('RightArm',-0.1,0,-0.35+sw*0.08-air*0.4);S('RightForeArm',0,0,-0.35);
+}
+// oyoqlarni taxtaga tushirish: eng past oyoq taxta ustida tursin
+function rnSkateGround(R,root,top,push){root.parent.updateMatrixWorld(true);const a=R.LeftFoot.getWorldPosition(R.v).y,b=push>0.1&&push<0.9?a:R.RightFoot.getWorldPosition(R.w).y;
+  root.position.y+=top-Math.min(a,b)+0.02}
 const RN_REGS=[['tsh','Toshkent shahri'],['tsv','Toshkent viloyati'],['and','Andijon'],['bux','Buxoro'],['far',"Farg'ona"],['jiz','Jizzax'],['xor','Xorazm'],['nam','Namangan'],['nav','Navoiy'],['qas','Qashqadaryo'],['qqr',"Qoraqalpog'iston"],['sam','Samarqand'],['sir','Sirdaryo'],['sur','Surxondaryo']];
 const rnRegN=k=>{const r=RN_REGS.find(x=>x[0]===k);return r?r[1]:'—'};
 let RN_LB=null; // oxirgi reyting javobi
@@ -7061,14 +7081,15 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   const waves=[0,1,2].map(i=>{const w=new T.Mesh(new T.RingGeometry(0.9,1.0,32),waveM.clone());w.rotation.x=-Math.PI/2;w.position.y=0.15;hero.add(w);return w});
   const bubble=new T.Mesh(new T.SphereGeometry(1.15,20,14),bend(new T.MeshBasicMaterial({color:0x6fe0ff,transparent:true,opacity:0.18,depthWrite:false})));bubble.position.y=0.95;hero.add(bubble);
   let mixer=null,acts={},curA='',heroM=null,aT=0;const SK=window.THREE_SkeletonUtils;
-  const KID=!!(RNA&&RNA.hero&&RNA.hero.kid);
+  const KID=!!(RNA&&RNA.hero&&RNA.hero.kid);let SKR=null,skT=0,skOn=false;
   const AN=KID?{run:'RunFast',idle:'Running',jump:'Regular_Jump',roll:'slide_light',death:'Dead'}:{run:'Sprint_Loop',idle:'Idle_Loop',jump:'Jump_Start',jumpL:'Jump_Loop',land:'Jump_Land',roll:'Roll',death:'Death01',hit:'Hit_Chest'};
   if(RNA&&RNA.hero&&KID){
     // Meshy qahramoni: tayyor tekstura, doppi va ryukzak modelning o'zida
-    heroM=SK?SK.clone(RNA.hero.scene):RNA.hero.scene;let skel=null;
+    heroM=SK?SK.clone(RNA.hero.scene):RNA.hero.scene;let skel=null;SKR=null;
     heroM.traverse(o=>{if(!o.isMesh)return;if(o.skeleton)skel=o.skeleton;o.frustumCulled=false;const mp=o.material.map;o.material=ML({map:mp||null,color:mp?0xffffff:0xcccccc});o.castShadow=true;o.customDepthMaterial=depthB});
     heroM.rotation.y=RN_HROT;body.children.forEach(c=>{if(c!==jet)c.visible=false});body.add(heroM);heroM.updateMatrixWorld(true);
     const hr=skel&&skel.bones.find(b=>/RightHand$/.test(b.name));if(hr)hr.attach(magG);
+    if(skel){try{skel.pose();SKR=rnSkateRig(skel,T)}catch(e){SKR=null}heroM.userData.y0=heroM.position.y}
   }else if(RNA&&RNA.hero){
     heroM=SK?SK.clone(RNA.hero.scene):RNA.hero.scene;
     const boneCol=n=>/head|neck/.test(n)?0xe2a87a:/hand|f_|thumb/.test(n)?0xe2a87a:/spine|shoulder|upper_arm|forearm/.test(n)?0x17a8a0:/foot|toe/.test(n)?0xf4f4f4:0x2d3a5a;
@@ -7209,7 +7230,13 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
       if(A[N.run])A[N.run].timeScale=Math.min(1.35,Math.max(0.8,s.v/(KID?18:16)));
       mixer.update(live||!s.alive?dt:dt);
     }
-    {const on=s.pw.board>0&&s.pw.jet<=0;boardG.visible=on&&(s.pw.board>3||Math.sin(spin*9)>-0.3);if(on){body.position.y+=0.3;boardG.rotation.z=-lean*0.6;boardG.rotation.x=s.vy>0.5?-0.25:0}}
+    {const on=s.pw.board>0&&s.pw.jet<=0;boardG.visible=on&&(s.pw.board>3||Math.sin(spin*9)>-0.3);if(on){body.position.y+=0.3;boardG.rotation.z=-lean*0.6;boardG.rotation.x=s.vy>0.5?-0.25:air&&s.vy<-2?0.12:0}
+      // skeytda haqiqiy skeytchidek turadi: yonlama, tizzalar bukilgan, vaqti-vaqti bilan oyoq bilan itaradi; sakrashda — ollie
+      const ride=on&&SKR&&s.alive&&live;
+      if(ride){skT+=dt;const sl=s.roll>0,ph=air||sl?0:rnSkatePush(skT);boardG.rotation.y=Math.sin(skT*1.6)*0.05;
+        rnSkatePose(SKR,skT,ph,air?1:sl?0.8:0);heroM.rotation.set(0,RN_HROT-1.45+boardG.rotation.y,-lean*0.4);heroM.position.y=heroM.userData.y0;
+        body.rotation.x=0;body.scale.setScalar(1);rnSkateGround(SKR,heroM,boardG.getWorldPosition(SKR.w).y+0.2,ph);skOn=true}
+      else if(skOn){skOn=false;skT=0;heroM.rotation.set(0,RN_HROT,0);heroM.position.y=heroM.userData.y0;boardG.rotation.y=0}}
     jet.visible=s.pw.jet>0;const mgOn=s.pw.magnet>0;magG.visible=mgOn;if(mgOn){armR.p.rotation.x=-1.3;armR.k.rotation.x=-0.2}
     waves.forEach((w,i)=>{w.visible=mgOn;const k=((spin*0.45+i/3)%1);w.scale.setScalar(0.6+k*4.5);w.material.opacity=0.45*(1-k)*(s.pw.magnet<2?(Math.sin(spin*8)>0?1:0.2):1)});flames.forEach(f=>f.scale.set(1,0.8+Math.random()*0.6,1));
     bubble.visible=!!s.pw.shield||s.inv>0;bubble.material.opacity=s.inv>0?0.1+0.15*Math.abs(Math.sin(spin*6)):0.18;
