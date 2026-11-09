@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 08.11.2026-11
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 09.11.2026-12
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -227,6 +227,8 @@ async function D(env){
       env.DB.prepare('CREATE TABLE IF NOT EXISTS food(day TEXT,uid INTEGER,n INTEGER DEFAULT 0,PRIMARY KEY(day,uid))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS blroom(id TEXT PRIMARY KEY,game TEXT,p0 INTEGER,p1 INTEGER,n0 TEXT,n1 TEXT,seq INTEGER DEFAULT 0,data TEXT,init TEXT,created INTEGER,updated INTEGER,lp0 INTEGER DEFAULT 0,lp1 INTEGER DEFAULT 0)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS foodfix(day TEXT,k TEXT,a TEXT,u TEXT,n INTEGER DEFAULT 0,r REAL DEFAULT 0,PRIMARY KEY(day,k,a,u))'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_user(uid INTEGER PRIMARY KEY,name TEXT,region TEXT,rwk TEXT,ref INTEGER,bonus INTEGER DEFAULT 0,wkc TEXT,card INTEGER DEFAULT 0)'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,dist INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
       env.DB.prepare("INSERT OR IGNORE INTO meta(k,v) VALUES('since',?1)").bind(String(Date.now()))
     ]);
     SCH=true;
@@ -265,7 +267,7 @@ async function handlePing(req,env){
   const db=await D(env).catch(()=>null);if(!db)return J({ok:true,admin:false,nodb:true,hq:!!env.ANTHROPIC_API_KEY});
   const secs=Math.max(0,Math.min(900,parseInt(f.get('secs'))||0)), open=f.get('open')==='1'?1:0, day=dstr(Date.now());
   let secList=[];try{secList=JSON.parse(f.get('sec')||'[]').filter(x=>typeof x==='string'&&/^[a-z0-9_:-]{1,30}$/.test(x)).slice(0,15)}catch(e){}
-  const sp=String(f.get('sp')||'').replace(/[^\w-]/g,'').slice(0,40);
+  const sp=String(f.get('sp')||'').replace(/[^\w-]/g,'').slice(0,40).replace(/^yugur-r\d+$/,'yugur-ref');
   const st=[userStmt(db,u,{src:sp||'app',app_lang:String(f.get('lang')||'').slice(0,5)||null,platform:String(f.get('pf')||'').slice(0,12)||null}),
     db.prepare('INSERT INTO daily(day,uid,secs,opens) VALUES(?1,?2,?3,?4) ON CONFLICT(day,uid) DO UPDATE SET secs=secs+?3,opens=opens+?4').bind(day,u.id,secs,open),
     ...secList.map(x=>db.prepare('INSERT INTO sections(day,sec,n) VALUES(?1,?2,1) ON CONFLICT(day,sec) DO UPDATE SET n=n+1').bind(day,x)),
@@ -527,6 +529,59 @@ async function statsText(env,db){
   const S=await computeStats(db,env),U=S.users;
   return `📊 <b>Hamroh statistikasi</b>\n\n👥 Jami foydalanuvchi: <b>${U.total||0}</b>\n▶️ Botda start bosgan: <b>${U.started||0}</b>\n✅ Faol (bloklamagan): <b>${U.active||0}</b>\n⛔ Bloklagan: <b>${U.blocked||0}</b>\n\n📅 Bugun: <b>${S.dau}</b> · 7 kun: <b>${S.wau}</b> · 30 kun: <b>${S.mau}</b>\n🆕 Yangi: bugun <b>${U.n1||0}</b> · 7 kun <b>${U.n7||0}</b> · 30 kun <b>${U.n30||0}</b>\n⏱ O‘rtacha kunlik vaqt (7 kun): <b>${S.avg7.au?fmtMin(S.avg7.s/S.avg7.au):'—'}</b>\n\n<i>Batafsil — admin panelda.</i>`;
 }
+// ---------- Yugur!: viloyatlar bellashuvi, haftalik reyting, do'stni chaqirish ----------
+const RN_REG=['tsh','tsv','and','bux','far','jiz','xor','nam','nav','qas','qqr','sam','sir','sur'];
+const RN_ROUTES={'/rn/me':1,'/rn/run':1,'/rn/card':1};
+// hafta: Toshkent vaqti bo'yicha dushanbadan boshlanadi
+function rnWeek(t){const d=new Date(t+TZMS),wd=(d.getUTCDay()+6)%7;return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-wd)).toISOString().slice(0,10)}
+const rnName=u=>((u.first_name||'').trim().slice(0,16)+(u.last_name?' '+u.last_name.trim()[0]+'.':''))||'O\'yinchi';
+async function handleRn(path,req,env){
+  let f;try{f=await req.formData()}catch(e){return J({ok:false},400)}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false},403);
+  const db=await D(env).catch(()=>null);if(!db)return J({ok:false,nodb:true});
+  const now=Date.now(),wk=rnWeek(now),lwk=rnWeek(now-7*DAY);
+  await db.prepare('INSERT INTO rn_user(uid,name) VALUES(?1,?2) ON CONFLICT(uid) DO UPDATE SET name=?2').bind(u.id,rnName(u)).run();
+  if(path==='/rn/run'){
+    const sc=Math.max(0,Math.min(3e6,parseInt(f.get('score'))||0)),di=Math.max(0,Math.min(2e5,parseInt(f.get('dist'))||0));
+    const row=await db.prepare('SELECT last FROM rn_week WHERE wk=?1 AND uid=?2').bind(wk,u.id).first();
+    if(row&&now-row.last<8000)return J({ok:false,slow:true}); // juda tez-tez yuborilmasin
+    await db.prepare('INSERT INTO rn_week(wk,uid,best,dist,runs,last) VALUES(?1,?2,?3,?4,1,?5) ON CONFLICT(wk,uid) DO UPDATE SET best=MAX(best,?3),dist=dist+?4,runs=runs+1,last=?5').bind(wk,u.id,sc,di,now).run();
+    return J({ok:true});
+  }
+  if(path==='/rn/card'){ // natija kartasini foydalanuvchining o'ziga rasm qilib yuboradi — u do'stlariga uzatadi
+    const img=f.get('img'),cap=String(f.get('cap')||'').slice(0,300);if(!img||typeof img==='string'||img.size>1.5e6)return J({ok:false},400);
+    const cu=await db.prepare('SELECT card FROM rn_user WHERE uid=?1').bind(u.id).first();if(cu&&now-cu.card<20000)return J({ok:false,slow:true});
+    await db.prepare('UPDATE rn_user SET card=?2 WHERE uid=?1').bind(u.id,now).run();
+    const fd=new FormData();fd.append('chat_id',String(u.id));fd.append('photo',img,'yugur.png');fd.append('caption',cap);fd.append('parse_mode','HTML');
+    fd.append('reply_markup',JSON.stringify({inline_keyboard:[[{text:'🏃 Yugur! o\'ynash',url:'https://t.me/Hamronilovabot/app?startapp=yugur-r'+u.id}]]}));
+    const r=await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/sendPhoto`,{method:'POST',body:fd}).then(r=>r.json()).catch(()=>({ok:false}));
+    return J({ok:!!r.ok,blocked:r.error_code===403});
+  }
+  // /rn/me: viloyat, taklif bonusi, reyting
+  const reg=String(f.get('region')||'');let me=await db.prepare('SELECT * FROM rn_user WHERE uid=?1').bind(u.id).first();
+  if(RN_REG.includes(reg)&&reg!==me.region&&me.rwk!==wk){await db.prepare('UPDATE rn_user SET region=?2,rwk=?3 WHERE uid=?1').bind(u.id,reg,wk).run();me.region=reg;me.rwk=wk}
+  const ref=parseInt(f.get('ref'))||0;let refOk=false;
+  if(ref&&ref!==u.id&&!me.ref){
+    const nu=await db.prepare('SELECT first_seen FROM users WHERE id=?1').bind(u.id).first(),ru=await db.prepare('SELECT uid FROM rn_user WHERE uid=?1').bind(ref).first();
+    if(ru&&(!nu||!nu.first_seen||now-nu.first_seen<3*DAY)){
+      await db.batch([db.prepare('UPDATE rn_user SET ref=?2,bonus=bonus+500 WHERE uid=?1 AND ref IS NULL').bind(u.id,ref),db.prepare('UPDATE rn_user SET bonus=bonus+500 WHERE uid=?1').bind(ref)]);refOk=true}
+  }
+  const [top,regs,lastRegs,mine,rank,lastMine]=(await db.batch([
+    db.prepare('SELECT u.name,u.region,w.best FROM rn_week w JOIN rn_user u ON u.uid=w.uid WHERE w.wk=?1 ORDER BY w.best DESC LIMIT 10').bind(wk),
+    db.prepare('SELECT u.region k,SUM(w.dist) d,COUNT(*) n FROM rn_week w JOIN rn_user u ON u.uid=w.uid WHERE w.wk=?1 AND u.region IS NOT NULL GROUP BY u.region ORDER BY d DESC').bind(wk),
+    db.prepare('SELECT u.region k,SUM(w.dist) d FROM rn_week w JOIN rn_user u ON u.uid=w.uid WHERE w.wk=?1 AND u.region IS NOT NULL GROUP BY u.region ORDER BY d DESC LIMIT 1').bind(lwk),
+    db.prepare('SELECT best,dist,runs FROM rn_week WHERE wk=?1 AND uid=?2').bind(wk,u.id),
+    db.prepare('SELECT COUNT(*)+1 r FROM rn_week WHERE wk=?1 AND best>(SELECT COALESCE(MAX(best),0) FROM rn_week WHERE wk=?1 AND uid=?2)').bind(wk,u.id),
+    db.prepare('SELECT dist FROM rn_week WHERE wk=?1 AND uid=?2').bind(lwk,u.id)
+  ])).map(r=>r.results||[]);
+  const win=lastRegs[0]&&lastRegs[0].k;let wbonus=0;
+  me=await db.prepare('SELECT * FROM rn_user WHERE uid=?1').bind(u.id).first();
+  if(win&&me.region===win&&me.wkc!==lwk&&lastMine[0]&&lastMine[0].dist>0){wbonus=300;await db.prepare('UPDATE rn_user SET wkc=?2,bonus=bonus+300 WHERE uid=?1').bind(u.id,lwk).run()}
+  // bonus bir marta beriladi: ayirib olamiz (parallel so'rovda ikki marta berilmaydi)
+  const cur=await db.prepare('SELECT bonus FROM rn_user WHERE uid=?1').bind(u.id).first();let bonus=0;
+  if(cur&&cur.bonus>0){const r=await db.prepare('UPDATE rn_user SET bonus=bonus-?2 WHERE uid=?1 AND bonus>=?2').bind(u.id,cur.bonus).run();if(r.meta&&r.meta.changes)bonus=cur.bonus}
+  return J({ok:true,wk,region:me.region||null,canMove:me.rwk!==wk,bonus,refOk,win,winBonus:wbonus,top,regs,me:mine[0]||null,rank:mine[0]?rank[0].r:null});
+}
 export default {
   async fetch(req,env){
     const path=new URL(req.url).pathname;
@@ -539,6 +594,7 @@ export default {
     if(path==='/food'&&req.method==='POST')return handleFood(req,env);
     if(path==='/food/fix'&&req.method==='POST')return handleFoodFix(req,env);
     if(BL_ROUTES[path]&&req.method==='POST')return handleBl(path,req,env);
+    if(RN_ROUTES[path]&&req.method==='POST')return handleRn(path,req,env);
     if(req.method!=='POST') return new Response('Hamroh bot ishlayapti ✅');
     if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
     const u=await req.json().catch(()=>({}));

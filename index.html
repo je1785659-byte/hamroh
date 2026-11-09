@@ -749,6 +749,20 @@ body.rn-play nav.tabs{display:none}
 .rn-bd .btn{width:auto;flex:none;padding:10px 16px}.rn-bd>div:nth-child(2){min-width:0}
 .rn-q{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.rn-q .chip{padding:9px 4px;font-size:13px}.rn-q .chip.on{background:var(--accent,#1fa7b8);color:#fff;border-color:transparent}
 .rn-qh{display:block;margin-top:8px;font-size:12px;opacity:.65}
+.rn-sheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+.rn-sh{width:100%;max-width:520px;max-height:86vh;overflow:auto;background:var(--card,#fff);border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px}
+.rn-sh h3{margin:0 0 4px;font-size:20px}.rn-sh>.btn,.rn-sh>.chip{width:100%;margin-top:6px}
+.rn-regs{display:grid;grid-template-columns:1fr 1fr;gap:6px}.rn-regs .chip{padding:11px 6px;font-size:14px}.rn-regs .chip.on{background:var(--accent,#1fa7b8);color:#fff}
+.rn-rgl{display:flex;flex-direction:column;gap:6px}.rn-rgl>div{display:grid;grid-template-columns:minmax(0,1.4fr) 1fr auto;align-items:center;gap:8px;font-size:13px;padding:4px 6px;border-radius:10px}
+.rn-rgl>div.me{background:rgba(31,167,184,.14);font-weight:700}.rn-rgl i{height:8px;border-radius:5px;background:rgba(127,127,127,.18);overflow:hidden}.rn-rgl i u{display:block;height:100%;background:linear-gradient(90deg,#f2a23a,#e8c25a)}.rn-rgl b{font-size:12px;white-space:nowrap}
+.rn-tops{display:flex;flex-direction:column;gap:4px}.rn-tops>div{display:grid;grid-template-columns:30px 1fr auto auto;gap:8px;align-items:center;padding:6px;border-radius:10px;background:var(--card2,rgba(127,127,127,.07))}
+.rn-tops small{opacity:.6;font-size:11px}.rn-tops em{font-style:normal;font-weight:700}
+.rn-lba{display:flex;gap:8px;margin-top:8px}.rn-lba>*{flex:1;width:auto;margin:0}
+.rn-snd{grid-template-columns:1fr 1fr;margin-top:8px}
+.rn-ev{display:flex;flex-direction:column;gap:6px;color:#fff;background:linear-gradient(135deg,#1f8a5a,#e0a020)}
+.rn-ev-mustaqillik{background:linear-gradient(135deg,#1b8fc9,#1ea050)}.rn-ev-yangiyil{background:linear-gradient(135deg,#1d3d8f,#c8323a)}.rn-ev-ramazon{background:linear-gradient(135deg,#0d2a4a,#2a6a7a)}
+.rn-ev b{font-size:18px}.rn-ev small{opacity:.92;font-size:13px;line-height:1.35}.rn-ev i{height:8px;border-radius:5px;background:rgba(255,255,255,.25);overflow:hidden}.rn-ev i u{display:block;height:100%;background:#fff}
+.rn-evr{display:flex;align-items:center;justify-content:space-between;font-size:13px}.rn-evr .btn,.rn-evr .chip{width:auto;padding:7px 14px}
 body[data-sec="ov"]{--sec-a:#1f2d16;--sec-b:#5a6b2a;--sec:#6b7d2e}
 body.hu-play nav.tabs{display:none}
 .hu-lvls{display:grid;gap:8px}
@@ -2325,7 +2339,7 @@ function viewSaved(){
 }
 // open a shared recipe: t.me/bot/app?startapp=r_osh
 (function(){try{const tq=new URLSearchParams(location.search).get('t');if(tq){current=tq;store.set('tab',tq)}}catch(e){}})();
-(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'||sp==='bilyard'||sp==='ov'||sp==='yugur'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('bl_')){store.set('tab','bilyard');current='bilyard';store.set('bl_join',sp.slice(3).replace(/[^a-z0-9]/g,''))}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
+(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'||sp==='bilyard'||sp==='ov'||sp==='yugur'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('yugur-r')){store.set('tab','yugur');current='yugur';store.set('rn_ref',sp.slice(7).replace(/\D/g,''))}if(sp&&sp.startsWith('bl_')){store.set('tab','bilyard');current='bilyard';store.set('bl_join',sp.slice(3).replace(/[^a-z0-9]/g,''))}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
 
 const TOOLIC={qibla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
  tasbeh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="17.5" cy="15" r="2"/><circle cx="12" cy="18.5" r="2"/><circle cx="6.5" cy="15" r="2"/><circle cx="6.5" cy="8.5" r="2"/></svg>',
@@ -4105,9 +4119,11 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108m';
+const APP_VER='20261108n';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
+// oflayn rejim: ilova va o'yinlar internetsiz ham ochiladi
+try{if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}catch(e){}
 /* ---------- KALORIYA HISOBLAGICH ---------- */
 const KK_MEALS=[['nonushta','Nonushta'],['tushlik','Tushlik'],['kechki','Kechki ovqat'],['gazak','Gazak']];
 const KK_ACT=[[1.2,'Kam harakat',"Asosan o'tirib ishlash, deyarli mashq yo'q"],[1.375,'Yengil faollik',"Haftada 1–3 marta mashq yoki ko'p piyoda yurish"],[1.55,"O'rtacha faollik",'Haftada 3–5 marta mashq'],[1.725,'Yuqori faollik','Haftada 6–7 marta mashq'],[1.9,'Juda yuqori faollik',"Og'ir jismoniy ish yoki kuniga 2 mashg'ulot"]];
@@ -6388,6 +6404,19 @@ function rnLogin(st,day){
   st.streak=st.last===y?(st.streak||0)+1:1;st.last=day;
   return RN_LOGIN[Math.min(st.streak,RN_LOGIN.length)-1];
 }
+// ---------- bayramlar: sanaga qarab bezak va maxsus vazifa ----------
+const RN_RAM={2026:['02-18','03-21'],2027:['02-08','03-11'],2028:['01-28','02-28'],2029:['01-16','02-16'],2030:['01-06','02-06']}; // Ramazon + Hayit (taxminiy)
+function rnEvent(day){
+  const y=+day.slice(0,4),md=day.slice(5),in_=(a,b)=>md>=a&&md<=b;
+  const r=RN_RAM[y];if(r&&in_(r[0],r[1]))return {id:'ramazon',key:'ramazon-'+y};
+  if(in_('03-15','03-25'))return {id:'navruz',key:'navruz-'+y};
+  if(in_('08-25','09-03'))return {id:'mustaqillik',key:'mustaqillik-'+y};
+  if(md>='12-20')return {id:'yangiyil',key:'yangiyil-'+y};
+  if(md<='01-10')return {id:'yangiyil',key:'yangiyil-'+(y-1)};
+  return null;
+}
+// trafikni tejash: o'yinchi tanlamagan bo'lsa — telefondagi "Data Saver" sozlamasiga qaraymiz
+function rnLite(stored,saveData){return stored==null?!!saveData:!!stored}
 
 /* ---------- YUGUR: 3D shahar, egilgan dunyo, qahramon, boshqaruv ---------- */
 let rnPerfSent=0,rnLoadMs=0,rnLoadT0=0,rnStreak=0,rnStreakT=0,RNS=null,rnR=null,rnRAF=null,rnSt='menu',rnAud=null,rnTrauma=0,rnHint=0;
@@ -6397,7 +6426,60 @@ const RN_SK=[{id:'kid',p:0,n:()=>'Jasur',d:()=>KT("Doppili bola — sizning biri
   {id:'girl',p:1500,n:()=>'Malika',d:()=>KT('Atlas kofta, ikki o\'rim soch','Худи из атласа, две косы','Atlas hoodie, two braids')},
   {id:'skater',p:3000,n:()=>'Sardor',d:()=>KT('Skeytchi: har yugurishda 1 bepul skeyt','Скейтер: 1 бесплатный скейт за забег','Skater: 1 free board per run')},
   {id:'afandi',p:6000,n:()=>'Afandi',d:()=>KT("Ertaklardagi hazilkash chol",'Весёлый мудрец из сказок','The witty sage of folk tales')},
+  {id:'polvon',p:4000,n:()=>'Polvon',d:()=>KT("Kurashchi yigit — yashil yaktak, qizil belbog'",'Борец кураша — зелёный яктак, красный пояс','Kurash wrestler — green robe, red belt')},
+  {id:'askiya',p:5000,n:()=>'Askiyachi',d:()=>KT("Hazil-mutoyiba ustasi, beqasam to'nda",'Мастер аскии в полосатом чапане','Master of askiya wit, striped chapan')},
+  {id:'dutor',p:7000,n:()=>'Dutorchi qiz',d:()=>KT("Atlas ko'ylak, yelkasida dutor",'Атласное платье, дутар за спиной','Atlas dress, dutar on her back')},
+  {id:'buvi',p:8000,n:()=>'Buvijon',d:()=>KT("Chaqqon buvijon — nevaralaridan tez!",'Шустрая бабушка — быстрее внуков!','Speedy granny — faster than the grandkids!')},
   {id:'cosmo',p:10000,n:()=>'Kosmonavt',d:()=>KT('Skafandrli jasur bola','Отважный мальчик в скафандре','Brave kid in a space suit')}];
+const RN_CITY=[{n:'Toshkent',r:'Ташкент',e:'Tashkent',g:'CHORSU'},{n:'Samarqand',r:'Самарканд',e:'Samarkand',g:'SIYOB'},{n:'Buxoro',r:'Бухару',e:'Bukhara',g:'TOQI ZARGARON'},{n:'Xiva',r:'Хиву',e:'Khiva',g:"ICHAN QAL'A"},{n:"Farg'ona",r:'Фергану',e:'Fergana',g:"MARG'ILON"}];
+const rnTx=t=>typeof LANG!=='undefined'&&LANG==='uzc'&&typeof cyrSafe==='function'?cyrSafe(t):t;
+const RN_LITE=()=>rnLite(store.get('rn_lite',null),navigator.connection&&navigator.connection.saveData);
+const RN_REGS=[['tsh','Toshkent shahri'],['tsv','Toshkent viloyati'],['and','Andijon'],['bux','Buxoro'],['far',"Farg'ona"],['jiz','Jizzax'],['xor','Xorazm'],['nam','Namangan'],['nav','Navoiy'],['qas','Qashqadaryo'],['qqr',"Qoraqalpog'iston"],['sam','Samarqand'],['sir','Sirdaryo'],['sur','Surxondaryo']];
+const rnRegN=k=>{const r=RN_REGS.find(x=>x[0]===k);return r?r[1]:'—'};
+let RN_LB=null; // oxirgi reyting javobi
+function rnApi(path,o={}){if(!(tg&&tg.initData))return Promise.resolve(null);const fd=new FormData();fd.append('initData',tg.initData);for(const k in o)if(o[k]!=null)fd.append(k,o[k]);
+  return fetch(BOT_API+path,{method:'POST',body:fd}).then(r=>r.json()).catch(()=>null)}
+function rnSync(region){const ref=store.get('rn_ref','');
+  return rnApi('/rn/me',{region:region||store.get('rn_region',''),ref:ref||null}).then(j=>{if(!j||!j.ok)return null;RN_LB=j;if(ref)store.set('rn_ref','');
+    if(j.region)store.set('rn_region',j.region);
+    if(j.bonus>0){const P=rnProg();P.coins+=j.bonus;store.set('rn_p',P);haptic('done');
+      rnToastG(j.winBonus?KT(`🏆 ${rnRegN(j.win)} o'tgan haftada g'olib! +${j.bonus} tanga`,`🏆 ${rnRegN(j.win)} победил на прошлой неделе! +${j.bonus}`,`🏆 ${rnRegN(j.win)} won last week! +${j.bonus}`):KT(`🎁 Do'st taklifi uchun +${j.bonus} tanga`,`🎁 За приглашение друга +${j.bonus}`,`🎁 Friend invite bonus +${j.bonus}`))}
+    return j})}
+function rnRegPick(){const cur=store.get('rn_region','');const ov=document.createElement('div');ov.className='rn-sheet';
+  ov.innerHTML=`<div class="rn-sh"><h3>${KT('Viloyatingiz qaysi?','Ваш регион?','Your region?')}</h3><p class="note">${KT("Har hafta qaysi viloyat ko'proq yugurganini hisoblaymiz. G'olib viloyat o'yinchilariga +300 tanga!",'Каждую неделю считаем, какой регион пробежал больше. Победителям +300 монет!','Each week we count which region ran the most. Winners get +300 coins!')}</p>
+    <div class="rn-regs">${RN_REGS.map(([k,n])=>`<button class="chip${k===cur?' on':''}" data-rg="${k}">${n}</button>`).join('')}</div><button class="chip" id="rgx">${KT('Keyinroq','Позже','Later')}</button></div>`;
+  document.body.appendChild(ov);ov.querySelector('#rgx').onclick=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)ov.remove()};
+  ov.querySelectorAll('[data-rg]').forEach(b=>b.onclick=()=>{store.set('rn_region',b.dataset.rg);ov.remove();rnSync(b.dataset.rg).then(()=>{if(current==='yugur'&&!$('#rnstage'))viewYugur()})})}
+function rnLbSheet(){const j=RN_LB;if(!j)return;const ov=document.createElement('div');ov.className='rn-sheet';const mx=Math.max(1,...j.regs.map(r=>r.d));
+  ov.innerHTML=`<div class="rn-sh"><h3>🏆 ${KT('Haftalik reyting','Рейтинг недели','Weekly ranking')}</h3>
+    <div class="label">${KT('Viloyatlar (yugurilgan masofa)','Регионы (дистанция)','Regions (distance)')}</div>
+    <div class="rn-rgl">${RN_REGS.map(([k])=>j.regs.find(r=>r.k===k)||{k,d:0,n:0}).sort((a,b)=>b.d-a.d).map((r,i)=>`<div class="${r.k===j.region?'me':''}"><span>${i+1}. ${rnRegN(r.k)}</span><i><u style="width:${Math.round(100*r.d/mx)}%"></u></i><b>${(r.d/1000).toFixed(1)} km</b></div>`).join('')}</div>
+    <div class="label" style="margin-top:12px">${KT("Eng yaxshi o'yinchilar",'Лучшие игроки','Top players')}</div>
+    <div class="rn-tops">${j.top.length?j.top.map((t,i)=>`<div><span>${['🥇','🥈','🥉'][i]||(i+1)+'.'}</span><b>${esc(t.name)}</b><small>${rnRegN(t.region)}</small><em>${t.best.toLocaleString()}</em></div>`).join(''):`<p class="note">${KT("Bu hafta hali hech kim yugurmadi — birinchi bo'ling!",'На этой неделе ещё никто не бегал — будьте первым!','Nobody ran yet this week — be first!')}</p>`}</div>
+    ${j.me?`<p class="note">${KT(`Sizning o'rningiz: ${j.rank}-o'rin · rekord ${j.me.best.toLocaleString()}`,`Ваше место: ${j.rank} · рекорд ${j.me.best.toLocaleString()}`,`Your place: #${j.rank} · best ${j.me.best.toLocaleString()}`)}</p>`:''}
+    <button class="btn" id="lbx">${KT('Yopish','Закрыть','Close')}</button></div>`;
+  document.body.appendChild(ov);ov.querySelector('#lbx').onclick=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)ov.remove()}}
+function rnInvite(){const id=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user&&tg.initDataUnsafe.user.id;const link=BOT_LINK+'?startapp=yugur'+(id?'-r'+id:'');
+  const t=trText("🏃 «Yugur!» — Toshkent, Chorsu va metro bo'ylab yuguradigan o'zbekcha o'yin! Shu havola orqali kirsang, ikkalamizga 500 tanga beriladi 🎁");
+  const u=`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(t)}`;tg&&tg.openTelegramLink?tg.openTelegramLink(u):window.open(u,'_blank')}
+// natija kartasi: rasm chiziladi va bot orqali o'zingizga yuboriladi — keyin do'stlarga uzatasiz
+function rnCard(sc,dist,coins){return new Promise(res=>{const c=document.createElement('canvas');c.width=1080;c.height=1350;const x=c.getContext('2d'),ft=x.fillText.bind(x);x.fillText=(t,a,b)=>ft(rnTx(String(t)),a,b);
+  const g=x.createLinearGradient(0,0,0,1350);g.addColorStop(0,'#0e4a6e');g.addColorStop(1,'#1fa7b8');x.fillStyle=g;x.fillRect(0,0,1080,1350);
+  x.globalAlpha=0.12;x.fillStyle='#fff';for(let r=0;r<8;r++)for(let k=0;k<6;k++){const cx=k*200+(r%2)*100,cy=r*190;x.beginPath();for(let i=0;i<16;i++){const a=i*Math.PI/8,rr=i%2?28:70;x.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr)}x.fill()}x.globalAlpha=1;
+  x.fillStyle='#fff';x.textAlign='center';x.font='bold 92px system-ui,sans-serif';x.fillText('YUGUR!',540,150);
+  x.font='600 40px system-ui,sans-serif';x.fillStyle='#d9f5f8';x.fillText(KT('Hamroh ilovasidagi o\'zbekcha yugurish o\'yini','Узбекская игра-бегалка в Hamroh','Uzbek runner game in Hamroh'),540,215);
+  const img=new Image();img.onload=img.onerror=()=>{try{x.drawImage(img,290,250,500,625)}catch(e){}
+    x.fillStyle='rgba(0,0,0,.25)';x.beginPath();x.roundRect(90,900,900,330,40);x.fill();
+    x.fillStyle='#ffd54a';x.font='bold 150px system-ui,sans-serif';x.fillText(sc.toLocaleString(),540,1060);
+    x.fillStyle='#fff';x.font='600 46px system-ui,sans-serif';x.fillText(`📏 ${dist} m   ·   🪙 ${coins}`+(store.get('rn_region','')?'   ·   📍 '+rnRegN(store.get('rn_region','')):''),540,1150);
+    x.font='600 42px system-ui,sans-serif';x.fillStyle='#e8fbff';x.fillText(KT('Meni quvib o\'ta olasanmi? 👇','Сможешь обогнать? 👇','Can you beat me? 👇'),540,1300);
+    c.toBlob(b=>res(b),'image/png')};img.src='rn/sk/'+rnSkin()+'.png?v='+APP_VER})}
+const rnToday=()=>window.RN_DATE||rnDay();
+const RN_EVD={navruz:{e:'🌷',t:()=>KT("Navro'z bayrami muborak!",'С праздником Навруз!','Happy Navruz!'),d:()=>KT("Yo'llar lolaga burkandi, sumalak qozonlari qaynayapti. Bayram davomida 3 km yuguring — 1000 tanga!",'Тюльпаны и сумаляк на улицах. Пробегите 3 км за праздник — 1000 монет!','Tulips and sumalak everywhere. Run 3 km during the holiday — 1000 coins!'),goal:3000,r:1000},
+  mustaqillik:{e:'🇺🇿',t:()=>KT('Mustaqillik kuni muborak!','С Днём независимости!','Happy Independence Day!'),d:()=>KT("Ko'chalar bayroqlar bilan bezandi, kechqurun mushaklar! Bayram davomida 5 km yuguring — 1500 tanga!",'Флаги и салюты! Пробегите 5 км — 1500 монет!','Flags and fireworks! Run 5 km — 1500 coins!'),goal:5000,r:1500},
+  yangiyil:{e:'🎄',t:()=>KT('Yangi yil muborak!','С Новым годом!','Happy New Year!'),d:()=>KT("Qor yog'yapti, archalar chiroqlarda! Bayram davomida 5 km yuguring — 1500 tanga!",'Идёт снег, ёлки в огнях! 5 км — 1500 монет!','Snow and lit-up trees! Run 5 km — 1500 coins!'),goal:5000,r:1500},
+  ramazon:{e:'🌙',t:()=>KT('Ramazon oyi muborak!','Благословенного Рамадана!','Blessed Ramadan!'),d:()=>KT("Kechki ko'chalarda fonuslar yonadi. Oy davomida 10 km yuguring — 2000 tanga!",'Вечерние фонари на улицах. 10 км за месяц — 2000 монет!','Lanterns light the evening streets. Run 10 km this month — 2000 coins!'),goal:10000,r:2000}};
+const rnEv=()=>rnEvent(rnToday()),rnEvSt=ev=>{const st=store.get('rn_ev',{});return st.key===ev.key?st:{key:ev.key,p:0,claimed:false}};
 const RN_BOARD_P=300,rnDay=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const rnMS=()=>rnMissions(store.get('rn_ms',{}),rnDay());
 const RN_MTXT={coins:n=>KT(`Bir yugurishda ${n} ta tanga`,`${n} монет за забег`,`${n} coins in one run`),dist:n=>KT(`Bir yugurishda ${n} m`,`${n} м за забег`,`Run ${n} m in one go`),score:n=>KT(`Bir yugurishda ${n.toLocaleString()} ochko`,`${n.toLocaleString()} очков за забег`,`${n.toLocaleString()} points in one run`),
@@ -6408,6 +6490,7 @@ const RN_PW={board:['🛹',()=>KT('Skeyt','Скейт','Skateboard')],magnet:['�
 // ---- tayyor 3D modellar (Kenney, CC0): bir marta yuklanadi ----
 let RNA=null,RNAp=null,RN_FROT=0,RN_BROT=1,RN_HROT=0,RN_HBACK=1;
 const RN_AV='m4',RN_LO=['coin','cab','car','apart','bazaar','mahalla','madrasa','choy','chinar','cart','low','high','block','ramp'];
+const RN_MC=['registan','gurem','kalon','toki','khwall','kalta','cotton','atlasst','tut']; // shaharlar: o'yin boshlangach fonda yuklanadi
 const RN_MN=['board','cab','car','low','high','block','ramp','coin','magnet','jet','shoe','shield','apart','bazaar','mahalla','madrasa','choy','chinar','lamp','cart'];
 function rnHalf(h){const s=(h&0x8000)?-1:1,e=(h>>10)&31,f=h&1023;return e===0?s*Math.pow(2,-14)*(f/1024):e===31?(f?NaN:s*Infinity):s*Math.pow(2,e-15)*(1+f/1024)}
 function rnLoadAssets(){
@@ -6429,7 +6512,7 @@ function rnLoadAssets(){
   // qahramon: Quaternius Universal Animation Library (CC0) — skelet va tayyor harakatlar
   const sk=rnSkin();
   const opt=n=>scr('lib/three-gltf.js').then(()=>new window.THREE_GLTFLoader().loadAsync('rn/'+n+'.glb?v='+RN_AV)).catch(e=>{console.warn(n,e);return null});
-  const guardP=opt('guard'),dogP=opt('dog');
+  const LITE=RN_LITE(),guardP=LITE?Promise.resolve(null):opt('guard'),dogP=LITE?Promise.resolve(null):opt('dog');
   const L0=()=>new window.THREE_GLTFLoader(),hero=scr('lib/three-gltf.js').then(()=>L0().loadAsync('rn/'+sk+'.glb?v='+RN_AV).catch(()=>L0().loadAsync('rn/kid.glb?v='+RN_AV)).then(g=>(g.kid=true,g),()=>L0().loadAsync('rn/hero.glb?v='+RN_AV))).catch(e=>{console.warn('hero',e);return null});
   // Toshkent to'plami (Meshy): poyezd, to'siqlar, tanga, bonuslar, binolar — yagona uslubda
   const MROT={cab:-Math.PI/2,car:-Math.PI/2,ramp:Math.PI},CEN={coin:1,magnet:1,jet:1,shoe:1,shield:1};
@@ -6445,22 +6528,29 @@ function rnLoadAssets(){
   const mods=scr('lib/three-gltf.js').then(()=>{const L=new window.THREE_GLTFLoader();if(window.THREE_Meshopt)L.setMeshoptDecoder(window.THREE_Meshopt);
     const one=n=>L.loadAsync('rn/m/'+n+'.glb?v='+RN_AV).then(g=>{let me=null;g.scene.updateMatrixWorld(true);g.scene.traverse(o=>{if(o.isMesh&&!me)me=o});return me});
     return Promise.all(RN_MN.map(k=>one(k).then(me=>{const hi=prep(k,me);if(!RN_LO.includes(k))return [[k,hi]];
-        return one(k+'_lo').then(m2=>[[k,hi],[k+'_lo',prep(k,m2,hi)]],()=>[[k,hi]])},e=>{console.warn('rn/m',k,e);return []}))).then(a=>{const M={};for(const l of a)for(const [k,v] of l)M[k]=v;return M})}).catch(()=>({}));
-  const post=scr2('lib/three-post.js').catch(()=>null);
+        return one(k+'_lo').then(m2=>[[k,hi],[k+'_lo',prep(k,m2,hi)]],()=>[[k,hi]])},e=>{console.warn('rn/m',k,e);return []}))).then(a=>{const M={};for(const l of a)for(const [k,v] of l)M[k]=v;
+      if(!LITE)setTimeout(()=>{let q=Promise.resolve();for(const k of RN_MC)q=q.then(()=>one(k).then(me=>{const hi=prep(k,me);return one(k+'_lo').then(m2=>{M[k+'_lo']=prep(k,m2,hi);M[k]=hi},()=>{M[k]=hi})},()=>{}))},1200);
+      return M})}).catch(()=>({}));
+  const post=LITE?Promise.resolve(null):scr2('lib/three-post.js').catch(()=>null);
   RNAp=Promise.all([kit('track'),hero,mods,post,guardP,dogP]).then(([t,h,m,_,gd,dg])=>{const base={t,c:null,hero:h,m,guard:gd,dog:dg,skin:sk};
     if(m.cab&&m.apart)return RNA=base; // Meshy to'plami bor — Kenney shahri kerak emas
     return Promise.all([kit('train'),kit('city')]).then(([t2,c])=>(RNA=Object.assign(base,{t:{G:Object.assign({},t2.G,t.G),tx:t2.tx},c})),()=>RNA=base)},e=>{RNAp=null;throw e});
   return RNAp;
 }
-function rnDispose(){cancelAnimationFrame(rnRAF);if(rnR){try{rnR.dispose()}catch(e){}rnR=null}}
+function rnDispose(){rnMusic(false);cancelAnimationFrame(rnRAF);if(rnR){try{rnR.dispose()}catch(e){}rnR=null}}
 function viewYugur(){
   rnDispose();document.body.classList.remove('rn-play');try{tg&&tg.enableVerticalSwipes&&tg.enableVerticalSwipes()}catch(e){}
   setHero('yugur');
   {const L=store.get('rn_login',{}),r=rnLogin(L,rnDay());if(r){store.set('rn_login',L);const P0=rnProg();P0.coins+=r;store.set('rn_p',P0);setTimeout(()=>rnToastG(KT(`🎁 ${L.streak}-kun mukofoti: +${r} tanga`,`🎁 Награда за ${L.streak}-й день: +${r} монет`,`🎁 Day ${L.streak} reward: +${r} coins`)),400)}}
   const P=rnProg(),MS=rnMS();store.set('rn_ms',MS);const nb=store.get('rn_boards',0);
-  $('#screen').innerHTML=`<section class="card rn-menu" data-notr>
+  const EV=rnEv(),ED=EV&&RN_EVD[EV.id],ES=EV&&rnEvSt(EV);
+  $('#screen').innerHTML=`${ED?`<section class="card rn-ev rn-ev-${EV.id}" data-notr><b>${ED.e} ${ED.t()}</b><small>${ED.d()}</small><i><u style="width:${Math.min(100,Math.round(100*ES.p/ED.goal))}%"></u></i>
+      <div class="rn-evr"><span>${(Math.min(ES.p,ED.goal)/1000).toFixed(1)} / ${ED.goal/1000} km</span>${ES.claimed?'<span>✓</span>':`<button class="${ES.p>=ED.goal?'btn':'chip'}" id="rnevc" ${ES.p>=ED.goal?'':'disabled'}>🪙 ${ED.r}</button>`}</div></section>`:''}
+    <section class="card rn-menu" data-notr>
       <div class="rn-stats"><div><small>${KT('Rekord','Рекорд','Best')}</small><b>${P.best.toLocaleString()}</b></div><div><small>${KT('Tangalar','Монеты','Coins')}</small><b>🪙 ${P.coins.toLocaleString()}</b></div><div><small>${KT("O'yinlar",'Игры','Games')}</small><b>${P.games}</b></div></div>
       <button class="btn rn-go" id="rngo">▶ ${KT('Yugurish','Бежать','Run')}</button></section>
+    <section class="card rn-lb" data-notr><div class="label">🏆 ${KT('Viloyatlar bellashuvi','Битва регионов','Region battle')}</div><div id="rnlb">${rnLbHtml()}</div>
+      <div class="rn-lba"><button class="chip" id="rnlball">${KT("To'liq reyting",'Весь рейтинг','Full ranking')}</button><button class="btn" id="rninv">👥 ${KT("Do'stni chaqirish +500",'Пригласить +500','Invite +500')}</button></div></section>
     <section class="card" data-notr><div class="label">${KT('Bugungi vazifalar','Задания на сегодня','Today\'s missions')} <small class="rn-streak">🔥 ${store.get('rn_login',{}).streak||1}</small></div><div class="rn-ms">${MS.list.map((m,i)=>`<div class="rn-m${m.claimed?' ok':''}"><div><b>${RN_MTXT[m.t](m.n)}</b><i><u style="width:${Math.round(100*m.p/m.n)}%"></u></i><small>${Math.floor(m.p).toLocaleString()} / ${m.n.toLocaleString()}</small></div>
       ${m.claimed?'<span>✓</span>':`<button class="${m.p>=m.n?'btn':'chip'}" data-ms="${i}" ${m.p>=m.n?'':'disabled'}>🪙 ${m.r}</button>`}</div>`).join('')}
       ${MS.list.every(m=>m.claimed)?(MS.chest?`<div class="rn-chest">🎉 ${KT('Bugungi sandiq ochildi. Ertaga yangi vazifalar!','Сундук открыт. Завтра новые задания!','Chest opened. New missions tomorrow!')}</div>`:`<button class="btn rn-chest" id="rnchest">🎁 ${KT('Sandiqni ochish: +500','Открыть сундук: +500','Open chest: +500')}</button>`):`<div class="rn-chest dim">🎁 ${KT('Uchala vazifa — sandiq (+500)','Все три задания — сундук (+500)','All three — chest (+500)')}</div>`}</div></section>
@@ -6470,7 +6560,8 @@ function viewYugur(){
       return `<div class="rn-skc${cur?' on':''}"><img src="rn/sk/${k.id}.png?v=${APP_VER}" alt="" loading="lazy"><b>${k.n()}</b><small>${k.d()}</small>
       <button class="${cur?'chip':own?'chip':'btn'}" data-sk="${k.id}" ${cur||(!own&&P.coins<k.p)?'disabled':''}>${cur?'✓ '+KT('Tanlangan','Выбран','Selected'):own?KT('Tanlash','Выбрать','Select'):'🪙 '+k.p.toLocaleString()}</button></div>`}).join('')}</div></section>
     <section class="card" data-notr><div class="label">${KT('Grafika','Графика','Graphics')}</div><div class="rn-q">${[['auto',KT('Avto','Авто','Auto')],['2',KT('Yuqori','Высокая','High')],['1',KT("O'rta",'Средняя','Medium')],['0',KT('Past','Низкая','Low')]].map(([k,t])=>`<button class="chip${String(store.get('rn_qset','auto'))===k?' on':''}" data-q="${k}">${t}</button>`).join('')}</div>
-      <small class="rn-qh">${KT("O'yin qotsa — «Past»ni tanlang. «Avto» telefoningizga qarab o'zi sozlaydi.",'Если игра тормозит — выберите «Низкая». «Авто» подстроится само.','If the game lags, choose Low. Auto adapts to your phone.')}</small></section>
+      <div class="rn-q rn-snd"><button class="chip${store.get('rn_mus',true)?' on':''}" id="rnmus">🎵 ${KT('Musiqa','Музыка','Music')}</button><button class="chip${store.get('rn_snd',true)?' on':''}" id="rnsfx">🔊 ${KT('Ovozlar','Звуки','Sounds')}</button><button class="chip${RN_LITE()?' on':''}" id="rnlite">📶 ${KT('Tejamkor','Экономия','Data saver')}</button></div>
+      <small class="rn-qh">${KT("O'yin qotsa — «Past»ni tanlang. «Avto» telefoningizga qarab o'zi sozlaydi. «Tejamkor» — internet kam sarflanadi: qorovul, it va shahar binolari yuklanmaydi; o'yin bir marta yuklangach internetsiz ham ishlaydi.",'Если игра тормозит — выберите «Низкая». «Авто» подстроится само. «Экономия» — меньше трафика: без охранника, собаки и зданий городов; после первой загрузки игра работает и без интернета.','If the game lags, choose Low. Auto adapts to your phone. Data saver uses less traffic: no guard, dog or city buildings; after the first load the game also works offline.')}</small></section>
     <section class="card" data-notr><div class="label">${KT('Boshqaruv','Управление','Controls')}</div><div class="rn-how">
       <p>⬅️ ➡️ ${KT("Chapga/o'ngga suring — yo'lak almashtirish",'Свайп влево/вправо — смена пути','Swipe left/right — change lane')}</p>
       <p>⬆️ ${KT("Tepaga — sakrash (past to'siqlardan)",'Вверх — прыжок (через низкие барьеры)','Up — jump (over low barriers)')}</p>
@@ -6478,8 +6569,14 @@ function viewYugur(){
       <p>🚆 ${KT("Poyezdga rampadan chiqing. Poyezd yoniga urilsangiz qorovul yaqinlashadi — ikkinchi marta ushlaydi!",'На поезд — по рампе. Удар о бок поезда — охранник ближе, второй раз — поймает!','Climb trains by ramps. Bump a side — the guard gets closer, twice and you are caught!')}</p>
       <p>🧲 🚀 👟 ✖2 🛡 ${KT('Bonuslarni yig\'ing','Собирайте бонусы','Grab power-ups')}</p></div></section>`;
   $('#rngo').onclick=()=>rnStart();
+  if($('#rnevc'))$('#rnevc').onclick=()=>{const st=rnEvSt(EV);if(st.claimed||st.p<ED.goal)return;st.claimed=true;store.set('rn_ev',st);const P=rnProg();P.coins+=ED.r;store.set('rn_p',P);haptic('done');rnToastG(ED.e+' +'+ED.r+' 🪙');viewYugur()};
+  $('#rnlball').onclick=()=>RN_LB?rnLbSheet():rnToastG(KT("Reyting faqat Telegram ichida ishlaydi",'Рейтинг работает только в Telegram','Ranking works inside Telegram'));$('#rninv').onclick=()=>rnInvite();
+  if($('#rnreg'))$('#rnreg').onclick=()=>rnRegPick();
+  rnSync().then(j=>{if(j&&$('#rnlb')){$('#rnlb').innerHTML=rnLbHtml();if($('#rnreg'))$('#rnreg').onclick=()=>rnRegPick()}
+    if(j&&!j.region&&!store.get('rn_regask',false)&&tg&&tg.initData){store.set('rn_regask',true);rnRegPick()}});
   // menyu ochilganda 3D fayllarni oldindan yuklab qo'yamiz — «Yugurish» bosilganda kutish qisqaradi
   setTimeout(()=>{if(current==='yugur')blLoad3().then(ok=>ok&&rnLoadAssets()).catch(()=>{})},700);
+  $('#rnmus').onclick=()=>{store.set('rn_mus',!store.get('rn_mus',true));viewYugur()};$('#rnsfx').onclick=()=>{store.set('rn_snd',!store.get('rn_snd',true));viewYugur()};$('#rnlite').onclick=()=>{store.set('rn_lite',!RN_LITE());viewYugur()};
   document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{store.set('rn_qset',b.dataset.q);if(b.dataset.q!=='auto')store.set('rn_q',+b.dataset.q);viewYugur()});
   document.querySelectorAll('[data-ms]').forEach(b=>b.onclick=()=>{const st=rnMS(),r=rnMissionClaim(st,+b.dataset.ms);if(!r)return;store.set('rn_ms',st);const P=rnProg();P.coins+=r;store.set('rn_p',P);haptic('done');rnToastG('+'+r+' 🪙');viewYugur()});
   if($('#rnchest'))$('#rnchest').onclick=()=>{const st=rnMS(),r=rnChest(st);if(!r)return;store.set('rn_ms',st);const P=rnProg();P.coins+=r;store.set('rn_p',P);haptic('done');rnToastG('🎁 +'+r+' 🪙');viewYugur()};
@@ -6488,6 +6585,11 @@ function viewYugur(){
     if(!own.includes(k.id)){if(P.coins<k.p)return;P.coins-=k.p;store.set('rn_p',P);own.push(k.id);store.set('rn_own',own);haptic('done');rnToastG(KT(`${k.n()} sizniki!`,`${k.n()} теперь ваш!`,`${k.n()} is yours!`))}
     store.set('rn_skin',k.id);viewYugur()});
 }
+function rnLbHtml(){const j=RN_LB,reg=store.get('rn_region','');
+  if(!j)return `<p class="note">${reg?'📍 '+rnRegN(reg)+' · ':''}${KT("Har hafta viloyatlar yugurgan masofa bo'yicha bellashadi. G'olib viloyatga +300 tanga.",'Каждую неделю регионы соревнуются по дистанции. Победителям +300.','Regions compete weekly by distance. Winners get +300.')}</p>${reg?'':`<button class="btn" id="rnreg">📍 ${KT('Viloyatni tanlash','Выбрать регион','Choose region')}</button>`}`;
+  const mx=Math.max(1,...j.regs.map(r=>r.d)),top=j.regs.slice(0,3),mine=j.regs.findIndex(r=>r.k===j.region);
+  return `<div class="rn-rgl">${top.map((r,i)=>`<div class="${r.k===j.region?'me':''}"><span>${['🥇','🥈','🥉'][i]} ${rnRegN(r.k)}</span><i><u style="width:${Math.round(100*r.d/mx)}%"></u></i><b>${(r.d/1000).toFixed(1)} km</b></div>`).join('')||`<p class="note">${KT("Bu hafta hali hech kim yugurmadi.",'На этой неделе ещё не бегали.','Nobody ran yet this week.')}</p>`}</div>
+    <p class="note">${j.region?`📍 ${rnRegN(j.region)}${mine>=0?' — '+(mine+1)+KT("-o'rinda",'-е место','th place'):''}`:''}${j.me?` · ${KT('Sizning haftalik rekordingiz','Ваш рекорд недели','Your weekly best')}: <b>${j.me.best.toLocaleString()}</b> (${j.rank}-${KT("o'rin",'место','place')})`:''}</p>${j.region?'':`<button class="btn" id="rnreg">📍 ${KT('Viloyatni tanlash','Выбрать регион','Choose region')}</button>`}`}
 function rnToastG(t){try{toast(t)}catch(e){}}
 function rnStart(){
   RNS=rnNew((Date.now()%1e6)|0);RNS.free=rnSkin()==='skater'?1:0;RNS.boards=store.get('rn_boards',0)+RNS.free;RNS.st={jumps:0,rolls:0,items:0};rnSt='ready';rnTrauma=0;statSec('yugur_game');rnGameV();window.scrollTo(0,0);
@@ -6505,7 +6607,7 @@ function rnGameV(){
     <div class="rn-msg" id="rnmsg"></div>
     <div id="rnend"></div></div>`;
   $('#rnback').onclick=()=>rnPause();
-  $('#rnboard').onclick=e=>{e.stopPropagation();if(rnSt==='ready'){rnSt='run';$('#rnmsg').hidden=true}if(rnSt==='run')rnInput(RNS,'board')};
+  $('#rnboard').onclick=e=>{e.stopPropagation();if(rnSt==='ready'){rnSt='run';$('#rnmsg').hidden=true;rnMusic(true)}if(rnSt==='run')rnInput(RNS,'board')};
   rnHud();
   rnLoadT0=performance.now();
   blLoad3().then(ok=>ok?rnLoadAssets().then(()=>ok,()=>ok):ok).then(ok=>{
@@ -6518,10 +6620,10 @@ function rnGameV(){
 function rnReady(){rnSt='ready';const m=$('#rnmsg');m.innerHTML=`<div class="rn-start"><b>${KT('Suring — boshlaymiz!','Свайпните — поехали!','Swipe to start!')}</b><span>⬅️ ➡️ ⬆️ ⬇️</span></div>`;m.hidden=false}
 function rnPause(){
   if(rnSt==='over')return rnLeave();
-  if(rnSt==='run'){rnSt='pause'}
+  if(rnSt==='run'){rnSt='pause';rnMusic(false)}
   $('#rnend').innerHTML=`<div class="rn-end"><div class="rn-endc"><h3>${KT('Pauza','Пауза','Paused')}</h3>
     <div class="rn-ea"><button class="btn" id="rnres">▶ ${KT('Davom etish','Продолжить','Resume')}</button><button class="chip" id="rnquit">${KT('Chiqish','Выйти','Quit')}</button></div></div></div>`;
-  $('#rnres').onclick=()=>{$('#rnend').innerHTML='';if(rnSt==='pause')rnSt='run'};
+  $('#rnres').onclick=()=>{$('#rnend').innerHTML='';if(rnSt==='pause'){rnSt='run';rnMusic(true)}};
   $('#rnquit').onclick=()=>rnLeave();
 }
 function rnLeave(){rnDispose();viewYugur()}
@@ -6536,7 +6638,7 @@ function rnBind(el){
 }
 function rnKey(k){
   if(rnSt==='ready'&&k==='board')return;
-  if(rnSt==='ready'){rnSt='run';$('#rnmsg').hidden=true;rnSnd('go')}
+  if(rnSt==='ready'){rnSt='run';$('#rnmsg').hidden=true;rnSnd('go');rnMusic(true)}
   if(rnSt!=='run')return;rnInput(RNS,k);
 }
 function rnHud(){
@@ -6548,10 +6650,12 @@ function rnHud(){
   {const bb=$('#rnboard');if(bb){bb.hidden=!(s.boards>0)||s.pw.board>0||!s.alive;$('#rnbn').textContent=s.boards}}
 }
 function rnOver(){
-  rnSt='over';const s=RNS,P=rnProg(),sc=Math.floor(s.score),nb=sc>P.best;
+  rnSt='over';rnMusic(false);const s=RNS,P=rnProg(),sc=Math.floor(s.score),nb=sc>P.best;
   P.best=Math.max(P.best,sc);P.coins+=s.coins;P.games++;store.set('rn_p',P);haptic(nb?'done':'heavy');
   const MS=rnMS(),before=MS.list.map(m=>m.p>=m.n);rnMissionRun(MS,{coins:s.coins,dist:Math.round(s.z),score:sc,jumps:s.st?s.st.jumps:0,rolls:s.st?s.st.rolls:0,items:s.st?s.st.items:0});store.set('rn_ms',MS);
   const newDone=MS.list.filter((m,i)=>m.p>=m.n&&!before[i]);
+  {const ev=rnEv();if(ev){const st=rnEvSt(ev);st.p+=Math.round(s.z);store.set('rn_ev',st)}}
+  if(s.z>30)rnApi('/rn/run',{score:sc,dist:Math.round(s.z)});
   const why={caught:KT('Qorovul ushlab oldi!','Охранник поймал!','The guard caught you!'),train:KT('Poyezdga urildingiz!','Врезались в поезд!','Hit a train!'),mtrain:KT('Poyezdga urildingiz!','Врезались в поезд!','Hit a train!'),block:KT("To'siqqa urildingiz!",'Врезались в барьер!','Hit a barrier!'),low:KT("Past to'siq — sakrash kerak edi",'Низкий барьер — надо было прыгать','Low barrier — jump!'),high:KT("Baland to'siq — sirpanish kerak edi",'Высокий барьер — надо было подкатиться','High bar — roll!')}[s.crash]||'';
   setTimeout(()=>{if(!$('#rnstage'))return;
     $('#rnend').innerHTML=`<div class="rn-end"><div class="rn-endc"><small>${why}</small>
@@ -6562,9 +6666,13 @@ function rnOver(){
       <div class="rn-row"><span>🏆 ${KT('Rekord','Рекорд','Best')}</span><b>${P.best.toLocaleString()}</b></div>
       ${newDone.map(m=>`<div class="rn-row rn-done"><span>✅ ${RN_MTXT[m.t](m.n)}</span><b>🪙 ${m.r}</b></div>`).join('')}
       <div class="rn-ea"><button class="btn" id="rnagain">↻ ${KT('Yana yugurish','Ещё раз','Run again')}</button>
-      <button class="chip" id="rnshare">📤 ${KT("Do'stlarga",'Друзьям','Share')}</button><button class="chip" id="rnmenu">${KT('Menyu','Меню','Menu')}</button></div></div></div>`;
+      <button class="chip" id="rnshare">📸 ${KT('Natija kartasi','Карточка','Result card')}</button><button class="chip" id="rnmenu">${KT('Menyu','Меню','Menu')}</button></div></div></div>`;
     $('#rnagain').onclick=()=>{rnDispose();rnStart()};$('#rnmenu').onclick=()=>rnLeave();
-    $('#rnshare').onclick=()=>{const link=BOT_LINK+'?startapp=yugur',t=trText(`🏃 Hamrohdagi «Yugur!» o'yinida ${sc} ochko to'pladim! Meni quvib o'ta olasanmi?`);const u=`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(t)}`;tg&&tg.openTelegramLink?tg.openTelegramLink(u):window.open(u,'_blank')};
+    $('#rnshare').onclick=()=>{if(tg&&tg.initData){const b=$('#rnshare');b.disabled=true;rnCard(sc,Math.round(s.z),s.coins).then(img=>{const fd=new FormData();fd.append('initData',tg.initData);fd.append('img',img,'yugur.png');
+        fd.append('cap',trText(`🏃 «Yugur!» o'yinida <b>${sc.toLocaleString()}</b> ochko to'pladim! Meni quvib o'ta olasanmi?`));
+        return fetch(BOT_API+'/rn/card',{method:'POST',body:fd}).then(r=>r.json())}).then(j=>{b.disabled=false;rnToastG(j&&j.ok?KT("✅ Karta bot chatiga yuborildi — uni do'stlaringizga uzating!",'✅ Карточка отправлена в чат бота — перешлите друзьям!','✅ Card sent to the bot chat — forward it to friends!'):KT("Yuborib bo'lmadi, birozdan so'ng urinib ko'ring",'Не удалось отправить, попробуйте позже','Could not send, try later'))}).catch(()=>{b.disabled=false})
+        return}
+      const link=BOT_LINK+'?startapp=yugur',t=trText(`🏃 Hamrohdagi «Yugur!» o'yinida ${sc} ochko to'pladim! Meni quvib o'ta olasanmi?`);const u=`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(t)}`;tg&&tg.openTelegramLink?tg.openTelegramLink(u):window.open(u,'_blank')};
   },900);
 }
 function rnLoop(){
@@ -6578,11 +6686,11 @@ function rnLoop(){
       else if(e.k==='board'){rnSnd('item');haptic('light');if(RNS.free>0)RNS.free--;else store.set('rn_boards',Math.max(0,store.get('rn_boards',0)-1))}
       else if(e.k==='boardBreak'){rnSnd('shield');rnTrauma=Math.min(1,rnTrauma+0.5);haptic('medium');rnToast('🛹 '+KT('Skeyt sindi — siz omon qoldingiz!','Скейт сломан — вы спасены!','Board broke — you survived!'))}
       else if(e.k==='item'){RNS.st.items++;rnSnd('item');rnToast(RN_PW[e.p][0]+' '+RN_PW[e.p][1]());haptic('light')}
-      else if(e.k==='stumble'){rnSnd('stumble');rnTrauma=Math.min(1,rnTrauma+0.55);haptic('medium')}
+      else if(e.k==='stumble'){rnSnd('stumble');rnWhistle();rnTrauma=Math.min(1,rnTrauma+0.55);haptic('medium')}
       else if(e.k==='shield'){rnSnd('shield');rnTrauma=Math.min(1,rnTrauma+0.5)}
       else if(e.k==='crash'){rnSnd('crash');rnTrauma=1;rnOver()}}
     rnTrauma=Math.max(0,rnTrauma-dt*1.6);
-    hudT-=dt;if(hudT<=0){hudT=0.1;rnHud()}
+    hudT-=dt;if(hudT<=0){hudT=0.1;rnHud();if(rnMus&&RNS)rnMus.spd=RNS.v-11}
     rnR.frame(dt,rnSt==='run'||rnSt==='over',rnSt==='run'&&RNS.alive?acc:0);
     rnRAF=requestAnimationFrame(f)};
   rnRAF=requestAnimationFrame(f);
@@ -6775,7 +6883,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     g.visible=false;sc.add(g);segs.push(g)}
   // portal (tunnel kirish/chiqish) — arkali peshtoq, «METRO» yozuvi
   const portT=cvT(256,256,(x,w,h)=>{x.fillStyle='#e7d7b8';x.fillRect(0,0,w,h);x.strokeStyle='rgba(140,110,70,.4)';x.lineWidth=2;for(let y=0;y<h;y+=16){x.beginPath();x.moveTo(0,y);x.lineTo(w,y);x.stroke();for(let xx=(y/16%2)*16;xx<w;xx+=32){x.beginPath();x.moveTo(xx,y);x.lineTo(xx,y+16);x.stroke()}}},0.12,0.12);
-  const signT=(txt,bg,fg)=>{const t=cvT(512,128,(x,w,h)=>{x.fillStyle=bg;x.fillRect(0,0,w,h);x.strokeStyle='#e8c25a';x.lineWidth=8;x.strokeRect(6,6,w-12,h-12);x.fillStyle=fg;x.font='bold 74px system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,w/2,h/2+4)});t.wrapS=t.wrapT=T.ClampToEdgeWrapping;return t};
+  const signT=(txt,bg,fg)=>{const t=cvT(512,128,(x,w,h)=>{x.fillStyle=bg;x.fillRect(0,0,w,h);x.strokeStyle='#e8c25a';x.lineWidth=8;x.strokeRect(6,6,w-12,h-12);x.fillStyle=fg;let fs=74;do{x.font='bold '+fs+'px system-ui,sans-serif'}while(x.measureText(rnTx(txt)).width>w-40&&(fs-=4)>30);x.textAlign='center';x.textBaseline='middle';x.fillText(rnTx(txt),w/2,h/2+4)});t.wrapS=t.wrapT=T.ClampToEdgeWrapping;return t};
   const mkPortal=()=>{const g=new T.Group(),sh=new T.Shape();sh.moveTo(-15,0);sh.lineTo(15,0);sh.lineTo(15,16);sh.lineTo(-15,16);sh.closePath();
     const hole=new T.Path();hole.moveTo(-TW,0);hole.lineTo(TW,0);hole.lineTo(TW,TH);hole.absarc(0,TH,TW,0,Math.PI,false);hole.lineTo(-TW,0);sh.holes.push(hole);
     const eg=new T.ExtrudeGeometry(sh,{depth:2,bevelEnabled:false,curveSegments:20});const m=new T.Mesh(eg,ML({map:portT}));m.position.z=-1;g.add(m);
@@ -6786,15 +6894,55 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   // Chorsu darvozasi va bayroqchalar
   const gate=new T.Group();{const pm=ML({map:portT});for(const sg of [-1,1]){const p=new T.Mesh(boxG,pm);p.scale.set(1.4,14,1.4);p.position.set(sg*7.6,7,0);gate.add(p);const d=new T.Mesh(sphG,domeM);d.scale.setScalar(1.1);d.position.set(sg*7.6,14,0);gate.add(d)}
     const b=new T.Mesh(boxG,ML({color:0x1d7f95}));b.scale.set(16.6,1.2,1.2);b.position.y=12.6;gate.add(b);
-    const s1=new T.Mesh(new T.PlaneGeometry(10,2.5),ML({map:signT('CHORSU','#f3ead6','#14506f'),side:T.DoubleSide}));s1.position.set(0,12.6,-0.65);s1.rotation.y=Math.PI;gate.add(s1);sc.add(gate);gate.visible=false}
-  const buntG=(()=>{const P=[],C=[],cols=[[0.85,0.2,0.15],[0.95,0.75,0.1],[0.1,0.6,0.7],[0.95,0.95,0.9],[0.2,0.55,0.25]];for(let i=0;i<24;i++){const x0=-10+i*20/24,x1=x0+20/24*0.8,y=xx=>11.6-1.4*(1-(xx/10)**2);const c=cols[i%5];
+    const s1=new T.Mesh(new T.PlaneGeometry(10,2.5),ML({map:signT('CHORSU','#f3ead6','#14506f'),side:T.DoubleSide}));s1.position.set(0,12.6,-0.65);s1.rotation.y=Math.PI;gate.add(s1);gate.userData.s=s1;sc.add(gate);gate.visible=false}
+  // ---- shaharlar: har metro tunnelidan keyin yangi shahar (Toshkent → Samarqand → Buxoro → Xiva → Farg'ona) ----
+  const cityAt=z=>z<Z0+ZT1?0:(Math.floor((z-Z0-ZT1)/ZC)+1)%RN_CITY.length;
+  const gateTx=RN_CITY.map(c=>signT(c.g,'#f3ead6','#14506f'));let gateC=0;
+  const CITYP={1:[['registan','x',22,0.35],['gurem','y',15,0.4],['chinar','t',8,0.25]],2:[['kalon','y',26,0.25],['toki','x',13,0.45],['mahalla','x',11,0.3]],
+    3:[['khwall','x',16,0.5],['kalta','y',11,0.25],['tut','t',7,0.25]],4:[['cotton','x',13,0.35],['atlasst','x',6,0.35],['tut','t',7,0.3]]};
+  function makeCity(c,sg,wMax){const L=CITYP[c];if(!L||!L.every(x=>RM[x[0]]))return null;const R=Math.random;let r=R(),it=L[L.length-1];
+    for(const x of L){if(r<x[3]){it=x;break}r-=x[3]}
+    const g=new T.Group(),[k,ax,sz]=it,a=RM[k];
+    if(ax==='t'){for(let i=0;i<2;i++){const t=mmU(k,sz*(0.85+R()*0.3));t.rotation.y=R()*6.3;t.position.set(sg*(8.5+i*2.4),0,i*4.2);g.add(t)}g.userData.w=8;return g}
+    const s0=Math.min(sz/a.s[ax],(wMax+3)/a.s.x),b=mesh(k);b.scale.setScalar(s0);b.rotation.y=-sg*Math.PI/2;const wd=a.s.z*s0;b.position.x=sg*(7.2+wd/2);g.add(b);
+    if(k==='atlasst'){const b2=mesh(k);b2.scale.setScalar(s0);b2.rotation.y=-sg*Math.PI/2;b2.position.set(b.position.x,0,a.s.x*s0+0.6);g.add(b2)}
+    if(k==='kalon'||k==='kalta'){if(RM.tut){const t=mmU('tut',6.5);t.position.set(sg*(7.2+wd+3.5),0,3);g.add(t)}}
+    return g}
+  const buntG=(()=>{const P=[],C=[],cols=[[0.85,0.2,0.15],[0.95,0.75,0.1],[0.1,0.6,0.7],[0.95,0.95,0.9],[0.2,0.55,0.25]];for(let i=0;i<24;i++){const x0=-10+i*20/24,x1=x0+20/24*0.8,y=xx=>11.6-1.4*(1-(xx/10)**2);const c=cols[i%5].map(v=>Math.pow(v,2.2));
     P.push(x0,y(x0),0,x1,y(x1),0,(x0+x1)/2,y((x0+x1)/2)-0.9,0);C.push(...c,...c,...c)}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('color',new T.Float32BufferAttribute(C,3));return g})();
   const buntM=bend(new T.MeshBasicMaterial({vertexColors:true,side:T.DoubleSide}));const bunts=[];for(let i=0;i<12;i++){const b=new T.Mesh(buntG,buntM);b.visible=false;sc.add(b);bunts.push(b)}
+  // ---- bayram bezaklari ----
+  const EV=rnEv(),decor=[];let snow=null,fw=[],moonS=null;
+  if(EV){const flagG=(cols)=>{const P=[],C=[];for(let i=0;i<20;i++){const x0=-10+i,x1=x0+0.85,y=xx=>12.2-1.5*(1-(xx/10)**2),c=cols[i%cols.length];P.push(x0,y(x0),0,x1,y(x1),0,x0,y(x0)-1.1,0,x1,y(x1),0,x1,y(x1)-1.1,0,x0,y(x0)-1.1,0);for(let k=0;k<6;k++)C.push(...c.map(v=>Math.pow(v,2.2)))}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('color',new T.Float32BufferAttribute(C,3));return g};
+    const cols={navruz:[[0.95,0.3,0.25],[0.98,0.8,0.2],[0.3,0.75,0.35]],mustaqillik:[[0.1,0.55,0.8],[0.97,0.97,0.97],[0.15,0.62,0.3]],yangiyil:[[0.9,0.15,0.2],[0.98,0.85,0.2],[0.2,0.6,0.95],[0.2,0.8,0.4]],ramazon:[[0.95,0.8,0.35],[0.1,0.45,0.55]]}[EV.id];
+    const fg=flagG(cols);for(let i=0;i<10;i++){const b=new T.Mesh(fg,buntM);b.visible=false;b.userData.flag=1;sc.add(b);decor.push(b)}
+    const stemM=ML({color:0x3f8f3a}),tulM=[ML({color:0xe0302a}),ML({color:0xf2c230}),ML({color:0xe85a9a})],potM=ML({color:0x3a2a20}),archaM=ML({color:0x2f7a3a}),lanM=ML({color:0xd9a93b,emissive:0x8a5a10});
+    const mk=(i)=>{const g=new T.Group(),sg=i%2?1:-1;g.userData.sg=sg;
+      if(EV.id==='navruz'){if(i%5===0){const p=new T.Mesh(sphG,potM);p.scale.set(0.8,0.6,0.8);p.rotation.x=Math.PI;p.position.y=0.6;g.add(p);const st=glowP(glowMat(0xffffff,0.35),1.4);st.position.y=1.6;g.add(st)}
+        else for(let k=0;k<7;k++){const x=(Math.random()-0.5)*1.4,z=(Math.random()-0.5)*2.2,st=new T.Mesh(cylG,stemM);st.scale.set(0.03,0.5,0.03);st.position.set(x,0.25,z);g.add(st);const f=new T.Mesh(icoG,tulM[k%3]);f.scale.set(0.12,0.17,0.12);f.position.set(x,0.55,z);g.add(f)}}
+      else if(EV.id==='yangiyil'){for(let k=0;k<3;k++){const c=new T.Mesh(new T.ConeGeometry(1.1-k*0.3,1.3,10),archaM);c.position.y=0.9+k*0.8;g.add(c)}const st=new T.Mesh(icoG,goldM);st.scale.setScalar(0.18);st.position.y=3.3;g.add(st);
+        for(let k=0;k<6;k++){const l=glowP(glowMat([0xff4040,0xffd040,0x40a0ff][k%3],0.9),0.5);const a=k*1.1;l.position.set(Math.cos(a)*0.7,1.2+k*0.3,Math.sin(a)*0.7);g.add(l)}}
+      else if(EV.id==='ramazon'){const pole=new T.Mesh(cylG,poleM);pole.scale.set(0.06,3.6,0.06);pole.position.y=1.8;g.add(pole);const lan=new T.Mesh(new T.CylinderGeometry(0.22,0.28,0.55,6),lanM);lan.position.set(-sg*0.5,3.2,0);g.add(lan);const gl=glowP(glowMat(0xffc860,0.9),1.8);gl.position.set(-sg*0.5,3.2,0);g.add(gl)}
+      else{const pole=new T.Mesh(cylG,poleM);pole.scale.set(0.05,4,0.05);pole.position.y=2;g.add(pole);const fl=new T.Mesh(new T.PlaneGeometry(1.2,0.75),ML({map:cvT(96,60,(x,w,h)=>{x.fillStyle='#1b8fc9';x.fillRect(0,0,w,h/3);x.fillStyle='#fff';x.fillRect(0,h/3,w,h/3);x.fillStyle='#1ea050';x.fillRect(0,2*h/3,w,h/3);x.fillStyle='#d8322a';x.fillRect(0,h/3-2,w,3);x.fillRect(0,2*h/3-1,w,3);x.fillStyle='#fff';x.beginPath();x.arc(16,10,7,0,7);x.fill();x.fillStyle='#1b8fc9';x.beginPath();x.arc(19,10,6,0,7);x.fill()}),side:T.DoubleSide}));fl.position.set(-sg*0.6,3.6,0);fl.rotation.y=Math.PI/2;g.add(fl)}
+      g.visible=false;sc.add(g);decor.push(g)};
+    for(let i=0;i<22;i++)mk(i);
+    if(EV.id==='yangiyil'){const n=900,a=new Float32Array(n*3);for(let i=0;i<n;i++){a[i*3]=(Math.random()-0.5)*40;a[i*3+1]=Math.random()*18;a[i*3+2]=Math.random()*60-10}const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(a,3));
+      snow=new T.Points(g,new T.PointsMaterial({color:0xffffff,size:0.14,transparent:true,opacity:0.9,depthWrite:false}));sc.add(snow);walkM.color.setHex(0xf4f8ff)}
+    if(EV.id==='ramazon'){moonS=new T.Sprite(new T.SpriteMaterial({map:cvT(128,128,(x)=>{x.fillStyle='#fff6d8';x.beginPath();x.arc(64,64,50,0,7);x.fill();x.globalCompositeOperation='destination-out';x.beginPath();x.arc(84,52,44,0,7);x.fill()}),fog:false,transparent:true}));moonS.scale.setScalar(40);moonS.position.set(90,150,300);sc.add(moonS)}
+    if(EV.id==='mustaqillik'||EV.id==='yangiyil')for(let i=0;i<5;i++){const p=new T.Points(new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(new Float32Array(60*3),3)),new T.PointsMaterial({size:1.6,sizeAttenuation:false,transparent:true,opacity:0,depthWrite:false,fog:false,vertexColors:false,color:[0xff5050,0xffd040,0x50c0ff,0x60ff90,0xffffff][i]}));p.userData={t:9+i*1.3,v:[]};sc.add(p);fw.push(p)}}
+  function decorFrame(pz,dt,lp){if(!EV)return;
+    let fi=0,di=0;for(const d of decor){if(d.userData.flag){const zs=Math.floor(pz/30)*30+(fi++)*30+15;d.visible=zoneAt(zs)!==1;d.position.z=zs-pz}
+      else{const zs=Math.floor(pz/14)*14+di*7+5,sg=di%2?1:-1;di++;d.visible=zoneAt(zs)!==1&&zoneAt(zs)!==2;d.position.set(sg*6.1,0.45,zs-pz)}}
+    if(snow){const a=snow.geometry.attributes.position.array;for(let i=0;i<a.length;i+=3){a[i+1]-=dt*2.2;a[i]+=Math.sin(a[i+1]*0.7+i)*dt*0.3;if(a[i+1]<0)a[i+1]+=18}snow.geometry.attributes.position.needsUpdate=true;snow.position.z=0}
+    for(const p of fw){const u=p.userData;u.t-=dt;const a=p.geometry.attributes.position.array;
+      if(u.t<=0){u.t=2.5+Math.random()*3;const cx=(Math.random()-0.5)*60,cy=40+Math.random()*30,cz=120+Math.random()*80;u.v=[];for(let i=0;i<60;i++){const th=Math.random()*6.28,ph=Math.acos(2*Math.random()-1),sp=14+Math.random()*6;u.v.push(Math.sin(ph)*Math.cos(th)*sp,Math.cos(ph)*sp,Math.sin(ph)*Math.sin(th)*sp);a[i*3]=cx;a[i*3+1]=cy;a[i*3+2]=cz}u.age=0}
+      if(u.v.length){u.age+=dt;for(let i=0;i<60;i++){a[i*3]+=u.v[i*3]*dt;a[i*3+1]+=(u.v[i*3+1]-u.age*9)*dt;a[i*3+2]+=u.v[i*3+2]*dt}p.geometry.attributes.position.needsUpdate=true;p.material.opacity=Math.max(0,(1-u.age/1.6))*Math.max(0.25,lp)}}
+  }
   const fogC=new T.Color(),TUNF=new T.Color(0x16120e),TUNH=new T.Color(0xffe2b8);
   function world(pz){
     for(let i=0;i<NSEG;i++){const g=segs[i],zs=Math.floor((pz-20)/SEG)*SEG+i*SEG,on=zoneAt(zs+SEG/2)===1;g.visible=on;if(on){g.position.z=zs-pz;g.userData.st.visible=Math.round(zs/SEG)%6===0}}
     const k=tunK(pz),a=tun0(k),b=tun1(k);portIn.visible=a-pz<300;portIn.position.z=a-pz;portOut.visible=b-pz<300&&b-pz>-30;portOut.position.z=b-pz;portOut.rotation.y=Math.PI;
-    const gz=b+30;gate.visible=gz-pz<300&&gz-pz>-20;gate.position.z=gz-pz;
+    const gz=b+30;gate.visible=gz-pz<300&&gz-pz>-20;gate.position.z=gz-pz;{const gc=cityAt(gz);if(gc!==gateC){gateC=gc;gate.userData.s.material.map=gateTx[gc];gate.userData.s.material.needsUpdate=true}}
     for(let i=0;i<bunts.length;i++){const zs=Math.floor(pz/22)*22+i*22,on=zoneAt(zs)===2&&zs>b+50;bunts[i].visible=on;bunts[i].position.z=zs-pz}
     // tunnel ichida yorug'lik: quyosh so'nadi, chiroqlar, qorong'i tuman
     const d=Math.min(pz-a,b-pz),tf=Math.max(0,Math.min(1,(d+3)/14));
@@ -6983,7 +7131,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     {top:0x4f9be0,hor:0xbfdcf0,fog:0xbfdcf0,hs:0xd8ecff,hg:0x7a6a52,hi:0.95,sc:0xfff0d0,si:2.1,sp:[-9,18,-4],ex:1.1,lamp:0,star:0,bl:0.22,sunc:0xfff6dc},
     {top:0x2f4a8a,hor:0xffa165,fog:0xe5a07a,hs:0xffcfa0,hg:0x5a4038,hi:0.78,sc:0xff9a4a,si:2.4,sp:[-11,5,13],ex:1.05,lamp:0.65,star:0.1,bl:0.6,sunc:0xffb060},
     {top:0x081128,hor:0x26386a,fog:0x1c2850,hs:0x7088d0,hg:0x1c1c2c,hi:0.62,sc:0xaabcff,si:0.85,sp:[7,15,8],ex:1.0,lamp:1,star:1,bl:0.95,sunc:0xdfe8ff}];
-  const hr=new Date().getHours(),tod0=window.RN_TOD!=null?window.RN_TOD:hr>=6&&hr<10?0:hr>=10&&hr<17?1:hr>=17&&hr<20?2:3;
+  const hr=new Date().getHours(),tod0=window.RN_TOD!=null?window.RN_TOD:EV&&EV.id==='ramazon'?2:hr>=6&&hr<10?0:hr>=10&&hr<17?1:hr>=17&&hr<20?2:3;
   const cA=new T.Color(),cB=new T.Color(),v3a=new T.Vector3(),TODL=900,TODT=160;
   const mixC=(o,ka,kb,t)=>o.copy(cA.setHex(ka)).lerp(cB.setHex(kb),t);
   const QSET=store.get('rn_qset','auto');let bloom=null,comp=null,QL=QSET==='auto'?store.get('rn_q',2):+QSET,fpsN=0,fpsT=0;
@@ -7004,15 +7152,19 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     if(fps>56&&QL<2){store.set('rn_q',QL+1);return} // keyingi safar sifatni bir pog'ona oshiramiz
     if(fps<40&&QL>=2){QL=1;comp=null;bloom=null;rd.setPixelRatio(Math.min(1.5,devicePixelRatio||1));rd.setSize(W(),H())}if(fps<27&&QL>=1){QL=0;rd.shadowMap.enabled=false;sun.castShadow=false;rd.setPixelRatio(1);rd.setSize(W(),H())}store.set('rn_q',QL)}}};
   const camP=new T.Vector3(0,4.3,-7.2),look=new T.Vector3(0,1.5,12),lookT=new T.Vector3(0,1.5,12);
+  let curCity=-1;
   function frame(dt,live,ex=0){
     // fizika 120 Hz; kadrlar orasini silliqlash uchun qolgan vaqtga oldinga suriladi
     const s=RNS,pz=s.z+s.v*ex,hx=s.x+(s.vx||0)*ex,hy=Math.max(rnSurf(s,s.x,s.z),s.y+s.vy*ex);U.uCZ.value=-7;
     // egilish: yo'l uzoqda yon tomonga ham sekin buriladi
     U.uBX.value=Math.sin(pz/260)*0.0012;tod(pz);if(live&&s.alive)quality(dt);
     trackT.offset.y=(pz/TL)%1;if(rails)rails.position.z=-(pz%TK);sideT.offset.y=(pz/6)%1;
-    world(pz);
-    for(const g of pool){const u=g.userData;let z=u.z-pz;if(z<-30){u.z+=propSpan;z+=propSpan}g.position.z=z;const zn=zoneAt(u.z),k=tunK(u.z-20);
-      g.visible=zn!==1&&!(u.z+u.w>tun0(k)-8&&u.z<tun1(k)+8);u.b.visible=zn===2;u.a.visible=zn!==2}
+    world(pz);decorFrame(pz,dt,lampGM.opacity);
+    for(const g of pool){const u=g.userData;let z=u.z-pz;while(z<-30){u.z+=propSpan;z+=propSpan}g.position.z=z;const zn=zoneAt(u.z),k=tunK(u.z-20);
+      g.visible=zn!==1&&!(u.z+u.w>tun0(k)-8&&u.z<tun1(k)+8);u.b.visible=zn===2;
+      const ct=zn===0?cityAt(u.z):0;let cc=null;if(ct){u.c=u.c||{};cc=u.c[ct];if(!cc){cc=makeCity(ct,u.sg,u.w);if(cc){u.c[ct]=cc;g.add(cc)}}}
+      if(u.c)for(const key in u.c)u.c[key].visible=u.c[key]===cc;u.a.visible=zn!==2&&!cc}
+    {const cn=cityAt(pz+40);if(cn!==curCity){if(curCity>=0&&live&&s.alive){const C=RN_CITY[cn];rnToastG('🏙 '+KT(C.n+'ga xush kelibsiz!','Добро пожаловать в '+C.r+'!','Welcome to '+C.e+'!'))}curCity=cn}}
     // to'siqlar
     const alive=new Set();
     for(const o of s.obs){if(o.dead||o.z1-pz<-20||o.z0-pz>240)continue;alive.add(o.id);const m=objMesh(o);m.position.z=o.z0-pz}
@@ -7079,6 +7231,38 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   const onR=()=>{rd.setSize(W(),H());if(comp)comp.setSize(W(),H())};addEventListener('resize',onR);
   return {frame,fx,get heroM(){return heroM},get guard(){return guard},get info(){return {calls:rd.info.render.calls,tris:rd.info.render.triangles,geos:rd.info.memory.geometries,tex:rd.info.memory.textures,q:QL,bloom:!!comp}},dispose(){removeEventListener('resize',onR);rd.dispose();try{rd.forceContextLoss()}catch(e){}rd.domElement.remove()}};
 }
+// ---------------- o'zbekcha fon musiqasi: doira usuli + dutor ohangi (WebAudio, fayl yuklanmaydi) ----------------
+let rnMus=null;
+function rnMusic(on,speed=0){
+  if(!on){if(rnMus){clearInterval(rnMus.iv);try{rnMus.g.gain.setTargetAtTime(0,rnMus.a.currentTime,0.15)}catch(e){}const m=rnMus;setTimeout(()=>{try{m.g.disconnect()}catch(e){}},600);rnMus=null}return}
+  if(rnMus){rnMus.spd=speed;return}
+  if(!store.get('rn_mus',true))return;let a=null;try{rnAud=rnAud||new (window.AudioContext||window.webkitAudioContext)();if(rnAud.state==='suspended')rnAud.resume();a=rnAud}catch(e){}if(!a)return;
+  const g=a.createGain();g.gain.value=0;g.gain.setTargetAtTime(0.22,a.currentTime,0.4);g.connect(a.destination);
+  const rev=a.createDelay(0.5);rev.delayTime.value=0.19;const fb=a.createGain();fb.gain.value=0.22;const rlp=a.createBiquadFilter();rlp.frequency.value=2200;rev.connect(rlp);rlp.connect(fb);fb.connect(rev);rlp.connect(g);
+  const noiseB=(()=>{const n=a.sampleRate*0.4,b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;return b})();
+  const nz=(t,dur,type,f,q,gain)=>{const s=a.createBufferSource();s.buffer=noiseB;const fl=a.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;const v=a.createGain();v.gain.setValueAtTime(gain,t);v.gain.exponentialRampToValueAtTime(0.001,t+dur);s.connect(fl);fl.connect(v);v.connect(g);s.start(t);s.stop(t+dur+0.02)};
+  const bum=(t,k=1)=>{const o=a.createOscillator(),v=a.createGain();o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(48,t+0.18);v.gain.setValueAtTime(0.9*k,t);v.gain.exponentialRampToValueAtTime(0.001,t+0.32);o.connect(v);v.connect(g);o.start(t);o.stop(t+0.35);nz(t,0.06,'lowpass',600,0.7,0.25*k)};
+  const tak=(t,k=1)=>{nz(t,0.07,'bandpass',2600,1.2,0.55*k);nz(t,0.22,'highpass',7000,0.5,0.12*k)}; // doira halqalari jaranglashi
+  const pluck=(t,f,dur,k=1)=>{for(const [m,det] of [[1,0],[2,4]]){const o=a.createOscillator(),fl=a.createBiquadFilter(),v=a.createGain();o.type='sawtooth';o.frequency.value=f*m;o.detune.value=det;
+      fl.type='lowpass';fl.frequency.setValueAtTime(f*6,t);fl.frequency.exponentialRampToValueAtTime(f*1.2,t+dur);v.gain.setValueAtTime(0.0001,t);v.gain.exponentialRampToValueAtTime((m===1?0.16:0.05)*k,t+0.006);v.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+      o.connect(fl);fl.connect(v);v.connect(g);v.connect(rev);o.start(t);o.stop(t+dur+0.05)}};
+  // lad: D Eb F# G A Bb C (hijoz uslubi) — dutor ohangiga yaqin
+  const SC=[146.83,155.56,185,196,220,233.08,261.63,293.66,311.13,369.99,392];
+  const MEL=[[0,2,3,4,3,2,1,0, 3,4,5,4,3,2,3,-1],[4,5,7,5,4,3,4,2, 3,2,1,0,1,2,0,-1],[7,8,9,8,7,5,4,5, 4,3,2,3,4,2,1,0],[0,0,2,3,4,4,5,4, 3,2,3,1,2,1,0,-1]];
+  const USUL='B.t.tB.tB.t.t.tt'; // 16 qadam
+  const DRONE=73.42;
+  const m={a,g,iv:0,spd:speed,step:0,bar:0,next:a.currentTime+0.15};rnMus=m;
+  const sched=()=>{if(rnMus!==m)return;const bpm=104+Math.min(26,m.spd*1.2),st=60/bpm/4;
+    while(m.next<a.currentTime+0.12){const t=m.next,i=m.step%16,ch=USUL[i];
+      if(ch==='B')bum(t,i===0?1:0.75);else if(ch==='t')tak(t,i%4===2?1:0.7);
+      const ph=MEL[(m.bar>>1)%MEL.length];if(i%2===0){const d=ph[(i>>1)+((m.bar&1)?8:0)];if(d>=0)pluck(t,SC[d],st*3.2,1)}
+      if(i===0&&m.bar%2===0){const o=a.createOscillator(),v=a.createGain();o.type='triangle';o.frequency.value=DRONE;v.gain.setValueAtTime(0.0001,t);v.gain.exponentialRampToValueAtTime(0.07,t+0.3);v.gain.exponentialRampToValueAtTime(0.0005,t+st*30);o.connect(v);v.connect(g);o.start(t);o.stop(t+st*31)}
+      m.next+=st;m.step++;if(m.step%16===0)m.bar++}};
+  m.iv=setInterval(sched,25);sched();
+}
+// qorovul hushtagi
+function rnWhistle(){const a=rnCtx();if(!a)return;const t=a.currentTime;for(const [t0,d] of [[0,0.18],[0.24,0.42]]){const o=a.createOscillator(),l=a.createOscillator(),lg=a.createGain(),v=a.createGain();o.type='sine';o.frequency.value=2650;l.frequency.value=28;lg.gain.value=90;l.connect(lg);lg.connect(o.frequency);
+  v.gain.setValueAtTime(0.0001,t+t0);v.gain.exponentialRampToValueAtTime(0.16,t+t0+0.02);v.gain.setValueAtTime(0.16,t+t0+d-0.04);v.gain.exponentialRampToValueAtTime(0.0001,t+t0+d);o.connect(v);v.connect(a.destination);o.start(t+t0);l.start(t+t0);o.stop(t+t0+d+0.02);l.stop(t+t0+d+0.02)}}
 // ---------------- ovoz ----------------
 function rnCtx(){if(!store.get('rn_snd',true))return null;try{rnAud=rnAud||new (window.AudioContext||window.webkitAudioContext)();if(rnAud.state==='suspended')rnAud.resume();return rnAud}catch(e){return null}}
 function rnSnd(k,n=0){
