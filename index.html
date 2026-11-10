@@ -4604,7 +4604,7 @@ function rnStep(s,dt){
   s.roll=Math.max(0,s.roll-dt);if(s.jbuf>0)s.jbuf=Math.max(0,s.jbuf-dt);s.inv=Math.max(0,s.inv-dt);if(s.guard>0)s.guard=Math.max(0,s.guard-dt);
   // tik harakat
   const h=rnSurf(s,s.x,s.z);
-  if(s.pw.jet>0){const d=RN.jetY-s.y;s.y+=Math.sign(d)*Math.min(Math.abs(d),9*dt);s.vy=0}
+  if(s.pw.jet>0){const d=Math.min(RN.jetY,s.ceil?s.ceil(s.z):Infinity)-s.y;s.y+=Math.sign(d)*Math.min(Math.abs(d),9*dt);s.vy=0}
   else if(s.vy>0||s.y>h+1e-3){s.vy+=RN.g*dt*(s.dive?2.2:1);s.y+=s.vy*dt;if(s.y<=h&&s.vy<=0){s.y=h;s.vy=0;s.dive=false;s.ev.push({k:'land'});if(s.jbuf>0){s.jbuf=0;rnInput(s,'up')}}}
   else if(h-s.y<0.6){s.y=h;s.vy=0}
   // to'qnashuvlar
@@ -4631,6 +4631,7 @@ function rnStep(s,dt){
       const tx=s.x,ty=s.y+1.0,tz=s.z+0.4,rx=tx-c.fx,ry=ty-c.y,rz=tz-c.z,L=Math.hypot(rx,ry,rz);c.fv=Math.min(46,c.fv+70*dt);
       const st=Math.min(L,c.fv*dt);if(L<0.6||st>=L){c.got=true;s.coins++;s.score+=5*(s.pw.x2>0?2:1);s.ev.push({k:'coin',id:c.id,mag:true});continue}
       c.fx+=rx/L*st;c.y+=ry/L*st+Math.min(L,4)*0.9*dt*(c.fv<20?1:0);c.z+=rz/L*st;continue}
+    if(s.ceil&&c.z-s.z<170){const cy=s.ceil(c.z)+0.6;if(c.y>cy)c.y=cy}
     const cx=rnLX(c.lane);
     const near=Math.abs(cx-s.x)<0.9&&Math.abs(c.z-s.z)<1.0&&c.y>s.y-0.4&&c.y<s.y+hgt+0.5;
     if(near){c.got=true;s.coins++;s.score+=5*(s.pw.x2>0?2:1);s.ev.push({k:'coin',id:c.id});continue}
@@ -5142,9 +5143,9 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   const track=new T.Mesh(trackG,ML({map:trackT}));track.receiveShadow=true;sc.add(track);
   // yon tomonlar: tosh devor va trotuar
   const sideT=cvT(256,256,(x,w,h)=>{x.fillStyle='#c9b79a';x.fillRect(0,0,w,h);x.strokeStyle='rgba(90,70,50,.35)';x.lineWidth=3;for(let y=0;y<h;y+=32){x.beginPath();x.moveTo(0,y);x.lineTo(w,y);x.stroke();for(let xx=(y/32%2)*32;xx<w;xx+=64){x.beginPath();x.moveTo(xx,y);x.lineTo(xx,y+32);x.stroke()}}});
-  const walkG=new T.PlaneGeometry(10,300,1,60);walkG.rotateX(-Math.PI/2);{const uv=walkG.attributes.uv,p=walkG.attributes.position;for(let i=0;i<uv.count;i++){uv.setY(i,p.getZ(i)/6);uv.setX(i,uv.getX(i)*1.6)}}
+  const walkG=new T.PlaneGeometry(60,300,1,60);walkG.rotateX(-Math.PI/2);{const uv=walkG.attributes.uv,p=walkG.attributes.position;for(let i=0;i<uv.count;i++){uv.setY(i,p.getZ(i)/6);uv.setX(i,uv.getX(i)*9.6)}}
   const walkM=ML({map:sideT});
-  for(const sg of [-1,1]){const m=new T.Mesh(walkG,walkM);m.receiveShadow=true;m.position.set(sg*9.5,0.45,140);sc.add(m);
+  for(const sg of [-1,1]){const m=new T.Mesh(walkG,walkM);m.receiveShadow=true;m.position.set(sg*34.5,0.45,140);sc.add(m); // keng: binolar ostida bo'shliq qolmasin
     const cur=new T.Mesh(new T.BoxGeometry(0.5,0.6,300),ML({color:0x9a9184}));cur.position.set(sg*4.75,0.15,140);sc.add(cur)}
   // ---- shahar: binolar, gumbazlar, chinorlar (qayta ishlatiladigan hovuz) ----
   const winT=(base,frame)=>cvT(128,256,(x,w,h)=>{x.fillStyle=base;x.fillRect(0,0,w,h);for(let r=0;r<8;r++)for(let c=0;c<3;c++){x.fillStyle=frame;x.fillRect(12+c*38,14+r*30,30,22);x.fillStyle=Math.random()<0.25?'#ffe6a6':'#7fb6d9';x.fillRect(15+c*38,17+r*30,24,16)}});
@@ -5219,6 +5220,8 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   // ---- zonalar: shahar → metro tunneli → Chorsu bozori (yo'l bo'ylab takrorlanadi) ----
   const ZC=1500,Z0=150,ZT0=600,ZT1=860;
   const zoneAt=z=>{if(z<Z0)return 0;const u=(z-Z0)%ZC;return u<ZT0?0:u<ZT1?1:2};
+  // tunnel shifti past: reaktiv ryukzak bilan uchganda shiftga urilmaslik uchun balandlik chegarasi (kirishdan 35 m oldin pasayadi)
+  const rnCeil=z=>{if(z<Z0-40)return Infinity;const u=((z-Z0)%ZC+ZC)%ZC;return u>ZT0-35&&u<ZT1+4?5.5:Infinity};
   const tunK=pz=>Math.max(0,Math.ceil((pz-40-Z0-ZT1)/ZC)),tun0=k=>Z0+k*ZC+ZT0,tun1=k=>Z0+k*ZC+ZT1;
   // tunnel: marmar devorlar, naqshli gumbaz shift, devor chiroqlari, bekat ustunlari va qandillar
   const wallT=cvT(256,256,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#efe6d6');g.addColorStop(1,'#d9cbb2');x.fillStyle=g;x.fillRect(0,0,w,h);
@@ -5516,7 +5519,7 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
     if(fps<40&&QL>=2){QL=1;comp=null;bloom=null;rd.setPixelRatio(Math.min(1.5,devicePixelRatio||1));rd.setSize(W(),H())}if(fps<27&&QL>=1){QL=0;rd.shadowMap.enabled=false;sun.castShadow=false;rd.setPixelRatio(1);rd.setSize(W(),H())}store.set('rn_q',QL)}}};
   const camP=new T.Vector3(0,4.3,-7.2),look=new T.Vector3(0,1.5,12),lookT=new T.Vector3(0,1.5,12);
   let curCity=-1;
-  function frame(dt,live,ex=0){
+  function frame(dt,live,ex=0){if(RNS&&RNS.ceil!==rnCeil)RNS.ceil=rnCeil;
     // fizika 120 Hz; kadrlar orasini silliqlash uchun qolgan vaqtga oldinga suriladi
     const s=RNS,pz=s.z+s.v*ex,hx=s.x+(s.vx||0)*ex,hy=Math.max(rnSurf(s,s.x,s.z),s.y+s.vy*ex);U.uCZ.value=-7;
     // egilish: yo'l uzoqda yon tomonga ham sekin buriladi
