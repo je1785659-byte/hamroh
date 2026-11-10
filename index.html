@@ -3982,7 +3982,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261110f';
+const APP_VER='20261110g';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 // oflayn rejim: ilova va o'yinlar internetsiz ham ochiladi
@@ -5150,7 +5150,8 @@ worldPosition.y -= bz2*bz2*uBY; worldPosition.x += bz2*bz2*uBX;
   const walkG=new T.PlaneGeometry(60,300,1,60);walkG.rotateX(-Math.PI/2);{const uv=walkG.attributes.uv,p=walkG.attributes.position;for(let i=0;i<uv.count;i++){uv.setY(i,p.getZ(i)/6);uv.setX(i,uv.getX(i)*9.6)}}
   const walkM=ML({map:sideT});
   for(const sg of [-1,1]){const m=new T.Mesh(walkG,walkM);m.receiveShadow=true;m.position.set(sg*34.5,0.45,140);sc.add(m); // keng: binolar ostida bo'shliq qolmasin
-    const cur=new T.Mesh(new T.BoxGeometry(0.5,0.6,300),ML({color:0x9a9184}));cur.position.set(sg*4.75,0.15,140);sc.add(cur)}
+    // bordyur: uzunasiga bo'laklangan — yo'l egilganda u ham birga egiladi (aks holda yo'l bilan trotuar orasi ochilib qoladi)
+    const cur=new T.Mesh(new T.BoxGeometry(0.5,1.2,300,1,1,60),ML({color:0x9a9184}));cur.position.set(sg*4.75,-0.15,140);sc.add(cur)}
   // ---- shahar: binolar, gumbazlar, chinorlar (qayta ishlatiladigan hovuz) ----
   const winT=(base,frame)=>cvT(128,256,(x,w,h)=>{x.fillStyle=base;x.fillRect(0,0,w,h);for(let r=0;r<8;r++)for(let c=0;c<3;c++){x.fillStyle=frame;x.fillRect(12+c*38,14+r*30,30,22);x.fillStyle=Math.random()<0.25?'#ffe6a6':'#7fb6d9';x.fillRect(15+c*38,17+r*30,24,16)}});
   const FAC=[['#e9d8b8','#b98f5a'],['#f2efe8','#3e8fb0'],['#d9a679','#8a4d2a'],['#cfe0e8','#2b6a8a'],['#f0c9a0','#a0522d'],['#e8e2f2','#6a4fa0']].map(([b,f])=>ML({map:winT(b,f)}));
