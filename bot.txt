@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 10.11.2026-13
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 10.11.2026-14
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -54,9 +54,175 @@ async function ensureUpdates(env){if(UPD_OK)return;UPD_OK=true;try{const w=await
 async function cmdNamoz(env,chat,priv){
   if(priv){await ensureUpdates(env);const r=await tg(env,'sendWidget',{chat_id:chat,html:NAMOZ_HTML,chat_data:JSON.stringify(namozData(0)),allow_queries:true,caption:namozCap(0),reply_markup:regionKb()}).catch(()=>null);if(r&&r.ok)return r}
   return say(env,chat,namozText(0)+'\n\nHududni tanlang:',{parse_mode:'HTML',reply_markup:regionKb()})}
-async function onWidgetQuery(env,q){const m=/^nm:(\d+)$/.exec(q.data||''),i=m?+m[1]:-1;let out='';
+async function onWidgetQuery(env,q){if((q.data||'').startsWith('m:'))return chwMove(env,q);const m=/^nm:(\d+)$/.exec(q.data||''),i=m?+m[1]:-1;let out='';
   if(CENTRES[i]){const d=JSON.stringify(namozData(i));out=d;if(q.chat&&q.message_id)await tg(env,'editMessageWidgetData',{chat_id:q.chat.id,message_id:q.message_id,chat_data:d}).catch(()=>{})}
   await tg(env,'answerWidgetQuery',{widget_query_id:q.id,...(out?{data:out}:{})})}
+// ---- vidjet: chat ichida shaxmat (kompyuter — shu bot; holat D1 jadvalida chw) ----
+/* ---------- SHAXMAT: qoidalar va kompyuter raqibi (DOM'siz) ---------- */
+// Doska: 64 katak, indeks = qator*8 + ustun (0 = a1, 63 = h8). Katta harf — oq, kichik — qora.
+const CH_N=[[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]],CH_K=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
+const CH_RD=[[1,0],[-1,0],[0,1],[0,-1]],CH_BD=[[1,1],[1,-1],[-1,1],[-1,-1]];
+const chSq=i=>'abcdefgh'[i&7]+((i>>3)+1),chIx=s=>(s.charCodeAt(0)-97)+(s.charCodeAt(1)-49)*8;
+const chCol=p=>p?(p<'a'?'w':'b'):'',chUp=p=>p.toUpperCase();
+const CH_START='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+function chFen(f){const [pos,turn,cas,ep,half,full]=f.trim().split(/\s+/),b=new Array(64).fill('');let r=7,c=0;
+  for(const ch of pos){if(ch==='/'){r--;c=0}else if(ch>='1'&&ch<='8')c+=+ch;else{b[r*8+c]=ch;c++}}
+  const g={b,turn:turn||'w',cas:(cas&&cas!=='-')?((cas.includes('K')?1:0)|(cas.includes('Q')?2:0)|(cas.includes('k')?4:0)|(cas.includes('q')?8:0)):0,
+    ep:ep&&ep!=='-'?chIx(ep):-1,half:+(half||0),full:+(full||1),hist:[],keys:[],kw:b.indexOf('K'),kb:b.indexOf('k')};
+  g.keys.push(chKey(g));return g}
+const chNew=()=>chFen(CH_START);
+function chToFen(g){let s='';for(let r=7;r>=0;r--){let e=0;for(let c=0;c<8;c++){const p=g.b[r*8+c];if(!p)e++;else{if(e){s+=e;e=0}s+=p}}if(e)s+=e;if(r)s+='/'}
+  const cs=(g.cas&1?'K':'')+(g.cas&2?'Q':'')+(g.cas&4?'k':'')+(g.cas&8?'q':'')||'-';return `${s} ${g.turn} ${cs} ${g.ep>=0?chSq(g.ep):'-'} ${g.half} ${g.full}`}
+function chKey(g){return g.b.map(p=>p||'.').join('')+g.turn+g.cas+(g.ep>=0&&chEpUsable(g)?g.ep:'')}
+function chEpUsable(g){const P=g.turn==='w'?'P':'p',dr=g.turn==='w'?-1:1,c=g.ep&7,r=(g.ep>>3)+dr;for(const dc of [-1,1]){const cc=c+dc;if(cc>=0&&cc<8&&g.b[r*8+cc]===P)return true}return false}
+// katak `sq` ni `by` rangidagi dona urib turibdimi
+function chAttacked(g,sq,by){const b=g.b,r=sq>>3,c=sq&7,W=by==='w';
+  const pr=r+(W?-1:1);if(pr>=0&&pr<8){const P=W?'P':'p';if(c>0&&b[pr*8+c-1]===P)return true;if(c<7&&b[pr*8+c+1]===P)return true}
+  const N=W?'N':'n',K=W?'K':'k';for(const [dr,dc] of CH_N){const rr=r+dr,cc=c+dc;if(rr>=0&&rr<8&&cc>=0&&cc<8&&b[rr*8+cc]===N)return true}
+  for(const [dr,dc] of CH_K){const rr=r+dr,cc=c+dc;if(rr>=0&&rr<8&&cc>=0&&cc<8&&b[rr*8+cc]===K)return true}
+  const R=W?'R':'r',B=W?'B':'b',Q=W?'Q':'q';
+  for(const [dr,dc] of CH_RD){let rr=r+dr,cc=c+dc;while(rr>=0&&rr<8&&cc>=0&&cc<8){const p=b[rr*8+cc];if(p){if(p===R||p===Q)return true;break}rr+=dr;cc+=dc}}
+  for(const [dr,dc] of CH_BD){let rr=r+dr,cc=c+dc;while(rr>=0&&rr<8&&cc>=0&&cc<8){const p=b[rr*8+cc];if(p){if(p===B||p===Q)return true;break}rr+=dr;cc+=dc}}
+  return false}
+const chInCheck=(g,col)=>chAttacked(g,col==='w'?g.kw:g.kb,col==='w'?'b':'w');
+function chPseudo(g,caps){const b=g.b,me=g.turn,W=me==='w',L=[];
+  const add=(f,t,o)=>{L.push(Object.assign({f,t,p:b[f],c:b[t]},o||null))};
+  for(let f=0;f<64;f++){const p=b[f];if(!p||chCol(p)!==me)continue;const r=f>>3,c=f&7,u=chUp(p);
+    if(u==='P'){const d=W?1:-1,r1=r+d,last=W?7:0,start=W?1:6;
+      const pushP=(t,o)=>{if((t>>3)===last){for(const q of ['q','r','b','n'])add(t===f?f:f,t,Object.assign({promo:W?q.toUpperCase():q},o))}else add(f,t,o)};
+      if(r1>=0&&r1<8){const t=r1*8+c;
+        if(!b[t]&&(!caps||(t>>3)===last)){pushP(t);if(!caps&&r===start&&!b[(r+2*d)*8+c])add(f,(r+2*d)*8+c,{dbl:1})}
+        for(const dc of [-1,1]){const cc=c+dc;if(cc<0||cc>7)continue;const t2=r1*8+cc,q=b[t2];if(q&&chCol(q)!==me)pushP(t2);else if(t2===g.ep)add(f,t2,{ep:1,c:W?'p':'P'})}}
+      continue}
+    if(u==='N'||u==='K'){for(const [dr,dc] of (u==='N'?CH_N:CH_K)){const rr=r+dr,cc=c+dc;if(rr<0||rr>7||cc<0||cc>7)continue;const t=rr*8+cc,q=b[t];if(q&&chCol(q)===me)continue;if(caps&&!q)continue;add(f,t)}
+      if(u==='K'&&!caps){const rk=W?0:56,ks=W?1:4,qs=W?2:8,op=W?'b':'w';
+        if(f===rk+4&&(g.cas&ks)&&!b[rk+5]&&!b[rk+6]&&b[rk+7]===(W?'R':'r')&&!chAttacked(g,rk+4,op)&&!chAttacked(g,rk+5,op)&&!chAttacked(g,rk+6,op))add(f,rk+6,{cs:'k'});
+        if(f===rk+4&&(g.cas&qs)&&!b[rk+3]&&!b[rk+2]&&!b[rk+1]&&b[rk]===(W?'R':'r')&&!chAttacked(g,rk+4,op)&&!chAttacked(g,rk+3,op)&&!chAttacked(g,rk+2,op))add(f,rk+2,{cs:'q'})}
+      continue}
+    const dirs=u==='R'?CH_RD:u==='B'?CH_BD:CH_K;
+    for(const [dr,dc] of dirs){let rr=r+dr,cc=c+dc;while(rr>=0&&rr<8&&cc>=0&&cc<8){const t=rr*8+cc,q=b[t];if(q){if(chCol(q)!==me)add(f,t);break}if(!caps)add(f,t);rr+=dr;cc+=dc}}}
+  return L}
+const CH_CR=[];for(let i=0;i<64;i++)CH_CR[i]=15;CH_CR[0]&=~2;CH_CR[7]&=~1;CH_CR[4]&=~3;CH_CR[56]&=~8;CH_CR[63]&=~4;CH_CR[60]&=~12;
+function chMake(g,m){const b=g.b;g.hist.push({m,cas:g.cas,ep:g.ep,half:g.half,kw:g.kw,kb:g.kb});
+  b[m.t]=m.promo||m.p;b[m.f]='';if(m.ep)b[m.t+(g.turn==='w'?-8:8)]='';
+  if(m.cs){const rk=m.t>>3<<3;if(m.cs==='k'){b[rk+5]=b[rk+7];b[rk+7]=''}else{b[rk+3]=b[rk];b[rk]=''}}
+  if(m.p==='K')g.kw=m.t;else if(m.p==='k')g.kb=m.t;
+  g.cas&=CH_CR[m.f]&CH_CR[m.t];g.ep=m.dbl?(m.f+m.t)>>1:-1;g.half=(m.c||chUp(m.p)==='P')?0:g.half+1;if(g.turn==='b')g.full++;g.turn=g.turn==='w'?'b':'w'}
+function chUnmake(g){const h=g.hist.pop(),m=h.m,b=g.b;g.turn=g.turn==='w'?'b':'w';if(g.turn==='b')g.full--;
+  b[m.f]=m.p;b[m.t]=m.ep?'':m.c;if(m.ep)b[m.t+(g.turn==='w'?-8:8)]=m.c;
+  if(m.cs){const rk=m.t>>3<<3;if(m.cs==='k'){b[rk+7]=b[rk+5];b[rk+5]=''}else{b[rk]=b[rk+3];b[rk+3]=''}}
+  g.cas=h.cas;g.ep=h.ep;g.half=h.half;g.kw=h.kw;g.kb=h.kb}
+function chLegal(g,caps){const me=g.turn,out=[];for(const m of chPseudo(g,caps)){chMake(g,m);if(!chInCheck(g,me))out.push(m);chUnmake(g)}return out}
+function chMoves(g){return chLegal(g,false).map(m=>Object.assign(m,{from:chSq(m.f),to:chSq(m.t)}))}
+// ommaviy yurish: tarix va takrorlanish kalitlari bilan
+function chMove(g,m){chMake(g,m);g.keys.push(chKey(g));return m}
+function chUndo(g){if(!g.hist.length)return null;const m=g.hist[g.hist.length-1].m;g.keys.pop();chUnmake(g);return m}
+function chFromUci(g,u){const f=chIx(u.slice(0,2)),t=chIx(u.slice(2,4)),pr=u[4];return chMoves(g).find(m=>m.f===f&&m.t===t&&(!m.promo||chUp(m.promo)===chUp(pr||'q')))||null}
+function chPerft(g,d){if(d===0)return 1;const L=chLegal(g,false);if(d===1)return L.length;let n=0;for(const m of L){chMake(g,m);n+=chPerft(g,d-1);chUnmake(g)}return n}
+function chInsufficient(g){const P=g.b.filter(p=>p&&chUp(p)!=='K');if(!P.length)return true;if(P.length===1&&'NB'.includes(chUp(P[0])))return true;
+  if(P.every(p=>chUp(p)==='B')){const cs=new Set();g.b.forEach((p,i)=>{if(p&&chUp(p)==='B')cs.add(((i>>3)+(i&7))&1)});return cs.size===1}return false}
+// natija: r = play | mate | stalemate | material | repetition | fifty
+function chStatus(g){const L=chLegal(g,false),chk=chInCheck(g,g.turn);
+  if(!L.length)return chk?{r:'mate',win:g.turn==='w'?'b':'w',check:true}:{r:'stalemate'};
+  if(chInsufficient(g))return {r:'material'};if(g.half>=100)return {r:'fifty'};
+  const k=g.keys[g.keys.length-1];let n=0;for(const x of g.keys)if(x===k)n++;if(n>=3)return {r:'repetition'};
+  return {r:'play',check:chk}}
+function chSan(g,m){const u=chUp(m.p);let s;
+  if(m.cs)s=m.cs==='k'?'O-O':'O-O-O';
+  else{s=u==='P'?'':u;if(u==='P'){if(m.c)s=chSq(m.f)[0]}else{const amb=chLegal(g,false).filter(x=>x.p===m.p&&x.t===m.t&&x.f!==m.f);
+      if(amb.length){const sf=amb.some(x=>(x.f&7)===(m.f&7)),sr=amb.some(x=>(x.f>>3)===(m.f>>3));s+=!sf?chSq(m.f)[0]:!sr?chSq(m.f)[1]:chSq(m.f)}}
+    if(m.c)s+='x';s+=chSq(m.t);if(m.promo)s+='='+chUp(m.promo)}
+  chMake(g,m);const st=chLegal(g,false).length,ck=chInCheck(g,g.turn);chUnmake(g);return s+(ck?(st?'+':'#'):'')}
+// ---------- kompyuter: alfa-beta, iterativ chuqurlashuv, sokin qidiruv ----------
+const CH_V={P:100,N:320,B:330,R:500,Q:900,K:0};
+const CH_PST={ // oq uchun, a8 dan h1 gacha qatorlar
+  P:[0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0],
+  N:[-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50],
+  B:[-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20],
+  R:[0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,0,0,0,5,5,0,0,0],
+  Q:[-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20],
+  K:[-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20],
+  E:[-50,-40,-30,-20,-20,-30,-40,-50,-30,-20,-10,0,0,-10,-20,-30,-30,-10,20,30,30,20,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,20,30,30,20,-10,-30,-30,-30,0,0,0,0,-30,-30,-50,-30,-30,-30,-30,-30,-30,-50]};
+function chEval(g){let s=0,mat=0;for(let i=0;i<64;i++){const p=g.b[i];if(p&&chUp(p)!=='K'&&chUp(p)!=='P')mat+=CH_V[chUp(p)]}const end=mat<=1500;
+  for(let i=0;i<64;i++){const p=g.b[i];if(!p)continue;const u=chUp(p),W=p===u,r=i>>3,c=i&7,idx=W?(7-r)*8+c:r*8+c;
+    const v=CH_V[u]+(u==='K'&&end?CH_PST.E:CH_PST[u])[idx];s+=W?v:-v}
+  return g.turn==='w'?s:-s}
+function chOrder(L,best){for(const m of L)m.o=(best&&m.f===best.f&&m.t===best.t&&m.promo===best.promo?1e6:0)+(m.c?10*CH_V[chUp(m.c)]-CH_V[chUp(m.p)]+1000:0)+(m.promo?CH_V[chUp(m.promo)]:0);L.sort((a,b)=>b.o-a.o);return L}
+function chBest(g,o){o=o||{};const T0=Date.now(),ms=o.ms||1500,maxD=o.depth||4,noise=o.noise||0;let nodes=0,stop=false,best=null,bestS=0;
+  const out=()=>{if((++nodes&1023)===0&&Date.now()-T0>ms)stop=true;return stop};
+  function qs(a,b){if(out())return 0;const sp=chEval(g);if(sp>=b)return b;if(sp>a)a=sp;
+    for(const m of chOrder(chLegal(g,true))){chMake(g,m);const v=-qs(-b,-a);chUnmake(g);if(stop)return 0;if(v>=b)return b;if(v>a)a=v}return a}
+  function ab(d,a,b,ply){if(out())return 0;const L=chLegal(g,false);if(!L.length)return chInCheck(g,g.turn)?-100000+ply:0;if(g.half>=100)return 0;
+    if(d<=0)return qs(a,b);for(const m of chOrder(L)){chMake(g,m);const v=-ab(d-1,-b,-a,ply+1);chUnmake(g);if(stop)return 0;if(v>=b)return b;if(v>a)a=v}return a}
+  const root=chLegal(g,false);if(!root.length)return null;if(root.length===1)return Object.assign(root[0],{from:chSq(root[0].f),to:chSq(root[0].t)});
+  const jit=new Map(root.map(m=>[m,noise?(Math.random()-0.5)*2*noise:0]));
+  for(let d=1;d<=maxD;d++){let a=-1e9,cur=null;
+    for(const m of chOrder(root,best)){chMake(g,m);
+      // takrorlanishdan qochish: g'olib holatda bir xil pozitsiyaga qaytmaymiz
+      const rep=g.keys.includes(chKey(g));let v=-ab(d-1,-1e9,-a+ (noise?2*noise:0),1);chUnmake(g);if(stop)break;
+      if(rep)v=Math.min(v,0);v+=jit.get(m);if(v>a){a=v;cur=m}}
+    if(stop&&d>1)break;if(cur){best=cur;bestS=a}if(a>90000)break}
+  best=best||root[0];return Object.assign(best,{from:chSq(best.f),to:chSq(best.t),score:Math.round(bestS)})}
+
+// ---------- masalalar: majburiy mat ----------
+// yuruvchi tomon n ta o'z yurishi ichida mat qila oladimi
+function chMateIn(g,n){for(const m of chLegal(g,false)){chMake(g,m);const ok=chForced(g,n-1);chUnmake(g);if(ok)return true}return false}
+// raqib navbati: mat bo'lgan yoki har qanday javobdan keyin ham n yurishda mat bor
+function chForced(g,n){const L=chLegal(g,false);if(!L.length)return chInCheck(g,g.turn);if(n<=0)return false;
+  for(const m of L){chMake(g,m);const ok=chMateIn(g,n);chUnmake(g);if(!ok)return false}return true}
+// ---------- tahlil va reyting ----------
+const chWin=cp=>50+50*(2/(1+Math.exp(-0.00368208*cp))-1); // yutish ehtimoli, %
+const chAcc=(wb,wa)=>Math.max(0,Math.min(100,103.1668*Math.exp(-0.04354*Math.max(0,wb-wa))-3.1669)); // yurish aniqligi, %
+const chElo=(r,opp,sc,k)=>Math.round(r+(k||32)*(sc-1/(1+Math.pow(10,(opp-r)/400))));
+function chPgn(sans,res,tags){let h='';for(const k in tags)h+=`[${k} "${tags[k]}"]\n`;h+=`[Result "${res}"]\n\n`;let b='';sans.forEach((s,i)=>{b+=(i%2?'':(i/2+1)+'. ')+s+' '});return h+b+res+'\n'}
+// ---------- debyutlar: [yurishlar, o'zbekcha, ruscha, inglizcha] ----------
+const CH_OPEN=[
+['e4',"Qirol piyodasi debyuti",'Дебют королевской пешки',"King's Pawn Opening"],['d4',"Farzin piyodasi debyuti",'Дебют ферзевой пешки',"Queen's Pawn Opening"],
+['c4','Ingliz debyuti','Английское начало','English Opening'],['Nf3','Reti debyuti','Дебют Рети','Réti Opening'],['f4','Berd debyuti','Дебют Берда',"Bird's Opening"],['b3','Larsen debyuti','Дебют Ларсена','Larsen Opening'],
+['e4 c5','Sitsiliya himoyasi','Сицилианская защита','Sicilian Defence'],['e4 c5 c3','Sitsiliya himoyasi: Alapin varianti','Сицилианская защита: вариант Алапина','Sicilian Defence: Alapin'],
+['e4 c5 Nc3','Yopiq Sitsiliya','Закрытая сицилианская','Closed Sicilian'],['e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6','Sitsiliya himoyasi: Naydorf varianti','Сицилианская защита: вариант Найдорфа','Sicilian Defence: Najdorf'],
+['e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6','Sitsiliya himoyasi: Ajdar varianti','Сицилианская защита: вариант дракона','Sicilian Defence: Dragon'],
+['e4 c5 Nf3 Nc6 d4 cxd4 Nxd4','Ochiq Sitsiliya','Открытая сицилианская','Open Sicilian'],
+['e4 e6','Fransuz himoyasi','Французская защита','French Defence'],['e4 c6','Karo-Kann himoyasi','Защита Каро-Канн','Caro-Kann Defence'],['e4 d5','Skandinaviya himoyasi','Скандинавская защита','Scandinavian Defence'],
+['e4 d6','Pirs himoyasi','Защита Пирца','Pirc Defence'],['e4 Nf6','Alyoxin himoyasi','Защита Алехина',"Alekhine's Defence"],['e4 g6','Zamonaviy himoya','Современная защита','Modern Defence'],
+['e4 e5','Ochiq debyut','Открытый дебют','Open Game'],['e4 e5 Nf3 Nc6 Bb5','Ispan partiyasi','Испанская партия','Ruy Lopez'],['e4 e5 Nf3 Nc6 Bc4','Italyan partiyasi','Итальянская партия','Italian Game'],
+['e4 e5 Nf3 Nc6 Bc4 Bc5','Italyan partiyasi: Juoko Piano','Итальянская партия: джуоко пиано','Italian Game: Giuoco Piano'],['e4 e5 Nf3 Nc6 Bc4 Nf6','Ikki ot himoyasi','Защита двух коней','Two Knights Defence'],
+['e4 e5 Nf3 Nc6 d4','Shotland partiyasi','Шотландская партия','Scotch Game'],['e4 e5 Nf3 Nf6','Rus partiyasi','Русская партия',"Petrov's Defence"],['e4 e5 Nf3 d6','Filidor himoyasi','Защита Филидора','Philidor Defence'],
+['e4 e5 f4','Qirol gambiti','Королевский гамбит',"King's Gambit"],['e4 e5 Nc3','Vena partiyasi','Венская партия','Vienna Game'],['e4 e5 Nf3 Nc6 Nc3 Nf6',"To'rt ot debyuti",'Дебют четырёх коней','Four Knights Game'],
+['d4 d5','Yopiq debyut','Закрытый дебют','Closed Game'],['d4 d5 c4','Farzin gambiti','Ферзевый гамбит',"Queen's Gambit"],['d4 d5 c4 e6','Rad etilgan farzin gambiti','Отказанный ферзевый гамбит',"Queen's Gambit Declined"],
+['d4 d5 c4 dxc4','Qabul qilingan farzin gambiti','Принятый ферзевый гамбит',"Queen's Gambit Accepted"],['d4 d5 c4 c6','Slavyan himoyasi','Славянская защита','Slav Defence'],
+['d4 d5 Bf4','London tizimi','Лондонская система','London System'],['d4 Nf6 Bf4','London tizimi','Лондонская система','London System'],['d4 d5 Nf3 Nf6 Bf4','London tizimi','Лондонская система','London System'],
+['d4 Nf6','Hind himoyasi','Индийская защита','Indian Defence'],['d4 Nf6 c4 g6 Nc3 Bg7','Qirol hind himoyasi','Староиндийская защита',"King's Indian Defence"],['d4 Nf6 c4 g6 Nc3 d5','Gryunfeld himoyasi','Защита Грюнфельда','Grünfeld Defence'],
+['d4 Nf6 c4 e6 Nc3 Bb4','Nimtsovich himoyasi','Защита Нимцовича','Nimzo-Indian Defence'],['d4 Nf6 c4 e6 Nf3 b6','Farzin hind himoyasi','Новоиндийская защита',"Queen's Indian Defence"],
+['d4 Nf6 c4 e6 g3','Katalon debyuti','Каталонское начало','Catalan Opening'],['d4 Nf6 c4 c5','Benoni himoyasi','Защита Бенони','Benoni Defence'],['d4 f5','Golland himoyasi','Голландская защита','Dutch Defence']];
+const CH_OPM=new Map(CH_OPEN.map(o=>[o[0],[o[1],o[2],o[3]]]));
+function chOpening(sans){const a=sans.slice(0,10).map(s=>s.replace(/[+#]/g,''));for(let k=a.length;k>0;k--){const o=CH_OPM.get(a.slice(0,k).join(' '));if(o)return o}return null}
+
+export const CHESS_HTML="<style>\nbody{margin:0;padding:8px 10px max(8px,env(safe-area-inset-bottom));font:14px/1.3 system-ui,sans-serif}\n.h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}\n.h b{font-size:15px}.h small{color:var(--tg-theme-hint-color)}\n#b{display:grid;grid-template-columns:repeat(8,1fr);border-radius:8px;overflow:hidden;touch-action:none;aspect-ratio:1}\n.q{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:min(9.2vw,40px);line-height:1}\n.l{background:#ecd9b6}.d{background:#b0845a}\n.q.m{box-shadow:inset 0 0 0 99px rgba(240,200,70,.38)}.q.s{box-shadow:inset 0 0 0 99px rgba(90,170,240,.5)}.q.k{box-shadow:inset 0 0 0 99px rgba(230,60,40,.55)}\n.q i{position:absolute;width:30%;height:30%;border-radius:50%;background:rgba(20,20,20,.3)}.q i.x{width:86%;height:86%;background:none;border:4px solid rgba(20,20,20,.3)}\n.p{position:relative}.p u{position:absolute;left:0;top:0;text-decoration:none;color:#1b130d}\n.w{color:#fff}.bk{color:#1b130d}\n.f{position:absolute;bottom:1px;left:3px;font-size:10px;color:rgba(0,0,0,.45)}\n</style>\n<div class=\"h\"><b id=\"t\">♟</b><small id=\"o\"></small></div>\n<div id=\"b\"></div>\n<script>\nvar W=window.TelegramWidget,S=null,sel=-1,busy=0,G={k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'},O={k:'♔',q:'♕',r:'♖',b:'♗',n:'♘',p:'♙'};\nfunction sq(i){return 'abcdefgh'[i&7]+((i>>3)+1)}\nfunction ix(s){return s.charCodeAt(0)-97+(s.charCodeAt(1)-49)*8}\nfunction board(){var b=[],r=7,c=0,f=S.f.split(' ')[0];for(var i=0;i<f.length;i++){var ch=f[i];if(ch=='/'){r--;c=0}else if(ch>='1'&&ch<='8')c+=+ch;else{b[r*8+c]=ch;c++}}return b}\nfunction mv(){var a=[];for(var i=0;i<S.l.length;i+=4)a.push(S.l.substr(i,4));return a}\nfunction load(){try{S=JSON.parse(W?W.chatData:'null')}catch(e){S=null}sel=-1;draw()}\nfunction draw(){if(!S)return;var b=board(),my=S.c,turn=S.f.slice(-1),M=mv(),T=sel<0?[]:M.filter(function(m){return ix(m)==sel}).map(function(m){return ix(m.slice(2))}),h='',st=S.s;\n var msg=st=='mate'?(S.w==my?'Mat! Siz yutdingiz 🎉':'Mat. Kompyuter yutdi'):st=='draw'?'Durang':busy?'Kompyuter o‘ylayapti…':turn==my?(st=='check'?'Shax! Sizning navbat':'Sizning navbatingiz'):'Kompyuter navbati';\n document.getElementById('t').textContent=msg;document.getElementById('o').textContent=S.n?Math.ceil(S.n/2)+'-yurish':'';\n var lm=S.m?[ix(S.m),ix(S.m.slice(2))]:[];\n for(var v=0;v<64;v++){var r=my=='w'?7-(v>>3):v>>3,c=my=='w'?v&7:7-(v&7),i=r*8+c,p=b[i],cl='q '+((r+c)%2?'l':'d');\n  if(lm.indexOf(i)>=0)cl+=' m';if(i==sel)cl+=' s';if(p&&p.toLowerCase()=='k'&&(st=='check'||st=='mate')&&(p=='K')==(turn=='w'))cl+=' k';\n  var x='';if(p){var lo=p.toLowerCase(),wh=p!=lo;x='<span class=\"p '+(wh?'w':'bk')+'\">'+G[lo]+'︎'+(wh?'<u>'+O[lo]+'︎</u>':'')+'</span>'}\n  if(T.indexOf(i)>=0)x+='<i'+(p?' class=\"x\"':'')+'></i>';\n  if((my=='w'?r==0:r==7))x+='<span class=\"f\">'+'abcdefgh'[c]+'</span>';\n  h+='<div class=\"'+cl+'\" data-i=\"'+i+'\">'+x+'</div>'}\n document.getElementById('b').innerHTML=h}\ndocument.getElementById('b').addEventListener('click',function(e){var el=e.target.closest('[data-i]');if(!el||!S||busy||S.s=='mate'||S.s=='draw'||S.f.slice(-1)!=S.c)return;var i=+el.dataset.i,b=board(),M=mv();\n if(sel>=0){var m=M.find(function(m){return ix(m)==sel&&ix(m.slice(2))==i});if(m){busy=1;sel=-1;S.m=m;draw();W.request('m:'+m).then(function(a){busy=0;try{var d=JSON.parse(a.result);if(d.f)S=d}catch(e){}draw();W.HapticFeedback&&W.HapticFeedback.impactOccurred('light')},function(){busy=0;load()});return}}\n var p=b[i];sel=p&&((p<'a')==(S.c=='w'))&&M.some(function(m){return ix(m)==i})&&sel!=i?i:-1;draw()});\nif(W)W.onEvent('chatDataChanged',function(){if(!busy)load()});\nload();if(W&&W.ready)W.ready();\n</script>\n";
+const CHW_KB=()=>({inline_keyboard:[[{text:'♔ Yangi o‘yin (oq)',callback_data:'chw:w'},{text:'♚ Qora bilan',callback_data:'chw:b'}],[appBtn('🎮 To‘liq 3D shaxmat',APP_URL+'?t=shaxmat')]]});
+async function chwDb(env){const db=await D(env).catch(()=>null);if(!db)return null;if(!chwDb.ok){await db.prepare('CREATE TABLE IF NOT EXISTS chw(k TEXT PRIMARY KEY,h TEXT,c TEXT,upd INTEGER)').run();chwDb.ok=1}return db}
+function chwGame(h){const g=chNew();for(const u of h){const m=chFromUci(g,u);if(!m)break;chMove(g,m)}return g}
+function chwState(g,c){const st=chStatus(g),L=[...new Set(chMoves(g).map(m=>m.from+m.to))].join(''),last=g.hist[g.hist.length-1];
+  return {f:chToFen(g).split(' ').slice(0,2).join(' '),c,l:st.r==='play'?L:'',m:last?chSq(last.m.f)+chSq(last.m.t):'',n:g.hist.length,s:st.r==='play'?(st.check?'check':'play'):st.r==='mate'?'mate':'draw',w:st.win||''}}
+function chwAi(g){if(chStatus(g).r!=='play')return null;return chBest(g,{depth:2,ms:6,noise:25})}
+const chwCap=d=>d.s==='mate'?'♟ Shaxmat: mat!':d.s==='draw'?'♟ Shaxmat: durang':'♟ Shaxmat — kompyuterga qarshi. Donani, keyin katakni bosing.';
+async function chwNew(env,db,chat,c,mid){const g=chNew(),h=[];if(c==='b'){const m=chwAi(g);if(m){chMove(g,m);h.push(m.from+m.to+(m.promo?m.promo.toLowerCase():''))}}
+  const d=chwState(g,c);if(mid==null){const r=await tg(env,'sendWidget',{chat_id:chat,html:CHESS_HTML,chat_data:JSON.stringify(d),allow_queries:true,caption:chwCap(d),reply_markup:CHW_KB()}).catch(()=>null);if(!r||!r.ok)return r;mid=r.result.message_id}
+  else await tg(env,'editMessageWidgetData',{chat_id:chat,message_id:mid,chat_data:JSON.stringify(d)}).catch(()=>{});
+  if(db)await db.prepare('INSERT OR REPLACE INTO chw(k,h,c,upd) VALUES(?1,?2,?3,?4)').bind(chat+':'+mid,JSON.stringify(h),c,Date.now()).run();return {ok:true}}
+async function cmdChess(env,chat,priv){const db=await chwDb(env);
+  if(!priv||!db)return say(env,chat,'♟ Shaxmat — ilovada: kompyuterga qarshi 8 daraja, masalalar va tahlil.',{reply_markup:{inline_keyboard:[[appBtn('♟ Shaxmatni ochish',APP_URL+'?t=shaxmat')]]}});
+  await ensureUpdates(env);const r=await chwNew(env,db,chat,'w',null);if(!r||!r.ok)return say(env,chat,'♟ Shaxmat — ilovada.',{reply_markup:{inline_keyboard:[[appBtn('♟ Shaxmatni ochish',APP_URL+'?t=shaxmat')]]}})}
+async function chwMove(env,q){const ans=o=>tg(env,'answerWidgetQuery',{widget_query_id:q.id,data:JSON.stringify(o)});const db=await chwDb(env);
+  const k=q.chat&&q.message_id?q.chat.id+':'+q.message_id:'',row=db&&k?await db.prepare('SELECT h,c FROM chw WHERE k=?1').bind(k).first():null;if(!row)return ans({e:'nogame'});
+  const h=JSON.parse(row.h||'[]'),g=chwGame(h),u=(q.data||'').slice(2);
+  if(g.turn!==row.c||chStatus(g).r!=='play'||!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(u))return ans({e:'illegal'});
+  const m=chFromUci(g,u);if(!m)return ans({e:'illegal'});chMove(g,m);h.push(m.from+m.to+(m.promo?m.promo.toLowerCase():''));
+  const a=chwAi(g);if(a){chMove(g,a);h.push(a.from+a.to+(a.promo?a.promo.toLowerCase():''))}
+  const d=chwState(g,row.c);await db.prepare('UPDATE chw SET h=?1,upd=?2 WHERE k=?3').bind(JSON.stringify(h),Date.now(),k).run();
+  await tg(env,'editMessageWidgetData',{chat_id:q.chat.id,message_id:q.message_id,chat_data:JSON.stringify(d)}).catch(()=>{});
+  if(d.s!=='play'&&d.s!=='check')await tg(env,'editMessageCaption',{chat_id:q.chat.id,message_id:q.message_id,caption:chwCap(d),reply_markup:CHW_KB()}).catch(()=>{});
+  return ans(d)}
 const regionKb=()=>({inline_keyboard:[...Array.from({length:Math.ceil(CENTRES.length/2)},(_,i)=>CENTRES.slice(i*2,i*2+2).map((c,k)=>({text:c[0],callback_data:'nm:'+(i*2+k)}))),[appBtn('📍 Joylashuv bo‘yicha — ilovada',APP_URL)]]});
 async function kursText(){
   try{const r=await fetch('https://cbu.uz/uz/arkhiv-kursov-valyut/json/',{cf:{cacheTtl:1800}});const j=await r.json();
@@ -94,7 +260,7 @@ async function handleHello(req,env){
 // Bot buyruqlari: har biri o'z funksiyasida, onMessage faqat yo'naltiradi.
 const say=(env,chat,text,extra={})=>tg(env,'sendMessage',{chat_id:chat,text,...extra});
 const HUJJAT_TEXT=`📄 <b>Hujjatlar bilan ishlash</b>\n\n• Rasmlardan PDF\n• PDF birlashtirish\n• Sahifalarni ajratish\n• PDF → rasm\n• Rasmdan matn (o‘zbek, rus, ingliz)\n• Rasmni siqish\n• Lotin ↔ Kirill\n\nTayyor fayl shu chatga yuboriladi.`;
-const HELP_TEXT=`<b>Hamroh bot buyruqlari</b>\n\n/start — bosh sahifa\n/namoz — bugungi namoz vaqtlari\n/kurs — valyuta kursi\n/taom — bugun nima pishiramiz?\n/hujjat — PDF va hujjatlar\n\nTo‘liq imkoniyatlar — «Hamroh» ilovasida.`;
+const HELP_TEXT=`<b>Hamroh bot buyruqlari</b>\n\n/start — bosh sahifa\n/namoz — bugungi namoz vaqtlari\n/kurs — valyuta kursi\n/taom — bugun nima pishiramiz?\n/shaxmat — chat ichida shaxmat\n/hujjat — PDF va hujjatlar\n\nTo‘liq imkoniyatlar — «Hamroh» ilovasida.`;
 async function cmdTaom(env,chat){
   const C=await cfg(),DL=(C.dishes&&C.dishes.length)?C.dishes:DISHES,n=DL[Math.floor(Math.random()*DL.length)];
   return say(env,chat,`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,{parse_mode:'HTML',
@@ -104,6 +270,7 @@ const COMMANDS={
   '/namoz':(env,chat,priv)=>cmdNamoz(env,chat,priv),
   '/kurs':async(env,chat)=>say(env,chat,await kursText(),{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('💱 Konvertorni ochish')]]}}),
   '/taom':cmdTaom,
+  '/shaxmat':(env,chat,priv)=>cmdChess(env,chat,priv),
   '/hujjat':(env,chat)=>say(env,chat,HUJJAT_TEXT,{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('📄 Hujjatlar bo‘limini ochish',APP_URL+'?t=doc')]]}}),
   '/yordam':(env,chat)=>say(env,chat,HELP_TEXT,{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()]]}})
 };
@@ -138,6 +305,8 @@ async function onMessage(env,msg){
 async function onCallback(env,q){
   const C=await cfg(); const DL=(C.dishes&&C.dishes.length)?C.dishes:DISHES;
   const d=q.data||'';
+  if((d==='chw:w'||d==='chw:b')&&q.message){const db=await chwDb(env);await chwNew(env,db,q.message.chat.id,d.slice(4),q.message.message_id);
+    await tg(env,'editMessageCaption',{chat_id:q.message.chat.id,message_id:q.message.message_id,caption:chwCap({s:'play'}),reply_markup:CHW_KB()}).catch(()=>{})}
   if(d.startsWith('nm:')&&q.message&&q.message.widget){const i=+d.slice(3);if(CENTRES[i]){const c=q.message.chat.id,mid=q.message.message_id;
     await tg(env,'editMessageWidgetData',{chat_id:c,message_id:mid,chat_data:JSON.stringify(namozData(i))});await tg(env,'editMessageCaption',{chat_id:c,message_id:mid,caption:namozCap(i),reply_markup:regionKb()})}}
   else if(d.startsWith('nm:')){const i=+d.slice(3);if(CENTRES[i]) await tg(env,'editMessageText',{chat_id:q.message.chat.id,message_id:q.message.message_id,text:namozText(i)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()})}
