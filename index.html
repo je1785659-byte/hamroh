@@ -691,6 +691,7 @@ body[data-sec="kkal"]{--kk-a:#1a7d4c}
 .kk-quick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.kk-quick::-webkit-scrollbar{display:none}
 .kk-quick .chip{flex:none;white-space:nowrap}
 body[data-sec="mafia"]{--sec-a:#2b0f14;--sec-b:#8e1b2b;--sec:#b3263a}
+body[data-sec="port"]{--sec-a:#14181d;--sec-b:#8a4a22;--sec:#c9772e}
 body[data-sec="yugur"]{--sec-a:#0e4a6e;--sec-b:#1fa7b8;--sec:#1793a8}
 body.rn-play nav.tabs{display:none}
 .rn-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
@@ -1026,6 +1027,7 @@ ICONS.mafia='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 ICONS.bilyard='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10.5" r="4.2"/><path d="M12 8.6a.95.95 0 1 0 0 1.9.95.95 0 1 0 0-1.9zM12 10.5a1.15 1.15 0 1 0 0 2.3 1.15 1.15 0 1 0 0-2.3z"/></svg>';
 ICONS.ov='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>';
 ICONS.yugur='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="14.5" cy="4.5" r="2"/><path d="M9 21l3-6 3 2v5M6 12l3-4 4 1 3 4 3 1M12 15l1-6"/></svg>';
+ICONS.port='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>';
 ICONS.home='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>';
 const TABS = [['home','Asosiy'],['namoz','Namoz'],['food','Taomlar'],['cash','Valyuta'],['quiz','Viktorina']];
 const HERO = {
@@ -1041,6 +1043,7 @@ const HERO = {
   mafia:['Mafiya',"Davrada o'ynash uchun: rollarni tarqatadi, kecha va ovoz berishda boshlovchiga yordam beradi"],
   bilyard:['Bilyard',"Rus piramidasi, Amerikanka va 8-shar: ikki kishi, kompyuterga qarshi yoki mashq"],
   ov:['Snayper ovi',"3D o'rmon: durbin, shamol va masofa — kiyik, qobon va tulkini ov qiling"],
+  port:["Port: So'nggi signal","3D otishma: portda uchta uzatgichni o'chiring va chiqish nuqtasiga yeting"],
   yugur:['Yugur!',"Cheksiz yugurish: poyezdlar ustidan sakrang, tanga yig'ing, qorovuldan qoching"],
   kkal:['Kaloriya hisoblagich',"Ovqatni suratga oling — AI taomni taniydi, kaloriya va kunlik normangizni hisoblaydi"]
 };
@@ -2339,7 +2342,7 @@ function viewSaved(){
 }
 // open a shared recipe: t.me/bot/app?startapp=r_osh
 (function(){try{const tq=new URLSearchParams(location.search).get('t');if(tq){current=tq;store.set('tab',tq)}}catch(e){}})();
-(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'||sp==='bilyard'||sp==='ov'||sp==='yugur'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('yugur-r')){store.set('tab','yugur');current='yugur';store.set('rn_ref',sp.slice(7).replace(/\D/g,''))}if(sp&&sp.startsWith('bl_')){store.set('tab','bilyard');current='bilyard';store.set('bl_join',sp.slice(3).replace(/[^a-z0-9]/g,''))}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
+(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'||sp==='bilyard'||sp==='ov'||sp==='yugur'||sp==='port'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('yugur-r')){store.set('tab','yugur');current='yugur';store.set('rn_ref',sp.slice(7).replace(/\D/g,''))}if(sp&&sp.startsWith('bl_')){store.set('tab','bilyard');current='bilyard';store.set('bl_join',sp.slice(3).replace(/[^a-z0-9]/g,''))}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
 
 const TOOLIC={qibla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
  tasbeh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="17.5" cy="15" r="2"/><circle cx="12" cy="18.5" r="2"/><circle cx="6.5" cy="15" r="2"/><circle cx="6.5" cy="8.5" r="2"/></svg>',
@@ -4119,7 +4122,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261108n';
+const APP_VER='20261110a';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 // oflayn rejim: ilova va o'yinlar internetsiz ham ochiladi
@@ -7329,6 +7332,7 @@ function viewHome(){
     <button class="card pv-main" data-go="bilyard" style="margin:0;background:linear-gradient(135deg,#0b3d2a,#1f7a52)"><span class="pv-ic">${ICONS.bilyard}</span><span><b>Bilyard</b><small>3D · Rus piramidasi, Amerikanka, 8-shar</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="ov" style="margin:0;background:linear-gradient(135deg,#1f2d16,#6b7d2e)"><span class="pv-ic">${ICONS.ov}</span><span><b>Snayper ovi</b><small>3D o'rmon · durbin, shamol, masofa</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="yugur" style="margin:0;background:linear-gradient(135deg,#0e4a6e,#1fa7b8)"><span class="pv-ic">${ICONS.yugur}</span><span><b>Yugur!</b><small>3D · poyezdlar, tangalar, bonuslar</small></span><span class="pv-go">→</span></button>
+    <button class="card pv-main" data-go="port" style="margin:0;background:linear-gradient(135deg,#14181d,#a85a24)"><span class="pv-ic">${ICONS.port}</span><span><b>Port: So'nggi signal</b><small>3D otishma · uzatgichlar, dronlar</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="prava" style="margin:0;background:linear-gradient(135deg,#4a3200,#d99a00)"><span class="pv-ic">${ICONS.prava}</span><span><b>Prava imtihoniga tayyorlaning</b><small>Imtihon rejimi · xatolar ustida ishlash · yo'l belgilari</small></span><span class="pv-go">→</span></button>
     <button class="card pv-main" data-go="sert" style="margin:0;background:linear-gradient(135deg,#2a1a6e,#6a4fd6)"><span class="pv-ic">∑</span><span><b>Milliy sertifikatga tayyorlaning</b><small>8 fan · imtihon rejimi · izohli savollar</small></span><span class="pv-go">→</span></button>
     ${STAT.admin?`<button class="card pv-main" data-go="admin" data-noi18n style="margin:0;background:linear-gradient(135deg,#14224d,#3563d4)"><span class="pv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg></span><span><b>Statistika</b><small>Admin panel · faqat siz ko'rasiz</small></span><span class="pv-go">→</span></button>`:''}
@@ -7357,7 +7361,7 @@ function viewHome(){
 }
 
 /* ---------- ADMIN PANEL: statistika ---------- */
-const AD_SEC={home:'Asosiy',namoz:'Namoz',food:'Taomlar',cash:'Valyuta',quiz:'Viktorina',kids:'Bolalar',audio:'Audio',doc:'Hujjatlar',prava:'Prava',sert:'Sertifikat',admin:'Admin panel',game:"Bolalar o'yinlari",ertak:'Ertaklar',cook:'Pishirish rejimi',pv_exam:'Prava imtihoni',sr_exam:'Sertifikat imtihoni',kkal:'Kaloriya',kk_photo:'Kaloriya: surat tahlili',mafia:'Mafiya',mafia_game:'Mafiya: yangi o\'yin',bilyard:'Bilyard',bilyard_game:'Bilyard: yangi o\'yin',ov:'Snayper ovi',ov_game:'Snayper ovi: yangi ov',yugur:'Yugur!',yugur_game:'Yugur!: yangi yugurish'};
+const AD_SEC={home:'Asosiy',namoz:'Namoz',food:'Taomlar',cash:'Valyuta',quiz:'Viktorina',kids:'Bolalar',audio:'Audio',doc:'Hujjatlar',prava:'Prava',sert:'Sertifikat',admin:'Admin panel',game:"Bolalar o'yinlari",ertak:'Ertaklar',cook:'Pishirish rejimi',pv_exam:'Prava imtihoni',sr_exam:'Sertifikat imtihoni',kkal:'Kaloriya',kk_photo:'Kaloriya: surat tahlili',mafia:'Mafiya',mafia_game:'Mafiya: yangi o\'yin',bilyard:'Bilyard',bilyard_game:'Bilyard: yangi o\'yin',ov:'Snayper ovi',ov_game:'Snayper ovi: yangi ov',yugur:'Yugur!',yugur_game:'Yugur!: yangi yugurish',port:"Port: So'nggi signal"};
 const AD_PF={android:'Android',ios:'iPhone (iOS)',tdesktop:'Kompyuter (Telegram Desktop)',macos:'Mac',weba:'Telegram Web',webk:'Telegram Web',web:'Telegram Web',unigram:'Windows (Unigram)','?':"Noma'lum"};
 const AD_LANG={uz:"O'zbekcha (lotin)",uzc:"O'zbekcha (kirill)",ru:'Ruscha',en:'Inglizcha','?':"Noma'lum"};
 function adSrc(k){if(k==='bot')return 'Bot: /start';if(k==='app')return 'Ilova havolasi';if(k==='?')return "Eski foydalanuvchi (manba noma'lum)";if(k==='prava')return 'Prava havolasi';if(/^ertak_/.test(k))return 'Ertak ulashilgan';if(/^r_/.test(k))return 'Retsept havolasi';return k}
@@ -7449,7 +7453,10 @@ function renderAdmin(j){
     try{for(let k=0;k<1000;k++){b.textContent=`Tekshirilmoqda… ${fmt(al+bl)}`;const r=await adPost('/admin/check',{after});if(!r||!r.ok)throw 0;al+=r.alive;bl+=r.blocked;after=r.next;if(r.done)break}
       toast(`Tayyor: ${fmt(al)} faol, ${fmt(bl)} bloklagan`);adBusy=false;if(current==='admin')viewAdmin()}catch(e){adBusy=false;b.textContent="Xatolik — qayta urinish"}};
 }
-VIEWS.home=viewHome;VIEWS.audio=viewAudio;VIEWS.admin=viewAdmin;VIEWS.mafia=viewMafia;VIEWS.yugur=()=>viewYugur();VIEWS.ov=()=>viewOv();VIEWS.bilyard=()=>{if(BLS)BLS.live=false;viewBilyard()};VIEWS.kkal=()=>{kkView='day';kkPick=null;kkPh=null;kkOff=0;kkQ='';viewKkal()};
+VIEWS.home=viewHome;VIEWS.audio=viewAudio;VIEWS.admin=viewAdmin;VIEWS.mafia=viewMafia;VIEWS.yugur=()=>viewYugur();VIEWS.port=()=>viewPort();
+function viewPort(){document.body.classList.add('rn-play');try{tg&&tg.disableVerticalSwipes&&tg.disableVerticalSwipes()}catch(e){}$('#hero').hidden=true;
+  $('#screen').innerHTML=`<div class="rn" style="background:#0d1014" data-noi18n><iframe id="ptframe" title="Port" src="port/index.html?v=${APP_VER}#${LANG||'uz'}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="autoplay; fullscreen"></iframe></div>`}
+addEventListener('message',e=>{if(e.data==='port-exit'&&current==='port'){try{tg&&tg.enableVerticalSwipes&&tg.enableVerticalSwipes()}catch(_){}go('home')}});VIEWS.ov=()=>viewOv();VIEWS.bilyard=()=>{if(BLS)BLS.live=false;viewBilyard()};VIEWS.kkal=()=>{kkView='day';kkPick=null;kkPh=null;kkOff=0;kkQ='';viewKkal()};
 (function(){const n=uzNow();$('#todaychip').textContent=`${n.getUTCDate()}-${OYLAR[n.getUTCMonth()].slice(0,3)}`})();
 if(!VIEWS[current]) current='home';
 renderTabs(); setHero(current); VIEWS[current](); loadRates();
