@@ -365,7 +365,7 @@ function marble(x,X,Y,W,H,c1,v1,v2){x.save();x.beginPath();x.rect(X,Y,W,H);x.cli
   x.globalAlpha=1;for(let i=0;i<W*H/60;i++){x.fillStyle=`rgba(${rnd()<.5?255:0},${rnd()<.5?255:0},${rnd()<.5?255:0},${.035*rnd()})`;x.fillRect(X+rnd()*W,Y+rnd()*H,1+rnd()*2,1+rnd()*2)}x.restore()}
 const SQ=128,FR=9.4,PLAY=8,PSC={p:.84,n:1,b:1.02,r:.96,q:1.1,k:1.15};
 const THEMES={wood:{frame:0xffffff,rough:.5},marble:{frame:0x8f8f96,rough:.42},green:{frame:0x9a8f80,rough:.6}};
-function boardTex(th){seed=11;return cvT(SQ*8,SQ*8,(x)=>{for(let r=0;r<8;r++)for(let c=0;c<8;c++){const light=(r+c)%2===1,X=c*SQ,Y=(7-r)*SQ;
+function boardTex(th){seed=11;return cvT(SQ*8,SQ*8,(x)=>{for(let r=0;r<8;r++)for(let c=0;c<8;c++){const light=(r+c)%2===0,X=c*SQ,Y=(7-r)*SQ; // a1 — to'q katak
   if(th==='marble'){if(light)marble(x,X,Y,SQ,SQ,'#ebe7df','#8b8f96','#b9b2a6');else marble(x,X,Y,SQ,SQ,'#3f5953','#cfe0d8','#22332f')}
   else if(th==='green'){x.fillStyle=light?'#ecebd4':'#5c8a58';x.fillRect(X,Y,SQ,SQ);for(let i=0;i<220;i++){x.fillStyle=`rgba(${rnd()<.5?255:0},${rnd()<.5?255:0},${rnd()<.5?255:0},${.03*rnd()})`;x.fillRect(X+rnd()*SQ,Y+rnd()*SQ,2,2)}}
   else{if(light)grain(x,X,Y,SQ,SQ,'#d6b684','#bd9960','#ad8650',(r+c)%4===1,.45);else grain(x,X,Y,SQ,SQ,'#4f3220','#2e1c10','#6b4428',(r+c)%4===0,.5)}
