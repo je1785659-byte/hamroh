@@ -77,6 +77,10 @@ html,body{height:100%;margin:0;background:var(--ink);color:var(--text);font-fami
 #bf::after{content:"";width:34px;height:34px;border-radius:50%;background:rgba(255,74,54,.75)}
 #ba{right:124px;bottom:64px;width:60px;height:60px}
 #bj{right:30px;bottom:196px;width:56px;height:56px}
+#bw{right:200px;bottom:22px;width:56px;height:56px;font-size:11px}
+#bg{right:196px;bottom:92px;width:58px;height:58px;font-size:9.5px}
+#scope{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 50%,transparent 0,transparent 33vmin,rgba(0,0,0,.92) 33.6vmin,#000 36vmin)}
+#scope i{position:absolute;background:rgba(0,0,0,.85)}#scope i:first-child{left:50%;top:calc(50% - 33vmin);width:1.5px;height:66vmin;margin-left:-.75px}#scope i:last-child{top:50%;left:calc(50% - 33vmin);height:1.5px;width:66vmin;margin-top:-.75px}
 #br{right:116px;bottom:148px;width:54px;height:54px}
 #bu{right:112px;bottom:232px;width:74px;height:74px;border-color:var(--amber);color:var(--amber)}
 #bp{position:fixed;right:12px;top:10px;width:40px;height:40px;border-radius:6px;border:2px solid var(--line);background:rgba(13,16,20,.4);color:var(--text);font:700 14px var(--display);pointer-events:auto}
@@ -114,12 +118,12 @@ input[type=range]{flex:1;min-width:120px;accent-color:var(--amber)}
   <div class="mk" id="mk0"><u></u><b></b></div><div class="mk" id="mk1"><u></u><b></b></div><div class="mk" id="mk2"><u></u><b></b></div><div class="mk x" id="mk3"><u></u><b></b></div>
   <div class="obj"><small>VAZIFA</small><b id="ot"></b><i id="oc"></i></div>
   <div class="foe">DUSHMAN <b id="fn">0</b></div>
-  <div id="xh"><u></u><u></u><u></u><u></u></div><div id="hm"></div>
+  <div id="scope"><i></i><i></i></div><div id="xh"><u></u><u></u><u></u><u></u></div><div id="hm"></div>
   <div id="pop"></div><div id="tip" hidden></div>
   <div id="use" hidden><span id="ut"></span><div class="pb"><u id="up"></u></div></div>
   <div id="sub"></div>
   <div class="hp" id="hp"><b id="hn">100</b><div class="bar"><u id="hb"></u></div></div>
-  <div class="am"><b id="an">30</b><span id="ar">/ 150</span><small>TR-7 KARABIN</small></div>
+  <div class="am"><b id="an">30</b><span id="ar">/ 150</span><small id="wn">TR-7 KARABIN</small><small id="gn"></small></div>
 </div>
 
 <div id="touch" hidden>
@@ -128,6 +132,8 @@ input[type=range]{flex:1;min-width:120px;accent-color:var(--amber)}
   <div class="tb" id="bj">SAKRA</div>
   <div class="tb" id="br">O'QLA</div>
   <div class="tb" id="ba">NISHON</div>
+  <div class="tb" id="bw">QUROL</div>
+  <div class="tb" id="bg">GRANATA</div>
   <div class="tb" id="bf"></div>
 </div>
 <button id="bp" hidden aria-label="Pauza">II</button>
@@ -172,12 +178,12 @@ input[type=range]{flex:1;min-width:120px;accent-color:var(--amber)}
 
 <script src="../lib/three.min.js?v=158"></script>
 <script src="../lib/three-gltf.js?v=158"></script>
-<script>window.SOL_URL="soldier.glb?v=1";window.GUN_URL="gun.glb?v=1";window.DRONE_URL="drone.glb?v=1"</script>
+<script>window.SOL_URL="soldier.glb?v=1";window.GUN_URL="gun.glb?v=1";window.DRONE_URL="drone.glb?v=1";window.SG_URL="sg.glb?v=1";window.SN_URL="sn.glb?v=1"</script>
 <script>
 'use strict';
 (function(){
 const $=s=>document.querySelector(s);
-const LNG=(location.hash||'').slice(1)||'uz',EMB=window.parent!==window,DICT={"BIRINCHI SHAXS OTISHMA · 3D": ["ШУТЕР ОТ ПЕРВОГО ЛИЦА · 3D", "FIRST-PERSON SHOOTER · 3D"], "Port: So'nggi signal": ["Порт: последний сигнал", "Port: Last Signal"], "Yuk porti dushman qo'lida. Konteynerlar orasidan o'tib, uchta uzatgichni o'chiring va shimoli-sharqdagi maydonchaga yetib boring.": ["Грузовой порт захвачен. Пройдите между контейнерами, отключите три передатчика и доберитесь до площадки на северо-востоке.", "The cargo port is in enemy hands. Move through the containers, shut down three uplinks and reach the pad in the north-east."], "Qiyinlik": ["Сложность", "Difficulty"], "Oson": ["Легко", "Easy"], "O'rta": ["Средне", "Medium"], "Qiyin": ["Сложно", "Hard"], "Boshlash": ["Начать", "Start"], "TO'XTATILDI": ["ОСТАНОВЛЕНО", "PAUSED"], "Pauza": ["Пауза", "Pause"], "Sezgirlik": ["Чувствительность", "Sensitivity"], "Avto-otish": ["Автоогонь", "Auto-fire"], "Yoqilgan": ["Вкл", "On"], "O'chirilgan": ["Выкл", "Off"], "Grafika": ["Графика", "Graphics"], "Yuqori": ["Высокая", "High"], "Past": ["Низкая", "Low"], "Davom etish": ["Продолжить", "Resume"], "Qaytadan boshlash": ["Начать заново", "Restart"], "Yana o'ynash": ["Играть ещё", "Play again"], "Hamrohga qaytish": ["Вернуться в Hamroh", "Back to Hamroh"], "VAZIFA": ["ЗАДАЧА", "OBJECTIVE"], "DUSHMAN": ["ВРАГИ", "HOSTILES"], "TR-7 KARABIN": ["КАРАБИН TR-7", "TR-7 CARBINE"], "O'CHIR": ["ОТКЛ", "CUT"], "SAKRA": ["ПРЫЖОК", "JUMP"], "O'QLA": ["ЗАРЯД", "LOAD"], "NISHON": ["ПРИЦЕЛ", "AIM"], "VAQT": ["ВРЕМЯ", "TIME"], "YO'Q QILINDI": ["УНИЧТОЖЕНО", "KILLS"], "BOSHGA": ["В ГОЛОВУ", "HEADSHOTS"], "ANIQLIK": ["ТОЧНОСТЬ", "ACCURACY"], "O'yinni yuklab bo'lmadi: 3D kutubxona ochilmadi yoki qurilmangiz WebGL'ni qo'llamaydi. Sahifani yangilab ko'ring.": ["Не удалось загрузить игру: 3D-библиотека не открылась или устройство не поддерживает WebGL. Обновите страницу.", "The game could not load: the 3D library failed or your device has no WebGL. Reload the page."], "Uchta uzatgichni o'chiring": ["Отключите три передатчика", "Shut down three uplinks"], "Chiqish nuqtasiga yeting": ["Доберитесь до точки эвакуации", "Reach the extraction point"], "SHIMOLI-SHARQ": ["СЕВЕРО-ВОСТОК", "NORTH-EAST"], "BAZA": ["БАЗА", "BASE"], "GRANATA!": ["ГРАНАТА!", "GRENADE!"], "Lochin, port dushman nazoratida. Uchta uzatgichni o'chir.": ["Сокол, порт под контролем противника. Отключи три передатчика.", "Falcon, the port is under enemy control. Shut down three uplinks."], "Birinchisi o'chdi. Ehtiyot bo'l, ular seni payqadi.": ["Первый отключён. Осторожно, тебя заметили.", "First one is down. Careful, they know you are here."], "Yana bittasi qoldi. Dronlar havoda, tepaga qara.": ["Остался один. В воздухе дроны, смотри вверх.", "One left. Drones are up, watch the sky."], "Signal uzildi! Shimoli-sharqdagi maydonchaga yet, seni olib ketamiz.": ["Сигнал оборван! Иди к площадке на северо-востоке, мы тебя заберём.", "Signal is cut! Get to the pad in the north-east, we will pick you up."], "TOPSHIRIQ YAKUNLANDI": ["ЗАДАНИЕ ЗАВЕРШЕНО", "MISSION COMPLETE"], "TOPSHIRIQ BARBOD BO'LDI": ["ЗАДАНИЕ ПРОВАЛЕНО", "MISSION FAILED"], "Vazifa bajarildi": ["Задача выполнена", "Objective complete"], "Halok bo'ldingiz": ["Вы погибли", "You were killed"], "Uchta uzatgich o'chirildi, siz portdan olib chiqildingiz.": ["Три передатчика отключены, вас эвакуировали из порта.", "All three uplinks are down and you were extracted from the port."], "O'chirilgan uzatgichlar": ["Отключено передатчиков", "Uplinks shut down"], "Pana joydan otib, sog'lig'ingiz tiklanishini kuting.": ["Стреляйте из укрытия и ждите, пока здоровье восстановится.", "Shoot from cover and wait for your health to recover."], "Chiqish nuqtasiga oz qolgan edi. Yana urinib ko'ring.": ["До точки эвакуации оставалось немного. Попробуйте ещё раз.", "You were close to extraction. Try again."], "Qayta o'qlanmoqda": ["Перезарядка", "Reloading"], "O'QLA tugmasini bosing": ["Нажмите ЗАРЯД", "Tap LOAD"], "R — qayta o'qlash": ["R — перезарядка", "R — reload"], "O'q tugadi": ["Патроны кончились", "Out of ammo"], "O'q kam": ["Мало патронов", "Low ammo"], "O'CHIR TUGMASINI BOSIB TURING": ["УДЕРЖИВАЙТЕ КНОПКУ ОТКЛ", "HOLD THE CUT BUTTON"], "E — UZATGICHNI O'CHIRISH (BOSIB TURING)": ["E — ОТКЛЮЧИТЬ ПЕРЕДАТЧИК (УДЕРЖИВАЙТЕ)", "E — SHUT DOWN UPLINK (HOLD)"], "+30 O'Q": ["+30 ПАТРОНОВ", "+30 AMMO"], "GRAFIKA YENGILLASHTIRILDI": ["ГРАФИКА УПРОЩЕНА", "GRAPHICS LOWERED"], "ENG YAXSHI VAQT": ["ЛУЧШЕЕ ВРЕМЯ", "BEST TIME"], "Chap tomon": ["Левая сторона", "Left side"], "yurish (joystik); oxirigacha tortsangiz, yuguradi": ["движение (джойстик); до упора — бег", "move (joystick); push all the way to sprint"], "O'ng tomon": ["Правая сторона", "Right side"], "atrofga qarash": ["обзор", "look around"], "Qizil tugma": ["Красная кнопка", "Red button"], "otish. Avto-otish yoqilgan: nishon dushmanga tushsa, o'zi otadi": ["огонь. Автоогонь включён: стреляет сам, когда прицел на враге", "fire. Auto-fire is on: it shoots when the crosshair is on an enemy"], "mo'ljalga olish": ["прицеливание", "aim down sights"], "uzatgich yonida bosib turing": ["удерживайте рядом с передатчиком", "hold next to an uplink"], "yurish": ["движение", "move"], "Sichqoncha": ["Мышь", "Mouse"], "qarash, chap tugma — otish, o'ng tugma — mo'ljal": ["обзор, левая кнопка — огонь, правая — прицел", "look, left button fires, right button aims"], "Shift · Bo'sh joy": ["Shift · Пробел", "Shift · Space"], "yugurish · sakrash": ["бег · прыжок", "sprint · jump"], "qayta o'qlash · uzatgichni o'chirish (bosib turing)": ["перезарядка · отключить передатчик (удерживайте)", "reload · shut down uplink (hold)"], "pauza": ["пауза", "pause"]};
+const LNG=(location.hash||'').slice(1)||'uz',EMB=window.parent!==window,DICT={"BIRINCHI SHAXS OTISHMA · 3D": ["ШУТЕР ОТ ПЕРВОГО ЛИЦА · 3D", "FIRST-PERSON SHOOTER · 3D"], "Port: So'nggi signal": ["Порт: последний сигнал", "Port: Last Signal"], "Yuk porti dushman qo'lida. Konteynerlar orasidan o'tib, uchta uzatgichni o'chiring va shimoli-sharqdagi maydonchaga yetib boring.": ["Грузовой порт захвачен. Пройдите между контейнерами, отключите три передатчика и доберитесь до площадки на северо-востоке.", "The cargo port is in enemy hands. Move through the containers, shut down three uplinks and reach the pad in the north-east."], "Qiyinlik": ["Сложность", "Difficulty"], "Oson": ["Легко", "Easy"], "O'rta": ["Средне", "Medium"], "Qiyin": ["Сложно", "Hard"], "Boshlash": ["Начать", "Start"], "TO'XTATILDI": ["ОСТАНОВЛЕНО", "PAUSED"], "Pauza": ["Пауза", "Pause"], "Sezgirlik": ["Чувствительность", "Sensitivity"], "Avto-otish": ["Автоогонь", "Auto-fire"], "Yoqilgan": ["Вкл", "On"], "O'chirilgan": ["Выкл", "Off"], "Grafika": ["Графика", "Graphics"], "Yuqori": ["Высокая", "High"], "Past": ["Низкая", "Low"], "Davom etish": ["Продолжить", "Resume"], "Qaytadan boshlash": ["Начать заново", "Restart"], "Yana o'ynash": ["Играть ещё", "Play again"], "Hamrohga qaytish": ["Вернуться в Hamroh", "Back to Hamroh"], "VAZIFA": ["ЗАДАЧА", "OBJECTIVE"], "DUSHMAN": ["ВРАГИ", "HOSTILES"], "TR-7 KARABIN": ["КАРАБИН TR-7", "TR-7 CARBINE"], "O'CHIR": ["ОТКЛ", "CUT"], "SAKRA": ["ПРЫЖОК", "JUMP"], "O'QLA": ["ЗАРЯД", "LOAD"], "NISHON": ["ПРИЦЕЛ", "AIM"], "VAQT": ["ВРЕМЯ", "TIME"], "YO'Q QILINDI": ["УНИЧТОЖЕНО", "KILLS"], "BOSHGA": ["В ГОЛОВУ", "HEADSHOTS"], "ANIQLIK": ["ТОЧНОСТЬ", "ACCURACY"], "O'yinni yuklab bo'lmadi: 3D kutubxona ochilmadi yoki qurilmangiz WebGL'ni qo'llamaydi. Sahifani yangilab ko'ring.": ["Не удалось загрузить игру: 3D-библиотека не открылась или устройство не поддерживает WebGL. Обновите страницу.", "The game could not load: the 3D library failed or your device has no WebGL. Reload the page."], "Uchta uzatgichni o'chiring": ["Отключите три передатчика", "Shut down three uplinks"], "Chiqish nuqtasiga yeting": ["Доберитесь до точки эвакуации", "Reach the extraction point"], "SHIMOLI-SHARQ": ["СЕВЕРО-ВОСТОК", "NORTH-EAST"], "BAZA": ["БАЗА", "BASE"], "GRANATA!": ["ГРАНАТА!", "GRENADE!"], "GRANATA": ["ГРАНАТА", "GRENADE"], "DROBOVIK": ["ДРОБОВИК", "SHOTGUN"], "SNAYPER": ["СНАЙПЕРКА", "SNIPER"], "QUROL": ["ОРУЖИЕ", "WEAPON"], "Lochin, port dushman nazoratida. Uchta uzatgichni o'chir.": ["Сокол, порт под контролем противника. Отключи три передатчика.", "Falcon, the port is under enemy control. Shut down three uplinks."], "Birinchisi o'chdi. Ehtiyot bo'l, ular seni payqadi.": ["Первый отключён. Осторожно, тебя заметили.", "First one is down. Careful, they know you are here."], "Yana bittasi qoldi. Dronlar havoda, tepaga qara.": ["Остался один. В воздухе дроны, смотри вверх.", "One left. Drones are up, watch the sky."], "Signal uzildi! Shimoli-sharqdagi maydonchaga yet, seni olib ketamiz.": ["Сигнал оборван! Иди к площадке на северо-востоке, мы тебя заберём.", "Signal is cut! Get to the pad in the north-east, we will pick you up."], "TOPSHIRIQ YAKUNLANDI": ["ЗАДАНИЕ ЗАВЕРШЕНО", "MISSION COMPLETE"], "TOPSHIRIQ BARBOD BO'LDI": ["ЗАДАНИЕ ПРОВАЛЕНО", "MISSION FAILED"], "Vazifa bajarildi": ["Задача выполнена", "Objective complete"], "Halok bo'ldingiz": ["Вы погибли", "You were killed"], "Uchta uzatgich o'chirildi, siz portdan olib chiqildingiz.": ["Три передатчика отключены, вас эвакуировали из порта.", "All three uplinks are down and you were extracted from the port."], "O'chirilgan uzatgichlar": ["Отключено передатчиков", "Uplinks shut down"], "Pana joydan otib, sog'lig'ingiz tiklanishini kuting.": ["Стреляйте из укрытия и ждите, пока здоровье восстановится.", "Shoot from cover and wait for your health to recover."], "Chiqish nuqtasiga oz qolgan edi. Yana urinib ko'ring.": ["До точки эвакуации оставалось немного. Попробуйте ещё раз.", "You were close to extraction. Try again."], "Qayta o'qlanmoqda": ["Перезарядка", "Reloading"], "O'QLA tugmasini bosing": ["Нажмите ЗАРЯД", "Tap LOAD"], "R — qayta o'qlash": ["R — перезарядка", "R — reload"], "O'q tugadi": ["Патроны кончились", "Out of ammo"], "O'q kam": ["Мало патронов", "Low ammo"], "O'CHIR TUGMASINI BOSIB TURING": ["УДЕРЖИВАЙТЕ КНОПКУ ОТКЛ", "HOLD THE CUT BUTTON"], "E — UZATGICHNI O'CHIRISH (BOSIB TURING)": ["E — ОТКЛЮЧИТЬ ПЕРЕДАТЧИК (УДЕРЖИВАЙТЕ)", "E — SHUT DOWN UPLINK (HOLD)"], "+30 O'Q": ["+30 ПАТРОНОВ", "+30 AMMO"], "GRAFIKA YENGILLASHTIRILDI": ["ГРАФИКА УПРОЩЕНА", "GRAPHICS LOWERED"], "ENG YAXSHI VAQT": ["ЛУЧШЕЕ ВРЕМЯ", "BEST TIME"], "Chap tomon": ["Левая сторона", "Left side"], "yurish (joystik); oxirigacha tortsangiz, yuguradi": ["движение (джойстик); до упора — бег", "move (joystick); push all the way to sprint"], "O'ng tomon": ["Правая сторона", "Right side"], "atrofga qarash": ["обзор", "look around"], "Qizil tugma": ["Красная кнопка", "Red button"], "otish. Avto-otish yoqilgan: nishon dushmanga tushsa, o'zi otadi": ["огонь. Автоогонь включён: стреляет сам, когда прицел на враге", "fire. Auto-fire is on: it shoots when the crosshair is on an enemy"], "mo'ljalga olish": ["прицеливание", "aim down sights"], "uzatgich yonida bosib turing": ["удерживайте рядом с передатчиком", "hold next to an uplink"], "yurish": ["движение", "move"], "Sichqoncha": ["Мышь", "Mouse"], "qarash, chap tugma — otish, o'ng tugma — mo'ljal": ["обзор, левая кнопка — огонь, правая — прицел", "look, left button fires, right button aims"], "Shift · Bo'sh joy": ["Shift · Пробел", "Shift · Space"], "yugurish · sakrash": ["бег · прыжок", "sprint · jump"], "qayta o'qlash · uzatgichni o'chirish (bosib turing)": ["перезарядка · отключить передатчик (удерживайте)", "reload · shut down uplink (hold)"], "pauza": ["пауза", "pause"]};
 const cyr=t=>{try{if(!parent.cyrSafe)return t;return t.length>2&&t===t.toUpperCase()&&/[A-Z]/.test(t)?parent.cyrSafe(t.toLowerCase()).toUpperCase():parent.cyrSafe(t)}catch(e){return t}};
 const TX=t=>{if(LNG==='uz'||t==null)return t;if(LNG==='uzc')return cyr(String(t));const d=DICT[t];return d?d[LNG==='ru'?0:1]:t};
 function trDom(root){if(LNG==='uz')return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),L=[];while(w.nextNode())L.push(w.currentNode);for(const n of L){const k=n.nodeValue.trim();if(!k||n.parentNode.tagName==='SCRIPT'||n.parentNode.tagName==='STYLE')continue;const v=TX(k);if(v!==k)n.nodeValue=n.nodeValue.replace(k,v)}}
@@ -413,7 +419,8 @@ const SFX={shot(){nz(.17,.6,5200,420);nz(.05,.5,9000,2500,'highpass');tn(170,45,
   prog(p){tn(400+p*500,400+p*500,.04,.05,'square')},
   whiz(){nz(.13,.26,4200,900,'bandpass');tn(1500,520,.12,.05,'sawtooth')},grn(){tn(1700,1700,.05,.12,'square');setTimeout(()=>tn(1700,1700,.05,.12,'square'),120)},
   gull(){for(let i=0;i<3;i++)setTimeout(()=>tn(1900+R()*300,1250,.16,.028),i*230+R()*60)},horn(){tn(92,88,1.7,.05,'sawtooth');tn(138,132,1.7,.03,'sawtooth')}};
-for(const k of ['shot','eshot','boom']){const f=SFX[k];SFX[k]=function(a){RVS=1;f(a);RVS=0}}
+SFX.shotSg=()=>{nz(.3,.85,3200,200);nz(.06,.5,8000,2000,'highpass');tn(125,34,.22,.75,'triangle')};SFX.shotSn=()=>{nz(.42,.9,6500,260);nz(.07,.6,9000,2500,'highpass');tn(210,38,.26,.75,'triangle')};
+for(const k of ['shot','eshot','boom','shotSg','shotSn']){const f=SFX[k];SFX[k]=function(a){RVS=1;f(a);RVS=0}}
 {const f=SFX.shot;SFX.shot=function(){f();RVS=1;nz(.45,.16,1700,180);RVS=0}}
 
 // ---------- qurol (ko'rinish modeli) ----------
@@ -436,9 +443,11 @@ const rh=new T.Group();gun.add(rh);gb(.066,.1,.072,gm.glove,.006,-.1,.04,rh);gb(
 const flash=new T.Sprite(new T.SpriteMaterial({map:starT,blending:T.AdditiveBlending,depthWrite:false,transparent:true,fog:false}));flash.position.set(0,.004,-.86);flash.visible=false;gun.add(flash);
 // ---------- Meshy modellari: qo'l+qurol va dron ----------
 const MDL={gun:null,drone:null};let GUNM=false;
-function mdlLoad(url,key){const L=window.THREE_GLTFLoader;if(!L||!url)return Promise.resolve();return new L().loadAsync(url).then(g=>{g.scene.traverse(o=>{if(o.isMesh){o.material.side=T.FrontSide;o.material.envMapIntensity=1.2}});MDL[key]=g.scene;if(key==='gun')gunModel()}).catch(e=>console.warn(key,e))}
+function mdlLoad(url,key){const L=window.THREE_GLTFLoader;if(!L||!url)return Promise.resolve();return new L().loadAsync(url).then(g=>{g.scene.traverse(o=>{if(o.isMesh){o.material.side=T.FrontSide;o.material.envMapIntensity=1.2}});MDL[key]=g.scene;if(key==='gun')gunModel();else if(GT[key])gunAdd(key)}).catch(e=>console.warn(key,e))}
 function gunModel(){for(const c of gun.children)if(c!==flash)c.visible=false;const w=new T.Group();w.add(MDL.gun);w.rotation.y=-Math.PI/2;w.scale.setScalar(.49);w.position.set(-.0637,-.0753,-.139);gun.add(w);
-  const d=gun.userData.dot;d.visible=true;d.position.set(0,.138,-.07);MDL.gun.traverse(o=>{if(o.isMesh){o.material.color.multiplyScalar(.5);o.material.envMapIntensity=.5;o.castShadow=false}});flash.position.set(0,.035,-.66);GUNM=true}
+  const d=gun.userData.dot;d.visible=true;d.position.set(0,.138,-.07);MDL.gun.traverse(o=>{if(o.isMesh){o.material.color.multiplyScalar(.5);o.material.envMapIntensity=.5;o.castShadow=false}});flash.position.set(0,.035,-.66);GUNM=true;GM.ar=w;gunShow()}
+const GT={sg:{s:.55,p:[-.0253,-.1578,-.2344]},sn:{s:.6,p:[-.048,-.0773,-.279]}};
+function gunAdd(key){const c=GT[key],w=new T.Group();w.add(MDL[key]);w.rotation.y=-Math.PI/2;w.scale.setScalar(c.s);w.position.set(c.p[0],c.p[1],c.p[2]);MDL[key].traverse(o=>{if(o.isMesh){o.material.color.multiplyScalar(.5);o.material.envMapIntensity=.5;o.castShadow=false}});gun.add(w);GM[key]=w;gunShow()}
 
 // ---------- dushmanlar ----------
 const EM={body:new T.MeshStandardMaterial({color:0x2a2f37,roughness:.85}),vest:new T.MeshStandardMaterial({color:0x17191d,roughness:.7,metalness:.2}),visor:new T.MeshBasicMaterial({color:0xff3b2a}),gun:gm.metal,
@@ -515,8 +524,8 @@ function aiPost(e,dt){const dx=P.x-e.x,dz=P.z-e.z,d=Math.hypot(dx,dz)||.001;
     else{e.aimT=Math.max(0,e.aimT-dt*2);l.material.opacity=0}return}
   if(!e.type&&GRT<=0&&e.los&&d>9&&d<27&&e.mx!==undefined&&!(e.fleeT>0)&&R()<dt*.6){GRT=9+R()*6;grThrow(e)}}
 function grThrow(e){const m=new T.Mesh(grG,grM);scene.add(m);const Tm=1.15,g={m,x:e.mx,y:e.my+.2,z:e.mz,t:2.3,land:false};g.vx=(P.x-g.x)/Tm;g.vz=(P.z-g.z)/Tm;g.vy=(.1-g.y)/Tm+.5*13*Tm;GR.push(g);pop('GRANATA!');SFX.grn()}
-function grUpd(dt){GRT-=dt;for(let i=GR.length-1;i>=0;i--){const g=GR[i];g.t-=dt;if(!g.land){g.vy-=13*dt;g.x+=g.vx*dt;g.y+=g.vy*dt;g.z+=g.vz*dt;if(g.y<=.08){g.y=.08;g.land=true;SFX.step()}}
-    g.m.position.set(g.x,g.y,g.z);g.m.rotation.x+=dt*9;if(g.t<=0){scene.remove(g.m);GR.splice(i,1);explode(g.x,.1,g.z,false);decal(g.x,0,g.z,0,1,0,12);const dp=Math.hypot(P.x-g.x,P.z-g.z);if(dp<6.5&&clearSeg(g.x,.6,g.z,P.x,P.y+1,P.z))hurt((1-dp/6.5)*60*DIFF[CFG.diff].dmg,g.x,g.z);P.shake=Math.max(P.shake,clamp(1.2-dp/10,0,.8))}}}
+function grUpd(dt){GRT-=dt;for(let i=GR.length-1;i>=0;i--){const g=GR[i];g.t-=dt;if(!g.land){g.vy-=13*dt;if(g.mine){const sl=Math.hypot(g.vx,g.vy,g.vz)||1,st=sl*dt;if(rayWorld(g.x,g.y,g.z,g.vx/sl,g.vy/sl,g.vz/sl,st+.1)<st+.1){if(Math.abs(HIT.ny)>.7){g.vy*=-.3;g.vx*=.5;g.vz*=.5}else{g.vx*=-.3;g.vz*=-.3}}}g.x+=g.vx*dt;g.y+=g.vy*dt;g.z+=g.vz*dt;if(g.y<=.08){g.y=.08;g.land=true;SFX.step()}}
+    g.m.position.set(g.x,g.y,g.z);g.m.rotation.x+=dt*9;if(g.t<=0){scene.remove(g.m);GR.splice(i,1);explode(g.x,g.y,g.z,false);decal(g.x,0,g.z,0,1,0,12);if(g.mine){for(const e of ens){if(e.dead)continue;const d=Math.hypot(e.x-g.x,e.z-g.z,e.kind==='d'?e.y-g.y:0);if(d<7)dmgEnemy(e,(1-d/7)*240,false)}for(const b of BRL)if(!b.gone&&Math.hypot(b.x-g.x,b.z-g.z)<4)b.fuse=.1}const dp=Math.hypot(P.x-g.x,P.z-g.z);if(dp<6.5&&clearSeg(g.x,.6,g.z,P.x,P.y+1,P.z))hurt((1-dp/6.5)*60*DIFF[CFG.diff].dmg,g.x,g.z);P.shake=Math.max(P.shake,clamp(1.2-dp/10,0,.8))}}}
 function mkDrone(x,z){const g=new T.Group(),md=MDL.drone;if(md){const w=md.clone();w.rotation.y=Math.PI/2;w.scale.setScalar(.8);w.position.y=-.08;w.traverse(o=>{if(o.isMesh)o.castShadow=true});g.add(w);const rot=[];for(const [X,Z] of [[.58,.32],[-.58,.32],[.58,-.44],[-.58,-.44]]){const r=new T.Mesh(EG.rotor,EM.rotor);r.position.set(X,.1,Z);r.scale.set(.95,1,.95);g.add(r);rot.push(r)}
     const eye=new T.Mesh(EG.eye,EM.visor);eye.scale.setScalar(.45);eye.position.set(0,-.02,.3);g.add(eye);const gl=new T.Sprite(glowM(0xff3b2a));gl.scale.setScalar(.7);gl.position.set(0,-.02,.32);g.add(gl);
     g.position.set(x,14,z);scene.add(g);const e={kind:'d',x,y:14,z,hp:45,g,rot,alert:true,los:false,losT:0,seen:0,react:.6,cool:1+R()*.7,dead:false,deadT:0,vy:0,ph:R()*6,sd:R()<.5?1:-1,h:8.8+R()*1.6};ens.push(e);return e}
@@ -575,24 +584,33 @@ function hurt(d,sx,sz){if(!P.alive||state!=='play')return;P.hp-=d;P.lastHit=now;
   if(P.hp<=0){P.hp=0;P.alive=false;finish(false)}}
 function say(who,text){subQ.push([TX(who),TX(text)])}
 function hitFx(){hmT=.16}
-function fire(){P.ammo--;P.fireT=.092;ST.shots++;P.kick=1;
-  const sp=(lerp(.019,.002,P.ads)+P.spread)*(P.onG?1:1.9)*(Math.hypot(P.vx,P.vz)>5.5?1.6:1);
+const WNAME=t=>TX(t);
+const WP=[{id:'ar',name:'TR-7 KARABIN',mag:30,res:150,rate:.092,dmg:34,hd:105,pel:1,sp:.019,spA:.002,rec:.0115,rel:1.95,zoom:.62,kick:1,sfx:'shot',mz:[0,.035,-.62],adsY:-.138},
+  {id:'sg',name:'DROBOVIK',mag:6,res:30,rate:.8,dmg:17,hd:30,pel:9,sp:.06,spA:.045,rec:.045,rel:2.5,zoom:.82,kick:2.3,sfx:'shotSg',fall:22,mz:[0,.0325,-.72],adsY:-.06},
+  {id:'sn',name:'SNAYPER',mag:5,res:20,rate:1.3,dmg:150,hd:400,pel:1,sp:.035,spA:0,rec:.05,rel:2.7,zoom:.2,kick:2.6,sfx:'shotSn',scope:true,mz:[0,.0325,-.82],adsY:-.12}];
+const GM={};
+function gunShow(){const id=WP[P.w].id,has=!!GM[id];for(const k in GM)GM[k].visible=has?k===id:k==='ar';if(GUNM){const m=has?WP[P.w].mz:WP[0].mz;flash.position.set(m[0],m[1],m[2]-.04)}}
+function swap(i){if(P.rel>0||i===P.w||!P.alive)return;P.am[P.w]=P.ammo;P.rs[P.w]=P.res;P.w=i;P.ammo=P.am[i];P.res=P.rs[i];P.adsOn=false;P.swT=.38;P.fireT=.38;gunShow();SFX.bolt();$('#wn').textContent=WNAME(WP[i].name)}
+function throwG(){if(P.gren<=0||P.grT>0||!P.alive)return;P.gren--;P.grT=.9;cam.getWorldDirection(V1);const m=new T.Mesh(grG,grM);scene.add(m);GR.push({m,x:cam.position.x+V1.x*.4,y:cam.position.y-.15,z:cam.position.z+V1.z*.4,vx:V1.x*15+P.vx,vy:V1.y*15+4.2,vz:V1.z*15+P.vz,t:2.2,land:false,mine:true});SFX.click()}
+function fire(){const w=WP[P.w];P.ammo--;P.fireT=w.rate;ST.shots++;P.kick=w.kick;
+  for(let pi=0;pi<w.pel;pi++){const sp=(lerp(w.sp,w.spA,P.ads)+P.spread)*(P.onG?1:1.9)*(Math.hypot(P.vx,P.vz)>5.5?1.6:1);
   V1.set((R()-R())*sp,(R()-R())*sp,-1).normalize().applyQuaternion(cam.quaternion);const o=cam.position,dx=V1.x,dy=V1.y,dz=V1.z;
   let t=rayWorld(o.x,o.y,o.z,dx,dy,dz,220),hb=HIT.b,nx=HIT.nx,ny=HIT.ny,nz2=HIT.nz,he=null,head=false;
   for(const e of ens){if(e.dead)continue;if(e.kind==='d'){const q=raySphere(o.x,o.y,o.z,dx,dy,dz,e.x,e.y,e.z,.5);if(q>0&&q<t){t=q;he=e;head=false}}
     else{let q=e.m?raySphere(o.x,o.y,o.z,dx,dy,dz,e.hx,e.hy,e.hz,.17):raySphere(o.x,o.y,o.z,dx,dy,dz,e.x,1.65,e.z,.18);if(q>0&&q<t){t=q;he=e;head=true}TB.x0=e.x-.27;TB.x1=e.x+.27;TB.y0=0;TB.y1=e.m?e.hy-.15:1.5;TB.z0=e.z-.27;TB.z1=e.z+.27;q=rayBox(o.x,o.y,o.z,dx,dy,dz,TB);if(q>0&&q<t){t=q;he=e;head=false}}}
   const hx=o.x+dx*t,hy=o.y+dy*t,hz=o.z+dz*t;
-  if(GUNM)V2.set(0,.035,-.62);else V2.set(0,.004,-.82);gun.localToWorld(V2);V2.applyMatrix4(cam.matrixWorld);tracer(V2.x,V2.y,V2.z,hx,hy,hz,0xffe2a0);
-  if(he){ST.hits++;const k=dmgEnemy(he,head?105:34,head);hitFx();$('#hm').className=k?'k':'';if(k){if(head){SFX.head();pop('BOSHGA')}else SFX.kill()}else SFX.hit();
+  if(GUNM){const m=GM[w.id]?w.mz:WP[0].mz;V2.set(m[0],m[1],m[2])}else V2.set(0,.004,-.82);gun.localToWorld(V2);V2.applyMatrix4(cam.matrixWorld);tracer(V2.x,V2.y,V2.z,hx,hy,hz,0xffe2a0);
+  if(he){ST.hits++;const k=dmgEnemy(he,(head?w.hd:w.dmg)*(w.fall?clamp(1.5-t/w.fall,.15,1):1),head);hitFx();$('#hm').className=k?'k':'';if(k){if(head){SFX.head();pop('BOSHGA')}else SFX.kill()}else SFX.hit();
     for(let i=0;i<5;i++)emit(SP,hx,hy,hz,(R()-.5)*3-dx,R()*2,(R()-.5)*3-dz,.2+R()*.2,1,.35,.2);emit(DU,hx,hy,hz,-dx*.5,.6,-dz*.5,.4,.2,.07,.05)}
   else if(t<220){sparks(hx,hy,hz,nx,ny,nz2,6,4.5);if(hb&&hb.tag){ST.hits++;const b=hb.tag;b.hp=(b.hp||2)-1;if(b.hp<=0)boomBarrel(b)}else decal(hx,hy,hz,nx,ny,nz2,1)}
-  P.pitch=clamp(P.pitch+.0115*(1-.35*P.ads),-1.5,1.5);P.yaw+=(R()-.5)*.007;P.spread=Math.min(P.spread+.0055,.035);
-  {const rx=Math.cos(P.yaw),rz=-Math.sin(P.yaw);emit(DU,V2.x,V2.y,V2.z,dx*1.5,.4,dz*1.5,.3,.5,.5,.5);emit(SP,V2.x-dx*.45+rx*.05,V2.y+.02,V2.z-dz*.45+rz*.05,rx*(1.6+R())+P.vx,1.8+R(),rz*(1.6+R())+P.vz,.55,1,.72,.22)}
+  }
+  P.pitch=clamp(P.pitch+w.rec*(1-.35*P.ads),-1.5,1.5);P.yaw+=(R()-.5)*.007;P.spread=Math.min(P.spread+.0055,.035);
+  {cam.getWorldDirection(V1);const dx=V1.x,dz=V1.z,rx=Math.cos(P.yaw),rz=-Math.sin(P.yaw);emit(DU,V2.x,V2.y,V2.z,dx*1.5,.4,dz*1.5,.3,.5,.5,.5);emit(SP,V2.x-dx*.45+rx*.05,V2.y+.02,V2.z-dz*.45+rz*.05,rx*(1.6+R())+P.vx,1.8+R(),rz*(1.6+R())+P.vz,.55,1,.72,.22)}
   flash.visible=true;flash.userData.t=.045;flash.scale.setScalar(.2+R()*.12);flash.material.rotation=R()*6.28;flashL.position.copy(cam.position);flashL.intensity=26;
-  SFX.shot();alertAll(P.x,P.z,60)}
+  SFX[w.sfx]();alertAll(P.x,P.z,60)}
 const TB={x0:0,x1:0,y0:0,y1:0,z0:0,z1:0};
 function boomBarrel(b){if(b.gone)return;b.gone=true;b.m.visible=false;b.col.y1=-1;explode(b.x,.3,b.z,true);buildGrid()}
-function reload(){if(P.rel>0||P.ammo>=30||P.res<=0||!P.alive)return;P.rel=1.95;P.relS=0;P.adsOn=false}
+function reload(){if(P.rel>0||P.ammo>=WP[P.w].mag||P.res<=0||!P.alive)return;P.rel=WP[P.w].rel;P.relS=0;P.adsOn=false}
 function pop(t){const el=$('#pop');el.textContent=TX(t);el.style.opacity=1;popT=.9}
 function aimEnemy(){cam.getWorldDirection(V1);const o=cam.position;let t=rayWorld(o.x,o.y,o.z,V1.x,V1.y,V1.z,75),he=null;
   for(const e of ens){if(e.dead)continue;const q=e.kind==='d'?raySphere(o.x,o.y,o.z,V1.x,V1.y,V1.z,e.x,e.y,e.z,.6):raySphere(o.x,o.y,o.z,V1.x,V1.y,V1.z,e.x,1.05,e.z,.62);if(q>0&&q<t){t=q;he=e}}return he}
@@ -607,6 +625,7 @@ function reset(){for(const g of GR)scene.remove(g.m);GR.length=0;GRT=7;for(const
   for(const b of BRL){b.gone=false;b.hp=2;b.fuse=0;b.m.visible=true;b.col.y1=1.05}for(const d of DC)d.visible=false;buildGrid();
   for(const u of U){u.done=false;u.prog=0;u.sc.material=scrOn;u.beam.visible=true;u.lamp.visible=true}exBeam.visible=false;
   Object.assign(P,{x:SPAWN.x,y:0,z:SPAWN.z,vx:0,vy:0,vz:0,yaw:0,pitch:0,hp:100,onG:true,ammo:30,res:150,rel:0,fireT:0,ads:0,adsOn:false,kick:0,lastHit:-9,alive:true,spread:0,shake:0,autoT:0});
+  P.w=0;P.am=WP.map(w=>w.mag);P.rs=WP.map(w=>w.res);P.gren=3;P.swT=0;P.grT=0;gunShow();$('#wn').textContent=WNAME(WP[0].name);
   Object.assign(ST,{kills:0,hs:0,shots:0,hits:0,time:0});stage=0;subQ=[];subT=0;$('#sub').style.opacity=0;I.fire=I.use=I.jump=false;I.mx=I.my=0;
   flow(P.x,P.z);flowT=0;
   mkSoldier(-37,13,false);mkSoldier(-43,6,false);mkSoldier(33,-11,false);mkSoldier(39,-17,false);mkSoldier(-5,-37,false);mkSoldier(-11,-43,false);mkSoldier(8,22,false);mkSoldier(-16,27,false);if(CFG.diff===2){mkSoldier(16,5,false);mkSoldier(-24,-16,false)}
@@ -626,7 +645,7 @@ function mark(el,x,y,z,show){if(!show){el.style.display='none';return}el.style.d
   if(V3.z<-.1){V3.applyMatrix4(cam.projectionMatrix);sx=(V3.x*.5+.5)*W;sy=(-V3.y*.5+.5)*H}else{sx=V3.x>0?W:0;sy=H*.5}
   sx=clamp(sx,34,W-34);sy=clamp(sy,70,H-150);el.style.transform=`translate(${sx|0}px,${sy|0}px)`;el.lastChild.textContent=Math.round(d)+' m'}
 function hud(dt){setT('#hn',Math.ceil(P.hp));$('#hb').style.width=P.hp+'%';$('#hp').className='hp'+(P.hp<35?' low':'');
-  setT('#an',P.ammo);$('#an').className=P.ammo<=6?'low':'';setT('#ar','/ '+P.res);let n=0;for(const e of ens)if(!e.dead)n++;setT('#fn',n);
+  setT('#an',P.ammo);$('#an').className=P.ammo<=WP[P.w].mag*.2?'low':'';setT('#ar','/ '+P.res);setT('#gn',WNAME('GRANATA')+' '+P.gren);let n=0;for(const e of ens)if(!e.dead)n++;setT('#fn',n);
   const g=(lerp(.019,.002,P.ads)+P.spread)*H/(2*Math.tan(cam.fov*Math.PI/360))+5,x=$('#xh').children;$('#xh').style.opacity=P.ads>.6||P.rel>0?0:1;
   x[0].style.top=(-g-9)+'px';x[1].style.top=g+'px';x[2].style.left=(-g-9)+'px';x[3].style.left=g+'px';
   if(hmT>0){hmT-=dt;$('#hm').style.opacity=hmT>0?1:0}
@@ -634,15 +653,15 @@ function hud(dt){setT('#hn',Math.ceil(P.hp));$('#hb').style.width=P.hp+'%';$('#h
   if(popT>0){popT-=dt;if(popT<=0)$('#pop').style.opacity=0}
   if(subT>0){subT-=dt;if(subT<=0)$('#sub').style.opacity=0}else if(subQ.length){const [w,t]=subQ.shift();$('#sub').innerHTML='<em>'+w+'</em>'+t;$('#sub').style.opacity=1;subT=4.2;SFX.radio()}
   for(let i=0;i<3;i++)mark(MK[i],U[i].x,2.2,U[i].z,!U[i].done);mark(MK[3],EXIT.x,1.5,EXIT.z,stage>=3);
-  let tip='';if(P.rel>0)tip="Qayta o'qlanmoqda";else if(P.ammo===0)tip=P.res>0?(TOUCH?"O'QLA tugmasini bosing":"R — qayta o'qlash"):"O'q tugadi";else if(P.ammo<=6&&P.res>0)tip="O'q kam";
+  let tip='';if(P.rel>0)tip="Qayta o'qlanmoqda";else if(P.ammo===0)tip=P.res>0?(TOUCH?"O'QLA tugmasini bosing":"R — qayta o'qlash"):"O'q tugadi";else if(P.ammo<=WP[P.w].mag*.2&&P.res>0)tip="O'q kam";
   const te=$('#tip');if(tip){te.hidden=false;setT('#tip',TX(tip))}else te.hidden=true}
 
 // ---------- boshqaruv ----------
 const keys={};
-addEventListener('keydown',e=>{if(e.repeat)return;keys[e.code]=true;if(state==='play'){if(e.code==='KeyR')reload();if(e.code==='Escape'||e.code==='KeyP')pause();if(e.code==='Space')e.preventDefault()}else if(state==='pause'&&(e.code==='Escape'||e.code==='KeyP'))resume()});
+addEventListener('keydown',e=>{if(e.repeat)return;keys[e.code]=true;if(state==='play'){if(e.code==='KeyR')reload();if(e.code==='KeyG')throwG();if(e.code==='KeyQ')swap((P.w+1)%WP.length);if(e.code==='Digit1')swap(0);if(e.code==='Digit2')swap(1);if(e.code==='Digit3')swap(2);if(e.code==='Escape'||e.code==='KeyP')pause();if(e.code==='Space')e.preventDefault()}else if(state==='pause'&&(e.code==='Escape'||e.code==='KeyP'))resume()});
 addEventListener('keyup',e=>{keys[e.code]=false});addEventListener('blur',()=>{for(const k in keys)keys[k]=false;I.fire=false;if(state==='play')pause()});
 const cv=$('#c');
-function look(dx,dy){const s=.0022*CFG.sens*lerp(1,.55,P.ads);P.yaw-=dx*s;P.pitch=clamp(P.pitch-dy*s,-1.5,1.5);P.swx=clamp(P.swx+dx*.0006,-.03,.03);P.swy=clamp(P.swy+dy*.0006,-.03,.03)}
+function look(dx,dy){const s=.0022*CFG.sens*lerp(1,Math.max(.16,WP[P.w].zoom*.9),P.ads);P.yaw-=dx*s;P.pitch=clamp(P.pitch-dy*s,-1.5,1.5);P.swx=clamp(P.swx+dx*.0006,-.03,.03);P.swy=clamp(P.swy+dy*.0006,-.03,.03)}
 function lock(){if(TOUCH||NOLOCK)return;try{const p=cv.requestPointerLock();if(p&&p.catch)p.catch(()=>{NOLOCK=true})}catch(e){NOLOCK=true}}
 if(!TOUCH){
   cv.addEventListener('mousedown',e=>{if(state!=='play')return;if(!document.pointerLockElement&&!NOLOCK){lock();return}if(e.button===0)I.fire=true;if(e.button===2)P.adsOn=true});
@@ -656,7 +675,7 @@ addEventListener('contextmenu',e=>e.preventDefault());
 const TS={joy:-1,jx:0,jy:0,look:new Map()};
 if(TOUCH){const layer=$('#touch'),joy=$('#joy'),knob=joy.firstElementChild;
   layer.addEventListener('pointerdown',e=>{if(state!=='play')return;e.preventDefault();const b=e.target.closest('.tb');
-    if(b){if(b.id==='bf'){I.fire=true;b.classList.add('on');TS.look.set(e.pointerId,{x:e.clientX,y:e.clientY,fire:true})}else if(b.id==='ba'){P.adsOn=!P.adsOn}else if(b.id==='bj')I.jump=true;else if(b.id==='br')reload();else if(b.id==='bu'){I.use=true;TS.look.set(e.pointerId,{x:e.clientX,y:e.clientY,use:true})}
+    if(b){if(b.id==='bf'){I.fire=true;b.classList.add('on');TS.look.set(e.pointerId,{x:e.clientX,y:e.clientY,fire:true})}else if(b.id==='ba'){P.adsOn=!P.adsOn}else if(b.id==='bj')I.jump=true;else if(b.id==='br')reload();else if(b.id==='bw')swap((P.w+1)%WP.length);else if(b.id==='bg')throwG();else if(b.id==='bu'){I.use=true;TS.look.set(e.pointerId,{x:e.clientX,y:e.clientY,use:true})}
       try{layer.setPointerCapture(e.pointerId)}catch(_){ }return}
     if(e.clientX<W*.42&&TS.joy<0){TS.joy=e.pointerId;TS.jx=e.clientX;TS.jy=e.clientY;joy.hidden=false;joy.style.left=e.clientX+'px';joy.style.top=e.clientY+'px';knob.style.transform='';}
     else TS.look.set(e.pointerId,{x:e.clientX,y:e.clientY});try{layer.setPointerCapture(e.pointerId)}catch(_){ }});
@@ -674,7 +693,7 @@ document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{CFG.diff=+b.data
 document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{CFG.auto=b.dataset.a==='1';store.set('auto',CFG.auto);syncChips()});
 document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{CFG.q=+b.dataset.q;store.set('q',CFG.q);applyQ();syncChips()});
 $('#sens').oninput=e=>{CFG.sens=+e.target.value;store.set('sens',CFG.sens)};
-if(window.SOL_URL){window.SOLP=Promise.race([Promise.all([solLoad(window.SOL_URL),mdlLoad(window.GUN_URL,'gun'),mdlLoad(window.DRONE_URL,'drone')]),new Promise(r=>setTimeout(r,12000))]).then(()=>{SOL.done=true})}
+if(window.SOL_URL){window.SOLP=Promise.race([Promise.all([solLoad(window.SOL_URL),mdlLoad(window.GUN_URL,'gun'),mdlLoad(window.DRONE_URL,'drone'),mdlLoad(window.SG_URL,'sg'),mdlLoad(window.SN_URL,'sn')]),new Promise(r=>setTimeout(r,12000))]).then(()=>{SOL.done=true})}
 $('#start').onclick=start;$('#again').onclick=start;$('#restart').onclick=start;$('#resume').onclick=resume;$('#bp').onclick=()=>state==='play'?pause():resume();
 $('#keys').innerHTML=TOUCH?"<b>Chap tomon</b><span>yurish (joystik); oxirigacha tortsangiz, yuguradi</span><b>O'ng tomon</b><span>atrofga qarash</span><b>Qizil tugma</b><span>otish. Avto-otish yoqilgan: nishon dushmanga tushsa, o'zi otadi</span><b>NISHON</b><span>mo'ljalga olish</span><b>O'CHIR</b><span>uzatgich yonida bosib turing</span>"
   :"<b>W A S D</b><span>yurish</span><b>Sichqoncha</b><span>qarash, chap tugma — otish, o'ng tugma — mo'ljal</span><b>Shift · Bo'sh joy</b><span>yugurish · sakrash</span><b>R · E</b><span>qayta o'qlash · uzatgichni o'chirish (bosib turing)</span><b>Esc</b><span>pauza</span>";
@@ -692,21 +711,22 @@ function update(dt){now+=dt;ST.time+=dt;
   if(P.y<=gr){if(!P.onG&&P.vy<-5){SFX.land();P.land=.12}P.y=gr;P.vy=0;P.onG=true}else if(P.y>gr+.02)P.onG=false;
   const hs=Math.hypot(P.vx,P.vz);if(P.onG&&hs>1){P.bob+=dt*hs*1.75;P.stepT-=dt*hs;if(P.stepT<=0){P.stepT=2.3;SFX.step()}}
   // qurol
+  P.swT=Math.max(0,(P.swT||0)-dt);P.grT=Math.max(0,(P.grT||0)-dt);
   P.fireT-=dt;P.spread=Math.max(0,P.spread-dt*.07);P.kick=Math.max(0,P.kick-dt*9);P.ads+=((P.adsOn&&P.rel<=0?1:0)-P.ads)*Math.min(1,dt*13);
   let wantFire=I.fire;if(CFG.auto&&TOUCH&&P.rel<=0){if(aimEnemy()){P.autoT+=dt;if(P.autoT>.1)wantFire=true}else P.autoT=0}
-  if(P.rel>0){const p0=1-P.rel/1.95;P.rel-=dt;const p=1-P.rel/1.95;if(p0<.14&&p>=.14)SFX.magOut();if(p0<.6&&p>=.6)SFX.magIn();if(p0<.86&&p>=.86)SFX.bolt();if(P.rel<=0){const n=Math.min(30-P.ammo,P.res);P.ammo+=n;P.res-=n}}
+  if(P.rel>0){const RL=WP[P.w].rel,p0=1-P.rel/RL;P.rel-=dt;const p=1-P.rel/RL;if(p0<.14&&p>=.14)SFX.magOut();if(p0<.6&&p>=.6)SFX.magIn();if(p0<.86&&p>=.86)SFX.bolt();if(P.rel<=0){const n=Math.min(WP[P.w].mag-P.ammo,P.res);P.ammo+=n;P.res-=n}}
   else if(wantFire&&P.fireT<=0&&!sprint){if(P.ammo>0)fire();else{if(P.fireT<-.25){SFX.dry();P.fireT=0}if(P.res>0)reload()}}
   // kamera
   P.shake=Math.max(0,P.shake-dt*2.2);P.land=Math.max(0,P.land-dt);
   const bobY=Math.sin(P.bob*2)*.028*clamp(hs/5,0,1.3)*(1-P.ads*.7),bobX=Math.cos(P.bob)*.02*clamp(hs/5,0,1.3)*(1-P.ads*.7);
   cam.position.set(P.x+bobX*cs,P.y+1.62+bobY-P.land*.5,P.z-bobX*sn);cam.rotation.set(P.pitch+(R()-.5)*P.shake*.05,P.yaw+(R()-.5)*P.shake*.05,(R()-.5)*P.shake*.04-ix*.012);
-  const tf=cam.userData.fov*lerp(1,.62,P.ads)*(sprint?1.05:1);if(Math.abs(cam.fov-tf)>.05){cam.fov+=(tf-cam.fov)*Math.min(1,dt*12);cam.updateProjectionMatrix()}
+  const tf=cam.userData.fov*lerp(1,WP[P.w].zoom,P.ads)*(sprint?1.05:1);if(Math.abs(cam.fov-tf)>.05){cam.fov+=(tf-cam.fov)*Math.min(1,dt*12);cam.updateProjectionMatrix()}
   cam.updateMatrixWorld();sky.position.copy(cam.position);sun.target.position.set(Math.round(P.x/4)*4,0,Math.round(P.z/4)*4);sun.position.copy(sun.target.position).addScaledVector(SUN,95);
   // qurol holati
-  P.swx*=Math.max(0,1-dt*9);P.swy*=Math.max(0,1-dt*9);const a=clamp(W/H,.55,1),A=P.ads,rp=P.rel>0?1-P.rel/1.95:0,rr=rp>0?Math.sin(Math.min(1,rp*1.15)*Math.PI):0,spn=sprint?1:0;
+  P.swx*=Math.max(0,1-dt*9);P.swy*=Math.max(0,1-dt*9);const a=clamp(W/H,.55,1),A=P.ads,rp=P.rel>0?1-P.rel/WP[P.w].rel:0,rr=rp>0?Math.sin(Math.min(1,rp*1.15)*Math.PI):0,spn=sprint?1:0;
   gun.userData.sp=(gun.userData.sp||0)+(spn-(gun.userData.sp||0))*Math.min(1,dt*8);const sq=gun.userData.sp;
-  gun.position.set(lerp(.2*a,0,A)+bobX*.5-P.swx*.6+sq*.05,lerp(-.2,GUNM?-.138:-.106,A)+bobY*.5+P.swy*.5-rr*.07-sq*.05-P.land*.2,lerp(-.52,GUNM?(W<H?-.72:-.5):(W<H?-.62:-.36),A)+P.kick*.028);
-  if(GUNM)gun.userData.dot.visible=A>.55;
+  gun.position.set(lerp(.2*a,0,A)+bobX*.5-P.swx*.6+sq*.05,lerp(-.2,GUNM?WP[P.w].adsY:-.106,A)+bobY*.5+P.swy*.5-rr*.07-sq*.05-P.land*.2-P.swT*.9,lerp(-.52,GUNM?(W<H?-.72:-.5):(W<H?-.62:-.36),A)+P.kick*.028);
+  if(GUNM)gun.userData.dot.visible=A>.55&&P.w===0;{const sc=WP[P.w].scope&&A>.82;gun.visible=!sc;$('#scope').style.opacity=sc?1:0}
   gun.rotation.set(P.kick*.035*(1-A*.5)+rr*.5-sq*.25-P.swy*.6,rr*.25+sq*.55-P.swx*1.2,rr*.6+P.swx*.8);
   const md=rp>0?(rp<.3?rp/.3:rp<.55?1:rp<.78?1-(rp-.55)/.23:0):0;mag.position.y=-.115-md*.32;mag.visible=!(rp>.3&&rp<.55);lh.position.set(0,-md*.3,md*.2);
   if(flash.visible){flash.userData.t-=dt;if(flash.userData.t<=0)flash.visible=false}flashL.intensity=Math.max(0,flashL.intensity-dt*(flashL.intensity>40?600:500));
@@ -715,7 +735,7 @@ function update(dt){now+=dt;ST.time+=dt;
   grUpd(dt);ambT-=dt;if(ambT<=0){ambT=8+R()*14;if(R()<.6)SFX.gull();else SFX.horn()}
   for(const e of ens)updEnemy(e,dt);for(let i=ens.length-1;i>=0;i--)if(ens[i].gone)ens.splice(i,1);
   for(const b of BRL)if(b.fuse>0&&!b.gone){b.fuse-=dt;if(b.fuse<=0)boomBarrel(b)}
-  for(let i=picks.length-1;i>=0;i--){const p=picks[i];p.m.rotation.y+=dt*2;p.m.position.y=.32+Math.sin(now*3+i)*.05;if(Math.hypot(p.x-P.x,p.z-P.z)<1.4){P.res+=30;SFX.pick();pop("+30 O'Q");scene.remove(p.m);picks.splice(i,1)}}
+  for(let i=picks.length-1;i>=0;i--){const p=picks[i];p.m.rotation.y+=dt*2;p.m.position.y=.32+Math.sin(now*3+i)*.05;if(Math.hypot(p.x-P.x,p.z-P.z)<1.4){P.rs[P.w]=P.res;P.rs[0]+=30;P.rs[1]+=4;P.rs[2]+=3;P.res=P.rs[P.w];if(R()<.4)P.gren=Math.min(5,P.gren+1);SFX.pick();pop("+30 O'Q");scene.remove(p.m);picks.splice(i,1)}}
   for(const t of TR)if(t.m.visible){t.life-=dt;t.m.material.opacity=Math.max(0,t.life/.07)*.85;if(t.life<=0)t.m.visible=false}
   if(boomT>0){boomT-=dt;const k=1-boomT/.35;boomS.scale.setScalar(boomS.userData.s*(.4+k));boomS.material.opacity=1-k;if(boomT<=0)boomS.visible=false}
   updPts(SP,dt,9,.985);updPts(DU,dt,-.4,.95);
@@ -736,7 +756,7 @@ function frame(t){requestAnimationFrame(frame);const dt=Math.min(.05,(t-last)/10
   else if(state==='end'&&!P.alive){cam.position.y=Math.max(.35,cam.position.y-dt*1.6);cam.rotation.z=Math.min(.9,cam.rotation.z+dt*1.2)}
   rd.clear();rd.render(scene,cam);if(state==='play'||state==='pause'){rd.clearDepth();rd.render(gscene,gcam)}}
 addEventListener('resize',resize);resize();applyQ();buildGrid();flow(SPAWN.x,SPAWN.z);syncChips();
-window.__G={update,SOL,dmgEnemy,mkDrone,MDL,solType,grThrow,GR,mkSoldier,P,ens,U,ST,I,start,get state(){return state},get stage(){return stage},uplinkDone,CFG};
+window.__G={swap,throwG,WP,GM,GT,gun,update,SOL,dmgEnemy,mkDrone,MDL,solType,grThrow,GR,mkSoldier,P,ens,U,ST,I,start,get state(){return state},get stage(){return stage},uplinkDone,CFG};
 requestAnimationFrame(frame);
 })();
 </script>
