@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 10.11.2026-14
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 11.11.2026-15
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -412,6 +412,7 @@ async function D(env){
       env.DB.prepare('CREATE TABLE IF NOT EXISTS blroom(id TEXT PRIMARY KEY,game TEXT,p0 INTEGER,p1 INTEGER,n0 TEXT,n1 TEXT,seq INTEGER DEFAULT 0,data TEXT,init TEXT,created INTEGER,updated INTEGER,lp0 INTEGER DEFAULT 0,lp1 INTEGER DEFAULT 0)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS foodfix(day TEXT,k TEXT,a TEXT,u TEXT,n INTEGER DEFAULT 0,r REAL DEFAULT 0,PRIMARY KEY(day,k,a,u))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_user(uid INTEGER PRIMARY KEY,name TEXT,region TEXT,rwk TEXT,ref INTEGER,bonus INTEGER DEFAULT 0,wkc TEXT,card INTEGER DEFAULT 0)'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,dist INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
       env.DB.prepare("INSERT OR IGNORE INTO meta(k,v) VALUES('since',?1)").bind(String(Date.now()))
     ]);
@@ -715,7 +716,7 @@ async function statsText(env,db){
 }
 // ---------- Yugur!: viloyatlar bellashuvi, haftalik reyting, do'stni chaqirish ----------
 const RN_REG=['tsh','tsv','and','bux','far','jiz','xor','nam','nav','qas','qqr','sam','sir','sur'];
-const RN_ROUTES={'/rn/me':1,'/rn/run':1,'/rn/card':1};
+const RN_ROUTES={'/rn/me':1,'/rn/run':1,'/rn/card':1,'/pt/run':1,'/pt/me':1};
 // hafta: Toshkent vaqti bo'yicha dushanbadan boshlanadi
 function rnWeek(t){const d=new Date(t+TZMS),wd=(d.getUTCDay()+6)%7;return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-wd)).toISOString().slice(0,10)}
 const rnName=u=>((u.first_name||'').trim().slice(0,16)+(u.last_name?' '+u.last_name.trim()[0]+'.':''))||'O\'yinchi';
@@ -725,6 +726,15 @@ async function handleRn(path,req,env){
   const db=await D(env).catch(()=>null);if(!db)return J({ok:false,nodb:true});
   const now=Date.now(),wk=rnWeek(now),lwk=rnWeek(now-7*DAY);
   await db.prepare('INSERT INTO rn_user(uid,name) VALUES(?1,?2) ON CONFLICT(uid) DO UPDATE SET name=?2').bind(u.id,rnName(u)).run();
+  if(path==='/pt/run'||path==='/pt/me'){ // Port o'yini: haftalik reyting
+    if(path==='/pt/run'){const sc=Math.max(0,Math.min(200000,parseInt(f.get('score'))||0));
+      const row=await db.prepare('SELECT last FROM pt_week WHERE wk=?1 AND uid=?2').bind(wk,u.id).first();if(row&&now-row.last<8000)return J({ok:false,slow:true});
+      await db.prepare('INSERT INTO pt_week(wk,uid,best,runs,last) VALUES(?1,?2,?3,1,?4) ON CONFLICT(wk,uid) DO UPDATE SET best=MAX(best,?3),runs=runs+1,last=?4').bind(wk,u.id,sc,now).run()}
+    const top=(await db.prepare('SELECT u.name name,w.best best FROM pt_week w JOIN rn_user u ON u.uid=w.uid WHERE w.wk=?1 ORDER BY w.best DESC,w.last ASC LIMIT 10').bind(wk).all()).results;
+    const me=await db.prepare('SELECT best FROM pt_week WHERE wk=?1 AND uid=?2').bind(wk,u.id).first();
+    const rank=me?(await db.prepare('SELECT COUNT(*) c FROM pt_week WHERE wk=?1 AND best>?2').bind(wk,me.best).first()).c+1:0;
+    return J({ok:true,top,best:me?me.best:0,rank});
+  }
   if(path==='/rn/run'){
     const sc=Math.max(0,Math.min(3e6,parseInt(f.get('score'))||0)),di=Math.max(0,Math.min(2e5,parseInt(f.get('dist'))||0));
     const row=await db.prepare('SELECT last FROM rn_week WHERE wk=?1 AND uid=?2').bind(wk,u.id).first();
