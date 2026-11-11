@@ -153,6 +153,7 @@ input[type=range]{flex:1;min-width:120px;accent-color:var(--amber)}
     <div class="keys" id="keys"></div>
     <div class="row"><span>Topshiriq</span><button class="chip" data-m="0">1 · Port</button><button class="chip" data-m="1">2 · Tun</button><button class="chip" data-m="2">3 · Ombor</button><button class="chip" data-m="3">4 · Bo'ron</button></div>
     <div class="row"><span>Qiyinlik</span><button class="chip" data-d="0">Oson</button><button class="chip" data-d="1">O'rta</button><button class="chip" data-d="2">Qiyin</button></div>
+    <div class="row" id="msens" hidden><span>Sezgirlik</span><input type="range" id="sens2" min="0.2" max="3" step="0.05"><span id="sensv"></span></div>
     <div class="row" id="shop"><span>Do'kon</span></div>
     <button class="go" id="start">Boshlash</button>
     <button class="go sec exit" hidden>Hamrohga qaytish</button>
@@ -243,7 +244,7 @@ function applyQ(){const pr=Math.min(devicePixelRatio||1,CFG.q===2?2:CFG.q===1?1.
   const ms=CFG.q===2?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
   scene.traverse(o=>{if(o.material&&o.material.isMeshStandardMaterial)o.material.needsUpdate=true})}
 function resize(){W=innerWidth;H=innerHeight;const a=W/H;cam.aspect=gcam.aspect=a;
-  cam.userData.fov=a<1?80:clamp(2*Math.atan(Math.tan(46*Math.PI/180)/a)*180/Math.PI,52,78);gcam.fov=a<1?64:50;
+  cam.userData.fov=a<1?80:clamp(2*Math.atan(Math.tan((TOUCH?46:53.13)*Math.PI/180)/a)*180/Math.PI,52,78);gcam.fov=a<1?64:50;
   cam.updateProjectionMatrix();gcam.updateProjectionMatrix();rd.setSize(W,H,false)}
 
 // ---------- osmon, tuman, yorug'lik ----------
@@ -750,8 +751,8 @@ let RAWM=true,MSKIP=0;
 function lock(){if(TOUCH||NOLOCK)return;const plain=()=>{try{const p=cv.requestPointerLock();if(p&&p.catch)p.catch(()=>{NOLOCK=true})}catch(e){NOLOCK=true}};
   if(RAWM){try{const p=cv.requestPointerLock({unadjustedMovement:true});if(p&&p.catch)p.catch(()=>{RAWM=false;plain()});else if(!p){}}catch(e){RAWM=false;plain()}}else plain()}
 // sichqoncha: xom harakat (tezlanishsiz), sakrashlar filtrlanadi; qulf bo'lmasa — chekkada burilish va mutlaq vertikal
-function mlook(e){if(state!=='play')return;if(document.pointerLockElement===cv){if(MSKIP>0){MSKIP--;return}let dx=e.movementX||0,dy=e.movementY||0;if(Math.abs(dx)>220||Math.abs(dy)>220)return;look(dx*.6,dy*.6);return}
-  if(!NOLOCK)return;const nx=e.clientX/W,ny=e.clientY/H;MOX=nx<.14?-(.14-nx)/.14:nx>.86?(nx-.86)/.14:0;let dx=e.movementX||0;if(Math.abs(dx)>120)dx=0;look(dx*.6,0);P.pitch=clamp((.5-ny)*1.5,-1.2,1.2)}
+function mlook(e){if(state!=='play')return;if(document.pointerLockElement===cv){if(MSKIP>0){MSKIP--;return}let dx=e.movementX||0,dy=e.movementY||0;if(Math.abs(dx)>220||Math.abs(dy)>220)return;look(dx*.44,dy*.44);return}
+  if(!NOLOCK)return;const nx=e.clientX/W,ny=e.clientY/H;MOX=nx<.14?-(.14-nx)/.14:nx>.86?(nx-.86)/.14:0;let dx=e.movementX||0;if(Math.abs(dx)>120)dx=0;look(dx*.44,0);P.pitch=clamp((.5-ny)*1.5,-1.2,1.2)}
 let MOX=0;
 if(!TOUCH){
   cv.addEventListener('mousedown',e=>{if(state!=='play')return;if(!document.pointerLockElement&&!NOLOCK){lock();return}if(e.button===0)I.fire=true;if(e.button===2)P.adsOn=true});
@@ -782,7 +783,9 @@ function syncChips(){document.querySelectorAll('[data-d]').forEach(b=>b.classLis
 document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{CFG.diff=+b.dataset.d;store.set('diff',CFG.diff);syncChips()});
 document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{CFG.auto=b.dataset.a==='1';store.set('auto',CFG.auto);syncChips()});
 document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{CFG.q=+b.dataset.q;store.set('q',CFG.q);applyQ();syncChips()});
-$('#sens').oninput=e=>{CFG.sens=+e.target.value;store.set('sens',CFG.sens)};
+$('#sens').min='0.2';$('#sens').max='3';$('#sens').step='0.05';
+const sensSync=()=>{$('#sens').value=CFG.sens;$('#sens2').value=CFG.sens;$('#sensv').textContent=(+CFG.sens).toFixed(2)};
+$('#sens').oninput=$('#sens2').oninput=e=>{CFG.sens=+e.target.value;store.set('sens',CFG.sens);sensSync()};if(!TOUCH)$('#msens').hidden=false;sensSync();
 shopDraw();ptApi('/pt/me',{});
 {const un=store.get('un',0);document.querySelector('#menu h1').textContent=WNAME(MS.name);document.querySelector('#menu p').textContent=WNAME(MS.desc);
   document.querySelectorAll('[data-m]').forEach(b=>{const i=+b.dataset.m;b.disabled=i>un;if(i===MI)b.classList.add('on');b.onclick=()=>{if(i===MI||i>un)return;store.set('m',i);location.reload()}})}
@@ -802,7 +805,7 @@ function update(dt){now+=dt;ST.time+=dt;
   let ix=I.mx,iy=I.my;if(!TOUCH){ix=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0);iy=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);I.sprint=!!(keys.ShiftLeft||keys.ShiftRight);I.use=!!keys.KeyE;if(keys.Space)I.jump=true}
   const il=Math.hypot(ix,iy);if(il>1){ix/=il;iy/=il}
   const sprint=I.sprint&&iy>.5&&!P.adsOn&&P.rel<=0,spd=P.adsOn?2.7:sprint?7.1:4.7,sn=Math.sin(P.yaw),cs=Math.cos(P.yaw);
-  const wx=(ix*cs-iy*sn)*spd,wz=(-ix*sn-iy*cs)*spd,ac=Math.min(1,dt*(P.onG?11:2.5));P.vx+=(wx-P.vx)*ac;P.vz+=(wz-P.vz)*ac;
+  const wx=(ix*cs-iy*sn)*spd,wz=(-ix*sn-iy*cs)*spd,ac=Math.min(1,dt*(P.onG?(TOUCH?11:16):2.5));P.vx+=(wx-P.vx)*ac;P.vz+=(wz-P.vz)*ac;
   if(I.jump&&P.onG){P.vy=5.7;P.onG=false}I.jump=false;P.vy-=15.5*dt;
   P.x+=P.vx*dt;P.z+=P.vz*dt;P.y+=P.vy*dt;const gr=collide(P,.36,1.72);P.x=clamp(P.x,-58,58);P.z=clamp(P.z,-58,58);
   if(P.y<=gr){if(!P.onG&&P.vy<-5){SFX.land();P.land=.12}P.y=gr;P.vy=0;P.onG=true}else if(P.y>gr+.02)P.onG=false;
@@ -816,7 +819,7 @@ function update(dt){now+=dt;ST.time+=dt;
   else if(wantFire&&P.fireT<=0&&!sprint){if(P.ammo>0)fire();else{if(P.fireT<-.25){SFX.dry();P.fireT=0}if(P.res>0)reload()}}
   // kamera
   P.shake=Math.max(0,P.shake-dt*2.2);P.land=Math.max(0,P.land-dt);
-  const bobY=Math.sin(P.bob*2)*.028*clamp(hs/5,0,1.3)*(1-P.ads*.7),bobX=Math.cos(P.bob)*.02*clamp(hs/5,0,1.3)*(1-P.ads*.7);
+  const bk=TOUCH?1:.45,bobY=Math.sin(P.bob*2)*.028*bk*clamp(hs/5,0,1.3)*(1-P.ads*.7),bobX=Math.cos(P.bob)*.02*bk*clamp(hs/5,0,1.3)*(1-P.ads*.7);
   cam.position.set(P.x+bobX*cs,P.y+1.62+bobY-P.land*.5,P.z-bobX*sn);cam.rotation.set(P.pitch+(R()-.5)*P.shake*.05,P.yaw+(R()-.5)*P.shake*.05,(R()-.5)*P.shake*.04-ix*.012);
   const tf=cam.userData.fov*lerp(1,WP[P.w].zoom,P.ads)*(sprint?1.05:1);if(Math.abs(cam.fov-tf)>.05){cam.fov+=(tf-cam.fov)*Math.min(1,dt*12);cam.updateProjectionMatrix()}
   cam.updateMatrixWorld();sky.position.copy(cam.position);sun.target.position.set(Math.round(P.x/4)*4,0,Math.round(P.z/4)*4);sun.position.copy(sun.target.position).addScaledVector(SUN,95);
