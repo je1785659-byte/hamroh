@@ -77,6 +77,8 @@ html,body{height:100%;margin:0;background:var(--ink);color:var(--text);font-fami
 #bf::after{content:"";width:34px;height:34px;border-radius:50%;background:rgba(255,74,54,.75)}
 #ba{right:124px;bottom:64px;width:60px;height:60px}
 #bj{right:30px;bottom:196px;width:56px;height:56px}
+#bb{position:fixed;left:50%;top:54px;transform:translateX(-50%);width:min(60vw,360px);text-align:center;font:700 11px var(--display);letter-spacing:.2em;color:#ff6a4a}#bb u{display:block;height:7px;margin-top:4px;background:rgba(0,0,0,.5);border:1px solid rgba(255,106,74,.6)}#bb i{display:block;height:100%;width:100%;background:#ff4a36}
+.chip:disabled{opacity:.32}
 #bw{right:200px;bottom:22px;width:56px;height:56px;font-size:11px}
 #bg{right:196px;bottom:92px;width:58px;height:58px;font-size:9.5px}
 #scope{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 50%,transparent 0,transparent 33vmin,rgba(0,0,0,.92) 33.6vmin,#000 36vmin)}
@@ -118,7 +120,7 @@ input[type=range]{flex:1;min-width:120px;accent-color:var(--amber)}
   <div class="mk" id="mk0"><u></u><b></b></div><div class="mk" id="mk1"><u></u><b></b></div><div class="mk" id="mk2"><u></u><b></b></div><div class="mk x" id="mk3"><u></u><b></b></div>
   <div class="obj"><small>VAZIFA</small><b id="ot"></b><i id="oc"></i></div>
   <div class="foe">DUSHMAN <b id="fn">0</b></div>
-  <div id="scope"><i></i><i></i></div><div id="xh"><u></u><u></u><u></u><u></u></div><div id="hm"></div>
+  <div id="bb" hidden><b>QO'MONDON</b><u><i></i></u></div><div id="scope"><i></i><i></i></div><div id="xh"><u></u><u></u><u></u><u></u></div><div id="hm"></div>
   <div id="pop"></div><div id="tip" hidden></div>
   <div id="use" hidden><span id="ut"></span><div class="pb"><u id="up"></u></div></div>
   <div id="sub"></div>
@@ -144,6 +146,7 @@ input[type=range]{flex:1;min-width:120px;accent-color:var(--amber)}
     <h1>Port: So'nggi signal</h1>
     <p>Yuk porti dushman qo'lida. Konteynerlar orasidan o'tib, uchta uzatgichni o'chiring va shimoli-sharqdagi maydonchaga yetib boring.</p>
     <div class="keys" id="keys"></div>
+    <div class="row"><span>Topshiriq</span><button class="chip" data-m="0">1 · Port</button><button class="chip" data-m="1">2 · Tun</button><button class="chip" data-m="2">3 · Bo'ron</button></div>
     <div class="row"><span>Qiyinlik</span><button class="chip" data-d="0">Oson</button><button class="chip" data-d="1">O'rta</button><button class="chip" data-d="2">Qiyin</button></div>
     <button class="go" id="start">Boshlash</button>
     <button class="go sec exit" hidden>Hamrohga qaytish</button>
@@ -183,7 +186,7 @@ input[type=range]{flex:1;min-width:120px;accent-color:var(--amber)}
 'use strict';
 (function(){
 const $=s=>document.querySelector(s);
-const LNG=(location.hash||'').slice(1)||'uz',EMB=window.parent!==window,DICT={"BIRINCHI SHAXS OTISHMA · 3D": ["ШУТЕР ОТ ПЕРВОГО ЛИЦА · 3D", "FIRST-PERSON SHOOTER · 3D"], "Port: So'nggi signal": ["Порт: последний сигнал", "Port: Last Signal"], "Yuk porti dushman qo'lida. Konteynerlar orasidan o'tib, uchta uzatgichni o'chiring va shimoli-sharqdagi maydonchaga yetib boring.": ["Грузовой порт захвачен. Пройдите между контейнерами, отключите три передатчика и доберитесь до площадки на северо-востоке.", "The cargo port is in enemy hands. Move through the containers, shut down three uplinks and reach the pad in the north-east."], "Qiyinlik": ["Сложность", "Difficulty"], "Oson": ["Легко", "Easy"], "O'rta": ["Средне", "Medium"], "Qiyin": ["Сложно", "Hard"], "Boshlash": ["Начать", "Start"], "TO'XTATILDI": ["ОСТАНОВЛЕНО", "PAUSED"], "Pauza": ["Пауза", "Pause"], "Sezgirlik": ["Чувствительность", "Sensitivity"], "Avto-otish": ["Автоогонь", "Auto-fire"], "Yoqilgan": ["Вкл", "On"], "O'chirilgan": ["Выкл", "Off"], "Grafika": ["Графика", "Graphics"], "Yuqori": ["Высокая", "High"], "Past": ["Низкая", "Low"], "Davom etish": ["Продолжить", "Resume"], "Qaytadan boshlash": ["Начать заново", "Restart"], "Yana o'ynash": ["Играть ещё", "Play again"], "Hamrohga qaytish": ["Вернуться в Hamroh", "Back to Hamroh"], "VAZIFA": ["ЗАДАЧА", "OBJECTIVE"], "DUSHMAN": ["ВРАГИ", "HOSTILES"], "TR-7 KARABIN": ["КАРАБИН TR-7", "TR-7 CARBINE"], "O'CHIR": ["ОТКЛ", "CUT"], "SAKRA": ["ПРЫЖОК", "JUMP"], "O'QLA": ["ЗАРЯД", "LOAD"], "NISHON": ["ПРИЦЕЛ", "AIM"], "VAQT": ["ВРЕМЯ", "TIME"], "YO'Q QILINDI": ["УНИЧТОЖЕНО", "KILLS"], "BOSHGA": ["В ГОЛОВУ", "HEADSHOTS"], "ANIQLIK": ["ТОЧНОСТЬ", "ACCURACY"], "O'yinni yuklab bo'lmadi: 3D kutubxona ochilmadi yoki qurilmangiz WebGL'ni qo'llamaydi. Sahifani yangilab ko'ring.": ["Не удалось загрузить игру: 3D-библиотека не открылась или устройство не поддерживает WebGL. Обновите страницу.", "The game could not load: the 3D library failed or your device has no WebGL. Reload the page."], "Uchta uzatgichni o'chiring": ["Отключите три передатчика", "Shut down three uplinks"], "Chiqish nuqtasiga yeting": ["Доберитесь до точки эвакуации", "Reach the extraction point"], "SHIMOLI-SHARQ": ["СЕВЕРО-ВОСТОК", "NORTH-EAST"], "BAZA": ["БАЗА", "BASE"], "GRANATA!": ["ГРАНАТА!", "GRENADE!"], "GRANATA": ["ГРАНАТА", "GRENADE"], "DROBOVIK": ["ДРОБОВИК", "SHOTGUN"], "SNAYPER": ["СНАЙПЕРКА", "SNIPER"], "QUROL": ["ОРУЖИЕ", "WEAPON"], "Lochin, port dushman nazoratida. Uchta uzatgichni o'chir.": ["Сокол, порт под контролем противника. Отключи три передатчика.", "Falcon, the port is under enemy control. Shut down three uplinks."], "Birinchisi o'chdi. Ehtiyot bo'l, ular seni payqadi.": ["Первый отключён. Осторожно, тебя заметили.", "First one is down. Careful, they know you are here."], "Yana bittasi qoldi. Dronlar havoda, tepaga qara.": ["Остался один. В воздухе дроны, смотри вверх.", "One left. Drones are up, watch the sky."], "Signal uzildi! Shimoli-sharqdagi maydonchaga yet, seni olib ketamiz.": ["Сигнал оборван! Иди к площадке на северо-востоке, мы тебя заберём.", "Signal is cut! Get to the pad in the north-east, we will pick you up."], "TOPSHIRIQ YAKUNLANDI": ["ЗАДАНИЕ ЗАВЕРШЕНО", "MISSION COMPLETE"], "TOPSHIRIQ BARBOD BO'LDI": ["ЗАДАНИЕ ПРОВАЛЕНО", "MISSION FAILED"], "Vazifa bajarildi": ["Задача выполнена", "Objective complete"], "Halok bo'ldingiz": ["Вы погибли", "You were killed"], "Uchta uzatgich o'chirildi, siz portdan olib chiqildingiz.": ["Три передатчика отключены, вас эвакуировали из порта.", "All three uplinks are down and you were extracted from the port."], "O'chirilgan uzatgichlar": ["Отключено передатчиков", "Uplinks shut down"], "Pana joydan otib, sog'lig'ingiz tiklanishini kuting.": ["Стреляйте из укрытия и ждите, пока здоровье восстановится.", "Shoot from cover and wait for your health to recover."], "Chiqish nuqtasiga oz qolgan edi. Yana urinib ko'ring.": ["До точки эвакуации оставалось немного. Попробуйте ещё раз.", "You were close to extraction. Try again."], "Qayta o'qlanmoqda": ["Перезарядка", "Reloading"], "O'QLA tugmasini bosing": ["Нажмите ЗАРЯД", "Tap LOAD"], "R — qayta o'qlash": ["R — перезарядка", "R — reload"], "O'q tugadi": ["Патроны кончились", "Out of ammo"], "O'q kam": ["Мало патронов", "Low ammo"], "O'CHIR TUGMASINI BOSIB TURING": ["УДЕРЖИВАЙТЕ КНОПКУ ОТКЛ", "HOLD THE CUT BUTTON"], "E — UZATGICHNI O'CHIRISH (BOSIB TURING)": ["E — ОТКЛЮЧИТЬ ПЕРЕДАТЧИК (УДЕРЖИВАЙТЕ)", "E — SHUT DOWN UPLINK (HOLD)"], "+30 O'Q": ["+30 ПАТРОНОВ", "+30 AMMO"], "GRAFIKA YENGILLASHTIRILDI": ["ГРАФИКА УПРОЩЕНА", "GRAPHICS LOWERED"], "ENG YAXSHI VAQT": ["ЛУЧШЕЕ ВРЕМЯ", "BEST TIME"], "Chap tomon": ["Левая сторона", "Left side"], "yurish (joystik); oxirigacha tortsangiz, yuguradi": ["движение (джойстик); до упора — бег", "move (joystick); push all the way to sprint"], "O'ng tomon": ["Правая сторона", "Right side"], "atrofga qarash": ["обзор", "look around"], "Qizil tugma": ["Красная кнопка", "Red button"], "otish. Avto-otish yoqilgan: nishon dushmanga tushsa, o'zi otadi": ["огонь. Автоогонь включён: стреляет сам, когда прицел на враге", "fire. Auto-fire is on: it shoots when the crosshair is on an enemy"], "mo'ljalga olish": ["прицеливание", "aim down sights"], "uzatgich yonida bosib turing": ["удерживайте рядом с передатчиком", "hold next to an uplink"], "yurish": ["движение", "move"], "Sichqoncha": ["Мышь", "Mouse"], "qarash, chap tugma — otish, o'ng tugma — mo'ljal": ["обзор, левая кнопка — огонь, правая — прицел", "look, left button fires, right button aims"], "Shift · Bo'sh joy": ["Shift · Пробел", "Shift · Space"], "yugurish · sakrash": ["бег · прыжок", "sprint · jump"], "qayta o'qlash · uzatgichni o'chirish (bosib turing)": ["перезарядка · отключить передатчик (удерживайте)", "reload · shut down uplink (hold)"], "pauza": ["пауза", "pause"]};
+const LNG=(location.hash||'').slice(1)||'uz',EMB=window.parent!==window,DICT={"BIRINCHI SHAXS OTISHMA · 3D": ["ШУТЕР ОТ ПЕРВОГО ЛИЦА · 3D", "FIRST-PERSON SHOOTER · 3D"], "Port: So'nggi signal": ["Порт: последний сигнал", "Port: Last Signal"], "Yuk porti dushman qo'lida. Konteynerlar orasidan o'tib, uchta uzatgichni o'chiring va shimoli-sharqdagi maydonchaga yetib boring.": ["Грузовой порт захвачен. Пройдите между контейнерами, отключите три передатчика и доберитесь до площадки на северо-востоке.", "The cargo port is in enemy hands. Move through the containers, shut down three uplinks and reach the pad in the north-east."], "Qiyinlik": ["Сложность", "Difficulty"], "Oson": ["Легко", "Easy"], "O'rta": ["Средне", "Medium"], "Qiyin": ["Сложно", "Hard"], "Boshlash": ["Начать", "Start"], "TO'XTATILDI": ["ОСТАНОВЛЕНО", "PAUSED"], "Pauza": ["Пауза", "Pause"], "Sezgirlik": ["Чувствительность", "Sensitivity"], "Avto-otish": ["Автоогонь", "Auto-fire"], "Yoqilgan": ["Вкл", "On"], "O'chirilgan": ["Выкл", "Off"], "Grafika": ["Графика", "Graphics"], "Yuqori": ["Высокая", "High"], "Past": ["Низкая", "Low"], "Davom etish": ["Продолжить", "Resume"], "Qaytadan boshlash": ["Начать заново", "Restart"], "Yana o'ynash": ["Играть ещё", "Play again"], "Hamrohga qaytish": ["Вернуться в Hamroh", "Back to Hamroh"], "VAZIFA": ["ЗАДАЧА", "OBJECTIVE"], "DUSHMAN": ["ВРАГИ", "HOSTILES"], "TR-7 KARABIN": ["КАРАБИН TR-7", "TR-7 CARBINE"], "O'CHIR": ["ОТКЛ", "CUT"], "SAKRA": ["ПРЫЖОК", "JUMP"], "O'QLA": ["ЗАРЯД", "LOAD"], "NISHON": ["ПРИЦЕЛ", "AIM"], "VAQT": ["ВРЕМЯ", "TIME"], "YO'Q QILINDI": ["УНИЧТОЖЕНО", "KILLS"], "BOSHGA": ["В ГОЛОВУ", "HEADSHOTS"], "ANIQLIK": ["ТОЧНОСТЬ", "ACCURACY"], "O'yinni yuklab bo'lmadi: 3D kutubxona ochilmadi yoki qurilmangiz WebGL'ni qo'llamaydi. Sahifani yangilab ko'ring.": ["Не удалось загрузить игру: 3D-библиотека не открылась или устройство не поддерживает WebGL. Обновите страницу.", "The game could not load: the 3D library failed or your device has no WebGL. Reload the page."], "Uchta uzatgichni o'chiring": ["Отключите три передатчика", "Shut down three uplinks"], "Chiqish nuqtasiga yeting": ["Доберитесь до точки эвакуации", "Reach the extraction point"], "SHIMOLI-SHARQ": ["СЕВЕРО-ВОСТОК", "NORTH-EAST"], "BAZA": ["БАЗА", "BASE"], "GRANATA!": ["ГРАНАТА!", "GRENADE!"], "Topshiriq": ["Задание", "Mission"], "1 · Port": ["1 · Порт", "1 · Port"], "2 · Tun": ["2 · Ночь", "2 · Night"], "3 · Bo'ron": ["3 · Шторм", "3 · Storm"], "QO'MONDON": ["КОМАНДИР", "COMMANDER"], "Tungi reyd": ["Ночной рейд", "Night Raid"], "Bo'ron: Qo'mondon": ["Шторм: Командир", "Storm: The Commander"], "Tun. Port qorong'i, snayperlar lazer bilan qidirmoqda. Fonaringiz yoniq: uchta uzatgichni o'chirib, chiqish nuqtasiga yeting.": ["Ночь. Порт во тьме, снайперы ищут вас лазерами. Фонарь включён: отключите три передатчика и доберитесь до точки эвакуации.", "Night. The port is dark and snipers sweep with lasers. Your flashlight is on: shut down three uplinks and reach the extraction point."], "Bo'ron ostida uchta uzatgichni o'chiring, so'ng dushman qo'mondonini yo'q qilib, chiqish nuqtasiga yeting.": ["Под штормом отключите три передатчика, затем уничтожьте вражеского командира и доберитесь до точки эвакуации.", "In the storm, shut down three uplinks, then eliminate the enemy commander and reach the extraction point."], "Qo'mondonni yo'q qiling": ["Уничтожьте командира", "Eliminate the commander"], "Qo'mondon shu yerda. Uni yo'q qil!": ["Командир здесь. Уничтожь его!", "The commander is here. Take him out!"], "Qo'mondon yo'q qilindi! Chiqish nuqtasiga yet.": ["Командир уничтожен! Иди к точке эвакуации.", "Commander down! Get to extraction."], "GRANATA": ["ГРАНАТА", "GRENADE"], "DROBOVIK": ["ДРОБОВИК", "SHOTGUN"], "SNAYPER": ["СНАЙПЕРКА", "SNIPER"], "QUROL": ["ОРУЖИЕ", "WEAPON"], "Lochin, port dushman nazoratida. Uchta uzatgichni o'chir.": ["Сокол, порт под контролем противника. Отключи три передатчика.", "Falcon, the port is under enemy control. Shut down three uplinks."], "Birinchisi o'chdi. Ehtiyot bo'l, ular seni payqadi.": ["Первый отключён. Осторожно, тебя заметили.", "First one is down. Careful, they know you are here."], "Yana bittasi qoldi. Dronlar havoda, tepaga qara.": ["Остался один. В воздухе дроны, смотри вверх.", "One left. Drones are up, watch the sky."], "Signal uzildi! Shimoli-sharqdagi maydonchaga yet, seni olib ketamiz.": ["Сигнал оборван! Иди к площадке на северо-востоке, мы тебя заберём.", "Signal is cut! Get to the pad in the north-east, we will pick you up."], "TOPSHIRIQ YAKUNLANDI": ["ЗАДАНИЕ ЗАВЕРШЕНО", "MISSION COMPLETE"], "TOPSHIRIQ BARBOD BO'LDI": ["ЗАДАНИЕ ПРОВАЛЕНО", "MISSION FAILED"], "Vazifa bajarildi": ["Задача выполнена", "Objective complete"], "Halok bo'ldingiz": ["Вы погибли", "You were killed"], "Uchta uzatgich o'chirildi, siz portdan olib chiqildingiz.": ["Три передатчика отключены, вас эвакуировали из порта.", "All three uplinks are down and you were extracted from the port."], "O'chirilgan uzatgichlar": ["Отключено передатчиков", "Uplinks shut down"], "Pana joydan otib, sog'lig'ingiz tiklanishini kuting.": ["Стреляйте из укрытия и ждите, пока здоровье восстановится.", "Shoot from cover and wait for your health to recover."], "Chiqish nuqtasiga oz qolgan edi. Yana urinib ko'ring.": ["До точки эвакуации оставалось немного. Попробуйте ещё раз.", "You were close to extraction. Try again."], "Qayta o'qlanmoqda": ["Перезарядка", "Reloading"], "O'QLA tugmasini bosing": ["Нажмите ЗАРЯД", "Tap LOAD"], "R — qayta o'qlash": ["R — перезарядка", "R — reload"], "O'q tugadi": ["Патроны кончились", "Out of ammo"], "O'q kam": ["Мало патронов", "Low ammo"], "O'CHIR TUGMASINI BOSIB TURING": ["УДЕРЖИВАЙТЕ КНОПКУ ОТКЛ", "HOLD THE CUT BUTTON"], "E — UZATGICHNI O'CHIRISH (BOSIB TURING)": ["E — ОТКЛЮЧИТЬ ПЕРЕДАТЧИК (УДЕРЖИВАЙТЕ)", "E — SHUT DOWN UPLINK (HOLD)"], "+30 O'Q": ["+30 ПАТРОНОВ", "+30 AMMO"], "GRAFIKA YENGILLASHTIRILDI": ["ГРАФИКА УПРОЩЕНА", "GRAPHICS LOWERED"], "ENG YAXSHI VAQT": ["ЛУЧШЕЕ ВРЕМЯ", "BEST TIME"], "Chap tomon": ["Левая сторона", "Left side"], "yurish (joystik); oxirigacha tortsangiz, yuguradi": ["движение (джойстик); до упора — бег", "move (joystick); push all the way to sprint"], "O'ng tomon": ["Правая сторона", "Right side"], "atrofga qarash": ["обзор", "look around"], "Qizil tugma": ["Красная кнопка", "Red button"], "otish. Avto-otish yoqilgan: nishon dushmanga tushsa, o'zi otadi": ["огонь. Автоогонь включён: стреляет сам, когда прицел на враге", "fire. Auto-fire is on: it shoots when the crosshair is on an enemy"], "mo'ljalga olish": ["прицеливание", "aim down sights"], "uzatgich yonida bosib turing": ["удерживайте рядом с передатчиком", "hold next to an uplink"], "yurish": ["движение", "move"], "Sichqoncha": ["Мышь", "Mouse"], "qarash, chap tugma — otish, o'ng tugma — mo'ljal": ["обзор, левая кнопка — огонь, правая — прицел", "look, left button fires, right button aims"], "Shift · Bo'sh joy": ["Shift · Пробел", "Shift · Space"], "yugurish · sakrash": ["бег · прыжок", "sprint · jump"], "qayta o'qlash · uzatgichni o'chirish (bosib turing)": ["перезарядка · отключить передатчик (удерживайте)", "reload · shut down uplink (hold)"], "pauza": ["пауза", "pause"]};
 const cyr=t=>{try{if(!parent.cyrSafe)return t;return t.length>2&&t===t.toUpperCase()&&/[A-Z]/.test(t)?parent.cyrSafe(t.toLowerCase()).toUpperCase():parent.cyrSafe(t)}catch(e){return t}};
 const TX=t=>{if(LNG==='uz'||t==null)return t;if(LNG==='uzc')return cyr(String(t));const d=DICT[t];return d?d[LNG==='ru'?0:1]:t};
 function trDom(root){if(LNG==='uz')return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),L=[];while(w.nextNode())L.push(w.currentNode);for(const n of L){const k=n.nodeValue.trim();if(!k||n.parentNode.tagName==='SCRIPT'||n.parentNode.tagName==='STYLE')continue;const v=TX(k);if(v!==k)n.nodeValue=n.nodeValue.replace(k,v)}}
@@ -191,9 +194,17 @@ trDom(document.body);document.title=TX(document.title);document.documentElement.
 const exitApp=()=>{try{parent.postMessage('port-exit','*')}catch(e){}};
 if(!window.THREE){$('#menu').hidden=true;$('#err').hidden=false;return}
 const T=THREE,clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t,R=Math.random;
-let seed=20261110;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+let seed=20261110,BOSS=null;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
 const TOUCH=('ontouchstart' in window)||matchMedia('(pointer:coarse)').matches;
+const MIS=[
+ {name:"Port: So'nggi signal",desc:"Yuk porti dushman qo'lida. Konteynerlar orasidan o'tib, uchta uzatgichni o'chiring va shimoli-sharqdagi maydonchaga yetib boring.",seed:20261110,sites:[{x:-40,z:10},{x:36,z:-14},{x:-8,z:-40}],
+  hor:[.98,.62,.36],mid:[.55,.46,.47],zen:[.16,.22,.36],sg:1,sunC:[1,.7,.42],sunI:3.4,fogC:[.62,.4,.26],fogD:.0092,hemi:.35,gI:1,dim:1,snMax:1},
+ {name:"Tungi reyd",desc:"Tun. Port qorong'i, snayperlar lazer bilan qidirmoqda. Fonaringiz yoniq: uchta uzatgichni o'chirib, chiqish nuqtasiga yeting.",seed:777123,sites:[{x:38,z:12},{x:-36,z:-16},{x:8,z:-40}],night:true,
+  hor:[.09,.12,.2],mid:[.035,.05,.1],zen:[.008,.012,.035],sg:.22,sunC:[.5,.62,1],sunI:.9,fogC:[.025,.04,.075],fogD:.012,hemi:.16,gI:.45,dim:.22,snMax:2},
+ {name:"Bo'ron: Qo'mondon",desc:"Bo'ron ostida uchta uzatgichni o'chiring, so'ng dushman qo'mondonini yo'q qilib, chiqish nuqtasiga yeting.",seed:424242,sites:[{x:-38,z:-12},{x:36,z:14},{x:-6,z:-40}],rain:true,boss:true,
+  hor:[.5,.52,.55],mid:[.36,.39,.43],zen:[.2,.23,.27],sg:0,sunC:[.8,.86,.92],sunI:1.3,fogC:[.4,.43,.46],fogD:.017,hemi:.5,gI:.75,dim:.6,snMax:1}];
 const store={get(k,d){try{const v=localStorage.getItem('pss_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('pss_'+k,JSON.stringify(v))}catch(e){}}};
+const MI=clamp(store.get('m',0)|0,0,MIS.length-1),MS=MIS[MI];seed=MS.seed;
 const CFG={sens:store.get('sens',1),auto:store.get('auto',TOUCH),q:store.get('q',TOUCH?1:2),diff:store.get('diff',1)};
 const DIFF=[{dmg:.55,acc:.7,n:0},{dmg:1,acc:1,n:0},{dmg:1.45,acc:1.25,n:1}];
 
@@ -213,14 +224,13 @@ function resize(){W=innerWidth;H=innerHeight;const a=W/H;cam.aspect=gcam.aspect=
 
 // ---------- osmon, tuman, yorug'lik ----------
 const SUN=new T.Vector3(-0.42,0.27,-0.87).normalize();
-const sky=new T.Mesh(new T.SphereGeometry(420,32,16),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,fog:false,uniforms:{sun:{value:SUN}},
+const sky=new T.Mesh(new T.SphereGeometry(420,32,16),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,fog:false,uniforms:{sun:{value:SUN},hor:{value:new T.Vector3(...MS.hor)},mid:{value:new T.Vector3(...MS.mid)},zen:{value:new T.Vector3(...MS.zen)},sg:{value:MS.sg}},
   vertexShader:'varying vec3 vD;void main(){vD=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader:`varying vec3 vD;uniform vec3 sun;void main(){vec3 d=normalize(vD);float h=max(d.y,0.);
-    vec3 hor=vec3(.98,.62,.36),mid=vec3(.55,.46,.47),zen=vec3(.16,.22,.36);
+  fragmentShader:`varying vec3 vD;uniform vec3 sun,hor,mid,zen;uniform float sg;void main(){vec3 d=normalize(vD);float h=max(d.y,0.);
     vec3 c=mix(hor,mid,smoothstep(0.,.22,h));c=mix(c,zen,smoothstep(.15,.85,h));
-    float s=max(dot(d,sun),0.);c+=vec3(1.,.62,.3)*pow(s,5.)*.55;c+=vec3(1.,.85,.6)*pow(s,60.)*.9;c+=vec3(1.,.95,.8)*smoothstep(.9992,.9996,s)*6.;
+    float s=max(dot(d,sun),0.);c+=sg*(vec3(1.,.62,.3)*pow(s,5.)*.55+vec3(1.,.85,.6)*pow(s,60.)*.9+vec3(1.,.95,.8)*smoothstep(.9992,.9996,s)*6.);
     float n=sin(d.x*9.+d.z*4.)*sin(d.z*13.-d.x*3.)*.5+.5;c=mix(c,c*vec3(.72,.66,.7),smoothstep(.55,.9,n)*smoothstep(.02,.3,h)*(1.-smoothstep(.3,.7,h))*.6);
-    if(d.y<0.)c=mix(hor*.75,vec3(.2,.16,.14),smoothstep(0.,-.25,d.y));
+    if(d.y<0.)c=mix(hor*.75,mid*.32,smoothstep(0.,-.25,d.y));
     gl_FragColor=vec4(c,1.);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -228,11 +238,11 @@ const sky=new T.Mesh(new T.SphereGeometry(420,32,16),new T.ShaderMaterial({side:
 sky.frustumCulled=false;
 {const es=new T.Scene();es.add(sky);const pm=new T.PMREMGenerator(rd);const env=pm.fromScene(es,0.03,1,1000).texture;scene.environment=env;gscene.environment=env;pm.dispose()}
 scene.add(sky);
-scene.fog=new T.FogExp2(new T.Color().setRGB(.62,.4,.26),0.0092);
-const sun=new T.DirectionalLight(new T.Color().setRGB(1,.7,.42),3.4);
+scene.fog=new T.FogExp2(new T.Color().setRGB(...MS.fogC),MS.fogD);
+const sun=new T.DirectionalLight(new T.Color().setRGB(...MS.sunC),MS.sunI);
 {const s=sun.shadow.camera;s.left=-44;s.right=44;s.top=44;s.bottom=-44;s.near=1;s.far=190;sun.shadow.bias=-0.0005;sun.shadow.normalBias=0.05}
-scene.add(sun,sun.target);scene.add(new T.HemisphereLight(0x8ea2cc,0x4a382c,0.35));
-gscene.add(new T.HemisphereLight(0xb9c4dd,0x5a4636,0.9));{const l=new T.DirectionalLight(new T.Color().setRGB(1,.75,.5),2.2);l.position.copy(SUN);gscene.add(l)}
+scene.add(sun,sun.target);scene.add(new T.HemisphereLight(0x8ea2cc,0x4a382c,MS.hemi));
+gscene.add(new T.HemisphereLight(0xb9c4dd,0x5a4636,0.9*MS.gI));{const l=new T.DirectionalLight(new T.Color().setRGB(...MS.sunC),2.2*MS.gI);l.position.copy(SUN);gscene.add(l)}
 const flashL=new T.PointLight(0xffc070,0,14,2);scene.add(flashL);
 
 // ---------- teksturalar ----------
@@ -259,7 +269,7 @@ const brandT=['TURON LINE','ORIENT CARGO','SILKWAY','ZARAFSHON'].map(n=>{const t
 
 // ---------- dunyo ----------
 const cols=[];const addCol=(x0,x1,y0,y1,z0,z1,tag)=>{const b={x0,x1,y0,y1,z0,z1,tag:tag||null};cols.push(b);return b};
-const SITES=[{x:-40,z:10},{x:36,z:-14},{x:-8,z:-40}],EXIT={x:34,z:-46},SPAWN={x:0,z:52};
+const SITES=MS.sites,EXIT={x:34,z:-46},SPAWN={x:0,z:52};
 const CW=2.44,CH=2.59,CL=12.19,CS=6.06,CCOL=[0x9c3b2e,0x2f5f8a,0x3f7a4d,0xb58a2a,0x7d848c,0x8a4a2a,0x1f6f78,0xa8452c,0x54306a,0xc9c4b8];
 const C40=[],C20=[],BAR=[],CRT=[],BRL=[];
 function stack(x,z,rot,h,len){for(let i=0;i<h;i++)(len>7?C40:C20).push({x,y:i*CH+CH/2,z,rot,c:CCOL[rnd()*CCOL.length|0]});
@@ -318,13 +328,13 @@ function crane(x,z,rot){const g=new T.Group();g.position.set(x,0,z);g.rotation.y
   const wx=rot?0:5,wz=rot?-5:0;addCol(x+wx-(rot?CL/2:CW/2),x+wx+(rot?CL/2:CW/2),7.9,10.5,z+wz-(rot?CW/2:CL/2),z+wz+(rot?CW/2:CL/2))}
 crane(0,0,false);crane(32,22,false);
 // uzoqdagi siluetlar: kranlar va kema
-{const m=new T.MeshBasicMaterial({color:0x2a2622});const far=(x,z,s,r)=>{const g=new T.Group();g.position.set(x,0,z);g.rotation.y=r;g.scale.setScalar(s);scene.add(g);
+{const nc=h=>new T.Color(h).multiplyScalar(MS.dim);const m=new T.MeshBasicMaterial({color:nc(0x2a2622)});const far=(x,z,s,r)=>{const g=new T.Group();g.position.set(x,0,z);g.rotation.y=r;g.scale.setScalar(s);scene.add(g);
   const b=(w,h,d,X,Y,Z,rz)=>{const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(X,Y,Z);if(rz)o.rotation.z=rz;g.add(o)};
   b(1.6,34,1.6,-7,17,0);b(1.6,34,1.6,7,17,0);b(16,2,2,0,24,0);b(2,2,2,0,36,0);b(44,2.4,2.4,14,36,0,.22);b(1,16,1,0,44,0);b(.5,20,.5,10,43,0,-1.1)};
   far(-70,-130,1,0);far(-25,-150,1.25,.2);far(60,-135,1.1,-.15);far(120,-95,1,-.8);far(-125,-60,1.1,.9);far(140,20,1,-1.5);far(-140,40,1.2,1.5);
-  const hull=new T.Mesh(new T.BoxGeometry(150,16,24),new T.MeshBasicMaterial({color:0x3a1f1a}));hull.position.set(20,8,-112);scene.add(hull);
-  const sup=new T.Mesh(new T.BoxGeometry(18,22,20),new T.MeshBasicMaterial({color:0xb8b0a4}));sup.position.set(78,27,-112);scene.add(sup);
-  const cm=new T.MeshBasicMaterial({color:0x5a4034});for(let i=0;i<9;i++){const c=new T.Mesh(new T.BoxGeometry(12,5+((i*7)%3)*2.6,20),cm);c.position.set(-44+i*12.4,18.5+((i*7)%3)*1.3,-112);scene.add(c)}}
+  const hull=new T.Mesh(new T.BoxGeometry(150,16,24),new T.MeshBasicMaterial({color:nc(0x3a1f1a)}));hull.position.set(20,8,-112);scene.add(hull);
+  const sup=new T.Mesh(new T.BoxGeometry(18,22,20),new T.MeshBasicMaterial({color:nc(0xb8b0a4)}));sup.position.set(78,27,-112);scene.add(sup);
+  const cm=new T.MeshBasicMaterial({color:nc(0x5a4034)});for(let i=0;i<9;i++){const c=new T.Mesh(new T.BoxGeometry(12,5+((i*7)%3)*2.6,20),cm);c.position.set(-44+i*12.4,18.5+((i*7)%3)*1.3,-112);scene.add(c)}}
 // chiroqlar
 const glowM=c=>new T.SpriteMaterial({map:glowT,color:c,blending:T.AdditiveBlending,depthWrite:false,transparent:true,fog:false});
 {const pm=new T.MeshStandardMaterial({color:0x30343a,roughness:.6,metalness:.6}),hm=new T.MeshBasicMaterial({color:0xfff0c8}),gmat=glowM(0xffd9a0);
@@ -406,7 +416,7 @@ function sOut(g){if(PANV&&AC.createStereoPanner){const p=AC.createStereoPanner()
 function audioInit(){if(AC){if(AC.state==='suspended')AC.resume().catch(()=>{});return}try{AC=new (window.AudioContext||window.webkitAudioContext)();MG=AC.createGain();MG.gain.value=.55;const cp=AC.createDynamicsCompressor();MG.connect(cp);cp.connect(AC.destination);
   NBUF=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const d=NBUF.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=R()*2-1;
   const s=AC.createBufferSource();s.buffer=NBUF;s.loop=true;const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=260;const g=AC.createGain();g.gain.value=.05;s.connect(f);f.connect(g);g.connect(MG);s.start();
-  const o=AC.createOscillator();o.frequency.value=52;const og=AC.createGain();og.gain.value=.018;o.connect(og);og.connect(MG);o.start();
+  const o=AC.createOscillator();o.frequency.value=52;const og=AC.createGain();og.gain.value=.018;o.connect(og);og.connect(MG);o.start();if(MS.rain){const s2=AC.createBufferSource();s2.buffer=NBUF;s2.loop=true;const f2=AC.createBiquadFilter();f2.type='highpass';f2.frequency.value=1800;const g2=AC.createGain();g2.gain.value=.045;s2.connect(f2);f2.connect(g2);g2.connect(MG);s2.start()}
   try{const n=AC.sampleRate*1.8|0,ib=AC.createBuffer(2,n,AC.sampleRate);for(let c=0;c<2;c++){const d=ib.getChannelData(c);for(let i=0;i<n;i++)d[i]=(R()*2-1)*Math.pow(1-i/n,3.2)}RVB=AC.createConvolver();RVB.buffer=ib;const rg=AC.createGain();rg.gain.value=.34;RVB.connect(rg);rg.connect(MG)}catch(e){RVB=null}}catch(e){AC=null}}
 function nz(dur,vol,f0,f1,type){if(!AC)return;const t=AC.currentTime,s=AC.createBufferSource();s.buffer=NBUF;const f=AC.createBiquadFilter();f.type=type||'lowpass';f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(Math.max(40,f1),t+dur);
   const g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f);f.connect(g);sOut(g);s.start(t,R()*1.5,dur+.02)}
@@ -509,20 +519,22 @@ function mkSoldier3(x,z,alert){const g=new T.Group();g.position.set(x,0,z);scene
 function rmEnemy(e){scene.remove(e.g);if(e.laser)scene.remove(e.laser);if(e.m)solFree(e)}
 // ---------- dushman turlari, chekinish, granata ----------
 const GR=[];let GRT=7;const grG=new T.SphereGeometry(.07,8,6),grM=new T.MeshStandardMaterial({color:0x2c3524,roughness:.6});
-function solType(e,t){e.type=t;if(t==='h'){e.hp=240;e.spd=.78;e.m.root.scale.setScalar(SOL.sc*1.14);const s=new T.Sprite(glowM(0xff8a2a));s.scale.setScalar(.34);e.g.add(s);e.tag=s}
+function solType(e,t){e.type=t;if(t==='b'){e.hp=e.hp0=[900,1400,1900][CFG.diff];e.spd=.9;e.pref=20;e.m.root.scale.setScalar(SOL.sc*1.38);const s=new T.Sprite(glowM(0xff2a1a));s.scale.setScalar(.6);e.g.add(s);e.tag=s}
+  else if(t==='h'){e.hp=240;e.spd=.78;e.m.root.scale.setScalar(SOL.sc*1.14);const s=new T.Sprite(glowM(0xff8a2a));s.scale.setScalar(.34);e.g.add(s);e.tag=s}
   else if(t==='s'){e.hp=80;e.pref=48;e.aimT=0;const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute([0,0,0,0,0,1],3));const l=new T.Line(g,new T.LineBasicMaterial({color:0xff2a1a,transparent:true,opacity:0,fog:false}));l.frustumCulled=false;scene.add(l);e.laser=l}}
 function aiPre(e,dt){if(e.type==='s'||e.fleeT>0){e.cool=Math.max(e.cool,.5);e.left=0}}
 function aiPost(e,dt){const dx=P.x-e.x,dz=P.z-e.z,d=Math.hypot(dx,dz)||.001;
   if(e.tag){SV3.set(e.hx,e.hy+.02,e.hz);e.g.worldToLocal(SV3);e.tag.position.copy(SV3)}
   if(!e.alert)return;
-  if(e.type!=='h'&&!e.fled&&e.hp<45&&e.los){e.fled=true;e.fleeT=2.6+R()*1.2;e.fs=R()<.5?1:-1}
+  if(e.type!=='h'&&e.type!=='b'&&!e.fled&&e.hp<45&&e.los){e.fled=true;e.fleeT=2.6+R()*1.2;e.fs=R()<.5?1:-1}
   if(e.fleeT>0){e.fleeT-=dt;const ax=-dx/d*.75-dz/d*.65*e.fs,az=-dz/d*.75+dx/d*.65*e.fs;e.x+=ax*3.4*dt;e.z+=az*3.4*dt;TP.x=e.x;TP.y=0;TP.z=e.z;collide(TP,.36,1.7);e.x=TP.x;e.z=TP.z;if(!e.los)e.fleeT=Math.min(e.fleeT,.5)}
   if(e.type==='s'){const l=e.laser;if(e.los&&d<95&&P.alive&&e.mx!==undefined){e.aimT+=dt;const a=l.geometry.attributes.position.array;a[0]=e.mx;a[1]=e.my;a[2]=e.mz;a[3]=P.x;a[4]=P.y+1.2;a[5]=P.z;l.geometry.attributes.position.needsUpdate=true;
       l.material.opacity=e.aimT<0?0:Math.min(.85,.15+e.aimT*.35)*(e.aimT>1.9&&Math.sin(now*40)<0?.3:1);
       if(e.aimT>2.4){e.aimT=-.4-R()*.8;const sp=Math.hypot(P.vx,P.vz),hit=R()<(sp>5?.3:sp>2?.55:.85)*Math.min(1,DIFF[CFG.diff].acc);solShot(e);SFX.eshot(1);
         if(hit){tracer(e.mx,e.my,e.mz,P.x,P.y+1.25,P.z,0xff7050);hurt(36*DIFF[CFG.diff].dmg,e.x,e.z)}else{tracer(e.mx,e.my,e.mz,P.x+(R()-.5)*1.6,P.y+1.5+R()*.5,P.z+(R()-.5)*1.6,0xff7050);SFX.whiz()}}}
     else{e.aimT=Math.max(0,e.aimT-dt*2);l.material.opacity=0}return}
-  if(!e.type&&GRT<=0&&e.los&&d>9&&d<27&&e.mx!==undefined&&!(e.fleeT>0)&&R()<dt*.6){GRT=9+R()*6;grThrow(e)}}
+  if((!e.type||e.type==='b')&&GRT<=0&&e.los&&d>9&&d<30&&e.mx!==undefined&&!(e.fleeT>0)&&R()<dt*(e.type?2:.6)){GRT=e.type?3.5+R()*2:9+R()*6;grThrow(e)}
+  if(e.type==='b'){e.sumT=(e.sumT||14)-dt;if(e.sumT<=0){e.sumT=16;wave(2,1)}}}
 function grThrow(e){const m=new T.Mesh(grG,grM);scene.add(m);const Tm=1.15,g={m,x:e.mx,y:e.my+.2,z:e.mz,t:2.3,land:false};g.vx=(P.x-g.x)/Tm;g.vz=(P.z-g.z)/Tm;g.vy=(.1-g.y)/Tm+.5*13*Tm;GR.push(g);pop('GRANATA!');SFX.grn()}
 function grUpd(dt){GRT-=dt;for(let i=GR.length-1;i>=0;i--){const g=GR[i];g.t-=dt;if(!g.land){g.vy-=13*dt;if(g.mine){const sl=Math.hypot(g.vx,g.vy,g.vz)||1,st=sl*dt;if(rayWorld(g.x,g.y,g.z,g.vx/sl,g.vy/sl,g.vz/sl,st+.1)<st+.1){if(Math.abs(HIT.ny)>.7){g.vy*=-.3;g.vx*=.5;g.vz*=.5}else{g.vx*=-.3;g.vz*=-.3}}}g.x+=g.vx*dt;g.y+=g.vy*dt;g.z+=g.vz*dt;if(g.y<=.08){g.y=.08;g.land=true;SFX.step()}}
     g.m.position.set(g.x,g.y,g.z);g.m.rotation.x+=dt*9;if(g.t<=0){scene.remove(g.m);GR.splice(i,1);explode(g.x,g.y,g.z,false);decal(g.x,0,g.z,0,1,0,12);if(g.mine){for(const e of ens){if(e.dead)continue;const d=Math.hypot(e.x-g.x,e.z-g.z,e.kind==='d'?e.y-g.y:0);if(d<7)dmgEnemy(e,(1-d/7)*240,false)}for(const b of BRL)if(!b.gone&&Math.hypot(b.x-g.x,b.z-g.z)<4)b.fuse=.1}const dp=Math.hypot(P.x-g.x,P.z-g.z);if(dp<6.5&&clearSeg(g.x,.6,g.z,P.x,P.y+1,P.z))hurt((1-dp/6.5)*60*DIFF[CFG.diff].dmg,g.x,g.z);P.shake=Math.max(P.shake,clamp(1.2-dp/10,0,.8))}}}
@@ -541,11 +553,11 @@ function drop(x,z){const m=new T.Mesh(pickG,pickM);m.position.set(x,.3,z);const 
 const TP={x:0,y:0,z:0};
 function enemyShot(e,d,steady){let oy=e.kind==='s'?1.45:e.y-.1;let p=clamp(.5-d*.011,.1,.46)*DIFF[CFG.diff].acc*(steady?1:.6)*(e.kind==='d'?.75:1);const sp=Math.hypot(P.vx,P.vz);if(sp>5.5)p*=.6;else if(sp>2)p*=.82;if(!P.onG)p*=.7;
   let ex=e.x,ez=e.z;const py=P.y+1.25;if(e.m&&e.mx!==undefined){ex=e.mx;oy=e.my;ez=e.mz;solShot(e)}PANV=clamp(((ex-P.x)*Math.cos(P.yaw)-(ez-P.z)*Math.sin(P.yaw))/(d||1),-1,1)*.85;SFX.eshot(clamp(1-d/60,.12,1));PANV=0;
-  if(R()<p){tracer(ex,oy,ez,P.x,py,P.z,0xff9a70);hurt((e.kind==='d'?7:e.type==='h'?12:9)*DIFF[CFG.diff].dmg,ex,ez)}
+  if(R()<p){tracer(ex,oy,ez,P.x,py,P.z,0xff9a70);hurt((e.kind==='d'?7:e.type==='b'?14:e.type==='h'?12:9)*DIFF[CFG.diff].dmg,ex,ez)}
   else{if(R()<.5)SFX.whiz();const a=R()*6.28,r=.7+R()*1.4,tx=P.x+Math.cos(a)*r,ty=py+(R()-.3)*1.2,tz=P.z+Math.sin(a)*r,dx=tx-ex,dy=ty-oy,dz=tz-ez,L=Math.hypot(dx,dy,dz),t=rayWorld(ex,oy,ez,dx/L,dy/L,dz/L,L+25);
     tracer(ex,oy,ez,ex+dx/L*t,oy+dy/L*t,ez+dz/L*t,0xff9a70);if(t<L+25)sparks(ex+dx/L*t,oy+dy/L*t,ez+dz/L*t,HIT.nx,HIT.ny,HIT.nz,3,3)}}
 function updEnemy(e,dt){const px=e.x,pz=e.z,wd=e.dead;if(e.m&&!e.dead)aiPre(e,dt);updEnemy0(e,dt);if(!e.m||e.gone)return;
-  if(e.dead){if(e.laser)e.laser.material.opacity=0;if(e.tag)e.tag.visible=false;solUpd(e,dt,0,1,false);return}
+  if(e.dead){if(e===BOSS&&!e.bd){e.bd=1;$('#bb').hidden=true;say('BAZA',"Qo'mondon yo'q qilindi! Chiqish nuqtasiga yet.");setObj()}if(e.laser)e.laser.material.opacity=0;if(e.tag)e.tag.visible=false;solUpd(e,dt,0,1,false);return}
   aiPost(e,dt);
   const vx=(e.x-px)/dt,vz=(e.z-pz)/dt,sp=Math.hypot(vx,vz);e.spS=(e.spS||0)+(sp-(e.spS||0))*Math.min(1,dt*10);
   solUpd(e,dt,e.spS,vx*Math.sin(e.yaw)+vz*Math.cos(e.yaw)<-.3?-1:1,e.alert&&e.los)}
@@ -571,7 +583,7 @@ function updEnemy0(e,dt){
   if(e.los&&d<70){e.seen+=dt;if(e.seen>e.react){if(e.left>0){e.st-=dt;if(e.st<=0){e.st=.115;e.left--;enemyShot(e,d,engage&&sp===0)}}else{e.cool-=dt;if(e.cool<=0){e.left=3+(R()*2|0);e.cool=.9+R()*1.4;e.st=0}}}}
   else{e.seen=Math.max(0,e.seen-dt*1.5);e.left=0}}
 function spawnPt(minC,maxC){let best=-1;for(let k=0;k<80;k++){const c=(R()*GN*GN)|0;if(blocked[c]||fd[c]<minC||fd[c]>maxC)continue;const x=cX(c),z=cZ(c);if(Math.abs(x)>55||Math.abs(z)>55)continue;best=c;if(!clearSeg(x,1.5,z,P.x,P.y+1.5,P.z))break}return best}
-function wave(ns,nd){ns+=DIFF[CFG.diff].n;for(let i=0;i<ns;i++){const c=spawnPt(13,30);if(c>=0){const e=mkSoldier(cX(c)+(R()-.5)*.6,cZ(c)+(R()-.5)*.6,true),r=R();if(e.m){if(stage>=2&&r<.25)solType(e,'h');else if(r<.45&&!ens.some(o=>o.type==='s'&&!o.dead))solType(e,'s')}}}
+function wave(ns,nd){ns+=DIFF[CFG.diff].n;for(let i=0;i<ns;i++){const c=spawnPt(13,30);if(c>=0){const e=mkSoldier(cX(c)+(R()-.5)*.6,cZ(c)+(R()-.5)*.6,true),r=R();if(e.m){if(stage>=2&&r<.25)solType(e,'h');else if(r<.45&&ens.filter(o=>o.type==='s'&&!o.dead).length<MS.snMax)solType(e,'s')}}}
   for(let i=0;i<nd;i++){const a=R()*6.28;mkDrone(clamp(P.x+Math.cos(a)*40,-55,55),clamp(P.z+Math.sin(a)*40,-55,55))}}
 
 // ---------- o'yinchi ----------
@@ -617,11 +629,13 @@ function aimEnemy(){cam.getWorldDirection(V1);const o=cam.position;let t=rayWorl
 
 // ---------- vazifa ----------
 function setObj(){ $('#ot').textContent=TX(stage<3?"Uchta uzatgichni o'chiring":'Chiqish nuqtasiga yeting');$('#oc').textContent=stage<3?stage+' / 3':TX('SHIMOLI-SHARQ')}
+const setObj0=setObj;setObj=function(){setObj0();if(stage>=3&&BOSS&&!BOSS.dead){$('#ot').textContent=WNAME("Qo'mondonni yo'q qiling");$('#oc').textContent='BOSS'}};
+function spawnBoss(){const e=mkSoldier(EXIT.x-3,EXIT.z+5,true);if(!e.m)return;solType(e,'b');BOSS=e;$('#bb').hidden=false;say('BAZA',"Qo'mondon shu yerda. Uni yo'q qil!");setObj()}
 function uplinkDone(u){u.done=true;u.sc.material=scrOff;u.beam.visible=false;u.lamp.visible=false;stage++;SFX.ok();setObj();
   if(stage===1){say('BAZA',"Birinchisi o'chdi. Ehtiyot bo'l, ular seni payqadi.");wave(4,0)}
   else if(stage===2){say('BAZA',"Yana bittasi qoldi. Dronlar havoda, tepaga qara.");wave(4,2)}
-  else{say('BAZA',"Signal uzildi! Shimoli-sharqdagi maydonchaga yet, seni olib ketamiz.");wave(5,3);exBeam.visible=true}}
-function reset(){for(const g of GR)scene.remove(g.m);GR.length=0;GRT=7;for(const e of ens)rmEnemy(e);ens.length=0;for(const p of picks)scene.remove(p.m);picks.length=0;
+  else{say('BAZA',"Signal uzildi! Shimoli-sharqdagi maydonchaga yet, seni olib ketamiz.");wave(5,3);exBeam.visible=!MS.boss;if(MS.boss)spawnBoss()}}
+function reset(){BOSS=null;$('#bb').hidden=true;for(const g of GR)scene.remove(g.m);GR.length=0;GRT=7;for(const e of ens)rmEnemy(e);ens.length=0;for(const p of picks)scene.remove(p.m);picks.length=0;
   for(const b of BRL){b.gone=false;b.hp=2;b.fuse=0;b.m.visible=true;b.col.y1=1.05}for(const d of DC)d.visible=false;buildGrid();
   for(const u of U){u.done=false;u.prog=0;u.sc.material=scrOn;u.beam.visible=true;u.lamp.visible=true}exBeam.visible=false;
   Object.assign(P,{x:SPAWN.x,y:0,z:SPAWN.z,vx:0,vy:0,vz:0,yaw:0,pitch:0,hp:100,onG:true,ammo:30,res:150,rel:0,fireT:0,ads:0,adsOn:false,kick:0,lastHit:-9,alive:true,spread:0,shake:0,autoT:0});
@@ -631,7 +645,7 @@ function reset(){for(const g of GR)scene.remove(g.m);GR.length=0;GRT=7;for(const
   mkSoldier(-37,13,false);mkSoldier(-43,6,false);mkSoldier(33,-11,false);mkSoldier(39,-17,false);mkSoldier(-5,-37,false);mkSoldier(-11,-43,false);mkSoldier(8,22,false);mkSoldier(-16,27,false);if(CFG.diff===2){mkSoldier(16,5,false);mkSoldier(-24,-16,false)}
   setObj();say('BAZA',"Lochin, port dushman nazoratida. Uchta uzatgichni o'chir.");hudCache={}}
 function fmtT(t){const m=(t/60)|0,s=(t%60)|0;return m+':'+(s<10?'0':'')+s}
-function finish(win){state='end';if(document.pointerLockElement)document.exitPointerLock();$('#hud').hidden=true;$('#touch').hidden=true;$('#bp').hidden=true;
+function finish(win){if(win)store.set('un',Math.max(store.get('un',0),MI+1));state='end';if(document.pointerLockElement)document.exitPointerLock();$('#hud').hidden=true;$('#touch').hidden=true;$('#bp').hidden=true;
   $('#ee').textContent=TX(win?'TOPSHIRIQ YAKUNLANDI':'TOPSHIRIQ BARBOD BO\'LDI');$('#eh').textContent=TX(win?'Vazifa bajarildi':"Halok bo'ldingiz");
   $('#ep').textContent=win?TX("Uchta uzatgich o'chirildi, siz portdan olib chiqildingiz."):(stage<3?TX("O'chirilgan uzatgichlar")+`: ${stage} / 3. `+TX("Pana joydan otib, sog'lig'ingiz tiklanishini kuting."):TX("Chiqish nuqtasiga oz qolgan edi. Yana urinib ko'ring."));
   $('#s1').textContent=fmtT(ST.time);$('#s2').textContent=ST.kills;$('#s3').textContent=ST.hs;$('#s4').textContent=(ST.shots?Math.round(ST.hits/ST.shots*100):0)+'%';
@@ -652,7 +666,7 @@ function hud(dt){setT('#hn',Math.ceil(P.hp));$('#hb').style.width=P.hp+'%';$('#h
   $('#vg').style.opacity=clamp((1-P.hp/100)*.9+clamp(.5-(now-P.lastHit),0,.5),0,1);if(hurt.t>0){hurt.t-=dt*1.2;$('#dir').style.opacity=Math.max(0,hurt.t)}
   if(popT>0){popT-=dt;if(popT<=0)$('#pop').style.opacity=0}
   if(subT>0){subT-=dt;if(subT<=0)$('#sub').style.opacity=0}else if(subQ.length){const [w,t]=subQ.shift();$('#sub').innerHTML='<em>'+w+'</em>'+t;$('#sub').style.opacity=1;subT=4.2;SFX.radio()}
-  for(let i=0;i<3;i++)mark(MK[i],U[i].x,2.2,U[i].z,!U[i].done);mark(MK[3],EXIT.x,1.5,EXIT.z,stage>=3);
+  for(let i=0;i<3;i++)mark(MK[i],U[i].x,2.2,U[i].z,!U[i].done);mark(MK[3],EXIT.x,1.5,EXIT.z,stage>=3&&!(BOSS&&!BOSS.dead));
   let tip='';if(P.rel>0)tip="Qayta o'qlanmoqda";else if(P.ammo===0)tip=P.res>0?(TOUCH?"O'QLA tugmasini bosing":"R — qayta o'qlash"):"O'q tugadi";else if(P.ammo<=WP[P.w].mag*.2&&P.res>0)tip="O'q kam";
   const te=$('#tip');if(tip){te.hidden=false;setT('#tip',TX(tip))}else te.hidden=true}
 
@@ -693,6 +707,11 @@ document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{CFG.diff=+b.data
 document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{CFG.auto=b.dataset.a==='1';store.set('auto',CFG.auto);syncChips()});
 document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{CFG.q=+b.dataset.q;store.set('q',CFG.q);applyQ();syncChips()});
 $('#sens').oninput=e=>{CFG.sens=+e.target.value;store.set('sens',CFG.sens)};
+{const un=store.get('un',0);document.querySelector('#menu h1').textContent=WNAME(MS.name);document.querySelector('#menu p').textContent=WNAME(MS.desc);
+  document.querySelectorAll('[data-m]').forEach(b=>{const i=+b.dataset.m;b.disabled=i>un;if(i===MI)b.classList.add('on');b.onclick=()=>{if(i===MI||i>un)return;store.set('m',i);location.reload()}})}
+if(MS.night){const fl=new T.SpotLight(0xdfe8ff,140,48,.48,.55,1.4);cam.add(fl);cam.add(fl.target);fl.target.position.set(0,0,-1);scene.add(cam)}
+let RAIN=null;if(MS.rain){const n=700,a=new Float32Array(n*6);for(let i=0;i<n;i++){const x=(R()-.5)*34,y=R()*18,z=(R()-.5)*34;a.set([x,y,z,x+.05,y-.55,z],i*6)}const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(a,3));RAIN=new T.LineSegments(g,new T.LineBasicMaterial({color:0xaab4c0,transparent:true,opacity:.38,fog:false}));RAIN.frustumCulled=false;scene.add(RAIN)}
+function rainUpd(dt){const a=RAIN.geometry.attributes.position.array,d=24*dt;for(let i=0;i<a.length;i+=6){a[i+1]-=d;a[i+4]-=d;if(a[i+4]<0){a[i+1]+=18;a[i+4]+=18}}RAIN.geometry.attributes.position.needsUpdate=true;RAIN.position.set(P.x,0,P.z)}
 if(window.SOL_URL){window.SOLP=Promise.race([Promise.all([solLoad(window.SOL_URL),mdlLoad(window.GUN_URL,'gun'),mdlLoad(window.DRONE_URL,'drone'),mdlLoad(window.SG_URL,'sg'),mdlLoad(window.SN_URL,'sn')]),new Promise(r=>setTimeout(r,12000))]).then(()=>{SOL.done=true})}
 $('#start').onclick=start;$('#again').onclick=start;$('#restart').onclick=start;$('#resume').onclick=resume;$('#bp').onclick=()=>state==='play'?pause():resume();
 $('#keys').innerHTML=TOUCH?"<b>Chap tomon</b><span>yurish (joystik); oxirigacha tortsangiz, yuguradi</span><b>O'ng tomon</b><span>atrofga qarash</span><b>Qizil tugma</b><span>otish. Avto-otish yoqilgan: nishon dushmanga tushsa, o'zi otadi</span><b>NISHON</b><span>mo'ljalga olish</span><b>O'CHIR</b><span>uzatgich yonida bosib turing</span>"
@@ -732,7 +751,7 @@ function update(dt){now+=dt;ST.time+=dt;
   if(flash.visible){flash.userData.t-=dt;if(flash.userData.t<=0)flash.visible=false}flashL.intensity=Math.max(0,flashL.intensity-dt*(flashL.intensity>40?600:500));
   // dunyo
   flowT-=dt;if(flowT<=0){flowT=.35;flow(P.x,P.z)}
-  grUpd(dt);ambT-=dt;if(ambT<=0){ambT=8+R()*14;if(R()<.6)SFX.gull();else SFX.horn()}
+  if(RAIN)rainUpd(dt);grUpd(dt);ambT-=dt;if(ambT<=0){ambT=8+R()*14;if(R()<.6)SFX.gull();else SFX.horn()}
   for(const e of ens)updEnemy(e,dt);for(let i=ens.length-1;i>=0;i--)if(ens[i].gone)ens.splice(i,1);
   for(const b of BRL)if(b.fuse>0&&!b.gone){b.fuse-=dt;if(b.fuse<=0)boomBarrel(b)}
   for(let i=picks.length-1;i>=0;i--){const p=picks[i];p.m.rotation.y+=dt*2;p.m.position.y=.32+Math.sin(now*3+i)*.05;if(Math.hypot(p.x-P.x,p.z-P.z)<1.4){P.rs[P.w]=P.res;P.rs[0]+=30;P.rs[1]+=4;P.rs[2]+=3;P.res=P.rs[P.w];if(R()<.4)P.gren=Math.min(5,P.gren+1);SFX.pick();pop("+30 O'Q");scene.remove(p.m);picks.splice(i,1)}}
@@ -747,7 +766,8 @@ function update(dt){now+=dt;ST.time+=dt;
     if(I.use){const p0=near.prog;near.prog+=dt/2.2;if(((p0*8)|0)!==((near.prog*8)|0))SFX.prog(near.prog);if(near.prog>=1){uplinkDone(near);I.use=false}}else near.prog=Math.max(0,near.prog-dt*.6);$('#up').style.width=clamp(near.prog,0,1)*100+'%'}
   else{ue.hidden=true;if(TOUCH){$('#bu').hidden=true}}
   if(TOUCH)$('#ba').classList.toggle('on',P.adsOn);
-  if(stage>=3){exBeam.material.opacity=.22+Math.sin(now*4)*.08;if(P.alive&&Math.hypot(EXIT.x-P.x,EXIT.z-P.z)<4.2)finish(true)}
+  if(BOSS){$('#bb').firstElementChild.nextElementSibling.firstElementChild.style.width=Math.max(0,BOSS.hp/BOSS.hp0*100)+'%'}
+  if(stage>=3&&!(BOSS&&!BOSS.dead)){exBeam.visible=true;exBeam.material.opacity=.22+Math.sin(now*4)*.08;if(P.alive&&Math.hypot(EXIT.x-P.x,EXIT.z-P.z)<4.2)finish(true)}
   hud(dt)}
 let last=performance.now(),menuA=0,fpsN=0,fpsT=0;
 function frame(t){requestAnimationFrame(frame);const dt=Math.min(.05,(t-last)/1000);last=t;
@@ -756,7 +776,7 @@ function frame(t){requestAnimationFrame(frame);const dt=Math.min(.05,(t-last)/10
   else if(state==='end'&&!P.alive){cam.position.y=Math.max(.35,cam.position.y-dt*1.6);cam.rotation.z=Math.min(.9,cam.rotation.z+dt*1.2)}
   rd.clear();rd.render(scene,cam);if(state==='play'||state==='pause'){rd.clearDepth();rd.render(gscene,gcam)}}
 addEventListener('resize',resize);resize();applyQ();buildGrid();flow(SPAWN.x,SPAWN.z);syncChips();
-window.__G={swap,throwG,WP,GM,GT,gun,update,SOL,dmgEnemy,mkDrone,MDL,solType,grThrow,GR,mkSoldier,P,ens,U,ST,I,start,get state(){return state},get stage(){return stage},uplinkDone,CFG};
+window.__G={MS,spawnBoss,get BOSS(){return BOSS},uplinkDone,swap,throwG,WP,GM,GT,gun,update,SOL,dmgEnemy,mkDrone,MDL,solType,grThrow,GR,mkSoldier,P,ens,U,ST,I,start,get state(){return state},get stage(){return stage},uplinkDone,CFG};
 requestAnimationFrame(frame);
 })();
 </script>
