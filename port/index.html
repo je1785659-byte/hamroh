@@ -746,13 +746,19 @@ addEventListener('keydown',e=>{if(e.repeat)return;keys[e.code]=true;if(state==='
 addEventListener('keyup',e=>{keys[e.code]=false});addEventListener('blur',()=>{for(const k in keys)keys[k]=false;I.fire=false;if(state==='play')pause()});
 const cv=$('#c');
 function look(dx,dy){const s=.0022*CFG.sens*lerp(1,Math.max(.16,WP[P.w].zoom*.9),P.ads);P.yaw-=dx*s;P.pitch=clamp(P.pitch-dy*s,-1.5,1.5);P.swx=clamp(P.swx+dx*.0006,-.03,.03);P.swy=clamp(P.swy+dy*.0006,-.03,.03)}
-function lock(){if(TOUCH||NOLOCK)return;try{const p=cv.requestPointerLock();if(p&&p.catch)p.catch(()=>{NOLOCK=true})}catch(e){NOLOCK=true}}
+let RAWM=true,MSKIP=0;
+function lock(){if(TOUCH||NOLOCK)return;const plain=()=>{try{const p=cv.requestPointerLock();if(p&&p.catch)p.catch(()=>{NOLOCK=true})}catch(e){NOLOCK=true}};
+  if(RAWM){try{const p=cv.requestPointerLock({unadjustedMovement:true});if(p&&p.catch)p.catch(()=>{RAWM=false;plain()});else if(!p){}}catch(e){RAWM=false;plain()}}else plain()}
+// sichqoncha: xom harakat (tezlanishsiz), sakrashlar filtrlanadi; qulf bo'lmasa — chekkada burilish va mutlaq vertikal
+function mlook(e){if(state!=='play')return;if(document.pointerLockElement===cv){if(MSKIP>0){MSKIP--;return}let dx=e.movementX||0,dy=e.movementY||0;if(Math.abs(dx)>220||Math.abs(dy)>220)return;look(dx*.6,dy*.6);return}
+  if(!NOLOCK)return;const nx=e.clientX/W,ny=e.clientY/H;MOX=nx<.14?-(.14-nx)/.14:nx>.86?(nx-.86)/.14:0;let dx=e.movementX||0;if(Math.abs(dx)>120)dx=0;look(dx*.6,0);P.pitch=clamp((.5-ny)*1.5,-1.2,1.2)}
+let MOX=0;
 if(!TOUCH){
   cv.addEventListener('mousedown',e=>{if(state!=='play')return;if(!document.pointerLockElement&&!NOLOCK){lock();return}if(e.button===0)I.fire=true;if(e.button===2)P.adsOn=true});
   addEventListener('mouseup',e=>{if(e.button===0)I.fire=false;if(e.button===2)P.adsOn=false});
-  addEventListener('mousemove',e=>{if(state==='play'&&(document.pointerLockElement===cv||NOLOCK))look(e.movementX||0,e.movementY||0)});
+  addEventListener('mousemove',mlook);document.addEventListener('mouseleave',()=>{MOX=0});
   document.addEventListener('pointerlockerror',()=>{NOLOCK=true});
-  document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&state==='play'&&!NOLOCK)pause()});
+  document.addEventListener('pointerlockchange',()=>{MSKIP=2;if(!document.pointerLockElement&&state==='play'&&!NOLOCK)pause()});
 }
 addEventListener('contextmenu',e=>e.preventDefault());
 // sensorli
@@ -802,6 +808,7 @@ function update(dt){now+=dt;ST.time+=dt;
   if(P.y<=gr){if(!P.onG&&P.vy<-5){SFX.land();P.land=.12}P.y=gr;P.vy=0;P.onG=true}else if(P.y>gr+.02)P.onG=false;
   const hs=Math.hypot(P.vx,P.vz);if(P.onG&&hs>1){P.bob+=dt*hs*1.75;P.stepT-=dt*hs;if(P.stepT<=0){P.stepT=2.3;SFX.step()}}
   // qurol
+  if(NOLOCK&&MOX&&!TOUCH)P.yaw-=MOX*2.4*dt*lerp(1,.4,P.ads);
   P.swT=Math.max(0,(P.swT||0)-dt);P.grT=Math.max(0,(P.grT||0)-dt);
   P.fireT-=dt;P.spread=Math.max(0,P.spread-dt*.07);P.kick=Math.max(0,P.kick-dt*9);P.ads+=((P.adsOn&&P.rel<=0?1:0)-P.ads)*Math.min(1,dt*13);
   let wantFire=I.fire;if(CFG.auto&&TOUCH&&P.rel<=0){if(aimEnemy()){P.autoT+=dt;if(P.autoT>.1)wantFire=true}else P.autoT=0}
