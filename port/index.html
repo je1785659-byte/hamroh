@@ -171,6 +171,8 @@ input[type=range]{flex:1;min-width:120px;accent-color:var(--amber)}
 <div id="err" hidden>O'yinni yuklab bo'lmadi: 3D kutubxona ochilmadi yoki qurilmangiz WebGL'ni qo'llamaydi. Sahifani yangilab ko'ring.</div>
 
 <script src="../lib/three.min.js?v=158"></script>
+<script src="../lib/three-gltf.js?v=158"></script>
+<script>window.SOL_URL="soldier.glb?v=1"</script>
 <script>
 'use strict';
 (function(){
@@ -421,30 +423,82 @@ const EM={body:new T.MeshStandardMaterial({color:0x2a2f37,roughness:.85}),vest:n
   drone:new T.MeshStandardMaterial({color:0x202328,roughness:.5,metalness:.6}),rotor:new T.MeshBasicMaterial({color:0x9aa0a6,transparent:true,opacity:.35,depthWrite:false})};
 const EG={leg:new T.BoxGeometry(.17,.85,.2).translate(0,-.425,0),torso:new T.BoxGeometry(.44,.62,.26),vest:new T.BoxGeometry(.5,.42,.33),head:new T.BoxGeometry(.23,.25,.25),helm:new T.BoxGeometry(.28,.13,.3),arm:new T.BoxGeometry(.13,.52,.13).translate(0,-.26,0),gun:new T.BoxGeometry(.06,.1,.74),visor:new T.BoxGeometry(.2,.055,.02),
   dbody:new T.BoxGeometry(.52,.15,.52),darm:new T.BoxGeometry(1.1,.04,.07),rotor:new T.CylinderGeometry(.2,.2,.012,12),eye:new T.SphereGeometry(.07,8,6)};
+// ---------- 3D askar modeli (Meshy, skeletli) ----------
+const SOL={ok:false,src:null,C:{},sc:1.08};
+const SOLB=/(Spine|Neck|Head|Shoulder|Arm|Hand)/;
+function solClip(c,loop){const h=c.tracks.find(t=>/Hips\.position$/.test(t.name));if(h){const v=h.values,x0=v[0],z0=v[2];for(let i=0;i<v.length;i+=3){if(loop){v[i]=0;v[i+2]=0}else{v[i]-=x0;v[i+2]-=z0}}}return c}
+function solSub(c,name,upper){return new T.AnimationClip(name,c.duration,c.tracks.filter(t=>SOLB.test(t.name)===upper))}
+function solLoad(url){const L=window.THREE_GLTFLoader||T.GLTFLoader;if(!L)return Promise.resolve(false);
+  return new L().loadAsync(url).then(g=>{const A={};for(const c of g.animations)A[c.name]=c;const C=SOL.C;
+    C.idle=solClip(A.Combat_Stance,true);C.walk=solClip(A.Walk_Forward_While_Shooting,true);C.run=solClip(A.Run_and_Shoot,true);
+    C.d0=solClip(A.Shot_and_Fall_Backward,false);C.d1=solClip(A.Shot_and_Fall_Forward,false);C.d2=solClip(A.Fall_Dead_from_Abdominal_Injury,false);
+    C.low=solSub(C.idle,'low',false);C.up=solSub(C.walk,'up',true);
+    g.scene.traverse(o=>{if(o.isSkinnedMesh){o.frustumCulled=false;o.castShadow=true;const m=o.material;m.side=T.FrontSide;m.envMapIntensity=1.3;if(m.normalScale)m.normalScale.set(1.2,1.2)}});
+    SOL.src=g.scene;SOL.ok=true;return true}).catch(e=>{console.warn('soldier',e);return false})}
+function solClone(src){const a=[],b=[],c=src.clone();src.traverse(o=>a.push(o));c.traverse(o=>b.push(o));const map=new Map();a.forEach((o,i)=>map.set(o,b[i]));
+  a.forEach((o,i)=>{if(o.isSkinnedMesh){const n=b[i];n.skeleton=new T.Skeleton(o.skeleton.bones.map(x=>map.get(x)),o.skeleton.boneInverses);n.bind(n.skeleton,o.bindMatrix)}});return c}
+const SOLG={rcv:new T.BoxGeometry(.05,.075,.34).translate(0,.045,.1),stk:new T.BoxGeometry(.04,.09,.24).translate(0,.02,-.19),hg:new T.BoxGeometry(.045,.05,.24).translate(0,.05,.39),
+  brl:new T.CylinderGeometry(.011,.011,.2,6).rotateX(Math.PI/2).translate(0,.055,.6),mag:new T.BoxGeometry(.03,.15,.06).translate(0,-.06,.12).rotateX(.18),sgt:new T.BoxGeometry(.02,.035,.09).translate(0,.1,.08),grp:new T.BoxGeometry(.03,.09,.04).translate(0,-.03,0)};
+const SOLFL=new T.SpriteMaterial({color:0xffc36a,transparent:true,blending:T.AdditiveBlending,depthWrite:false,fog:false});
+function solGun(mat){const g=new T.Group();for(const k in SOLG){const m=new T.Mesh(SOLG[k],mat);g.add(m)}const f=new T.Sprite(SOLFL);f.scale.setScalar(.55);f.position.set(0,.055,.76);f.visible=false;g.add(f);g.userData.f=f;return g}
+function solMake(par,gunMat){const root=solClone(SOL.src);root.scale.setScalar(SOL.sc);par.add(root);const mx=new T.AnimationMixer(root),C=SOL.C,ac={};
+  for(const k of ['idle','walk','run','low','up']){const a=mx.clipAction(C[k]);a.play();a.setEffectiveWeight(k==='idle'?1:0);a.time=Math.random()*C[k].duration;ac[k]=a}
+  const B=n=>root.getObjectByName('mixamorig'+n);const fl=[];root.traverse(o=>{if(o.isBone&&/(Index|Middle|Ring|Pinky)[123]$/.test(o.name))fl.push(o)});
+  for(const f of fl)f.rotation.x+=.9;
+  const gun=solGun(gunMat);par.add(gun);
+  return {root,mx,ac,w:{idle:1,walk:0,run:0,low:0,up:0},rh:B('RightHand'),lh:B('LeftHand'),head:B('Head'),spine:B('Spine1'),gun,fl,yo:-.35,hit:0,dead:false,ft:0,gy:0,gv:0}}
+const SV1=new T.Vector3(),SV2=new T.Vector3();
+// sp: tezlik (m/s), fwd: oldinga(+1)/orqaga(-1), aim: joyida nishonda
+function solUpd(e,dt,sp,fwd,aim){const m=e.m,w=m.w;
+  if(e.dead){if(!m.dead){m.dead=true;m.mx.stopAllAction();const di=e.hsKill?0:(Math.random()*3|0),c=SOL.C['d'+di];const a=m.mx.clipAction(c);a.setLoop(T.LoopOnce,1);a.clampWhenFinished=true;a.time=[1.3,.15,.6][di];a.timeScale=[1.25,1.25,1.5][di];a.play();m.gv=0;m.gun.userData.f.visible=false}
+    m.mx.update(dt);const g=m.gun;if(g.position.y>.05){m.gv-=9*dt;g.position.y=Math.max(.05,g.position.y+m.gv*dt);g.rotation.z+=dt*4;g.rotation.x*=.9}else g.rotation.z=1.5;return}
+  const t=sp>2.8?'run':sp>.35?'walk':aim?'aim':'idle',k=Math.min(1,dt*9);
+  const tw={idle:t==='idle'?1:0,walk:t==='walk'?1:0,run:t==='run'?1:0,low:t==='aim'?1:0,up:t==='aim'?1:0};
+  for(const n in tw){w[n]+=(tw[n]-w[n])*k;m.ac[n].setEffectiveWeight(w[n])}
+  m.ac.walk.timeScale=(fwd<0?-1:1)*Math.max(.6,sp/1.5)*1.6;m.ac.run.timeScale=Math.max(.7,sp/3.6);m.ac.up.timeScale=1.6;
+  m.mx.update(dt);if(m.hit>0){m.hit=Math.max(0,m.hit-dt);const q=m.hit/.28;m.spine.rotation.x-=.5*q;m.spine.rotation.z+=.25*q*m.hs}
+  e.g.updateMatrixWorld(true);m.rh.getWorldPosition(SV1);m.lh.getWorldPosition(SV2);m.head.getWorldPosition(SV3);e.hx=SV3.x;e.hy=SV3.y+.1;e.hz=SV3.z;
+  e.g.worldToLocal(SV1);e.g.worldToLocal(SV2);const dx=SV2.x-SV1.x,dy=SV2.y-SV1.y,dz=SV2.z-SV1.z,yaw=Math.atan2(dx,dz);
+  m.yo-=yaw*Math.min(1,dt*6);m.root.rotation.y=m.yo;
+  const g=m.gun;g.position.set(SV1.x-dx*.12,SV1.y-.01,SV1.z-dz*.12);g.rotation.set(-Math.atan2(dy,Math.hypot(dx,dz)),yaw,0,'YXZ');
+  g.updateMatrixWorld(true);SV1.set(0,.055,.72);g.localToWorld(SV1);e.mx=SV1.x;e.my=SV1.y;e.mz=SV1.z;
+  if(m.ft>0){m.ft-=dt;if(m.ft<=0)g.userData.f.visible=false}}
+const SV3=new T.Vector3();
+function solShot(e){const f=e.m.gun.userData.f;f.visible=true;f.material.rotation=Math.random()*6.28;e.m.ft=.05}
+function solHit(e){e.m.hit=.28;e.m.hs=Math.random()<.5?1:-1}
+function solFree(e){const m=e.m;m.mx.stopAllAction();m.mx.uncacheRoot(m.root);m.root.traverse(o=>{if(o.isSkinnedMesh)o.skeleton.dispose()})}
 const ens=[];
-function mkSoldier(x,z,alert){const g=new T.Group(),m=(geo,mat,X,Y,Z,sh)=>{const o=new T.Mesh(geo,mat);o.position.set(X,Y,Z);if(sh)o.castShadow=true;g.add(o);return o};
+function mkSoldier(x,z,alert){if(SOL.ok)return mkSoldier3(x,z,alert);const g=new T.Group(),m=(geo,mat,X,Y,Z,sh)=>{const o=new T.Mesh(geo,mat);o.position.set(X,Y,Z);if(sh)o.castShadow=true;g.add(o);return o};
   const lL=m(EG.leg,EM.body,-.11,.85,0,true),lR=m(EG.leg,EM.body,.11,.85,0,true);m(EG.torso,EM.body,0,1.16,0,true);m(EG.vest,EM.vest,0,1.22,0,false);m(EG.head,EM.body,0,1.62,0,true);m(EG.helm,EM.vest,0,1.74,0,false);m(EG.visor,EM.visor,0,1.63,.135,false);
   m(EG.arm,EM.body,-.3,1.42,0,false).rotation.x=-1.25;m(EG.arm,EM.body,.3,1.42,0,false).rotation.x=-1.05;m(EG.gun,EM.gun,.12,1.3,.52,false);
   g.position.set(x,0,z);scene.add(g);const e={kind:'s',x,y:0,z,hp:100,g,lL,lR,alert:!!alert,los:false,losT:R()*.2,seen:0,react:.45+R()*.5,left:0,st:0,cool:.3+R(),strafeT:1+R()*2,smove:0,sdir:0,pref:13+R()*14,walk:0,dead:false,deadT:0,sd:R()<.5?1:-1,yaw:R()*6.28};ens.push(e);return e}
+const NOLEG={rotation:{x:0}};
+function mkSoldier3(x,z,alert){const g=new T.Group();g.position.set(x,0,z);scene.add(g);const m=solMake(g,EM.gun);
+  const e={kind:'s',x,y:0,z,hp:100,g,m,lL:NOLEG,lR:NOLEG,hx:x,hy:1.65,hz:z,alert:!!alert,los:false,losT:R()*.2,seen:0,react:.45+R()*.5,left:0,st:0,cool:.3+R(),strafeT:1+R()*2,smove:0,sdir:0,pref:13+R()*14,walk:0,dead:false,deadT:0,sd:R()<.5?1:-1,yaw:R()*6.28};ens.push(e);return e}
+function rmEnemy(e){scene.remove(e.g);if(e.m)solFree(e)}
 function mkDrone(x,z){const g=new T.Group();const b=new T.Mesh(EG.dbody,EM.drone);b.castShadow=true;g.add(b);const a1=new T.Mesh(EG.darm,EM.drone);a1.rotation.y=Math.PI/4;g.add(a1);const a2=new T.Mesh(EG.darm,EM.drone);a2.rotation.y=-Math.PI/4;g.add(a2);
   const rot=[];for(const [X,Z] of [[.39,.39],[-.39,.39],[.39,-.39],[-.39,-.39]]){const r=new T.Mesh(EG.rotor,EM.rotor);r.position.set(X,.06,Z);g.add(r);rot.push(r)}
   const eye=new T.Mesh(EG.eye,EM.visor);eye.position.set(0,-.09,.2);g.add(eye);const gl=new T.Sprite(glowM(0xff3b2a));gl.scale.setScalar(.9);gl.position.set(0,-.09,.2);g.add(gl);
   g.position.set(x,14,z);scene.add(g);const e={kind:'d',x,y:14,z,hp:45,g,rot,alert:true,los:false,losT:0,seen:0,react:.6,cool:1+R(),dead:false,deadT:0,vy:0,ph:R()*6,sd:R()<.5?1:-1,h:8.8+R()*1.6};ens.push(e);return e}
 function alertAll(x,z,r){for(const e of ens)if(!e.dead&&!e.alert&&Math.hypot(e.x-x,e.z-z)<r)e.alert=true}
-function dmgEnemy(e,d,head){if(e.dead)return;e.hp-=d;e.alert=true;if(e.hp<=0){e.dead=true;e.deadT=0;ST.kills++;if(head)ST.hs++;
+function dmgEnemy(e,d,head){if(e.dead)return;e.hp-=d;e.alert=true;if(e.m)solHit(e);if(e.hp<=0){e.dead=true;e.deadT=0;e.hsKill=!!head;ST.kills++;if(head)ST.hs++;
   if(e.kind==='s'&&R()<.5)drop(e.x,e.z);if(e.kind==='d')e.vy=1;return true}return false}
 const pickG=new T.BoxGeometry(.34,.2,.22),pickM=new T.MeshStandardMaterial({color:0x4c5a34,roughness:.6,emissive:0x2a3a10}),picks=[];
 function drop(x,z){const m=new T.Mesh(pickG,pickM);m.position.set(x,.3,z);const s=new T.Sprite(glowM(0xffd070));s.scale.setScalar(1.1);m.add(s);scene.add(m);picks.push({x,z,m})}
 const TP={x:0,y:0,z:0};
-function enemyShot(e,d,steady){const oy=e.kind==='s'?1.45:e.y-.1;let p=clamp(.5-d*.011,.1,.46)*DIFF[CFG.diff].acc*(steady?1:.6)*(e.kind==='d'?.75:1);const sp=Math.hypot(P.vx,P.vz);if(sp>5.5)p*=.6;else if(sp>2)p*=.82;if(!P.onG)p*=.7;
-  const ex=e.x,ez=e.z,py=P.y+1.25;SFX.eshot(clamp(1-d/60,.12,1));
+function enemyShot(e,d,steady){let oy=e.kind==='s'?1.45:e.y-.1;let p=clamp(.5-d*.011,.1,.46)*DIFF[CFG.diff].acc*(steady?1:.6)*(e.kind==='d'?.75:1);const sp=Math.hypot(P.vx,P.vz);if(sp>5.5)p*=.6;else if(sp>2)p*=.82;if(!P.onG)p*=.7;
+  let ex=e.x,ez=e.z;const py=P.y+1.25;if(e.m&&e.mx!==undefined){ex=e.mx;oy=e.my;ez=e.mz;solShot(e)}SFX.eshot(clamp(1-d/60,.12,1));
   if(R()<p){tracer(ex,oy,ez,P.x,py,P.z,0xff9a70);hurt((e.kind==='d'?7:9)*DIFF[CFG.diff].dmg,ex,ez)}
   else{const a=R()*6.28,r=.7+R()*1.4,tx=P.x+Math.cos(a)*r,ty=py+(R()-.3)*1.2,tz=P.z+Math.sin(a)*r,dx=tx-ex,dy=ty-oy,dz=tz-ez,L=Math.hypot(dx,dy,dz),t=rayWorld(ex,oy,ez,dx/L,dy/L,dz/L,L+25);
     tracer(ex,oy,ez,ex+dx/L*t,oy+dy/L*t,ez+dz/L*t,0xff9a70);if(t<L+25)sparks(ex+dx/L*t,oy+dy/L*t,ez+dz/L*t,HIT.nx,HIT.ny,HIT.nz,3,3)}}
-function updEnemy(e,dt){
-  if(e.dead){e.deadT+=dt;if(e.kind==='s'){e.g.rotation.x=-Math.min(1,e.deadT/.38)*1.52;e.g.position.y=Math.min(1,e.deadT/.38)*.13-(e.deadT>5?(e.deadT-5)*.25:0)}
+function updEnemy(e,dt){const px=e.x,pz=e.z,wd=e.dead;updEnemy0(e,dt);if(!e.m||e.gone)return;
+  if(e.dead){solUpd(e,dt,0,1,false);return}
+  const vx=(e.x-px)/dt,vz=(e.z-pz)/dt,sp=Math.hypot(vx,vz);e.spS=(e.spS||0)+(sp-(e.spS||0))*Math.min(1,dt*10);
+  solUpd(e,dt,e.spS,vx*Math.sin(e.yaw)+vz*Math.cos(e.yaw)<-.3?-1:1,e.alert&&e.los)}
+function updEnemy0(e,dt){
+  if(e.dead){e.deadT+=dt;if(e.kind==='s'&&e.m){e.g.position.y=-(e.deadT>5?(e.deadT-5)*.25:0)}else if(e.kind==='s'){e.g.rotation.x=-Math.min(1,e.deadT/.38)*1.52;e.g.position.y=Math.min(1,e.deadT/.38)*.13-(e.deadT>5?(e.deadT-5)*.25:0)}
     else if(!e.boom){e.vy-=13*dt;e.y+=e.vy*dt;e.g.position.y=e.y;e.g.rotation.z+=dt*5;e.g.rotation.x+=dt*3;if(e.y<=.25){e.boom=true;e.g.visible=false;explode(e.x,.2,e.z,false)}}
-    if(e.deadT>7){scene.remove(e.g);e.gone=true}return}
+    if(e.deadT>7){rmEnemy(e);e.gone=true}return}
   const dx=P.x-e.x,dz=P.z-e.z,d=Math.hypot(dx,dz)||.001,ey=e.kind==='s'?1.5:e.y;
   e.losT-=dt;if(e.losT<=0){e.losT=.11+R()*.1;e.los=P.alive&&clearSeg(e.x,ey,e.z,P.x,P.y+1.45,P.z)}
   if(!e.alert){if((e.los&&d<30)||d<7)e.alert=true;else{e.yaw+=dt*.35*e.sd;e.g.rotation.y=e.yaw;return}}
@@ -481,7 +535,7 @@ function fire(){P.ammo--;P.fireT=.092;ST.shots++;P.kick=1;
   V1.set((R()-R())*sp,(R()-R())*sp,-1).normalize().applyQuaternion(cam.quaternion);const o=cam.position,dx=V1.x,dy=V1.y,dz=V1.z;
   let t=rayWorld(o.x,o.y,o.z,dx,dy,dz,220),hb=HIT.b,nx=HIT.nx,ny=HIT.ny,nz2=HIT.nz,he=null,head=false;
   for(const e of ens){if(e.dead)continue;if(e.kind==='d'){const q=raySphere(o.x,o.y,o.z,dx,dy,dz,e.x,e.y,e.z,.5);if(q>0&&q<t){t=q;he=e;head=false}}
-    else{let q=raySphere(o.x,o.y,o.z,dx,dy,dz,e.x,1.65,e.z,.18);if(q>0&&q<t){t=q;he=e;head=true}TB.x0=e.x-.27;TB.x1=e.x+.27;TB.y0=0;TB.y1=1.5;TB.z0=e.z-.27;TB.z1=e.z+.27;q=rayBox(o.x,o.y,o.z,dx,dy,dz,TB);if(q>0&&q<t){t=q;he=e;head=false}}}
+    else{let q=e.m?raySphere(o.x,o.y,o.z,dx,dy,dz,e.hx,e.hy,e.hz,.17):raySphere(o.x,o.y,o.z,dx,dy,dz,e.x,1.65,e.z,.18);if(q>0&&q<t){t=q;he=e;head=true}TB.x0=e.x-.27;TB.x1=e.x+.27;TB.y0=0;TB.y1=e.m?e.hy-.15:1.5;TB.z0=e.z-.27;TB.z1=e.z+.27;q=rayBox(o.x,o.y,o.z,dx,dy,dz,TB);if(q>0&&q<t){t=q;he=e;head=false}}}
   const hx=o.x+dx*t,hy=o.y+dy*t,hz=o.z+dz*t;
   V2.set(0,.004,-.82);gun.localToWorld(V2);V2.applyMatrix4(cam.matrixWorld);tracer(V2.x,V2.y,V2.z,hx,hy,hz,0xffe2a0);
   if(he){ST.hits++;const k=dmgEnemy(he,head?105:34,head);hitFx();$('#hm').className=k?'k':'';if(k){if(head){SFX.head();pop('BOSHGA')}else SFX.kill()}else SFX.hit();
@@ -503,7 +557,7 @@ function uplinkDone(u){u.done=true;u.sc.material=scrOff;u.beam.visible=false;u.l
   if(stage===1){say('BAZA',"Birinchisi o'chdi. Ehtiyot bo'l, ular seni payqadi.");wave(4,0)}
   else if(stage===2){say('BAZA',"Yana bittasi qoldi. Dronlar havoda, tepaga qara.");wave(4,2)}
   else{say('BAZA',"Signal uzildi! Shimoli-sharqdagi maydonchaga yet, seni olib ketamiz.");wave(5,3);exBeam.visible=true}}
-function reset(){for(const e of ens)scene.remove(e.g);ens.length=0;for(const p of picks)scene.remove(p.m);picks.length=0;
+function reset(){for(const e of ens)rmEnemy(e);ens.length=0;for(const p of picks)scene.remove(p.m);picks.length=0;
   for(const b of BRL){b.gone=false;b.hp=2;b.fuse=0;b.m.visible=true;b.col.y1=1.05}for(const d of DC)d.visible=false;buildGrid();
   for(const u of U){u.done=false;u.prog=0;u.sc.material=scrOn;u.beam.visible=true;u.lamp.visible=true}exBeam.visible=false;
   Object.assign(P,{x:SPAWN.x,y:0,z:SPAWN.z,vx:0,vy:0,vz:0,yaw:0,pitch:0,hp:100,onG:true,ammo:30,res:150,rel:0,fireT:0,ads:0,adsOn:false,kick:0,lastHit:-9,alive:true,spread:0,shake:0,autoT:0});
@@ -567,13 +621,14 @@ if(TOUCH){const layer=$('#touch'),joy=$('#joy'),knob=joy.firstElementChild;
 }
 function pause(){if(state!=='play')return;state='pause';I.fire=false;if(document.pointerLockElement)document.exitPointerLock();$('#pause').hidden=false;syncChips()}
 function resume(){if(state!=='pause')return;$('#pause').hidden=true;state='play';last=performance.now();lock()}
-function start(){audioInit();reset();$('#menu').hidden=true;$('#end').hidden=true;$('#pause').hidden=true;$('#hud').hidden=false;$('#touch').hidden=!TOUCH;if(TOUCH)$('#sub').style.bottom='36%';$('#bp').hidden=false;state='play';last=performance.now();lock()}
+function start(){audioInit();if(window.SOLP&&!SOL.done){const b=$('#start');if(b)b.disabled=true;window.SOLP.then(()=>{if(b)b.disabled=false;start()});return}reset();$('#menu').hidden=true;$('#end').hidden=true;$('#pause').hidden=true;$('#hud').hidden=false;$('#touch').hidden=!TOUCH;if(TOUCH)$('#sub').style.bottom='36%';$('#bp').hidden=false;state='play';last=performance.now();lock()}
 function syncChips(){document.querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',+b.dataset.d===CFG.diff));document.querySelectorAll('[data-a]').forEach(b=>b.classList.toggle('on',(+b.dataset.a===1)===!!CFG.auto));document.querySelectorAll('[data-q]').forEach(b=>b.classList.toggle('on',+b.dataset.q===CFG.q));$('#sens').value=CFG.sens;
   const b=store.get('best'+CFG.diff,0);$('#best').hidden=!b;if(b)$('#best').textContent=TX('ENG YAXSHI VAQT')+' · '+fmtT(b)}
 document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{CFG.diff=+b.dataset.d;store.set('diff',CFG.diff);syncChips()});
 document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{CFG.auto=b.dataset.a==='1';store.set('auto',CFG.auto);syncChips()});
 document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{CFG.q=+b.dataset.q;store.set('q',CFG.q);applyQ();syncChips()});
 $('#sens').oninput=e=>{CFG.sens=+e.target.value;store.set('sens',CFG.sens)};
+if(window.SOL_URL){window.SOLP=Promise.race([solLoad(window.SOL_URL),new Promise(r=>setTimeout(r,9000))]).then(()=>{SOL.done=true})}
 $('#start').onclick=start;$('#again').onclick=start;$('#restart').onclick=start;$('#resume').onclick=resume;$('#bp').onclick=()=>state==='play'?pause():resume();
 $('#keys').innerHTML=TOUCH?"<b>Chap tomon</b><span>yurish (joystik); oxirigacha tortsangiz, yuguradi</span><b>O'ng tomon</b><span>atrofga qarash</span><b>Qizil tugma</b><span>otish. Avto-otish yoqilgan: nishon dushmanga tushsa, o'zi otadi</span><b>NISHON</b><span>mo'ljalga olish</span><b>O'CHIR</b><span>uzatgich yonida bosib turing</span>"
   :"<b>W A S D</b><span>yurish</span><b>Sichqoncha</b><span>qarash, chap tugma — otish, o'ng tugma — mo'ljal</span><b>Shift · Bo'sh joy</b><span>yugurish · sakrash</span><b>R · E</b><span>qayta o'qlash · uzatgichni o'chirish (bosib turing)</span><b>Esc</b><span>pauza</span>";
@@ -633,7 +688,7 @@ function frame(t){requestAnimationFrame(frame);const dt=Math.min(.05,(t-last)/10
   else if(state==='end'&&!P.alive){cam.position.y=Math.max(.35,cam.position.y-dt*1.6);cam.rotation.z=Math.min(.9,cam.rotation.z+dt*1.2)}
   rd.clear();rd.render(scene,cam);if(state==='play'||state==='pause'){rd.clearDepth();rd.render(gscene,gcam)}}
 addEventListener('resize',resize);resize();applyQ();buildGrid();flow(SPAWN.x,SPAWN.z);syncChips();
-window.__G={P,ens,U,ST,I,start,get state(){return state},get stage(){return stage},uplinkDone,CFG};
+window.__G={SOL,dmgEnemy,P,ens,U,ST,I,start,get state(){return state},get stage(){return stage},uplinkDone,CFG};
 requestAnimationFrame(frame);
 })();
 </script>
