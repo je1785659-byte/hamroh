@@ -939,7 +939,8 @@ let bbOn=null;
 function syncBack(){if(!(tg&&tg.BackButton))return;const on=!!backAction();if(on!==bbOn){bbOn=on;try{on?tg.BackButton.show():tg.BackButton.hide()}catch(e){}}}
 if(tg&&tg.BackButton){try{tg.BackButton.onClick(appBack)}catch(e){}}
 new MutationObserver(()=>{clearTimeout(syncBack.t);syncBack.t=setTimeout(syncBack,60)}).observe(document.body,{childList:true,subtree:true});
-function go(t){ statSec(t); document.body.classList.remove('rn-play'); if(typeof compassStop==='function'&&compassStop){compassStop();compassStop=null} current=t; store.set('tab',t); stopGame(); renderTabs(); setHero(t); VIEWS[t](); window.scrollTo(0,0); if(tg&&tg.HapticFeedback){try{tg.HapticFeedback.selectionChanged()}catch(e){}} }
+function fsGame(on){try{if(!tg||!tg.requestFullscreen||!tg.isVersionAtLeast||!tg.isVersionAtLeast('8.0'))return;if(!/tdesktop|macos|web/.test(tg.platform||''))return;if(on&&!tg.isFullscreen)tg.requestFullscreen();else if(!on&&tg.isFullscreen)tg.exitFullscreen()}catch(e){}}
+function go(t){ statSec(t); document.body.classList.remove('rn-play');fsGame(t==='yugur'||t==='port'||t==='shaxmat'||t==='shashka'); if(typeof compassStop==='function'&&compassStop){compassStop();compassStop=null} current=t; store.set('tab',t); stopGame(); renderTabs(); setHero(t); VIEWS[t](); window.scrollTo(0,0); if(tg&&tg.HapticFeedback){try{tg.HapticFeedback.selectionChanged()}catch(e){}} }
 
 /* ---------- 1. TAOMLAR ---------- */
 const DISHES = {
@@ -3982,7 +3983,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261111b';
+const APP_VER='20261111c';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 // oflayn rejim: ilova va o'yinlar internetsiz ham ochiladi
