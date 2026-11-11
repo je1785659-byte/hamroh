@@ -82,8 +82,8 @@ html,body{height:100%;margin:0;background:var(--ink);color:var(--text);font-fami
 #menu{overflow-y:auto;align-items:flex-start;-webkit-overflow-scrolling:touch}#menu .box{margin:auto}
 .meta{margin-top:12px;font:500 12.5px/1.55 var(--body,system-ui);color:var(--dim,#aab);text-align:left}.meta b{color:var(--amber);font-weight:700;letter-spacing:.06em}.meta i{font-style:normal;float:right;color:var(--text,#fff)}.meta .ok{color:#5fe08a}
 #shop .chip{font-size:11px;padding:6px 7px}#shop{flex-wrap:wrap}
-#bw{right:200px;bottom:22px;width:56px;height:56px;font-size:11px}
-#bg{right:196px;bottom:92px;width:58px;height:58px;font-size:9.5px}
+#bw{right:12px;top:104px;width:54px;height:54px;font-size:10.5px}
+#bg{right:12px;top:166px;width:54px;height:54px;font-size:9px}
 #scope{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 50%,transparent 0,transparent 33vmin,rgba(0,0,0,.92) 33.6vmin,#000 36vmin)}
 #scope i{position:absolute;background:rgba(0,0,0,.85)}#scope i:first-child{left:50%;top:calc(50% - 33vmin);width:1.5px;height:66vmin;margin-left:-.75px}#scope i:last-child{top:50%;left:calc(50% - 33vmin);height:1.5px;width:66vmin;margin-top:-.75px}
 #br{right:116px;bottom:148px;width:54px;height:54px}
@@ -547,7 +547,7 @@ function mkSoldier3(x,z,alert){const g=new T.Group();g.position.set(x,0,z);scene
 function rmEnemy(e){scene.remove(e.g);if(e.laser)scene.remove(e.laser);if(e.m)solFree(e)}
 // ---------- dushman turlari, chekinish, granata ----------
 const GR=[];let GRT=7;const grG=new T.SphereGeometry(.07,8,6),grM=new T.MeshStandardMaterial({color:0x2c3524,roughness:.6});
-function solType(e,t){e.type=t;if(t==='b'){e.hp=e.hp0=[900,1400,1900][CFG.diff];e.spd=.9;e.pref=20;e.m.root.scale.setScalar(SOL.sc*1.38);const s=new T.Sprite(glowM(0xff2a1a));s.scale.setScalar(.6);e.g.add(s);e.tag=s}
+function solType(e,t){e.type=t;if(t==='b'){e.hp=e.hp0=[800,1200,1600][CFG.diff];e.spd=.9;e.pref=20;e.m.root.scale.setScalar(SOL.sc*1.38);const s=new T.Sprite(glowM(0xff2a1a));s.scale.setScalar(.6);e.g.add(s);e.tag=s}
   else if(t==='h'){e.hp=240;e.spd=.78;e.m.root.scale.setScalar(SOL.sc*1.14);const s=new T.Sprite(glowM(0xff8a2a));s.scale.setScalar(.34);e.g.add(s);e.tag=s}
   else if(t==='s'){e.hp=80;e.pref=48;e.aimT=0;const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute([0,0,0,0,0,1],3));const l=new T.Line(g,new T.LineBasicMaterial({color:0xff2a1a,transparent:true,opacity:0,fog:false}));l.frustumCulled=false;scene.add(l);e.laser=l}}
 function aiPre(e,dt){if(e.type==='s'||e.fleeT>0){e.cool=Math.max(e.cool,.5);e.left=0}}
@@ -561,8 +561,8 @@ function aiPost(e,dt){const dx=P.x-e.x,dz=P.z-e.z,d=Math.hypot(dx,dz)||.001;
       if(e.aimT>2.4){e.aimT=-.4-R()*.8;const sp=Math.hypot(P.vx,P.vz),hit=R()<(sp>5?.3:sp>2?.55:.85)*Math.min(1,DIFF[CFG.diff].acc);solShot(e);SFX.eshot(1);
         if(hit){tracer(e.mx,e.my,e.mz,P.x,P.y+1.25,P.z,0xff7050);hurt(36*DIFF[CFG.diff].dmg,e.x,e.z)}else{tracer(e.mx,e.my,e.mz,P.x+(R()-.5)*1.6,P.y+1.5+R()*.5,P.z+(R()-.5)*1.6,0xff7050);SFX.whiz()}}}
     else{e.aimT=Math.max(0,e.aimT-dt*2);l.material.opacity=0}return}
-  if((!e.type||e.type==='b')&&GRT<=0&&e.los&&d>9&&d<30&&e.mx!==undefined&&!(e.fleeT>0)&&R()<dt*(e.type?2:.6)){GRT=e.type?3.5+R()*2:9+R()*6;grThrow(e)}
-  if(e.type==='b'){e.sumT=(e.sumT||14)-dt;if(e.sumT<=0){e.sumT=16;wave(2,1)}}}
+  if((!e.type||e.type==='b')&&GRT<=0&&e.los&&d>9&&d<30&&e.mx!==undefined&&!(e.fleeT>0)&&R()<dt*(e.type?2:.6)){GRT=e.type?6+R()*3:9+R()*6;grThrow(e)}
+  if(e.type==='b'){e.sumT=(e.sumT||18)-dt;if(e.sumT<=0){e.sumT=24;if(ens.filter(o=>!o.dead).length<7)wave(2,1)}}}
 function grThrow(e){const m=new T.Mesh(grG,grM);scene.add(m);const Tm=1.15,g={m,x:e.mx,y:e.my+.2,z:e.mz,t:2.3,land:false};g.vx=(P.x-g.x)/Tm;g.vz=(P.z-g.z)/Tm;g.vy=(.1-g.y)/Tm+.5*13*Tm;GR.push(g);pop('GRANATA!');SFX.grn()}
 function grUpd(dt){GRT-=dt;for(let i=GR.length-1;i>=0;i--){const g=GR[i];g.t-=dt;if(!g.land){g.vy-=13*dt;if(g.mine){const sl=Math.hypot(g.vx,g.vy,g.vz)||1,st=sl*dt;if(rayWorld(g.x,g.y,g.z,g.vx/sl,g.vy/sl,g.vz/sl,st+.1)<st+.1){if(Math.abs(HIT.ny)>.7){g.vy*=-.3;g.vx*=.5;g.vz*=.5}else{g.vx*=-.3;g.vz*=-.3}}}g.x+=g.vx*dt;g.y+=g.vy*dt;g.z+=g.vz*dt;if(g.y<=.08){g.y=.08;g.land=true;SFX.step()}}
     g.m.position.set(g.x,g.y,g.z);g.m.rotation.x+=dt*9;if(g.t<=0){scene.remove(g.m);GR.splice(i,1);explode(g.x,g.y,g.z,false);decal(g.x,0,g.z,0,1,0,12);if(g.mine){for(const e of ens){if(e.dead)continue;const d=Math.hypot(e.x-g.x,e.z-g.z,e.kind==='d'?e.y-g.y:0);if(d<7){GKF=1;dmgEnemy(e,(1-d/7)*240,false);GKF=0}}for(const b of BRL)if(!b.gone&&Math.hypot(b.x-g.x,b.z-g.z)<4)b.fuse=.1}const dp=Math.hypot(P.x-g.x,P.z-g.z);if(dp<6.5&&clearSeg(g.x,.6,g.z,P.x,P.y+1,P.z))hurt((1-dp/6.5)*60*DIFF[CFG.diff].dmg,g.x,g.z);P.shake=Math.max(P.shake,clamp(1.2-dp/10,0,.8))}}}
@@ -824,7 +824,7 @@ function frame(t){requestAnimationFrame(frame);const dt=Math.min(.05,(t-last)/10
   else if(state==='end'&&!P.alive){cam.position.y=Math.max(.35,cam.position.y-dt*1.6);cam.rotation.z=Math.min(.9,cam.rotation.z+dt*1.2)}
   rd.clear();rd.render(scene,cam);if(state==='play'||state==='pause'){rd.clearDepth();rd.render(gscene,gcam)}}
 addEventListener('resize',resize);resize();applyQ();buildGrid();flow(SPAWN.x,SPAWN.z);syncChips();
-window.__G={econEnd,get COINS(){return COINS},UP,DQ,shopDraw,finish,spawnBoss,get BOSS(){return BOSS},uplinkDone,swap,throwG,WP,GM,GT,gun,update,SOL,dmgEnemy,mkDrone,MDL,solType,grThrow,GR,mkSoldier,P,ens,U,ST,I,start,get state(){return state},get stage(){return stage},uplinkDone,CFG};
+window.__G={rd,scene,econEnd,get COINS(){return COINS},UP,DQ,shopDraw,finish,spawnBoss,get BOSS(){return BOSS},uplinkDone,swap,throwG,WP,GM,GT,gun,update,SOL,dmgEnemy,mkDrone,MDL,solType,grThrow,GR,mkSoldier,P,ens,U,ST,I,start,get state(){return state},get stage(){return stage},uplinkDone,CFG};
 requestAnimationFrame(frame);
 })();
 </script>
