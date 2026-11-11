@@ -2204,7 +2204,7 @@ function viewSaved(){
 }
 // open a shared recipe: t.me/bot/app?startapp=r_osh
 (function(){try{const tq=new URLSearchParams(location.search).get('t');if(tq){current=tq;store.set('tab',tq)}}catch(e){}})();
-(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'||sp==='yugur'||sp==='port'||sp==='shaxmat'||sp==='shashka'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('yugur-r')){store.set('tab','yugur');current='yugur';store.set('rn_ref',sp.slice(7).replace(/\D/g,''))}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
+(function(){let sp=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param;try{const q=new URLSearchParams(location.search).get('r');if(q)sp='r_'+q}catch(e){}if(sp==='prava'){store.set('tab','prava');current='prava'}if(sp==='kkal'||sp==='sert'||sp==='mafia'||sp==='yugur'||sp==='port'||sp==='shaxmat'||sp==='shashka'){store.set('tab',sp);current=sp}if(sp&&sp.startsWith('yugur-r')){store.set('tab','yugur');current='yugur';store.set('rn_ref',sp.slice(7).replace(/\D/g,''))}if(sp&&sp.startsWith('pd-')){store.set('tab','port');current='port';window.PORT_ROOM=sp.slice(3).replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,8)}if(sp&&sp.startsWith('ertak_')){const eid=sp.slice(6);store.set('tab','kids');current='kids';setTimeout(()=>{if(typeof viewErtak==='function'&&ERTAKLAR.some(x=>x.id===eid))viewErtak(eid)},60)}if(sp&&sp.startsWith('r_')){const d=ALL_DISHES.find(x=>slug(x.n)===sp.slice(2));if(d){store.set('tab','food');current='food';foodMode='wheel';setTimeout(()=>{curRecipe=d;servings=4;showRecipe(true)},50)}}})();
 
 const TOOLIC={qibla:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
  tasbeh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="17.5" cy="15" r="2"/><circle cx="12" cy="18.5" r="2"/><circle cx="6.5" cy="15" r="2"/><circle cx="6.5" cy="8.5" r="2"/></svg>',
@@ -3984,7 +3984,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261112c';
+const APP_VER='20261112d';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 // oflayn rejim: ilova va o'yinlar internetsiz ham ochiladi
@@ -5806,7 +5806,7 @@ VIEWS.home=viewHome;VIEWS.audio=viewAudio;VIEWS.admin=viewAdmin;VIEWS.mafia=view
 function viewFrame(dir){document.body.classList.add('rn-play');try{tg&&tg.disableVerticalSwipes&&tg.disableVerticalSwipes()}catch(e){}$('#hero').hidden=true;
   $('#screen').innerHTML=`<div class="rn" style="background:#141210" data-noi18n><iframe title="${dir}" src="${dir}/index.html?v=${APP_VER}#${LANG||'uz'}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="autoplay; fullscreen"></iframe></div>`}
 function viewPort(){document.body.classList.add('rn-play');try{tg&&tg.disableVerticalSwipes&&tg.disableVerticalSwipes()}catch(e){}$('#hero').hidden=true;
-  $('#screen').innerHTML=`<div class="rn" style="background:#0d1014" data-noi18n><iframe id="ptframe" title="Port" src="port/index.html?v=${APP_VER}#${LANG||'uz'}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="autoplay; fullscreen"></iframe></div>`}
+  $('#screen').innerHTML=`<div class="rn" style="background:#0d1014" data-noi18n><iframe id="ptframe" title="Port" src="port/index.html?v=${APP_VER}#${LANG||'uz'}${window.PORT_ROOM?'&r='+window.PORT_ROOM:''}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="autoplay; fullscreen"></iframe></div>`;window.PORT_ROOM=''}
 addEventListener('message',e=>{if((e.data==='port-exit'||e.data==='game-exit')&&(current==='port'||current==='shaxmat'||current==='shashka')){try{tg&&tg.enableVerticalSwipes&&tg.enableVerticalSwipes()}catch(_){}go('home')}});VIEWS.kkal=()=>{kkView='day';kkPick=null;kkPh=null;kkOff=0;kkQ='';viewKkal()};
 (function(){const n=uzNow();$('#todaychip').textContent=`${n.getUTCDate()}-${OYLAR[n.getUTCMonth()].slice(0,3)}`})();
 if(!VIEWS[current]) current='home';

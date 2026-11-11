@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 11.11.2026-15
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 12.11.2026-16
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -412,6 +412,8 @@ async function D(env){
       env.DB.prepare('CREATE TABLE IF NOT EXISTS blroom(id TEXT PRIMARY KEY,game TEXT,p0 INTEGER,p1 INTEGER,n0 TEXT,n1 TEXT,seq INTEGER DEFAULT 0,data TEXT,init TEXT,created INTEGER,updated INTEGER,lp0 INTEGER DEFAULT 0,lp1 INTEGER DEFAULT 0)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS foodfix(day TEXT,k TEXT,a TEXT,u TEXT,n INTEGER DEFAULT 0,r REAL DEFAULT 0,PRIMARY KEY(day,k,a,u))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_user(uid INTEGER PRIMARY KEY,name TEXT,region TEXT,rwk TEXT,ref INTEGER,bonus INTEGER DEFAULT 0,wkc TEXT,card INTEGER DEFAULT 0)'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_room(room TEXT PRIMARY KEY,p TEXT,st INTEGER DEFAULT 0,t INTEGER)'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_sig(id INTEGER PRIMARY KEY AUTOINCREMENT,room TEXT,src INTEGER,dst INTEGER,data TEXT,t INTEGER)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,dist INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
       env.DB.prepare("INSERT OR IGNORE INTO meta(k,v) VALUES('since',?1)").bind(String(Date.now()))
@@ -716,7 +718,7 @@ async function statsText(env,db){
 }
 // ---------- Yugur!: viloyatlar bellashuvi, haftalik reyting, do'stni chaqirish ----------
 const RN_REG=['tsh','tsv','and','bux','far','jiz','xor','nam','nav','qas','qqr','sam','sir','sur'];
-const RN_ROUTES={'/rn/me':1,'/rn/run':1,'/rn/card':1,'/pt/run':1,'/pt/me':1};
+const RN_ROUTES={'/rn/me':1,'/rn/run':1,'/rn/card':1,'/pt/run':1,'/pt/me':1,'/pt/sig':1};
 // hafta: Toshkent vaqti bo'yicha dushanbadan boshlanadi
 function rnWeek(t){const d=new Date(t+TZMS),wd=(d.getUTCDay()+6)%7;return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-wd)).toISOString().slice(0,10)}
 const rnName=u=>((u.first_name||'').trim().slice(0,16)+(u.last_name?' '+u.last_name.trim()[0]+'.':''))||'O\'yinchi';
@@ -726,6 +728,21 @@ async function handleRn(path,req,env){
   const db=await D(env).catch(()=>null);if(!db)return J({ok:false,nodb:true});
   const now=Date.now(),wk=rnWeek(now),lwk=rnWeek(now-7*DAY);
   await db.prepare('INSERT INTO rn_user(uid,name) VALUES(?1,?2) ON CONFLICT(uid) DO UPDATE SET name=?2').bind(u.id,rnName(u)).run();
+  if(path==='/pt/sig'){ // Port dueli: xona va WebRTC ulanishi uchun xabar almashish (o'yin ma'lumoti bu yerdan o'tmaydi)
+    const op=String(f.get('op')||''),name=rnName(u);
+    if(op==='create'){if(Math.random()<.1){await db.prepare('DELETE FROM pt_room WHERE t<?1').bind(now-2*3600e3).run();await db.prepare('DELETE FROM pt_sig WHERE t<?1').bind(now-2*3600e3).run()}
+      for(let k=0;k<5;k++){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let room='';for(let i=0;i<5;i++)room+=A[Math.random()*A.length|0];
+        const r=await db.prepare('INSERT OR IGNORE INTO pt_room(room,p,st,t) VALUES(?1,?2,0,?3)').bind(room,JSON.stringify([{uid:u.id,name}]),now).run();if(r.meta.changes)return J({ok:true,room,slot:0,players:[{name}]})}
+      return J({ok:false})}
+    const room=String(f.get('room')||'').toUpperCase().slice(0,8),row=await db.prepare('SELECT p,st FROM pt_room WHERE room=?1 AND t>?2').bind(room,now-2*3600e3).first();if(!row)return J({ok:false,gone:true});
+    const pl=JSON.parse(row.p);let slot=pl.findIndex(x=>x.uid===u.id);const pub=()=>pl.map(x=>({name:x.name}));
+    if(op==='join'){if(slot<0){if(row.st)return J({ok:false,started:true});if(pl.length>=4)return J({ok:false,full:true});pl.push({uid:u.id,name});slot=pl.length-1;await db.prepare('UPDATE pt_room SET p=?2 WHERE room=?1').bind(room,JSON.stringify(pl)).run()}return J({ok:true,room,slot,players:pub()})}
+    if(slot<0)return J({ok:false},403);
+    if(op==='start'){if(slot!==0)return J({ok:false});await db.prepare('UPDATE pt_room SET st=1 WHERE room=?1').bind(room).run();return J({ok:true})}
+    if(op==='send'){const to=parseInt(f.get('to')),data=String(f.get('data')||'');if(!(to>=0&&to<4)||!data||data.length>12000)return J({ok:false});await db.prepare('INSERT INTO pt_sig(room,src,dst,data,t) VALUES(?1,?2,?3,?4,?5)').bind(room,slot,to,data,now).run();return J({ok:true})}
+    if(op==='poll'){const since=parseInt(f.get('since'))||0;const msgs=(await db.prepare('SELECT id,src,data FROM pt_sig WHERE room=?1 AND dst=?2 AND id>?3 ORDER BY id LIMIT 20').bind(room,slot,since).all()).results;return J({ok:true,slot,started:!!row.st,players:pub(),msgs})}
+    return J({ok:false},400);
+  }
   if(path==='/pt/run'||path==='/pt/me'){ // Port o'yini: haftalik reyting
     if(path==='/pt/run'){const sc=Math.max(0,Math.min(200000,parseInt(f.get('score'))||0));
       const row=await db.prepare('SELECT last FROM pt_week WHERE wk=?1 AND uid=?2').bind(wk,u.id).first();if(row&&now-row.last<8000)return J({ok:false,slow:true});
