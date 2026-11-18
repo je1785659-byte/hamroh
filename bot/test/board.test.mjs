@@ -133,3 +133,39 @@ test('bir kunlik eski xona yo\'q hisoblanadi', async () => {
   DB.raw.prepare('UPDATE bg_room SET t=? WHERE room=?').run(Date.now() - 25 * 3600e3, room);
   assert.deepEqual(await call(A, { op: 'poll', room, n: 0 }), { ok: false, gone: true });
 });
+
+// To'g'ridan-to'g'ri ulanish (WebRTC) uchun xabar almashish: bot faqat bir o'yinchining xabarini ikkinchisiga yetkazadi.
+test('ulanish xabari raqibga bir marta yetadi', async () => {
+  const { call, room } = await started();
+  assert.equal((await call(A, { op: 'sig', room, data: '{"o":"offer"}' })).ok, true);
+  assert.equal((await call(A, { op: 'poll', room, n: 0 })).sig, null, 'o\'zi yuborgan xabar o\'ziga qaytmaydi');
+  assert.equal((await call(B, { op: 'poll', room, n: 0 })).sig, '{"o":"offer"}');
+  assert.equal((await call(B, { op: 'poll', room, n: 0 })).sig, null, 'xabar ikkinchi marta berilmaydi');
+  await call(B, { op: 'sig', room, data: '{"a":"answer"}' });
+  assert.equal((await call(A, { op: 'poll', room, n: 0 })).sig, '{"a":"answer"}');
+});
+test('ulanish xabari yurish raqamini buzmaydi va o\'yinni o\'zgartirmaydi', async () => {
+  const { call, room } = await started();
+  await call(A, { op: 'move', room, n: 0, mv: 'e2e4' });
+  await call(A, { op: 'sig', room, data: '{"hi":1}' });
+  const p = await call(B, { op: 'poll', room, n: 0 });
+  assert.deepEqual(p.moves, ['e2e4']); assert.equal(p.sig, '{"hi":1}');
+  assert.equal((await call(B, { op: 'move', room, n: 1, mv: 'e7e5' })).ok, true);
+});
+test('ulanish xabari faqat a\'zodan, raqib kirgach va o\'lchovi me\'yorida qabul qilinadi', async () => {
+  const w = world(), c = await w.call(A, { op: 'create', g: 'ch', col: 'w' });
+  assert.equal((await w.call(A, { op: 'sig', room: c.room, data: 'x' })).ok, false, 'raqib hali yo\'q');
+  await w.call(B, { op: 'join', room: c.room });
+  assert.equal((await w.call(C, { op: 'sig', room: c.room, data: 'x' })).ok, false);
+  assert.equal((await w.call(A, { op: 'sig', room: c.room, data: '' })).ok, false);
+  assert.equal((await w.call(A, { op: 'sig', room: c.room, data: 'x'.repeat(12001) })).ok, false);
+});
+test('"yana" bilan ranglar almashganda yo\'ldagi ulanish xabari to\'g\'ri odamga boradi', async () => {
+  const { call, room } = await started();
+  await call(A, { op: 'resign', room });
+  await call(A, { op: 'sig', room, data: 'for-bek' });
+  assert.equal((await call(A, { op: 'again', room })).sig, null);
+  const nb = await call(B, { op: 'again', room });
+  assert.equal(nb.side, 'w', 'Bek endi oqlar'); assert.equal(nb.sig, 'for-bek', 'xabar har qanday javob bilan yetkaziladi');
+  assert.equal((await call(A, { op: 'poll', room, n: 0 })).sig, null);
+});

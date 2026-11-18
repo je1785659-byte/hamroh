@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 18.11.2026-17
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 18.11.2026-18
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -414,11 +414,12 @@ async function D(env){
       env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_user(uid INTEGER PRIMARY KEY,name TEXT,region TEXT,rwk TEXT,ref INTEGER,bonus INTEGER DEFAULT 0,wkc TEXT,card INTEGER DEFAULT 0)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_room(room TEXT PRIMARY KEY,p TEXT,st INTEGER DEFAULT 0,t INTEGER)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_sig(id INTEGER PRIMARY KEY AUTOINCREMENT,room TEXT,src INTEGER,dst INTEGER,data TEXT,t INTEGER)'),
-      env.DB.prepare("CREATE TABLE IF NOT EXISTS bg_room(room TEXT PRIMARY KEY,g TEXT,w INTEGER,b INTEGER,wn TEXT,bn TEXT,mv TEXT DEFAULT '',gn INTEGER DEFAULT 0,res TEXT,dr TEXT,rm TEXT,ws INTEGER DEFAULT 0,bs INTEGER DEFAULT 0,t INTEGER)"),
+      env.DB.prepare("CREATE TABLE IF NOT EXISTS bg_room(room TEXT PRIMARY KEY,g TEXT,w INTEGER,b INTEGER,wn TEXT,bn TEXT,mv TEXT DEFAULT '',gn INTEGER DEFAULT 0,res TEXT,dr TEXT,rm TEXT,ws INTEGER DEFAULT 0,bs INTEGER DEFAULT 0,t INTEGER,sgw TEXT,sgb TEXT)"),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,dist INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
       env.DB.prepare("INSERT OR IGNORE INTO meta(k,v) VALUES('since',?1)").bind(String(Date.now()))
     ]);
+    for(const c of ['sgw','sgb'])await env.DB.prepare(`ALTER TABLE bg_room ADD COLUMN ${c} TEXT`).run().catch(()=>{}); // eski bazaga yangi ustunlar
     SCH=true;
   }
   return env.DB;
@@ -732,7 +733,7 @@ function bgStep(r,side,op,a){const L=bgList(r.mv),live=r.w&&r.b&&!r.res;
   if(op==='resign')return live?{res:bgOpp(side)+' resign',dr:null}:{};
   if(op==='draw'){if(!live)return {};if(a.v==='offer')return {dr:side};if(r.dr!==bgOpp(side))return {};return a.v==='yes'?{res:'d agree',dr:null}:{dr:null}}
   if(op==='again'){if(!(r.w&&r.b)||!(r.res||a.over))return {};if(r.rm!==bgOpp(side))return {rm:side};
-    return {mv:'',gn:r.gn+1,res:null,dr:null,rm:null,w:r.b,b:r.w,wn:r.bn,bn:r.wn,ws:r.bs,bs:r.ws}}
+    return {mv:'',gn:r.gn+1,res:null,dr:null,rm:null,w:r.b,b:r.w,wn:r.bn,bn:r.wn,ws:r.bs,bs:r.ws,sgw:r.sgb||null,sgb:r.sgw||null}}
   return op==='poll'?{}:null}
 async function handleBg(req,env){
   let f;try{f=await req.formData()}catch(e){return J({ok:false},400)}
@@ -753,6 +754,9 @@ async function handleBg(req,env){
     const x=await db.prepare(`UPDATE bg_room SET ${side}=?2,${side}n=?3,${side}s=?4 WHERE room=?1 AND ${side} IS NULL`).bind(room,u.id,name,now).run();if(!x.meta.changes)return J({ok:false,full:true});
     r={...r,[side]:u.id,[side+'n']:name,[side+'s']:now}}
   if(!side)return J({ok:false},403);
+  if(op==='sig'){ // to'g'ridan-to'g'ri ulanish (WebRTC) xabari: raqibga yetkaziladi, yurishlarga tegmaydi
+    const data=String(f.get('data')||''),o=bgOpp(side);if(!(r.w&&r.b)||!data||data.length>12000)return J({ok:false});
+    await db.prepare(`UPDATE bg_room SET sg${o}=?2 WHERE room=?1`).bind(room,data).run();return J({ok:true})}
   const set=bgStep(r,side,op==='join'?'poll':op,{n:since,mv:String(f.get('mv')||''),v:String(f.get('v')||''),over:f.get('over')==='1'});if(!set)return J({ok:false,n:bgList(r.mv).length});
   if(set.w)side=bgOpp(side);
   if(f.get('hb')==='1'||op==='join')set[side+'s']=now;
@@ -761,7 +765,9 @@ async function handleBg(req,env){
     // ikki so'rov bir vaqtda kelsa, faqat o'zi ko'rgan holat ustiga yozgani o'tadi
     const x=await db.prepare(`UPDATE bg_room SET ${kk.map((k,i)=>k+'=?'+(i+4)).join(',')} WHERE room=?1 AND gn=?2 AND mv=?3`).bind(room,r.gn,r.mv,...kk.map(k=>set[k])).run();
     if(!x.meta.changes)return J({ok:false,n:bgList(r.mv).length});r={...r,...set}}
-  return J(bgView(r,side,op==='again'&&set.w?0:since,now));
+  const out=bgView(r,side,op==='again'&&set.w?0:since,now),sg=r['sg'+side];out.sig=null;
+  if(sg){const x=await db.prepare(`UPDATE bg_room SET sg${side}=NULL WHERE room=?1 AND sg${side}=?2`).bind(room,sg).run();if(x.meta.changes)out.sig=sg} // har bir xabar bir marta beriladi
+  return J(out);
 }
 // ---------- Yugur!: viloyatlar bellashuvi, haftalik reyting, do'stni chaqirish ----------
 const RN_REG=['tsh','tsv','and','bux','far','jiz','xor','nam','nav','qas','qqr','sam','sir','sur'];

@@ -525,7 +525,7 @@ window.__C={get G(){return G},tap,newGame,CFG,REV,analyse,setDim,dbg:()=>({start
 // ---------- onlayn: do'st bilan o'yin (xona bot orqali, yurishlar /bg/room dan o'tadi) ----------
 Object.assign(DICT,{"Onlayn": ["Онлайн", "Online"], "Do'st bilan onlayn": ["Онлайн с другом", "Online with a friend"], "Xona oching va havolani do'stingizga yuboring yoki do'stingiz bergan kodni kiriting.": ["Откройте комнату и отправьте ссылку другу или введите код, который дал друг.", "Open a room and send the link to a friend, or enter the code your friend gave you."], "Kirish": ["Войти", "Join"], "KOD": ["КОД", "CODE"], "Xona ochish": ["Открыть комнату", "Open a room"], "Onlayn o'yinga qaytish": ["Вернуться в онлайн-игру", "Back to online game"], "Onlayn o'yin": ["Онлайн-игра", "Online game"], "Do'stingizni kuting": ["Ждём друга", "Waiting for your friend"], "Xona kodi": ["Код комнаты", "Room code"], "Havolani yuborish": ["Отправить ссылку", "Send the link"], "Koddan nusxa": ["Скопировать код", "Copy code"], "Bekor qilish": ["Отмена", "Cancel"], "Do'stingiz havolani ochishi bilan o'yin boshlanadi.": ["Игра начнётся, как только друг откроет ссылку.", "The game starts as soon as your friend opens the link."], "Raqib durang taklif qilyapti": ["Соперник предлагает ничью", "Opponent offers a draw"], "Qabul": ["Принять", "Accept"], "Rad": ["Отказ", "Decline"], "Durang taklif qilish": ["Предложить ничью", "Offer a draw"], "Durang taklif qilindi": ["Ничья предложена", "Draw offered"], "Xona topilmadi yoki yopilgan.": ["Комната не найдена или закрыта.", "Room not found or closed."], "Raqib yana o'ynashni taklif qilyapti.": ["Соперник предлагает сыграть ещё.", "Opponent wants a rematch."], "Raqib chiqib ketdi.": ["Соперник вышел.", "Opponent left."], "Aloqa uzildi, qayta ulanmoqda…": ["Связь потеряна, переподключение…", "Connection lost, reconnecting…"], "Raqib": ["Соперник", "Opponent"], "qo'shildi": ["в игре", "joined"], "Siz oqlar bilan o'ynaysiz": ["Вы играете белыми", "You play White"], "Siz qoralar bilan o'ynaysiz": ["Вы играете чёрными", "You play Black"], "Ulanmoqda…": ["Подключение…", "Connecting…"], "Ulanib bo'lmadi. Onlayn o'yin Telegram ichidagi Hamrohda ishlaydi.": ["Не удалось подключиться. Онлайн-игра работает в Hamroh внутри Telegram.", "Could not connect. Online play works in Hamroh inside Telegram."], "Bu xonada ikki o'yinchi bor.": ["В этой комнате уже два игрока.", "This room already has two players."], "Ulanib bo'lmadi, qayta urinib ko'ring.": ["Не удалось подключиться, попробуйте ещё раз.", "Could not connect, please try again."], "Xona kodi 5 ta belgidan iborat.": ["Код комнаты состоит из 5 символов.", "The room code has 5 characters."], "O'yinchilar durangga kelishdi.": ["Игроки согласились на ничью.", "The players agreed to a draw."], "Siz yutdingiz!": ["Вы победили!", "You won!"], "yutdi": ["победил(а)", "won"], "Raqib taslim bo'ldi.": ["Соперник сдался.", "Opponent resigned."], "Siz taslim bo'ldingiz.": ["Вы сдались.", "You resigned."], "Yurishlar soni": ["Ходов", "Moves"], "Yana o'ynash": ["Сыграть ещё", "Play again"], "Raqib kutilmoqda…": ["Ждём соперника…", "Waiting for opponent…"], "Davom etish": ["Продолжить", "Continue"], "Nusxa olindi": ["Скопировано", "Copied"], "Havola nusxalandi": ["Ссылка скопирована", "Link copied"], "Xona": ["Комната", "Room"], "oflayn": ["не в сети", "offline"], "Hamrohda men bilan shaxmat o'ynang!": ["Сыграйте со мной в шахматы в Hamroh!", "Play chess with me in Hamroh!"], "Hamrohda men bilan shashka o'ynang!": ["Сыграйте со мной в шашки в Hamroh!", "Play checkers with me in Hamroh!"]});
 const NET={room:'',gn:0,all:[],on:true,name:'',res:null,dr:null,rm:null,live:false,app:false,k:0,t:0,hbT:0,fail:0,idle:0,asked:false};
-const netApi=o=>{try{return parent!==window&&parent.rnApi?parent.rnApi('/bg/room',o):Promise.resolve(null)}catch(e){return Promise.resolve(null)}};
+const netApi=o=>{try{return parent!==window&&parent.rnApi?parent.rnApi('/bg/room',o).then(p2Peek):Promise.resolve(null)}catch(e){return Promise.resolve(null)}};
 const netStr=m=>dkName(m),netFind=s=>dkFind(G,s);
 const netLink=()=>'https://t.me/Hamronilovabot/app?startapp=sk-'+NET.room;
 const netMsg=(t,bad)=>{const e=$('#netinfo');e.textContent=t;e.classList.toggle('bad',!!bad)};
@@ -535,10 +535,10 @@ function netBoard(side,list){cancelAI();G=dkNew();legal=[];pre=[];moves=[];over=
   MODE='net';HUM=side;TIME=0;clock={w:0,b:0};viewSide=side;NET.all=[];NET.live=true;NET.asked=false;
   for(const s of list){const m=netFind(s);if(!m)break;moves.push(s);dkMove(G,m);NET.all.push(s)}
   $('#again').textContent=TX("Yana o'ynash");$('#lobby').hidden=true;setView();started=true;sync();hide();const st=dkStatus(G);if(st.r!=='play')end(st)}
-function netStop(){NET.k++;clearTimeout(NET.t);NET.live=false;NET.room='';$('#drw').hidden=true;$('#lobby').hidden=true}
+function netStop(){p2Close();P2.n=0;P2.t=0;NET.k++;clearTimeout(NET.t);NET.live=false;NET.room='';$('#drw').hidden=true;$('#lobby').hidden=true}
 function netGone(){netStop();store.set('net',null);if(MODE==='net'){MODE='ai';started=false}toMenu();netMsg(TX("Xona topilmadi yoki yopilgan."),true)}
 function netFull(){const k=NET.k;netApi({op:'poll',room:NET.room,n:0}).then(j=>{if(k!==NET.k||!j||!j.ok||!j.ready)return;NET.gn=j.gn;netBoard(j.side,j.moves);netMeta(j)})}
-function netMeta(j){const ch=NET.name!==(j.opp||'')||NET.on!==j.on||NET.dr!==j.dr||NET.rm!==j.rm;NET.name=j.opp||'';NET.on=j.on;NET.res=j.res;NET.dr=j.dr;NET.rm=j.rm;
+function netMeta(j){const ch=NET.name!==(j.opp||'')||NET.on!==j.on||NET.dr!==j.dr||NET.rm!==j.rm;NET.name=j.opp||'';NET.on=j.on||p2Up();NET.res=j.res;NET.dr=j.dr;NET.rm=j.rm;
   $('#drw').hidden=!(NET.live&&!over&&j.dr&&j.dr!==HUM);
   if(over&&NET.live){const o=$('#orate');if(j.rm&&j.rm!==HUM){o.textContent=TX("Raqib yana o'ynashni taklif qilyapti.");o.hidden=false}else if(!j.on){o.textContent=TX('Raqib chiqib ketdi.');o.hidden=false}}
   if(ch)renderUI()}
@@ -551,16 +551,16 @@ function netIn(j){if(!j){if(++NET.fail===4&&NET.live)toast(TX("Aloqa uzildi, qay
   for(let i=0;i<j.moves.length;i++){const x=from+i;if(x<NET.all.length){if(NET.all[x]!==j.moves[i])return netFull()}else if(x===NET.all.length){NET.all.push(j.moves[i]);grew=true}}
   NET.idle=grew?0:NET.idle+1;netMeta(j)}
 function netLoop(){clearTimeout(NET.t);if(!NET.room)return;const k=NET.k,slow=NET.idle>400;
-  const d=document.hidden?4000:slow?8000:!NET.live?2000:over?3000:G.turn===HUM?3000:1100;
+  const d=document.hidden?4000:p2Up()&&NET.live?30000:slow?8000:!NET.live?2000:over?3000:G.turn===HUM?3000:1100;
   NET.t=setTimeout(()=>{if(k!==NET.k)return;if(document.hidden)return netLoop();const hb=now()-NET.hbT>8000;if(hb)NET.hbT=now();
-    netApi({op:'poll',room:NET.room,n:NET.all.length,hb:hb?1:null}).then(j=>{if(k!==NET.k)return;netIn(j);netLoop()})},d)}
+    netApi({op:'poll',room:NET.room,n:NET.all.length,hb:hb?1:null}).then(j=>{if(k!==NET.k)return;netIn(j);p2Want();netLoop()})},d)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&NET.room){NET.idle=0;NET.hbT=0;netLoop()}});
 // raqib yurishlarini navbat bilan doskaga qo'yadi; server natijasi (taslim, durang) hamma yurishlardan keyin e'lon qilinadi
 setInterval(()=>{if(MODE!=='net'||!NET.live||busy||over)return;
   if(moves.length<NET.all.length){const m=netFind(NET.all[moves.length]);if(!m)return netFull();NET.app=true;doMove(m);NET.app=false}
   else if(NET.res){const p=NET.res.split(' ');end(p[0]==='d'?{r:'agree'}:{r:p[1],win:p[0]})}},120);
 function netSend(n,s,gn,k){netApi({op:'move',room:NET.room,n,mv:s}).then(j=>{if(k!==NET.k||gn!==NET.gn||NET.all[n]!==s)return;
-  if(!j){setTimeout(()=>{if(k===NET.k&&gn===NET.gn&&NET.all[n]===s)netSend(n,s,gn,k)},1500);return}if(!j.ok)return netFull();netMeta(j);netLoop()})}
+  if(!j){setTimeout(()=>{if(k===NET.k&&gn===NET.gn&&NET.all[n]===s)netSend(n,s,gn,k)},1500);return}if(!j.ok)return netFull();p2Send({mv:s,n,gn});netMeta(j);netLoop()})}
 function netEnter(j){NET.k++;NET.room=j.room;NET.gn=j.gn;NET.live=false;NET.all=[];NET.fail=NET.idle=0;NET.hbT=now();store.set('net',{room:j.room});
   if(j.ready){netBoard(j.side,j.moves);netMeta(j);toast(TX(j.side==='w'?"Siz oqlar bilan o'ynaysiz":"Siz qoralar bilan o'ynaysiz"))}
   else{$('#lcode').textContent=j.room;$('#lside').textContent=TX(j.side==='w'?"Siz oqlar bilan o'ynaysiz":"Siz qoralar bilan o'ynaysiz");$('#menu').hidden=true;$('#lobby').hidden=false}
@@ -568,6 +568,31 @@ function netEnter(j){NET.k++;NET.room=j.room;NET.gn=j.gn;NET.live=false;NET.all=
 function netOpen(o){netMsg(TX('Ulanmoqda…'));netApi(o).then(j=>{if(j&&j.ok)return netEnter(j);
   netMsg(TX(!j?"Ulanib bo'lmadi. Onlayn o'yin Telegram ichidagi Hamrohda ishlaydi.":j.full?"Bu xonada ikki o'yinchi bor.":j.gone?"Xona topilmadi yoki yopilgan.":"Ulanib bo'lmadi, qayta urinib ko'ring."),true);if(j&&(j.gone||j.full))store.set('net',null);menuUI(true)})}
 const netJoin=c=>{c=String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(c.length<5)return netMsg(TX('Xona kodi 5 ta belgidan iborat.'),true);netOpen({op:'join',room:c,n:0})};
+// ---------- to'g'ridan-to'g'ri ulanish (WebRTC) ----------
+// Server yozuvchi bo'lib qoladi: har yurish avval serverga yoziladi, keyin raqibga shu kanal orqali darhol yuboriladi.
+// Kanal ochiq bo'lsa server har 30 soniyada bir so'raladi (nazorat uchun); ulanmasa, avvalgi tez so'rash ishlaydi.
+const P2={pc:null,ch:null,t:0,n:0},P2ICE={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]};
+const p2Up=()=>!!(P2.ch&&P2.ch.readyState==='open'),p2Can=()=>typeof RTCPeerConnection!=='undefined';
+function p2Close(){const pc=P2.pc;P2.pc=P2.ch=null;try{pc&&pc.close()}catch(e){}}
+function p2Send(o){if(p2Up())try{P2.ch.send(JSON.stringify(o))}catch(e){}}
+function p2Sig(o){if(NET.room)netApi({op:'sig',room:NET.room,data:JSON.stringify(o)})}
+function p2Peek(j){if(j&&j.sig){const d=j.sig;setTimeout(()=>p2Signal(d),0)}return j}
+function p2Gather(pc){return new Promise(r=>{if(pc.iceGatheringState==='complete')return r();const t=setTimeout(r,2600);pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState==='complete'){clearTimeout(t);r()}})})}
+function p2Wire(ch){P2.ch=ch;ch.onopen=()=>{if(P2.ch!==ch)return;P2.n=0;NET.on=true;NET.idle=0;renderUI();netLoop()};
+  ch.onclose=()=>{if(P2.ch!==ch)return;P2.ch=null;P2.t=0;netLoop()};ch.onmessage=ev=>{let o;try{o=JSON.parse(ev.data)}catch(e){return}p2In(o)}}
+async function p2Offer(){if(!p2Can())return;p2Close();P2.t=now();P2.n++;const k=NET.k,pc=new RTCPeerConnection(P2ICE);P2.pc=pc;p2Wire(pc.createDataChannel('m'));
+  await pc.setLocalDescription(await pc.createOffer());await p2Gather(pc);if(k===NET.k&&P2.pc===pc)p2Sig({o:pc.localDescription.sdp})}
+async function p2Answer(sdp){if(!p2Can())return;p2Close();P2.t=now();const k=NET.k,pc=new RTCPeerConnection(P2ICE);P2.pc=pc;pc.ondatachannel=ev=>{if(P2.pc===pc)p2Wire(ev.channel)};
+  await pc.setRemoteDescription({type:'offer',sdp});await pc.setLocalDescription(await pc.createAnswer());await p2Gather(pc);if(k===NET.k&&P2.pc===pc)p2Sig({a:pc.localDescription.sdp})}
+// faqat oqlar taklif qiladi (ikkalasi bir vaqtda taklif qilib qolmasin); qoralar "hi" bilan taklif so'raydi
+function p2Signal(d){if(!NET.room||!p2Can())return;try{d=JSON.parse(d)}catch(e){return}
+  if(d.o)p2Answer(d.o).catch(()=>{});else if(d.a){if(P2.pc&&!P2.pc.currentRemoteDescription)P2.pc.setRemoteDescription({type:'answer',sdp:d.a}).catch(()=>{})}
+  else if(d.hi&&HUM==='w'&&!p2Up()&&P2.n<6)p2Offer().catch(()=>{})}
+function p2Want(){if(!NET.live||p2Up()||!p2Can()||P2.n>=3||!NET.on||now()-P2.t<15000)return;if(HUM==='w')p2Offer().catch(()=>{});else{P2.t=now();P2.n++;p2Sig({hi:1})}}
+function netPoll(){const k=NET.k;if(NET.room)netApi({op:'poll',room:NET.room,n:NET.all.length}).then(j=>{if(k===NET.k)netIn(j)})}
+function p2In(o){if(!NET.live)return;NET.on=true;if(o.sy)return netPoll();
+  if(o.mv&&o.gn===NET.gn){if(o.n===NET.all.length){NET.all.push(o.mv);NET.idle=0}else if(o.n>NET.all.length)netFull()}}
+const netAct=j=>{netIn(j);if(j&&j.ok)p2Send({sy:1})};
 // mavjud o'yin oqimiga ulanish
 const _doMove=doMove;doMove=function(mv){if(MODE==='net'&&!NET.app){const s=netStr(mv),n=NET.all.length;NET.all.push(s);NET.idle=0;netSend(n,s,NET.gn,NET.k)}_doMove(mv)};
 const _canTouch=canTouch;canTouch=function(){return _canTouch()&&(MODE!=='net'||(NET.live&&moves.length===NET.all.length))};
@@ -583,12 +608,12 @@ const _menuUI=menuUI;menuUI=function(keep){_menuUI();const net=CFG.mode==='net';
 const _start=$('#start').onclick,_resume=$('#resume').onclick,_again=$('#again').onclick,_resign=$('#presign').onclick,_bmenu=$('#bmenu').onclick;
 $('#start').onclick=()=>{if(CFG.mode!=='net')return _start();audio();netStop();netOpen({op:'create',g:'dk',col:CFG.col})};
 $('#resume').onclick=()=>{if(CFG.mode!=='net')return _resume();audio();const sv=store.get('net',null);if(sv){netStop();netJoin(sv.room)}};
-$('#again').onclick=()=>{if(MODE!=='net'||!NET.live)return _again();if(NET.asked)return;NET.asked=true;$('#again').textContent=TX('Raqib kutilmoqda…');netApi({op:'again',room:NET.room,over:1}).then(netIn)};
-$('#presign').onclick=()=>{if(MODE!=='net'||!NET.live)return _resign();$('#pmenu').hidden=true;if(!over)netApi({op:'resign',room:NET.room}).then(netIn)};
+$('#again').onclick=()=>{if(MODE!=='net'||!NET.live)return _again();if(NET.asked)return;NET.asked=true;$('#again').textContent=TX('Raqib kutilmoqda…');netApi({op:'again',room:NET.room,over:1}).then(netAct)};
+$('#presign').onclick=()=>{if(MODE!=='net'||!NET.live)return _resign();$('#pmenu').hidden=true;if(!over)netApi({op:'resign',room:NET.room}).then(netAct)};
 $('#bmenu').onclick=()=>{$('#pdraw').hidden=!(MODE==='net'&&NET.live&&!over);_bmenu()};
-$('#pdraw').onclick=()=>{$('#pmenu').hidden=true;netApi({op:'draw',room:NET.room,v:'offer'}).then(netIn);toast(TX('Durang taklif qilindi'))};
-$('#dry').onclick=()=>{$('#drw').hidden=true;netApi({op:'draw',room:NET.room,v:'yes'}).then(netIn)};
-$('#drn').onclick=()=>{$('#drw').hidden=true;netApi({op:'draw',room:NET.room,v:'no'}).then(netIn)};
+$('#pdraw').onclick=()=>{$('#pmenu').hidden=true;netApi({op:'draw',room:NET.room,v:'offer'}).then(netAct);toast(TX('Durang taklif qilindi'))};
+$('#dry').onclick=()=>{$('#drw').hidden=true;netApi({op:'draw',room:NET.room,v:'yes'}).then(netAct)};
+$('#drn').onclick=()=>{$('#drw').hidden=true;netApi({op:'draw',room:NET.room,v:'no'}).then(netAct)};
 // menyuga chiqilsa so'rovlar to'xtaydi; tugamagan o'yinga "Onlayn o'yinga qaytish" bilan qaytiladi
 for(const id of ['omenu','pnew','bmenu'])$('#'+id).addEventListener('click',()=>{if(MODE==='net'&&!$('#menu').hidden){if(over)store.set('net',null);netStop();MODE='ai';started=false;CFG.mode='net';menuUI()}});
 $('#njoin').onclick=()=>{audio();netStop();netJoin($('#ncode').value)};
@@ -599,7 +624,7 @@ $('#lcode').onclick=()=>$('#lcopy').click();$('#lcopy').onclick=()=>{netCopy(NET
 $('#lshare').onclick=()=>{const u=netLink(),tx=TX("Hamrohda men bilan shashka o'ynang!")+'\n'+TX('Xona kodi')+':\n'+NET.room;
   try{parent.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(u)+'&text='+encodeURIComponent('\n'+tx))}catch(e){netCopy(u);$('#lshare').textContent=TX('Havola nusxalandi');setTimeout(()=>$('#lshare').textContent=TX('Havolani yuborish'),1500)}};
 for(const id of ['gnet','lobby','drw','pdraw'])trDom($('#'+id));document.querySelectorAll('#smode [data-v=net]').forEach(b=>b.textContent=TX('Onlayn'));
-$('#ncode').placeholder=TX('KOD');window.__N=NET;menuUI();if(ROOM0){CFG.mode='net';menuUI();netJoin(ROOM0)}
+$('#ncode').placeholder=TX('KOD');window.__N=NET;window.__P2=P2;window.__p2Up=p2Up;menuUI();if(ROOM0){CFG.mode='net';menuUI();netJoin(ROOM0)}
 })();
 </script>
 </body>
