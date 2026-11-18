@@ -108,7 +108,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .njoin{display:grid;grid-template-columns:1fr auto;gap:8px}
 #ncode{min-width:0;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:#0f0d0b;color:var(--text);font:800 18px var(--display);letter-spacing:.22em;text-transform:uppercase;user-select:text;-webkit-user-select:text;touch-action:auto;outline:0}
 #ncode:focus{border-color:var(--gold)}#ncode::placeholder{color:var(--dim);opacity:.6}
-#lcode{font:800 44px var(--display);letter-spacing:.2em;text-align:center;color:var(--gold);padding:6px 0 2px;user-select:text;-webkit-user-select:text}
+#lcode{cursor:pointer;font:800 44px var(--display);letter-spacing:.2em;text-align:center;color:var(--gold);padding:6px 0 2px;user-select:text;-webkit-user-select:text}
 #lobby p{margin:0;color:var(--dim);text-align:center}
 #drw{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:6;width:min(300px,88%);display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;padding:12px 14px;border-radius:16px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);max-width:92%}
 #drw[hidden]{display:none}#drw span{flex:1 1 100%;text-align:center;font-weight:600}
@@ -150,7 +150,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     <div class="grp" id="gtime"><span>Vaqt</span><div class="seg" id="stime"><button data-v="0">Cheksiz</button><button data-v="1">1 daqiqa</button><button data-v="3">3+2</button><button data-v="5">5 daqiqa</button><button data-v="10">10 daqiqa</button><button data-v="15">15+10</button></div></div>
     <div class="grp lvl" id="gpuz" hidden><span>Masalalar</span><small id="pzn"></small></div>
     <div class="grp"><span>Doska</span><div class="seg" id="sboard"><button data-v="wood">Yong'oq</button><button data-v="marble">Marmar</button><button data-v="green">Turnir</button></div></div>
-    <div class="grp" id="gnet" hidden><span>Do'st bilan onlayn</span><small id="netinfo">Xona oching va havolani do'stingizga yuboring yoki do'stingiz bergan kodni kiriting.</small><div class="njoin"><input id="ncode" maxlength="5" placeholder="KOD" aria-label="Xona kodi" autocapitalize="characters" autocomplete="off" spellcheck="false"><button class="go sec" id="njoin">Kirish</button></div></div>
+    <div class="grp" id="gnet" hidden><span>Do'st bilan onlayn</span><small id="netinfo">Xona oching va havolani do'stingizga yuboring yoki do'stingiz bergan kodni kiriting.</small><div class="njoin"><input id="ncode" placeholder="KOD" aria-label="Xona kodi" autocapitalize="characters" autocomplete="off" spellcheck="false"><button class="go sec" id="njoin">Kirish</button></div></div>
     <button class="go" id="start">Yangi o'yin</button>
     <div class="row2"><button class="go sec" id="resume" hidden>Davom etish</button><button class="go sec exit" hidden>Hamrohga qaytish</button></div>
     <div class="cred">Kuchli darajalarda Stockfish mexanizmi ishlaydi (GPLv3, stockfishchess.org)</div>
@@ -800,11 +800,11 @@ $('#drn').onclick=()=>{$('#drw').hidden=true;netApi({op:'draw',room:NET.room,v:'
 // menyuga chiqilsa so'rovlar to'xtaydi; tugamagan o'yinga "Onlayn o'yinga qaytish" bilan qaytiladi
 for(const id of ['omenu','pnew','bmenu'])$('#'+id).addEventListener('click',()=>{if(MODE==='net'&&!$('#menu').hidden){if(over)store.set('net',null);netStop();MODE='ai';started=false;CFG.mode='net';menuUI()}});
 $('#njoin').onclick=()=>{audio();netStop();netJoin($('#ncode').value)};
-$('#ncode').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,5)});
+$('#ncode').addEventListener('input',e=>{const v=e.target.value,m=v.length>5&&(v.match(/s[xk]-([A-Za-z0-9]{5})/)||v.match(/(?:^|[^A-Za-z0-9])([A-Z2-9]{5})\s*$/));e.target.value=(m?m[1]:v).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,5)});
 $('#lcancel').onclick=()=>{netStop();store.set('net',null);$('#menu').hidden=false;menuUI()};
 const netCopy=t=>{try{navigator.clipboard.writeText(t).then(()=>{},()=>{})}catch(e){}};
-$('#lcopy').onclick=()=>{netCopy(NET.room);$('#lcopy').textContent=TX('Nusxa olindi');setTimeout(()=>$('#lcopy').textContent=TX('Koddan nusxa'),1500)};
-$('#lshare').onclick=()=>{const u=netLink(),tx=TX("Hamrohda men bilan shaxmat o'ynang!")+' '+TX('Xona')+': '+NET.room;
+$('#lcode').onclick=()=>$('#lcopy').click();$('#lcopy').onclick=()=>{netCopy(NET.room);haptic('ok');$('#lcopy').textContent=TX('Nusxa olindi');setTimeout(()=>$('#lcopy').textContent=TX('Koddan nusxa'),1500)};
+$('#lshare').onclick=()=>{const u=netLink(),tx=TX("Hamrohda men bilan shaxmat o'ynang!")+'\n'+TX('Xona kodi')+':\n'+NET.room;
   try{parent.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(u)+'&text='+encodeURIComponent('\n'+tx))}catch(e){netCopy(u);$('#lshare').textContent=TX('Havola nusxalandi');setTimeout(()=>$('#lshare').textContent=TX('Havolani yuborish'),1500)}};
 for(const id of ['gnet','lobby','drw','pdraw'])trDom($('#'+id));document.querySelectorAll('#smode [data-v=net]').forEach(b=>b.textContent=TX('Onlayn'));
 $('#ncode').placeholder=TX('KOD');window.__N=NET;menuUI();if(ROOM0){CFG.mode='net';menuUI();netJoin(ROOM0)}
