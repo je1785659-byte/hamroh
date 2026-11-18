@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 12.11.2026-16
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 18.11.2026-17
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -414,6 +414,7 @@ async function D(env){
       env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_user(uid INTEGER PRIMARY KEY,name TEXT,region TEXT,rwk TEXT,ref INTEGER,bonus INTEGER DEFAULT 0,wkc TEXT,card INTEGER DEFAULT 0)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_room(room TEXT PRIMARY KEY,p TEXT,st INTEGER DEFAULT 0,t INTEGER)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_sig(id INTEGER PRIMARY KEY AUTOINCREMENT,room TEXT,src INTEGER,dst INTEGER,data TEXT,t INTEGER)'),
+      env.DB.prepare("CREATE TABLE IF NOT EXISTS bg_room(room TEXT PRIMARY KEY,g TEXT,w INTEGER,b INTEGER,wn TEXT,bn TEXT,mv TEXT DEFAULT '',gn INTEGER DEFAULT 0,res TEXT,dr TEXT,rm TEXT,ws INTEGER DEFAULT 0,bs INTEGER DEFAULT 0,t INTEGER)"),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,dist INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
       env.DB.prepare("INSERT OR IGNORE INTO meta(k,v) VALUES('since',?1)").bind(String(Date.now()))
@@ -716,6 +717,52 @@ async function statsText(env,db){
   const S=await computeStats(db,env),U=S.users;
   return `📊 <b>Hamroh statistikasi</b>\n\n👥 Jami foydalanuvchi: <b>${U.total||0}</b>\n▶️ Botda start bosgan: <b>${U.started||0}</b>\n✅ Faol (bloklamagan): <b>${U.active||0}</b>\n⛔ Bloklagan: <b>${U.blocked||0}</b>\n\n📅 Bugun: <b>${S.dau}</b> · 7 kun: <b>${S.wau}</b> · 30 kun: <b>${S.mau}</b>\n🆕 Yangi: bugun <b>${U.n1||0}</b> · 7 kun <b>${U.n7||0}</b> · 30 kun <b>${U.n30||0}</b>\n⏱ O‘rtacha kunlik vaqt (7 kun): <b>${S.avg7.au?fmtMin(S.avg7.s/S.avg7.au):'—'}</b>\n\n<i>Batafsil — admin panelda.</i>`;
 }
+// ---------- Shaxmat va shashka: do'st bilan onlayn o'yin (/bg/room) ----------
+// Xona: ikki o'rin (w — oqlar, b — qoralar), yurishlar ro'yxati (mv, bo'sh joy bilan ajratilgan), o'yin raqami (gn — "yana" bosilganda oshadi),
+// natija (res: "w resign", "d agree"), ochiq durang taklifi (dr) va "yana" so'rovi (rm) — ikkalasida ham so'ragan tomon.
+// Yurishning to'g'riligini ikkala mijoz o'z qoidalari bilan tekshiradi; bot faqat navbat va tartibni saqlaydi.
+const BG_TTL=24*3600e3,BG_ON=20000,BG_MAX=700,bgOpp=s=>s==='w'?'b':'w',bgList=mv=>mv?mv.split(' '):[];
+function bgView(r,side,since,now){const L=bgList(r.mv),o=bgOpp(side);
+  return {ok:true,room:r.room,g:r.g,side,gn:r.gn,ready:!!(r.w&&r.b),opp:r[o+'n']||null,on:now-(r[o+'s']||0)<BG_ON,n:L.length,moves:L.slice(Math.max(0,since)),res:r.res||null,dr:r.dr||null,rm:r.rm||null}}
+// Bitta amal: xona holatidan yangi qiymatlarni qaytaradi (o'zgarish bo'lmasa {}), rad etilsa null.
+function bgStep(r,side,op,a){const L=bgList(r.mv),live=r.w&&r.b&&!r.res;
+  if(op==='move'){const dup=a.n<L.length&&L[a.n]===a.mv&&(a.n%2?'b':'w')===side;if(dup)return {};
+    if(!live||a.n!==L.length||(L.length%2?'b':'w')!==side||L.length>=BG_MAX||!/^[A-Za-z0-9:x=+-]{2,24}$/.test(a.mv))return null;
+    return {mv:r.mv?r.mv+' '+a.mv:a.mv,dr:null}}
+  if(op==='resign')return live?{res:bgOpp(side)+' resign',dr:null}:{};
+  if(op==='draw'){if(!live)return {};if(a.v==='offer')return {dr:side};if(r.dr!==bgOpp(side))return {};return a.v==='yes'?{res:'d agree',dr:null}:{dr:null}}
+  if(op==='again'){if(!(r.w&&r.b)||!(r.res||a.over))return {};if(r.rm!==bgOpp(side))return {rm:side};
+    return {mv:'',gn:r.gn+1,res:null,dr:null,rm:null,w:r.b,b:r.w,wn:r.bn,bn:r.wn,ws:r.bs,bs:r.ws}}
+  return op==='poll'?{}:null}
+async function handleBg(req,env){
+  let f;try{f=await req.formData()}catch(e){return J({ok:false},400)}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false},403);
+  const db=await D(env).catch(()=>null);if(!db)return J({ok:false,nodb:true});
+  const now=Date.now(),op=String(f.get('op')||''),name=rnName(u),since=parseInt(f.get('n'))||0;
+  if(op==='create'){const g=String(f.get('g')||'');if(g!=='ch'&&g!=='dk')return J({ok:false},400);
+    const c=String(f.get('col')||''),side=c==='w'||c==='b'?c:(Math.random()<.5?'w':'b');
+    if(Math.random()<.1)await db.prepare('DELETE FROM bg_room WHERE t<?1').bind(now-BG_TTL).run();
+    for(let k=0;k<5;k++){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let room='';for(let i=0;i<5;i++)room+=A[Math.random()*A.length|0];
+      const r=await db.prepare(`INSERT OR IGNORE INTO bg_room(room,g,${side},${side}n,${side}s,t) VALUES(?1,?2,?3,?4,?5,?5)`).bind(room,g,u.id,name,now).run();
+      if(r.meta.changes)return J(bgView({room,g,gn:0,mv:'',[side]:u.id},side,0,now))}
+    return J({ok:false})}
+  const room=String(f.get('room')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);
+  let r=await db.prepare('SELECT * FROM bg_room WHERE room=?1 AND t>?2').bind(room,now-BG_TTL).first();if(!r)return J({ok:false,gone:true});
+  let side=r.w===u.id?'w':r.b===u.id?'b':'';
+  if(op==='join'&&!side){side=!r.w?'w':!r.b?'b':'';if(!side)return J({ok:false,full:true});
+    const x=await db.prepare(`UPDATE bg_room SET ${side}=?2,${side}n=?3,${side}s=?4 WHERE room=?1 AND ${side} IS NULL`).bind(room,u.id,name,now).run();if(!x.meta.changes)return J({ok:false,full:true});
+    r={...r,[side]:u.id,[side+'n']:name,[side+'s']:now}}
+  if(!side)return J({ok:false},403);
+  const set=bgStep(r,side,op==='join'?'poll':op,{n:since,mv:String(f.get('mv')||''),v:String(f.get('v')||''),over:f.get('over')==='1'});if(!set)return J({ok:false,n:bgList(r.mv).length});
+  if(set.w)side=bgOpp(side);
+  if(f.get('hb')==='1'||op==='join')set[side+'s']=now;
+  const ks=Object.keys(set);
+  if(ks.length){if('mv' in set||'res' in set)set.t=now;const kk=Object.keys(set);
+    // ikki so'rov bir vaqtda kelsa, faqat o'zi ko'rgan holat ustiga yozgani o'tadi
+    const x=await db.prepare(`UPDATE bg_room SET ${kk.map((k,i)=>k+'=?'+(i+4)).join(',')} WHERE room=?1 AND gn=?2 AND mv=?3`).bind(room,r.gn,r.mv,...kk.map(k=>set[k])).run();
+    if(!x.meta.changes)return J({ok:false,n:bgList(r.mv).length});r={...r,...set}}
+  return J(bgView(r,side,op==='again'&&set.w?0:since,now));
+}
 // ---------- Yugur!: viloyatlar bellashuvi, haftalik reyting, do'stni chaqirish ----------
 const RN_REG=['tsh','tsv','and','bux','far','jiz','xor','nam','nav','qas','qqr','sam','sir','sur'];
 const RN_ROUTES={'/rn/me':1,'/rn/run':1,'/rn/card':1,'/pt/run':1,'/pt/me':1,'/pt/sig':1};
@@ -805,6 +852,7 @@ export default {
     if(path==='/food'&&req.method==='POST')return handleFood(req,env);
     if(path==='/food/fix'&&req.method==='POST')return handleFoodFix(req,env);
     if(BL_ROUTES[path]&&req.method==='POST')return handleBl(path,req,env);
+    if(path==='/bg/room'&&req.method==='POST')return handleBg(req,env);
     if(RN_ROUTES[path]&&req.method==='POST')return handleRn(path,req,env);
     if(req.method!=='POST') return new Response('Hamroh bot ishlayapti ✅');
     if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
