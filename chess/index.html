@@ -805,7 +805,7 @@ $('#lcancel').onclick=()=>{netStop();store.set('net',null);$('#menu').hidden=fal
 const netCopy=t=>{try{navigator.clipboard.writeText(t).then(()=>{},()=>{})}catch(e){}};
 $('#lcopy').onclick=()=>{netCopy(NET.room);$('#lcopy').textContent=TX('Nusxa olindi');setTimeout(()=>$('#lcopy').textContent=TX('Koddan nusxa'),1500)};
 $('#lshare').onclick=()=>{const u=netLink(),tx=TX("Hamrohda men bilan shaxmat o'ynang!")+' '+TX('Xona')+': '+NET.room;
-  try{parent.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(u)+'&text='+encodeURIComponent(tx))}catch(e){netCopy(u);$('#lshare').textContent=TX('Havola nusxalandi');setTimeout(()=>$('#lshare').textContent=TX('Havolani yuborish'),1500)}};
+  try{parent.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(u)+'&text='+encodeURIComponent('\n'+tx))}catch(e){netCopy(u);$('#lshare').textContent=TX('Havola nusxalandi');setTimeout(()=>$('#lshare').textContent=TX('Havolani yuborish'),1500)}};
 for(const id of ['gnet','lobby','drw','pdraw'])trDom($('#'+id));document.querySelectorAll('#smode [data-v=net]').forEach(b=>b.textContent=TX('Onlayn'));
 $('#ncode').placeholder=TX('KOD');window.__N=NET;menuUI();if(ROOM0){CFG.mode='net';menuUI();netJoin(ROOM0)}
 })();
