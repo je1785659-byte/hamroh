@@ -858,7 +858,12 @@ function frame(t){requestAnimationFrame(frame);const dt=Math.min(.05,(t-last)/10
   if(state==='play'){update(dt);fpsN++;fpsT+=(dt>=.05?.08:dt);if(fpsT>4){const f=fpsN/fpsT;fpsN=fpsT=0;if(f<27&&CFG.q>0){CFG.q--;applyQ();pop('GRAFIKA YENGILLASHTIRILDI')}}}
   else if(state==='menu'){menuA+=dt*.05;cam.position.set(Math.sin(menuA)*8,7.5,58);cam.rotation.set(-.1,Math.sin(menuA*.7)*.25,0);if(cam.fov!==cam.userData.fov){cam.fov=cam.userData.fov;cam.updateProjectionMatrix()}sky.position.copy(cam.position);sun.target.position.set(0,0,20);sun.position.copy(sun.target.position).addScaledVector(SUN,95)}
   else if(state==='end'&&!P.alive){cam.position.y=Math.max(.35,cam.position.y-dt*1.6);cam.rotation.z=Math.min(.9,cam.rotation.z+dt*1.2)}
+  cullEns();
   rd.clear();rd.render(scene,cam);if(state==='play'||state==='pause'){rd.clearDepth();rd.render(gscene,gcam)}}
+// Kamera ko'rmaydigan askarlar chizilmaydi (skeletli model avtomatik saralanmaydi). Radius katta: chetdagi askarning uzun soyasi yo'qolmasin.
+const CUF=new T.Frustum(),CUM=new T.Matrix4(),CUS=new T.Sphere();
+function cullEns(){cam.updateMatrixWorld();CUM.multiplyMatrices(cam.projectionMatrix,cam.matrixWorldInverse);CUF.setFromProjectionMatrix(CUM);CUS.radius=9;
+  for(const e of ens){if(!e.m)continue;CUS.center.set(e.x,1,e.z);const v=CUF.intersectsSphere(CUS);e.m.root.visible=v;e.m.gun.visible=v}}
 addEventListener('resize',resize);resize();applyQ();buildGrid();flow(SPAWN.x,SPAWN.z);syncChips();
 // ---------- DUEL: 4 kishigacha, WebRTC (bot faqat ulanishni yo'lga qo'yadi) ----------
 const sig=o=>{try{if(window.parent!==window&&parent.rnApi)return parent.rnApi('/pt/sig',o)}catch(e){}return Promise.resolve(null)};
@@ -923,7 +928,7 @@ $('#dgo').onclick=()=>{sig({op:'start',room:DUEL.room});dCast({t:'G',n:DUEL.name
 $('#dinv').onclick=()=>{const u='https://t.me/Hamronilovabot/app?startapp=pd-'+DUEL.room;try{parent.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(u)+'&text='+encodeURIComponent(WNAME("Hamrohda duelga chiq! Xona: ")+DUEL.room))}catch(e){try{navigator.clipboard.writeText(u)}catch(_){}}};
 $('#duelb').onclick=()=>{if(MI!==0){try{sessionStorage.setItem('pdh','1')}catch(e){}location.reload();return}duelOpen('')};
 {let can=false;try{can=window.parent!==window&&!!parent.rnApi&&!!(parent.Telegram&&parent.Telegram.WebApp&&parent.Telegram.WebApp.initData)&&typeof RTCPeerConnection!=='undefined'}catch(e){}$('#duelb').hidden=!can;if(can&&(DUELR||DUELH))setTimeout(()=>duelOpen(DUELR),600)}
-window.__G={DUEL,duelOpen,MS,rd,scene,econEnd,get COINS(){return COINS},UP,DQ,shopDraw,finish,spawnBoss,get BOSS(){return BOSS},uplinkDone,swap,throwG,WP,GM,GT,gun,update,SOL,dmgEnemy,mkDrone,MDL,solType,grThrow,GR,mkSoldier,P,ens,U,ST,I,start,get state(){return state},get stage(){return stage},uplinkDone,CFG};
+window.__G={cullEns,DUEL,duelOpen,MS,rd,scene,econEnd,get COINS(){return COINS},UP,DQ,shopDraw,finish,spawnBoss,get BOSS(){return BOSS},uplinkDone,swap,throwG,WP,GM,GT,gun,update,SOL,dmgEnemy,mkDrone,MDL,solType,grThrow,GR,mkSoldier,P,ens,U,ST,I,start,get state(){return state},get stage(){return stage},uplinkDone,CFG};
 requestAnimationFrame(frame);
 })();
 </script>
