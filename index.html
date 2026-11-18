@@ -3984,7 +3984,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261118e';
+const APP_VER='20261119a';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 // oflayn rejim: ilova va o'yinlar internetsiz ham ochiladi
@@ -4862,9 +4862,10 @@ const RN_AV='m4',RN_LO=['coin','cab','car','apart','bazaar','mahalla','madrasa',
 const RN_MC=['registan','gurem','kalon','toki','khwall','kalta','cotton','atlasst','tut']; // shaharlar: o'yin boshlangach fonda yuklanadi
 const RN_MN=['board','cab','car','low','high','block','ramp','coin','magnet','jet','shoe','shield','apart','bazaar','mahalla','madrasa','choy','chinar','lamp','cart'];
 function rnHalf(h){const s=(h&0x8000)?-1:1,e=(h>>10)&31,f=h&1023;return e===0?s*Math.pow(2,-14)*(f/1024):e===31?(f?NaN:s*Infinity):s*Math.pow(2,e-15)*(1+f/1024)}
+const rnGL=()=>{const l=new window.THREE_GLTFLoader();if(window.THREE_Meshopt)l.setMeshoptDecoder(window.THREE_Meshopt);return l};
 function rnLoadAssets(){
   if(RNA&&RNA.skin!==rnSkin()){ // boshqa qahramon tanlangan: faqat uni yuklaymiz
-    const sk=rnSkin();return RNAp=new window.THREE_GLTFLoader().loadAsync('rn/'+sk+'.glb?v='+RN_AV).then(g=>{g.kid=true;RNA.hero=g;RNA.skin=sk;return RNA},()=>RNA)}
+    const sk=rnSkin();return RNAp=rnGL().loadAsync('rn/'+sk+'.glb?v='+RN_AV+'m').then(g=>{g.kid=true;RNA.hero=g;RNA.skin=sk;return RNA},()=>RNA)}
   if(RNA)return Promise.resolve(RNA);if(RNAp)return RNAp;
   const T=window.THREE,get=(u,t)=>fetch(u+'?v='+RN_AV).then(r=>{if(!r.ok)throw 0;return t==='j'?r.json():r.arrayBuffer()});
   const tex=u=>new Promise((res,rej)=>new T.TextureLoader().load(u+'?v='+RN_AV,t=>{t.colorSpace=T.SRGBColorSpace;t.flipY=false;t.magFilter=T.LinearFilter;res(t)},undefined,rej));
@@ -4880,9 +4881,9 @@ function rnLoadAssets(){
   const scr=u=>new Promise((res,rej)=>{if(window.THREE_GLTFLoader)return res();const el=document.createElement('script');el.src=u+'?v='+APP_VER;el.onload=res;el.onerror=rej;document.head.appendChild(el)});
   // qahramon: Quaternius Universal Animation Library (CC0) — skelet va tayyor harakatlar
   const sk=rnSkin();
-  const opt=n=>scr('lib/three-gltf.js').then(()=>new window.THREE_GLTFLoader().loadAsync('rn/'+n+'.glb?v='+RN_AV)).catch(e=>{console.warn(n,e);return null});
+  const opt=n=>scr('lib/three-gltf.js').then(()=>rnGL().loadAsync('rn/'+n+'.glb?v='+RN_AV+'m')).catch(e=>{console.warn(n,e);return null});
   const LITE=RN_LITE(),guardP=LITE?Promise.resolve(null):opt('guard'),dogP=LITE?Promise.resolve(null):opt('dog');
-  const L0=()=>new window.THREE_GLTFLoader(),hero=scr('lib/three-gltf.js').then(()=>L0().loadAsync('rn/'+sk+'.glb?v='+RN_AV).catch(()=>L0().loadAsync('rn/kid.glb?v='+RN_AV)).then(g=>(g.kid=true,g),()=>L0().loadAsync('rn/hero.glb?v='+RN_AV))).catch(e=>{console.warn('hero',e);return null});
+  const L0=rnGL,hero=scr('lib/three-gltf.js').then(()=>L0().loadAsync('rn/'+sk+'.glb?v='+RN_AV+'m').catch(()=>L0().loadAsync('rn/kid.glb?v='+RN_AV+'m')).then(g=>(g.kid=true,g),()=>L0().loadAsync('rn/hero.glb?v='+RN_AV+'m'))).catch(e=>{console.warn('hero',e);return null});
   // Toshkent to'plami (Meshy): poyezd, to'siqlar, tanga, bonuslar, binolar — yagona uslubda
   const MROT={cab:-Math.PI/2,car:-Math.PI/2,ramp:Math.PI},CEN={coin:1,magnet:1,jet:1,shoe:1,shield:1};
   const toF=a=>{const it=a.itemSize,f=new Float32Array(a.count*it);for(let i=0;i<a.count;i++){f[i*it]=a.getX(i);if(it>1)f[i*it+1]=a.getY(i);if(it>2)f[i*it+2]=a.getZ(i);if(it>3)f[i*it+3]=a.getW(i)}return new T.BufferAttribute(f,it)};
