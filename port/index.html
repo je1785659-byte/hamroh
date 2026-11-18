@@ -228,7 +228,7 @@ const MIS=[
   hor:[.5,.52,.55],mid:[.36,.39,.43],zen:[.2,.23,.27],sg:0,sunC:[.8,.86,.92],sunI:1.3,fogC:[.4,.43,.46],fogD:.017,hemi:.5,gI:.75,dim:.6,snMax:1}];
 const store={get(k,d){try{const v=localStorage.getItem('pss_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('pss_'+k,JSON.stringify(v))}catch(e){}}};
 const DUELR=((location.hash.match(/[#&]r=([A-Za-z0-9]{3,8})/)||[])[1]||'').toUpperCase();let DUELH=false;try{DUELH=sessionStorage.getItem('pdh')==='1';sessionStorage.removeItem('pdh')}catch(e){}
-const DUEL={on:false,room:'',slot:-1,host:false,names:[],pc:{},ch:{},st:{},ent:{},score:[0,0,0,0],since:0,fseq:0,sendT:0,rsT:0,lastBy:-1,target:10,poll:0,ok:false};
+const DUEL={on:false,room:'',slot:-1,host:false,names:[],pc:{},ch:{},st:{},ent:{},score:[0,0,0,0],stT:{},since:0,fseq:0,sendT:0,rsT:0,lastBy:-1,target:10,poll:0,ok:false};
 const MI=(DUELR||DUELH)?0:clamp(store.get('m',0)|0,0,MIS.length-1),MS=MIS[MI];seed=MS.seed;
 const CFG={sens:store.get('sens',1),auto:store.get('auto',TOUCH),q:store.get('q',TOUCH?1:2),diff:store.get('diff',1)};
 const DIFF=[{dmg:.55,acc:.7,n:0},{dmg:1,acc:1,n:0},{dmg:1.45,acc:1.25,n:1}];
@@ -644,7 +644,7 @@ const P={x:0,y:0,z:0,vx:0,vy:0,vz:0,yaw:0,pitch:0,hp:100,onG:true,ammo:30,res:15
 const ST={kills:0,hs:0,shots:0,hits:0,time:0};
 const I={mx:0,my:0,fire:false,ads:false,jump:false,sprint:false,use:false};
 let state='menu',stage=0,now=0,NOLOCK=false,flowT=0,subQ=[],subT=0,popT=0,hmT=0,tipT=0;
-function hurt(d,sx,sz){if(!P.alive||state!=='play')return;P.hp-=d;P.lastHit=now;P.shake=Math.max(P.shake,.35);SFX.hurt();
+function hurt(d,sx,sz){if(!P.alive||!(state==='play'||(state==='pause'&&DUEL.on)))return;P.hp-=d;P.lastHit=now;P.shake=Math.max(P.shake,.35);SFX.hurt();
   const a=Math.atan2(sx-P.x,sz-P.z),rel=a-(P.yaw+Math.PI);$('#dir').style.transform=`rotate(${-rel}rad)`;$('#dir').style.opacity=1;hurt.t=1;
   if(P.hp<=0){P.hp=0;P.alive=false;if(DUEL.on)duelDie();else finish(false)}}
 function say(who,text){subQ.push([TX(who),TX(text)])}
@@ -853,6 +853,7 @@ function update(dt){now+=dt;ST.time+=dt;
   hud(dt)}
 let last=performance.now(),menuA=0,fpsN=0,fpsT=0;
 function frame(t){requestAnimationFrame(frame);const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(state==='pause'&&DUEL.on){I.fire=false;I.mx=I.my=0;I.jump=I.sprint=I.ads=false;update(dt)}
   if(state==='play'){update(dt);fpsN++;fpsT+=(dt>=.05?.08:dt);if(fpsT>4){const f=fpsN/fpsT;fpsN=fpsT=0;if(f<27&&CFG.q>0){CFG.q--;applyQ();pop('GRAFIKA YENGILLASHTIRILDI')}}}
   else if(state==='menu'){menuA+=dt*.05;cam.position.set(Math.sin(menuA)*8,7.5,58);cam.rotation.set(-.1,Math.sin(menuA*.7)*.25,0);if(cam.fov!==cam.userData.fov){cam.fov=cam.userData.fov;cam.updateProjectionMatrix()}sky.position.copy(cam.position);sun.target.position.set(0,0,20);sun.position.copy(sun.target.position).addScaledVector(SUN,95)}
   else if(state==='end'&&!P.alive){cam.position.y=Math.max(.35,cam.position.y-dt*1.6);cam.rotation.z=Math.min(.9,cam.rotation.z+dt*1.2)}
@@ -871,7 +872,7 @@ function dSend(o){const m=JSON.stringify(o);if(DUEL.host){if(o.to!==undefined&&o
 function dCast(o,ch){const m=JSON.stringify(o);for(const k in DUEL.ch)dRaw(+k,ch||'e',m)}
 function dWire(i,c){DUEL.ch[i]=DUEL.ch[i]||{};DUEL.ch[i][c.label]=c;c.onopen=()=>{if(c.label==='e'){if(DUEL.host){dCast({t:'L',n:DUEL.names})}else dMsg("Ulandi. Xona egasi boshlashini kuting.");dList()}};
   c.onclose=()=>{if(c.label!=='e')return;delete DUEL.ch[i];if(DUEL.on){if(!DUEL.host){duelEnd(-1)}else{dDrop(i);dCast({t:'X',s:i})}}else dList()};
-  c.onmessage=ev=>{let o;try{o=JSON.parse(ev.data)}catch(e){return}if(c.label==='s'){if(DUEL.host){if(o.p){o.p[0]=i;DUEL.st[i]=o.p}}else if(o.a)for(const p of o.a)if(p[0]!==DUEL.slot)DUEL.st[p[0]]=p;return}
+  c.onmessage=ev=>{let o;try{o=JSON.parse(ev.data)}catch(e){return}if(c.label==='s'){if(DUEL.host){if(o.p){o.p[0]=i;DUEL.st[i]=o.p;DUEL.stT[i]=performance.now()}}else if(o.a)for(const p of o.a)if(p[0]!==DUEL.slot){DUEL.st[p[0]]=p;DUEL.stT[p[0]]=performance.now()}return}
     if(DUEL.host){o.by=i;if(o.t==='h'&&o.to!==0){dRaw(o.to,'e',JSON.stringify(o));return}}dEvent(o,i)}}
 function dDrop(i){const e=DUEL.ent[i];if(e){e.dead=true;e.g.visible=false;if(e.m)solFree(e);scene.remove(e.g);const k=ens.indexOf(e);if(k>=0)ens.splice(k,1);delete DUEL.ent[i]}delete DUEL.st[i];dScore()}
 function dEvent(o,from){
@@ -885,15 +886,18 @@ function dEvent(o,from){
 function dScore(){const el=$('#ds');el.hidden=!DUEL.on;el.innerHTML=DUEL.names.map((n,i)=>(i===DUEL.slot||DUEL.ent[i])?(i===DUEL.slot?'<b>':'')+String(n).replace(/[<>&]/g,'').slice(0,9)+' '+(DUEL.score[i]|0)+(i===DUEL.slot?'</b>':''):'').filter(Boolean).join(' · ')+' / '+DUEL.target}
 function dSpawn(i){const tg=[[0,52],[0,-52],[-52,0],[52,0],[30,30],[-30,-30]][i%6];let bd=1e9,bc=0;for(let c=0;c<GN*GN;c++){if(blocked[c])continue;const d=(cX(c)-tg[0])**2+(cZ(c)-tg[1])**2;if(d<bd){bd=d;bc=c}}return [cX(bc),cZ(bc)]}
 function dPlace(i){const s=dSpawn(i);P.x=s[0];P.z=s[1];P.y=0;P.vx=P.vy=P.vz=0;P.yaw=Math.atan2(s[0],s[1]);P.pitch=0}
-function duelSetup(){for(const e of ens)rmEnemy(e);ens.length=0;for(const u of U){u.done=true;u.beam.visible=false;u.lamp.visible=false;u.sc.material=scrOff}subQ.length=0;$('#sub').style.opacity=0;DUEL.ent={};DUEL.score=[0,0,0,0];DUEL.st={};
+function duelSetup(){for(const e of ens)rmEnemy(e);ens.length=0;for(const u of U){u.done=true;u.beam.visible=false;u.lamp.visible=false;u.sc.material=scrOff}subQ.length=0;$('#sub').style.opacity=0;DUEL.ent={};DUEL.score=[0,0,0,0];DUEL.st={};DUEL.stT={};
   DUEL.names.forEach((n,i)=>{if(i===DUEL.slot)return;if(!DUEL.host&&i!==0&&false)return;const sp=dSpawn(i),e=mkSoldier(sp[0],sp[1],true);e.net=true;e.slot=i;e.alert=true;DUEL.ent[i]=e});
   dPlace(DUEL.slot);$('#ot').textContent='DUEL';$('#oc').textContent=WNAME("10 ta g'alabagacha");dScore()}
 function duelBegin(){DUEL.on=true;$('#duel').hidden=true;clearInterval(DUEL.poll);start()}
 function duelDie(){const by=DUEL.lastBy;DUEL.rsT=performance.now()+3000;pop(WNAME("O'ldingiz"));I.fire=false;const m={t:'k',by2:by};if(DUEL.host){m.by=0;dEvent(m,0)}else dRaw(0,'e',JSON.stringify(m));DUEL.lastBy=-1}
 function duelTick(dt){if(!P.alive){I.fire=false;I.mx=I.my=0;if(performance.now()>=DUEL.rsT){let best=0,bd=-1;for(let i=0;i<6;i++){const s=dSpawn(i);let md=1e9;for(const k in DUEL.ent){const e=DUEL.ent[k];md=Math.min(md,Math.hypot(e.x-s[0],e.z-s[1]))}if(md>bd){bd=md;best=i}}dPlace(best);P.hp=HPMAX();P.alive=true;P.lastHit=now-9;P.ammo=WP[P.w].mag}}
   if(performance.now()>=DUEL.sendT){DUEL.sendT=performance.now()+66;const me=[DUEL.slot,+P.x.toFixed(2),+P.y.toFixed(2),+P.z.toFixed(2),+P.yaw.toFixed(3),+P.pitch.toFixed(3),P.w,P.alive?1:0,DUEL.fseq];
-    if(DUEL.host){DUEL.st[0]=me;const a=[];for(const k in DUEL.st)a.push(DUEL.st[k]);dCast({a},'s')}else dRaw(0,'s',JSON.stringify({p:me}))}}
-function netUpd(e,dt){const s=DUEL.st[e.slot];if(!s){e.g.visible=false;e.dead=true;return}const alive=!!s[7];if(alive&&e.dead){e.x=s[1];e.z=s[3];e.ny=s[2]}e.dead=!alive;e.g.visible=alive;if(!alive)return;
+    if(DUEL.host){DUEL.st[0]=me;const a=[],tn=performance.now();for(const k in DUEL.st)if(+k===0||tn-(DUEL.stT[k]||0)<DSTALE)a.push(DUEL.st[k]);dCast({a},'s')}else dRaw(0,'s',JSON.stringify({p:me}))}}
+const DSTALE=2500;Object.assign(DICT,{"aloqada emas":["не на связи","is not connected"]});
+// qayta tug'ilgan raqib modelini o'lim holatidan tik turgan holatga qaytaradi
+function solRevive(m){if(!m.dead)return;m.dead=false;m.mx.stopAllAction();for(const k in m.ac){const a=m.ac[k];a.reset();a.setEffectiveWeight(k==='idle'?1:0);a.play();m.w[k]=k==='idle'?1:0}m.gv=0;m.hit=0;m.gun.rotation.set(0,0,0);m.gun.userData.f.visible=false}
+function netUpd(e,dt){const s=DUEL.st[e.slot];if(!s||performance.now()-(DUEL.stT[e.slot]||0)>DSTALE){if(!e.away&&s&&s[7])pop((DUEL.names[e.slot]||'')+' '+WNAME('aloqada emas'));e.away=true;e.g.visible=false;e.dead=true;return}const alive=!!s[7];if(alive&&(e.dead||e.away)){e.x=s[1];e.z=s[3];e.ny=s[2];if(e.m)solRevive(e.m)}e.away=false;e.dead=!alive;e.g.visible=alive;if(!alive)return;
   const px=e.x,pz=e.z,k=Math.min(1,dt*14);if(Math.hypot(s[1]-e.x,s[3]-e.z)>6){e.x=s[1];e.z=s[3]}else{e.x+=(s[1]-e.x)*k;e.z+=(s[3]-e.z)*k}e.ny=(e.ny||0)+(s[2]-(e.ny||0))*k;e.y=0;
   let da=s[4]+Math.PI-e.yaw;while(da>Math.PI)da-=6.283;while(da<-Math.PI)da+=6.283;e.yaw+=da*Math.min(1,dt*14);e.g.rotation.y=e.yaw;e.g.position.set(e.x,e.ny,e.z);
   const sp=Math.hypot(e.x-px,e.z-pz)/Math.max(dt,.001);e.spS=(e.spS||0)+(sp-(e.spS||0))*Math.min(1,dt*10);if(e.m){solUpd(e,dt,e.spS,1,true);e.hy+=0}else{e.hx=e.x;e.hy=1.65+e.ny;e.hz=e.z}
