@@ -6,7 +6,7 @@
 // O'lchamlar metrda. Stol tik turadi: x — eni, y — bo'yi. "Uy" pastda, piramida tepada.
 const W=1.775,H=3.55,R=.034,G=9.8;
 // O'lchangan qiymatlar (pooltool loyihasi va bilyard fizikasi bo'yicha maqolalardan): mato, shar va bort
-let E_C=.95,F_C=.35,E_J=.35,HK=1.15;const MU_S=.2,MU_R=.01,SPIN_DEC=2.5*(4/9)*G,E_BB=.95,MU_BB=.05,ST_C=.4,CT_C=Math.sqrt(1-.16); // bort sharga markazidan 0.4R balandda tegadi
+let E_C=.95,F_C=.35,E_J=.35,HK=1.15,MU_BB=0;const MU_S=.2,MU_R=.01,SPIN_DEC=2.5*(4/9)*G,E_BB=.95,ST_C=.4,CT_C=Math.sqrt(1-.16); // bort sharga markazidan 0.4R balandda tegadi
 const DT=1/300,CW=.05;                       // CW — bort rezinasi eni
 // Luza og'zi (bort uchlari orasi): rasmiy o'lcham — burchak 72,5 mm, o'rta 82,5 mm (shar 68 mm). "Keng" rejimda 18% kattaroq.
 let PK=1,MC=.0725,MM=.0825;
@@ -60,7 +60,8 @@ function sub(dt){let moving=false;
   if(hyp(b.vx,b.vy)>.004||Math.abs(b.wz)>.6||hyp(b.vx-R*b.wy,b.vy+R*b.wx)>.004)moving=true;else{b.vx=b.vy=b.wx=b.wy=b.wz=0}}
  // shar — shar
  for(let it=0,any=true;it<5&&any;it++){any=false;for(let i=0;i<balls.length;i++){const a=balls[i];if(!a.on)continue;for(let j=i+1;j<balls.length;j++){const b=balls[j];if(!b.on)continue;const dx=b.x-a.x,dy=b.y-a.y;if(Math.abs(dx)>2*R||Math.abs(dy)>2*R)continue;const d=hyp(dx,dy);if(d>=2*R||d===0)continue;
-   const nx=dx/d,ny=dy/d,ov=(2*R-d)/2;a.x-=nx*ov;a.y-=ny*ov;b.x+=nx*ov;b.y+=ny*ov;const rvx=a.vx-b.vx,rvy=a.vy-b.vy,vn=rvx*nx+rvy*ny;if(vn<=0)continue;
+   const rvx=a.vx-b.vx,rvy=a.vy-b.vy;let nx=dx/d,ny=dy/d;const A=rvx*rvx+rvy*rvy,Bq=dx*rvx+dy*rvy;if(Bq>0&&A>1e-9){const tau=Math.min(dt*1.5,(-Bq+Math.sqrt(Bq*Bq-A*(d*d-4*R*R)))/A),ex=dx+rvx*tau,ey=dy+rvy*tau,el=hyp(ex,ey)||1;nx=ex/el;ny=ey/el} // tegish lahzasidagi yo'nalish
+   const ov=(2*R-d)/2;a.x-=nx*ov;a.y-=ny*ov;b.x+=nx*ov;b.y+=ny*ov;const vn=rvx*nx+rvy*ny;if(vn<=0)continue;
    const jn=(1+E_BB)/2*vn;a.vx-=jn*nx;a.vy-=jn*ny;b.vx+=jn*nx;b.vy+=jn*ny;
    const tx=-ny,ty=nx,vt=rvx*tx+rvy*ty-R*(a.wz+b.wz),jt=Math.sign(vt)*Math.min(MU_BB*jn,Math.abs(vt)*.14);a.vx-=jt*tx;a.vy-=jt*ty;b.vx+=jt*tx;b.vy+=jt*ty; // aylanish sharni biroz chetga suradi
    if(shot){if(!shot.first&&(a===shot.ball||b===shot.ball))shot.first=a===shot.ball?b:a;shot.hits++}click(jn*.22,2600);moving=true;any=true}}}
@@ -176,7 +177,7 @@ function drawCue(bx,by,a,back,al){const dx=Math.cos(a),dy=Math.sin(a),cl_=1.25*S
 function drawAim(){if(cueFx){const u=cueFx.t/.28;g.save();g.beginPath();g.rect(0,L.top-6,VW,VH-L.top-L.bot+10);g.clip();drawCue(cueFx.x,cueFx.y,cueFx.a,(R+.02)*S-u*.05*S*(1+cueFx.p),1-u);g.restore()}if(sim||!sel||ST!=='play'||pick)return;const dx=Math.cos(ang),dy=Math.sin(ang),h=ray(sel,dx,dy),gx=sel.x+dx*h.t,gy=sel.y+dy*h.t,r=R*S;
  g.save();g.beginPath();g.rect(0,L.top-6,VW,VH-L.top-L.bot+10);g.clip();g.strokeStyle='rgba(255,255,255,.85)';g.lineWidth=1.6;g.setLineDash([7,6]);g.beginPath();g.moveTo(X(sel.x+dx*R),Y(sel.y+dy*R));g.lineTo(X(gx),Y(gy));g.stroke();g.setLineDash([]);
  g.strokeStyle='rgba(255,255,255,.9)';g.lineWidth=1.5;g.beginPath();g.arc(X(gx),Y(gy),r,0,TAU);g.stroke();
- if(h.hit){const nx=(h.hit.x-gx)/(2*R),ny=(h.hit.y-gy)/(2*R),c=dx*nx+dy*ny,len=.12+.34*c;g.strokeStyle='rgba(255,255,255,.85)';g.lineWidth=2;g.beginPath();g.moveTo(X(h.hit.x),Y(h.hit.y));g.lineTo(X(h.hit.x+nx*len),Y(h.hit.y+ny*len));g.stroke();
+ if(h.hit){const n0x=(h.hit.x-gx)/(2*R),n0y=(h.hit.y-gy)/(2*R),c=dx*n0x+dy*n0y,vt0=-dx*n0y+dy*n0x,jn0=.975*c,jt0=Math.sign(vt0)*Math.min(MU_BB*jn0,Math.abs(vt0)*.14),ol=hyp(jn0,jt0)||1,nx=(n0x*jn0-n0y*jt0)/ol,ny=(n0y*jn0+n0x*jt0)/ol,len=.14+.5*c;g.strokeStyle='rgba(255,255,255,.85)';g.lineWidth=2;g.beginPath();g.moveTo(X(h.hit.x),Y(h.hit.y));g.lineTo(X(h.hit.x+nx*len),Y(h.hit.y+ny*len));g.stroke();
   const tx=dx-nx*c,ty=dy-ny*c,tl=hyp(tx,ty);if(tl>.05){const l2=.1+.25*tl;g.strokeStyle='rgba(255,220,120,.7)';g.beginPath();g.moveTo(X(gx),Y(gy));g.lineTo(X(gx+tx/tl*l2),Y(gy+ty/tl*l2));g.stroke()}}
  // kiy
  drawCue(sel.x,sel.y,ang,(R+.02+pow*.32)*S,1);g.restore()}
@@ -239,6 +240,6 @@ cv.addEventListener('pointermove',e=>{move(e.clientX,e.clientY)});cv.addEventLis
 let last=performance.now(),acc=0;
 function tick(dt){T+=dt;if(msgT>0)msgT-=dt;if(cueFx&&(cueFx.t+=dt)>.28)cueFx=null;for(const b of balls)if(b.fall>0){b.fall+=dt/.32;if(b.fall>=1)b.fall=0}if(aiTurn()&&!sim){if(pick){AI=AI||{ph:'pick',t:0};AI.t+=dt;if(AI.t>1){AI=null;aiPick()}}else{if(!AI||AI.ph==='pick')aiStart();aiTick(dt)}}if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tick(dt);render();requestAnimationFrame(frame)}
-window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},setC(e,f){E_C=e;F_C=f},setJ2(e,k){E_J=e;HK=k},setJ(v){JIT=v},setPk(v){PK=v;buildTable()},get HOLES(){return HOLES},setLvl(v){LVL=v},tick,get ai(){return AI},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
+window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},setC(e,f){E_C=e;F_C=f},setMB(v){MU_BB=v},setJ2(e,k){E_J=e;HK=k},setJ(v){JIT=v},setPk(v){PK=v;buildTable()},get HOLES(){return HOLES},setLvl(v){LVL=v},tick,get ai(){return AI},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
 requestAnimationFrame(frame);
 </script></body></html>
