@@ -35,7 +35,21 @@ const DICT={
 "Bu zombi birinchi o'simlikdan sakrab o'tadi":["Этот зомби перепрыгивает первое растение","This zombie vaults over the first plant"],"Belkurak bilan o'simlikni olib tashlash mumkin":["Лопатой можно убрать растение","Use the shovel to remove a plant"],
 "Tog'orali zombi juda chidamli":["Зомби с тазом очень живуч","The basin zombie is very tough"],"O'simliklar lentada keladi — quyosh kerak emas":["Растения приходят по ленте — солнце не нужно","Plants arrive on the belt — no sun needed"],
 "Hurmatli uy egalari, biz baribir kiramiz. Eshikni ochiq qoldiring. — Zombilar":["Уважаемые хозяева, мы всё равно войдём. Оставьте дверь открытой. — Зомби","Dear homeowners, we will get in anyway. Leave the door open. — The Zombies"],
-"Chiqish":["Выход","Exit"],"Otadi":["Стреляет","Shoots"],"Quyosh beradi":["Даёт солнце","Gives sun"],"To'sadi":["Преграда","Blocks"],"Portlaydi":["Взрывается","Explodes"],"Sekinlatadi":["Замедляет","Slows"],"Yutadi":["Глотает","Swallows"],"15 soniyada tayyor":["Готова через 15 с","Ready in 15 s"],"Yutdingiz!":["Победа!","You won!"]
+"Chiqish":["Выход","Exit"],"Otadi":["Стреляет","Shoots"],"Quyosh beradi":["Даёт солнце","Gives sun"],"To'sadi":["Преграда","Blocks"],"Portlaydi":["Взрывается","Explodes"],"Sekinlatadi":["Замедляет","Slows"],"Yutadi":["Глотает","Swallows"],"15 soniyada tayyor":["Готова через 15 с","Ready in 15 s"],"Yutdingiz!":["Победа!","You won!"],
+"Qamish sol":["Камышовый плот","Reed raft"],"Sakrovchi behi":["Прыгучая айва","Jumping quince"],"Tut":["Шелковица","Mulberry"],"Girdob gul":["Цветок-водоворот","Whirl flower"],
+"Suvga qo'yiladi. Ustiga boshqa o'simlik ekiladi.":["Ставится на воду. Сверху сажают другое растение.","Goes on water. Plant something else on top."],
+"Yaqin kelgan zombining ustiga sakrab, ezib tashlaydi.":["Прыгает на подошедшего зомби и давит его.","Jumps on a nearby zombie and squashes it."],
+"Birdaniga uch qatorga tut otadi.":["Стреляет сразу в три ряда.","Shoots into three rows at once."],
+"Faqat suvda o'sadi. Zombini suv ostiga tortib ketadi.":["Растёт только в воде. Утаскивает зомби под воду.","Grows only in water. Drags a zombie under."],
+"Avval suvga qamish sol qo'ying, keyin ustiga eking":["Сначала поставьте плот на воду, потом сажайте на него","Put a raft on the water first, then plant on it"],
+"Ariqdan tog'orada suzib keladigan zombilarni kuting":["По арыку приплывут зомби в тазах","Zombies will paddle down the canal in tubs"],
+"Sakrovchi behi yaqin kelgan zombini ezib tashlaydi":["Прыгучая айва давит подошедшего зомби","The jumping quince squashes a nearby zombie"],
+"Tut birdaniga uch qatorga otadi":["Шелковица стреляет в три ряда","The mulberry shoots into three rows"],
+"Sho'ng'uvchi zombi suv ostida — unga o'q tegmaydi":["Ныряльщик под водой — пули его не берут","The diver is underwater — shots miss him"],
+"Girdob gul suvdagi zombini tortib ketadi":["Цветок-водоворот утаскивает зомби в воде","The whirl flower drags water zombies under"],
+"Suvda turadi":["Стоит на воде","Floats"],"Ezadi":["Давит","Squashes"],"1-fasl":["Сезон 1","Season 1"],"2-fasl":["Сезон 2","Season 2"],"Hovli":["Двор","Yard"],"Ariq bo'yi":["У арыка","By the canal"],"Tez orada":["Скоро","Soon"],
+"Yettinchi karta joyi!":["Седьмой слот!","Seventh card slot!"],"Endi jangga 7 ta o'simlik olasiz.":["Теперь в бой можно взять 7 растений.","You can now take 7 plants into battle."],"Fasl tugadi!":["Сезон пройден!","Season complete!"],
+"2-fasl ochildi: Ariq bo'yi":["Открыт сезон 2: У арыка","Season 2 unlocked: By the canal"],"Keyingi bosqichlar tez orada qo'shiladi.":["Следующие уровни скоро появятся.","More levels coming soon."]
 };
 const TX=s=>{if(LNG==='uz')return s;const d=DICT[s];return d?(LNG==='ru'?d[0]:d[1])||s:s};
 const store={get(k,d){try{const v=localStorage.getItem('bog_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('bog_'+k,JSON.stringify(v))}catch(e){}}};
@@ -68,7 +82,7 @@ const SFX={plant(){tone(180,90,.12,'sine',.2);noise(.08,.08,600)},sun(){tone(880
  hit(){noise(.05,.07,1800)},clank(){tone(900,500,.07,'square',.05);noise(.04,.06,3000)},bite(){noise(.09,.1,500);tone(140,90,.08,'sawtooth',.04)},
  boom(){noise(.7,.4,400);tone(120,30,.6,'sine',.35)},mower(){tone(90,140,.9,'sawtooth',.12);noise(.9,.1,1200)},groan(){tone(rnd(90,130),rnd(55,75),rnd(.5,.9),'sawtooth',.05)},
  siren(){tone(300,600,.5,'sawtooth',.08);tone(600,300,.5,'sawtooth',.08,.5)},win(){[523,659,784,1047].forEach((f,i)=>tone(f,f,.25,'triangle',.14,i*.14))},lose(){[392,330,262,196].forEach((f,i)=>tone(f,f*.97,.4,'sawtooth',.1,i*.3))},
- tap(){tone(600,500,.04,'sine',.06)},no(){tone(200,150,.1,'square',.05)},gulp(){tone(300,80,.25,'sine',.2)},roll(){noise(.15,.05,300)},pop(){tone(500,900,.08,'sine',.12)}};
+ tap(){tone(600,500,.04,'sine',.06)},splash(){noise(.22,.12,900);tone(300,160,.14,'sine',.08)},no(){tone(200,150,.1,'square',.05)},gulp(){tone(300,80,.25,'sine',.2)},roll(){noise(.15,.05,300)},pop(){tone(500,900,.08,'sine',.12)}};
 
 // ---------- maydon o'lchamlari ----------
 const GX=205,GY=92,CW=79,CH=86,COLS=9,ROWS=5;
@@ -84,6 +98,10 @@ const P={
  ice:{n:"Yalpiz",cost:175,cd:FAST,hp:300,d:"Sovuq nafasi zombini sekinlashtiradi."},
  snap:{n:"Ko'zagul",cost:150,cd:FAST,hp:300,d:"Zombini butun yutadi, keyin uzoq chaynaydi."},
  twin:{n:"Qo'sh otuvchi",cost:200,cd:FAST,hp:300,d:"Birdaniga ikkita uzum otadi."},
+ raft:{n:"Qamish sol",cost:25,cd:FAST,hp:300,d:"Suvga qo'yiladi. Ustiga boshqa o'simlik ekiladi."},
+ jump:{n:"Sakrovchi behi",cost:50,cd:SLOW,hp:300,d:"Yaqin kelgan zombining ustiga sakrab, ezib tashlaydi."},
+ tri:{n:"Tut",cost:325,cd:FAST,hp:300,d:"Birdaniga uch qatorga tut otadi."},
+ whirl:{n:"Girdob gul",cost:25,cd:SLOW,hp:300,d:"Faqat suvda o'sadi. Zombini suv ostiga tortib ketadi."},
  xnut:{n:"Portlovchi g'aram",cost:0,cd:0,hp:4000,d:""}
 };
 const ORDER=['pea','sun','bomb','nut','mine','ice','snap','twin'];
@@ -93,7 +111,11 @@ const Z={
  flag:{hp:270,arm:0,sp:3.7,cost:1,w:0},
  helm:{hp:270,arm:370,sp:4.7,cost:2,w:4000},
  pole:{hp:500,arm:0,sp:2.5,cost:2,w:2000},
- pot:{hp:270,arm:1100,sp:4.7,cost:4,w:3000}
+ pot:{hp:270,arm:1100,sp:4.7,cost:4,w:3000},
+ // suvda suzuvchilar (faqat ariq qatorida)
+ tub:{hp:270,arm:0,sp:4.7,cost:1,w:3200,water:1},
+ tubh:{hp:270,arm:370,sp:4.7,cost:2,w:2600,water:1},
+ dive:{hp:270,arm:0,sp:4.2,cost:2,w:2600,water:1}
 };
 // ---------- bosqichlar (Kunduz) ----------
 const LV=[
@@ -106,17 +128,26 @@ const LV=[
  {flags:2,lanes:[0,1,2,3,4],zs:['basic','helm','pole'],reward:'snap',tip:["Belkurak bilan o'simlikni olib tashlash mumkin"]},
  {flags:1,lanes:[0,1,2,3,4],zs:['basic','helm','pot'],reward:'twin',tip:["Tog'orali zombi juda chidamli"]},
  {flags:2,lanes:[0,1,2,3,4],zs:['basic','helm','pole','pot'],reward:'note'},
- {flags:2,lanes:[0,1,2,3,4],zs:['basic','helm','pole','pot'],reward:'end',mode:'belt',tip:["O'simliklar lentada keladi — quyosh kerak emas"]}
+ {flags:2,lanes:[0,1,2,3,4],zs:['basic','helm','pole','pot'],reward:'raft',mode:'belt',tip:["O'simliklar lentada keladi — quyosh kerak emas"]},
+ // ---------- 2-fasl: Ariq bo'yi (o'rta qator — suv) ----------
+ {flags:1,lanes:[0,1,2,3,4],water:[2],zs:['basic','helm','tub'],reward:'jump',tip:["Avval suvga qamish sol qo'ying, keyin ustiga eking","Ariqdan tog'orada suzib keladigan zombilarni kuting"]},
+ {flags:2,lanes:[0,1,2,3,4],water:[2],zs:['basic','helm','pole','tub','tubh'],reward:'tri',tip:["Sakrovchi behi yaqin kelgan zombini ezib tashlaydi"]},
+ {flags:1,lanes:[0,1,2,3,4],water:[2],zs:['basic','helm','tub','tubh','dive'],reward:'whirl',tip:["Tut birdaniga uch qatorga otadi","Sho'ng'uvchi zombi suv ostida — unga o'q tegmaydi"]},
+ {flags:2,lanes:[0,1,2,3,4],water:[2],zs:['basic','helm','pot','tub','tubh','dive'],reward:'slot',tip:["Girdob gul suvdagi zombini tortib ketadi"]}
 ];
-const seedsFor=i=>ORDER.slice(0,Math.min(8,[1,2,3,4,4,5,6,7,8,8][i]));
-const SLOTS=6;
+const ORDER2=['raft','jump','tri','whirl'];
+const NSEED=[1,2,3,4,4,5,6,7,8,8];
+const seedsFor=i=>i<10?ORDER.slice(0,NSEED[i]):ORDER.concat(ORDER2.slice(0,NSEED[i-10]));
+let SLOTS=6;
+const lvName=i=>(Math.floor(i/10)+1)+'-'+(i%10+1);
+const isWater=r=>!!(LV[LI].water&&LV[LI].water.includes(r));
 
 // ================= O'YIN HOLATI =================
 let ST='menu',LI=0,prog=store.get('prog',0),T=0;
-let plants,zombies,shots,suns,mowers,fx,sunN,seeds,cdT,sel,shovel,nuts,belt,beltT;
+let rafts,plants,zombies,shots,suns,mowers,fx,sunN,seeds,cdT,sel,shovel,nuts,belt,beltT;
 let wave,waves,waveT,waveHP0,waveId,nextIn,hugeMsg,finalMsg,finalShown,spawnedAll,rewardDrop,readyT,skyT,skyN,tipT,tipI,lastLane,chosen,groanT,loseT,loseZ,flagAt;
 let btns=[];
-function newLevel(i){LI=i;const L=LV[i];T=0;plants=[...Array(ROWS)].map(()=>Array(COLS).fill(null));zombies=[];shots=[];suns=[];fx=[];nuts=[];belt=[];beltT=1.5;
+function newLevel(i){LI=i;const L=LV[i];T=0;SLOTS=prog>=14?7:6;rafts=[...Array(ROWS)].map(()=>Array(COLS).fill(null));plants=[...Array(ROWS)].map(()=>Array(COLS).fill(null));zombies=[];shots=[];suns=[];fx=[];nuts=[];belt=[];beltT=1.5;
  mowers=[...Array(ROWS)].map((_,r)=>L.lanes.includes(r)?{x:GX-42,on:false,gone:false}:null);
  sunN=L.mode?0:50;sel=null;shovel=false;wave=0;waves=L.flags?L.flags*10:4;waveT=0;nextIn=L.mode?10:(i===0?16:18);waveId=0;waveHP0=0;hugeMsg=0;finalMsg=0;finalShown=false;spawnedAll=false;rewardDrop=null;
  skyT=5;skyN=0;tipT=0;tipI=0;lastLane=[];groanT=rnd(6,12);loseT=0;loseZ=null;flagAt=[];for(let f=1;f<=L.flags;f++)flagAt.push(f*10);
@@ -126,10 +157,10 @@ function startReady(){ST='ready';readyT=0}
 
 // ---------- to'lqinlar ----------
 function laneOpen(r){return LV[LI].lanes.includes(r)}
-function pickLane(){const L=LV[LI].lanes;if(L.length===1)return L[0];let best=null,bw=-1;for(const r of L){let w=1+R();const k=lastLane.lastIndexOf(r);if(k>=0)w*=cl((lastLane.length-k)/L.length,.15,1);if(w>bw){bw=w;best=r}}lastLane.push(best);if(lastLane.length>8)lastLane.shift();return best}
-function spawnZ(type,x,row){const d=Z[type];const z={type,row:row==null?pickLane():row,x:x==null?LW+rnd(10,50):x,hp:d.hp,max:d.hp,arm:d.arm,armMax:d.arm,sp:CW/d.sp*rnd(.94,1.06),slow:0,eat:null,biteT:0,dead:0,ph:R()*10,wid:waveId,pole:type==='pole',jump:0,jx0:0,jx1:0,flash:0,butter:0};zombies.push(z);return z}
+function pickLane(wt){let L=LV[LI].lanes.filter(r=>isWater(r)===!!wt);if(!L.length)L=LV[LI].lanes;if(L.length===1)return L[0];let best=null,bw=-1;for(const r of L){let w=1+R();const k=lastLane.lastIndexOf(r);if(k>=0)w*=cl((lastLane.length-k)/L.length,.15,1);if(w>bw){bw=w;best=r}}lastLane.push(best);if(lastLane.length>8)lastLane.shift();return best}
+function spawnZ(type,x,row){const d=Z[type];const z={type,sub:type==='dive',row:row==null?pickLane(d.water):row,x:x==null?LW+rnd(10,50):x,hp:d.hp,max:d.hp,arm:d.arm,armMax:d.arm,sp:CW/d.sp*rnd(.94,1.06),slow:0,eat:null,biteT:0,dead:0,ph:R()*10,wid:waveId,pole:type==='pole',jump:0,jx0:0,jx1:0,flash:0,butter:0};zombies.push(z);return z}
 function spawnWave(){wave++;waveId++;const L=LV[LI];const isFlag=flagAt.includes(wave),isFinal=wave===waves;
- let pts=Math.floor(wave/3)+1;if(isFlag)pts=Math.floor(pts*2.5);if(L.mode==='bowl')pts=Math.ceil(pts*1.6);if(LI===0)pts=wave<3?1:2;
+ let pts=Math.floor(wave/3)+1+(LI>=10?1:0);if(isFlag)pts=Math.floor(pts*2.5);if(L.mode==='bowl')pts=Math.ceil(pts*1.6);if(LI===0)pts=wave<3?1:2;
  const list=[];if(isFlag){list.push('flag');pts=Math.max(1,pts-1)}
  const allow=L.zs.filter(t=>t!=='basic');let guard=0;
  while(pts>0&&guard++<60){const cand=['basic'];for(const t of allow){if(Z[t].cost<=pts&&(wave>=(t==='pot'?4:t==='pole'?2:3)||isFlag))cand.push(t)}
@@ -150,9 +181,10 @@ function explode(cx,cy,row,rad){SFX.boom();haptic('heavy');fx.push({k:'boom',x:c
  if(spawnedAll&&!rewardDrop&&zombies.every(q=>q.dead))rewardDrop={x:cl(cx,GX+40,LW-80),y:cy,t:0,got:false}}
 
 // ---------- ekish ----------
-function canPlant(type,r,c){if(r<0||r>=ROWS||c<0||c>=COLS||!laneOpen(r)||plants[r][c])return false;if(LV[LI].mode==='bowl'&&c>2)return false;return true}
-function plantAt(type,r,c){const d=P[type];const p={t:type,hp:d.hp,max:d.hp,r,c,age:0,tm:0,ph:R()*10,shoot:0,st:0};
- if(type==='sun')p.tm=rnd(3,12.5);if(type==='pea'||type==='ice'||type==='twin')p.tm=rnd(.2,1.4);if(type==='bomb')p.tm=1.2;if(type==='mine')p.tm=15;
+function canPlant(type,r,c){if(r<0||r>=ROWS||c<0||c>=COLS||!laneOpen(r)||plants[r][c])return false;const w=isWater(r);if(type==='raft'||type==='whirl')return w&&!rafts[r][c];if(w)return !!rafts[r][c]&&type!=='mine';if(LV[LI].mode==='bowl'&&c>2)return false;return true}
+function plantAt(type,r,c){const d=P[type];if(type==='raft'){rafts[r][c]={t:'raft',hp:d.hp,max:d.hp,r,c,age:0};SFX.splash();haptic('light');fx.push({k:'drop',x:cellX(c),y:rowY(r)-14,t:0});return}
+ const p={t:type,hp:d.hp,max:d.hp,r,c,age:0,tm:0,ph:R()*10,shoot:0,st:0};
+ if(type==='sun')p.tm=rnd(3,12.5);if(type==='pea'||type==='ice'||type==='twin'||type==='tri')p.tm=rnd(.2,1.4);if(type==='bomb')p.tm=1.2;if(type==='mine')p.tm=15;
  if(LV[LI].mode==='bowl'&&(type==='nut'||type==='xnut')){nuts.push({x:cellX(c),y:rowY(r)-28,row:r,vx:300,vy:0,x2:type==='xnut',last:null,rot:0});SFX.roll();return}
  plants[r][c]=p;SFX.plant();haptic('light');fx.push({k:'dirt',x:cellX(c),y:rowY(r),t:0})}
 
@@ -179,17 +211,22 @@ function update(dt){T+=dt;
  // o'simliklar
  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const p=plants[r][c];if(!p)continue;p.age+=dt;if(p.shoot>0)p.shoot-=dt;const px=cellX(c),py=rowY(r);
   if(p.t==='sun'){p.tm-=dt;if(p.tm<=0){p.tm=rnd(23.5,25);suns.push({x:px,y:py-50,ty:py-rnd(6,22),vy:-170,vx:rnd(-30,30),life:0,val:25,st:0})}}
-  else if(p.t==='pea'||p.t==='ice'||p.t==='twin'){p.tm-=dt;if(p.tm<=0){if(zombies.some(z=>!z.dead&&z.row===r&&z.x>px-10&&z.x<LW+10&&z.jump===0)){p.tm=rnd(1.36,1.5);p.shoot=.18;shots.push({row:r,x:px+26,y:py-46,ice:p.t==='ice'});if(p.t==='twin')p.q=.16;SFX.shoot()}else p.tm=.15}
+  else if(p.t==='pea'||p.t==='ice'||p.t==='twin'){p.tm-=dt;if(p.tm<=0){if(zombies.some(z=>!z.dead&&!z.sub&&z.row===r&&z.x>px-10&&z.x<LW+10&&z.jump===0)){p.tm=rnd(1.36,1.5);p.shoot=.18;shots.push({row:r,x:px+26,y:py-46,ice:p.t==='ice'});if(p.t==='twin')p.q=.16;SFX.shoot()}else p.tm=.15}
    if(p.q>0){p.q-=dt;if(p.q<=0){p.shoot=.18;shots.push({row:r,x:px+26,y:py-46,ice:false});SFX.shoot()}}}
+  else if(p.t==='tri'){p.tm-=dt;if(p.tm<=0){const rs=[r-1,r,r+1].filter(q=>q>=0&&q<ROWS&&laneOpen(q));if(zombies.some(z=>!z.dead&&!z.sub&&rs.includes(z.row)&&z.x>px-10&&z.x<LW+10&&z.jump===0)){p.tm=rnd(1.36,1.5);p.shoot=.18;for(const q of rs)shots.push({row:q,x:px+26,y:rowY(q)-46,ice:false,tut:true});SFX.shoot()}else p.tm=.15}}
+  else if(p.t==='jump'){if(p.st===0){const z=zombies.filter(z=>!z.dead&&!z.sub&&z.row===r&&z.jump===0&&z.x>px-52&&z.x<px+CW*1.25).sort((a,b)=>a.x-b.x)[0];if(z){p.st=1;p.tm=.55;p.tx=z.x;p.vic=z;SFX.pop()}}
+   else{p.tm-=dt;if(p.vic&&!p.vic.dead)p.tx=p.vic.x;if(p.tm<=0){plants[r][c]=null;SFX.boom();haptic('heavy');fx.push({k:'dirt',x:p.tx,y:py,t:0});fx.push({k:'boom',x:p.tx,y:py-20,t:0,r:46,small:true});for(const z of zombies)if(!z.dead&&z.row===r&&z.jump===0&&Math.abs(z.x-p.tx)<50){z.arm=0;z.hp-=1800;if(z.hp<=0)kill(z)}}}}
+  else if(p.t==='whirl'){if(p.st===0){const z=zombies.filter(z=>!z.dead&&z.row===r&&z.x>px-24&&z.x<px+CW*1.05).sort((a,b)=>a.x-b.x)[0];if(z){p.st=1;p.tm=.6;p.vic=z;z.pull=p;z.eat=null;SFX.splash()}}
+   else{p.tm-=dt;const z=p.vic;if(z&&!z.dead)z.x=lerp(z.x,px,cl(dt*7));if(p.tm<=0){plants[r][c]=null;fx.push({k:'drop',x:px,y:py-14,t:0});if(z&&!z.dead){z.gone=true;SFX.gulp();haptic('medium');kill(z)}}}}
   else if(p.t==='bomb'){p.tm-=dt;if(p.tm<=0){plants[r][c]=null;explode(px,py-30,r,CW*1.55)}}
   else if(p.t==='mine'){if(p.tm>0){p.tm-=dt;if(p.tm<=0){SFX.pop();fx.push({k:'dirt',x:px,y:py,t:0})}}else{if(zombies.some(z=>!z.dead&&z.row===r&&z.jump===0&&Math.abs(z.x-px)<38)){plants[r][c]=null;SFX.boom();haptic('heavy');fx.push({k:'boom',x:px,y:py-20,t:0,r:70,small:true});for(const z of zombies)if(!z.dead&&z.row===r&&z.x>px-55&&z.x<px+85){z.arm=0;z.hp-=1800;if(z.hp<=0){z.dead=.001;z.eat=null;z.ash=true}}
      if(spawnedAll&&!rewardDrop&&zombies.every(q=>q.dead))rewardDrop={x:px,y:py-30,t:0,got:false}}}}
-  else if(p.t==='snap'){if(p.st===0){const z=zombies.filter(z=>!z.dead&&z.row===r&&z.jump===0&&z.x>px-20&&z.x<px+CW*1.45).sort((a,b)=>a.x-b.x)[0];if(z){p.st=1;p.tm=.42;p.vic=z}}
+  else if(p.t==='snap'){if(p.st===0){const z=zombies.filter(z=>!z.dead&&!z.sub&&z.row===r&&z.jump===0&&z.x>px-20&&z.x<px+CW*1.45).sort((a,b)=>a.x-b.x)[0];if(z){p.st=1;p.tm=.42;p.vic=z}}
    else if(p.st===1){p.tm-=dt;if(p.tm<=0){const z=p.vic;if(z&&!z.dead&&z.row===r&&z.x<px+CW*1.7){z.dead=1;z.gone=true;z.eat=null;SFX.gulp();haptic('medium');p.st=2;p.tm=42;if(spawnedAll&&!rewardDrop&&zombies.every(q=>q.dead))rewardDrop={x:px+40,y:py-30,t:0,got:false}}else p.st=0;p.vic=null}}
    else{p.tm-=dt;if(p.tm<=0)p.st=0}}
  }
  // o'qlar
- for(const s of shots){s.x+=340*dt;const z=zombies.filter(z=>!z.dead&&z.row===s.row&&z.jump===0&&s.x>=z.x-16&&s.x<=z.x+26)[0];if(z){s.hit=true;hurt(z,20);if(s.ice)z.slow=10;fx.push({k:'splat',x:s.x,y:s.y,t:0,ice:s.ice})}}
+ for(const s of shots){s.x+=340*dt;const z=zombies.filter(z=>!z.dead&&!z.sub&&z.row===s.row&&z.jump===0&&s.x>=z.x-16&&s.x<=z.x+26)[0];if(z){s.hit=true;hurt(z,20);if(s.ice)z.slow=10;fx.push({k:'splat',x:s.x,y:s.y,t:0,ice:s.ice})}}
  shots=shots.filter(s=>!s.hit&&s.x<LW+20);
  // dumalovchi yong'oqlar
  for(const n of nuts){n.x+=n.vx*dt;n.y+=n.vy*dt;n.rot+=dt*9;const top=rowY(0)-28,bot=rowY(ROWS-1)-28;if(n.y<top){n.y=top;n.vy=Math.abs(n.vy)}if(n.y>bot){n.y=bot;n.vy=-Math.abs(n.vy)}
@@ -199,11 +236,13 @@ function update(dt){T+=dt;
  nuts=nuts.filter(n=>!n.done&&n.x<LW+40);
  // zombilar
  for(const z of zombies){if(z.dead){z.dead+=dt;continue}z.ph+=dt;if(z.flash>0)z.flash-=dt;if(z.slow>0)z.slow-=dt;const k=z.slow>0?.5:1;
+  if(z.pull){if(plants[z.pull.r][z.pull.c]===z.pull)continue;z.pull=null}
   if(z.jump>0){z.jump+=dt/ .9;if(z.jump>=1){z.jump=0;z.x=z.jx1;z.pole=false;z.sp=CW/4.7}else z.x=lerp(z.jx0,z.jx1,z.jump);continue}
   // o'simlik bilan to'qnashuv
-  let tgt=null;const c=Math.floor((z.x-28-GX)/CW);if(c>=0&&c<COLS){const p=plants[z.row][c];if(p&&!(p.t==='mine'&&p.tm<=0)&&!(p.t==='bomb')){const px=cellX(c);if(z.x-28<px+26&&z.x>px-20)tgt=p}}
+  let tgt=null;const c=Math.floor((z.x-28-GX)/CW);if(c>=0&&c<COLS){const p=plants[z.row][c]||rafts[z.row][c];if(p&&!((p.t==='jump'||p.t==='whirl')&&p.st===1)&&!(p.t==='mine'&&p.tm<=0)&&!(p.t==='bomb')){const px=cellX(c);if(z.x-28<px+26&&z.x>px-20)tgt=p}}
+  if(z.type==='dive')z.sub=!tgt;
   if(tgt&&z.pole){z.jump=.001;z.jx0=z.x;z.jx1=cellX(tgt.c)-CW*.62;z.eat=null;continue}
-  if(tgt){z.eat=tgt;z.biteT-=dt*k;if(z.biteT<=0){z.biteT=.5;tgt.hp-=50;tgt.bit=.15;SFX.bite();if(tgt.hp<=0){plants[tgt.r][tgt.c]=null;z.eat=null}}}
+  if(tgt){z.eat=tgt;z.biteT-=dt*k;if(z.biteT<=0){z.biteT=.5;tgt.hp-=50;tgt.bit=.15;SFX.bite();if(tgt.hp<=0){if(tgt.t==='raft'){rafts[tgt.r][tgt.c]=null;fx.push({k:'drop',x:cellX(tgt.c),y:rowY(tgt.r)-14,t:0})}else plants[tgt.r][tgt.c]=null;z.eat=null}}}
   else{z.eat=null;z.x-=z.sp*(z.pole?1:1)*k*dt}
   // maysa o'rgich / uy
   const m=mowers[z.row];if(m&&!m.gone&&!m.on&&z.x<m.x+34){m.on=true;SFX.mower();haptic('medium')}
@@ -211,7 +250,7 @@ function update(dt){T+=dt;
  }
  for(let r=0;r<ROWS;r++){const m=mowers[r];if(m&&m.on&&!m.gone){m.x+=430*dt;for(const z of zombies)if(!z.dead&&z.row===r&&Math.abs(z.x-m.x)<40){z.arm=0;z.hp=0;kill(z)}if(m.x>LW+60)m.gone=true}}
  zombies=zombies.filter(z=>!(z.dead>1.2));
- for(const f of fx)f.t+=dt;fx=fx.filter(f=>f.t<(f.k==='boom'?.7:f.k==='hat'?1.2:.45));
+ for(const f of fx)f.t+=dt;fx=fx.filter(f=>f.t<(f.k==='boom'?.7:f.k==='hat'?1.2:f.k==='drop'?.6:.45));
  // mukofot
  if(spawnedAll&&!rewardDrop&&zombies.length===0&&hugeMsg<=0)rewardDrop={x:LW/2,y:LH/2,t:0,got:false};
  if(rewardDrop){rewardDrop.t+=dt;if(!rewardDrop.got&&rewardDrop.t>6)collectReward()}
@@ -271,7 +310,7 @@ function icon(t,x,y,s){g.save();g.translate(x,y);g.scale(s,s);drawPlant(t,0,0,t=
 
 // ================= RASMLI QAHRAMONLAR =================
 // O'simliklar tayyor rasmlardan chiziladi; rasm yuklanmagan bo'lsa eski chizma ishlaydi.
-const IMG={},IMGV=9;for(const n of ['pea0','pea1','twin0','twin1','ice0','ice1','sun0','sun1','nut0','nut1','nut2','xnut','bomb0','bomb1','mine0','mine1','snap0','snap1','shot','shoti','zb0','zb1','zbe','zf0','zf1','zs0','zs1','zsj','zr0','zr1','zre','zfe','zfall','zash','sunc','pot0','pot1','pot2','bas0','bas1','shovel','cart0','cart1','boom','bg','ui_card','ui_bar','ui_b1','ui_b2','ui_panel','ui_pause','ui_plate']){const im=new Image();im.onload=()=>{IMG[n]=im};im.src='img/'+n+'.webp?v='+IMGV}
+const IMG={},IMGV=10;for(const n of ['raft','jump0','jump1','tri0','tri1','whirl0','whirl1','tshot','zt0','zt1','zte','zd0','zde','canal','pea0','pea1','twin0','twin1','ice0','ice1','sun0','sun1','nut0','nut1','nut2','xnut','bomb0','bomb1','mine0','mine1','snap0','snap1','shot','shoti','zb0','zb1','zbe','zf0','zf1','zs0','zs1','zsj','zr0','zr1','zre','zfe','zfall','zash','sunc','pot0','pot1','pot2','bas0','bas1','shovel','cart0','cart1','boom','bg','ui_card','ui_bar','ui_b1','ui_b2','ui_panel','ui_pause','ui_plate']){const im=new Image();im.onload=()=>{IMG[n]=im};im.src='img/'+n+'.webp?v='+IMGV}
 // rasmni pastki o'rtasi (x,y) nuqtaga, balandligi h qilib chizadi
 function spr(n,x,y,h,o){const im=IMG[n];if(!im)return false;const w=h*im.width/im.height;g.save();g.translate(x,y);if(o){if(o.rot)g.rotate(o.rot);if(o.sx||o.sy)g.scale(o.sx||1,o.sy||1)}g.drawImage(im,-w/2,-h,w,h);g.restore();return true}
 const drawPlant0=drawPlant,drawNut0=drawNut;
@@ -283,8 +322,23 @@ drawPlant=function(t,x,y,p){const ph=p.ph+p.age,bob=1+Math.sin(ph*2.4)*.025;
  else if(t==='bomb'){const u=cl(1-p.tm/1.2),sc=1+u*.3+Math.sin(ph*30)*.03*u,n=u>.4?'bomb1':'bomb0';if(!IMG[n])return drawPlant0(t,x,y,p);shadow(x,y,26);spr(n,x,y+2,72,{sx:sc,sy:sc})}
  else if(t==='mine'){const armed=p.tm<=0,n=armed?'mine1':'mine0';if(!IMG[n])return drawPlant0(t,x,y,p);spr(n,x,y+6,armed?72:46,{sy:armed?bob:1})}
  else if(t==='snap'){const n=p.st===2?'snap1':'snap0';if(!IMG[n])return drawPlant0(t,x,y,p);shadow(x,y);const lunge=p.st===1?(1-cl(p.tm/.42))*30:0;spr(n,x+lunge,y+2,80,p.st===2?{sy:1+Math.abs(Math.sin(ph*5))*.04}:{rot:lunge?.12:0,sy:bob})}
- else drawPlant0(t,x,y,p)};
-function drawShot(s){const n=s.ice?'shoti':'shot';if(spr(n,s.x,s.y+11,22,{rot:Math.sin(s.x*.06)*.25}))return;g.fillStyle=s.ice?'#2f8fc4':'#5a2a8a';ci(s.x,s.y,9);g.fill();g.fillStyle=s.ice?'#8fdcff':'#8a4fc4';ci(s.x-1,s.y-1,7.5);g.fill()}
+ else if(!drawNew(t,x,y,p,ph,bob))drawPlant0(t,x,y,p)};
+// 2-fasl o'simliklari. Rasm kelmaguncha vaqtinchalik oddiy chizma ko'rinadi.
+function blob(x,y,r,c1,c2,eyes){g.fillStyle=c2;ci(x+2,y+2,r);g.fill();g.fillStyle=c1;ci(x,y,r);g.fill();g.fillStyle='rgba(255,255,255,.35)';ci(x-r*.35,y-r*.4,r*.28);g.fill();if(eyes){g.fillStyle='#fff';ci(x+r*.15,y-r*.1,r*.2);g.fill();ci(x+r*.6,y-r*.1,r*.18);g.fill();g.fillStyle='#16210f';ci(x+r*.22,y-r*.08,r*.09);g.fill();ci(x+r*.65,y-r*.08,r*.08);g.fill()}}
+function drawRaft(x,y,rf){const u=rf.hp/rf.max,bob=Math.sin(T*2+x*.05)*1.5;if(IMG.raft){const im=IMG.raft,w=74,h=w*im.height/im.width;g.globalAlpha=.55+.45*u;g.drawImage(im,x-w/2,y-12-h/2+bob,w,h);g.globalAlpha=1;return}
+ g.save();g.translate(x,y-12+bob);g.fillStyle='rgba(10,50,80,.35)';rr(-34,-8,68,26,8);g.fill();g.fillStyle='#9a7a3a';rr(-34,-13,68,26,7);g.fill();g.fillStyle='#d2b566';rr(-34,-15,68,24,7);g.fill();g.strokeStyle='#a98a44';g.lineWidth=2;for(let i=-24;i<=24;i+=8){g.beginPath();g.moveTo(i,-14);g.lineTo(i,8);g.stroke()}g.strokeStyle='#7a5a2a';g.lineWidth=3;g.beginPath();g.moveTo(-34,-9);g.lineTo(34,-9);g.moveTo(-34,3);g.lineTo(34,3);g.stroke();if(u<.6){g.strokeStyle='rgba(60,40,20,.7)';g.lineWidth=2;g.beginPath();g.moveTo(-10,-14);g.lineTo(-4,-2);g.lineTo(-12,8);g.stroke()}g.restore()}
+function drawNew(t,x,y,p,ph,bob){
+ if(t==='raft'){drawRaft(x,y-12,{hp:1,max:1});return true}
+ if(t==='jump'){let jx=x,jy=y,n='jump0';if(p.st===1){const u=cl(1-p.tm/.55);jx=lerp(x,p.tx,u);jy=y-Math.sin(u*Math.PI)*92;n='jump1'}shadow(jx,y,24);if(!spr(IMG[n]?n:'jump0',jx,jy+2,p.st===1?84:70,{sx:1/bob,sy:bob})){g.fillStyle='#6a8f2a';el(jx+8,jy-52,10,5,-.5);g.fill();blob(jx,jy-26,25,'#f2c93a','#c9982a',1)}return true}
+ if(t==='tri'){const sh=p.shoot>0,n='tri'+(sh?1:0);shadow(x,y,28);if(!spr(IMG[n]?n:'tri0',x,y+2,88,{sx:1/bob,sy:bob})){g.fillStyle='#6b4a2a';rr(x-5,y-34,10,34,3);g.fill();blob(x-14,y-48,17,'#3f9a3a','#2c7a2f');blob(x+14,y-50,17,'#3f9a3a','#2c7a2f');blob(x,y-64,19,'#4fb04a','#2c7a2f',1);g.fillStyle='#5a2a8a';for(const[a,b]of[[-18,-42],[16,-40],[-6,-74],[22,-58],[-24,-58]]){ci(x+a,y+b,4.5);g.fill()}}return true}
+ if(t==='whirl'){const sp=p.st===1,n='whirl'+(sp?1:0),yy=y-12;g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=2;for(let i=0;i<2;i++){g.beginPath();g.ellipse(x,yy+4,(sp?30:22)+i*9+Math.sin(ph*3+i)*2,7+i*3,0,ph*(sp?9:1.5)+i,ph*(sp?9:1.5)+i+4);g.stroke()}
+  if(!spr(IMG[n]?n:'whirl0',x,yy+12,sp?70:62,{rot:sp?Math.sin(ph*30)*.15:Math.sin(ph*1.8)*.05,sy:bob})){g.fillStyle='#2f8f6a';el(x,yy+2,24,10);g.fill();for(let i=0;i<6;i++){const a=i/6*TAU+ph*(sp?10:.8);g.fillStyle=i%2?'#f39ac0':'#f7b6d2';el(x+Math.cos(a)*11,yy-6+Math.sin(a)*5,9,5,a);g.fill()}g.fillStyle='#ffd86a';ci(x,yy-6,6);g.fill()}return true}
+ return false}
+function drawWater(){const L=LV[LI];if(!L.water)return;for(const r of L.water){const y0=GY+r*CH,x0=GX-46,w=LW-x0;
+  if(IMG.canal)g.drawImage(IMG.canal,x0,y0-8,w,CH+16);else{const gr=g.createLinearGradient(0,y0,0,y0+CH);gr.addColorStop(0,'#2b86b0');gr.addColorStop(.5,'#45add4');gr.addColorStop(1,'#2a7fa8');g.fillStyle=gr;g.fillRect(x0,y0,w,CH);g.fillStyle='#7a5a34';g.fillRect(x0,y0-4,w,7);g.fillRect(x0,y0+CH-3,w,7);g.fillStyle='#9a7a4a';g.fillRect(x0,y0-4,w,3);g.fillRect(x0,y0+CH-3,w,3)}
+  g.save();g.beginPath();g.rect(x0,y0+4,w,CH-8);g.clip();g.lineWidth=2;g.lineCap='round';for(let i=0;i<16;i++){const xx=x0+(((i*137-T*26)%w)+w)%w,yy=y0+14+(i*53%(CH-28)),a=.14+.12*Math.sin(T*2+i);g.strokeStyle='rgba(255,255,255,'+a+')';g.beginPath();g.moveTo(xx,yy);g.quadraticCurveTo(xx+13,yy-3,xx+26,yy);g.stroke()}
+  g.fillStyle='rgba(255,255,255,.07)';for(let c=1;c<COLS;c++)g.fillRect(GX+c*CW-1,y0+6,2,CH-12);g.restore()}}
+function drawShot(s){if(s.tut&&IMG.tshot){spr('tshot',s.x,s.y+11,22,{rot:s.x*.05});return}const n=s.ice?'shoti':'shot';if(spr(n,s.x,s.y+11,22,{rot:Math.sin(s.x*.06)*.25}))return;g.fillStyle=s.ice?'#2f8fc4':'#5a2a8a';ci(s.x,s.y,9);g.fill();g.fillStyle=s.ice?'#8fdcff':'#8a4fc4';ci(s.x-1,s.y-1,7.5);g.fill()}
 
 // ---- rasmli zombilar ----
 // rang berilgan nusxa (kuygan, muzlagan, zarba chaqnashi) bir marta tayyorlanib, saqlab qo'yiladi
@@ -301,6 +355,18 @@ drawZombie=function(z){if(z.gone)return;const base=z.type==='flag'?'zf':z.pole||
  const k=burnt?'':z.ash?'ash':z.flash>0&&!z.dead?'flash':z.slow>0?'slow':'',im=k?tinted(n,k):IMG[n],w=h*im.width/im.height;g.drawImage(im,-w/2,-h-bobY,w,h);
  if(z.arm>0&&!z.dead){const dm=1-z.arm/z.armMax,hn=z.type==='helm'?(dm>.66?'pot2':dm>.33?'pot1':'pot0'):(dm>.5?'bas1':'bas0'),hi=IMG[hn];if(hi){const hw=z.type==='helm'?40:46,hh=hw*hi.height/hi.width;g.save();g.translate(z.eat?14:5,-h-bobY+(z.type==='helm'?27:24)+(z.eat?3:0));g.rotate(-.1);g.drawImage(z.ash?tinted(hn,'ash'):hi,-hw/2,-hh,hw,hh);g.restore()}else{g.translate(-7,-h-bobY+16);g.rotate(-.08);drawHat(z.type,dm)}}
  g.restore()};
+// suvda suzuvchilar: tog'orada eshkak eshuvchi va qamish naycha bilan sho'ng'uvchi
+const drawZombieL=drawZombie;
+drawZombie=function(z){const zd=Z[z.type];if(!zd||!zd.water)return drawZombieL(z);if(z.gone&&!z.pull)return;
+ const y=rowY(z.row),wl=y-16,d=z.dead||0;let sink=d?cl(d/.8)*52:0,al=d?1-cl((d-.5)/.6):1;if(z.pull&&!d){sink=30;al=.7}
+ g.save();g.globalAlpha=al;const rip=(rx,rw)=>{g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=2;g.beginPath();g.ellipse(rx,wl+5,rw+Math.sin(z.ph*3)*3,5,0,0,TAU);g.stroke()};
+ if(z.sub&&!d){const im=IMG.zd0;rip(z.x,15);if(im){const h=54,w=h*im.width/im.height;g.save();g.translate(z.x,wl+8+Math.sin(z.ph*3)*2);g.scale(-1,1);g.drawImage(im,-w/2,-h,w,h);g.restore()}else{g.strokeStyle='#8a9a3a';g.lineWidth=5;g.lineCap='round';g.beginPath();g.moveTo(z.x,wl+4);g.quadraticCurveTo(z.x-2,wl-14,z.x+6,wl-30+Math.sin(z.ph*3)*2);g.stroke();g.fillStyle='rgba(20,60,40,.35)';el(z.x+4,wl+12,20,8);g.fill()}g.restore();return}
+ const fr=Math.floor(z.ph*2.4)%2,n=z.type==='dive'?'zde':z.eat?'zte':'zt'+fr;
+ if(IMG[n]){const k=z.flash>0&&!d?'flash':z.slow>0?'slow':'',im=k?tinted(n,k):IMG[n],h=z.type==='dive'?78:98,w=h*im.width/im.height,bob=Math.sin(z.ph*2.4*Math.PI)*2;g.save();g.beginPath();g.rect(z.x-90,y-170,180,170+22);g.clip();g.translate(z.x,y+10+sink+bob);g.rotate(z.eat?Math.sin(z.ph*16)*.04:0);g.scale(-1,1);g.drawImage(im,-w/2,-h,w,h);g.restore();
+  if(z.arm>0&&!d){const dm=1-z.arm/z.armMax,hi=IMG[dm>.66?'pot2':dm>.33?'pot1':'pot0'];if(hi){const hw=40,hh=hw*hi.height/hi.width;g.drawImage(hi,z.x-4-hw/2,y+10+bob-h+6,hw,hh)}}}
+ else{g.save();g.beginPath();g.rect(z.x-90,y-180,180,180-14);g.clip();g.translate(0,20+sink);drawZombieL({...z,type:z.type==='tubh'?'helm':'basic',dead:0,gone:false});g.restore();
+  if(z.type!=='dive'){const ty=wl-2+sink*.9+Math.sin(z.ph*3)*1.5;g.fillStyle='#6b4a2a';g.beginPath();g.ellipse(z.x-4,ty,34,20,0,0,Math.PI);g.fill();g.fillStyle='#a87a44';g.beginPath();g.ellipse(z.x-4,ty-1,34,7,0,0,TAU);g.fill();g.strokeStyle='#5a3a1a';g.lineWidth=3;g.beginPath();g.ellipse(z.x-4,ty+8,31,9,0,.2,Math.PI-.2);g.stroke()}}
+ if(!d)rip(z.x-4,z.type==='dive'?22:40);g.restore()};
 
 // ---- buyumlar: eshak arava (qatorni tozalaydi), belkurak, uchib ketgan zirh, portlash ----
 const drawMower0=drawMower,drawShovel0=drawShovel,drawHat0=drawHat;
@@ -315,6 +381,7 @@ drawBG=function(){const im=IMG.bg;if(!im)return drawBG0();const L=LV[LI];g.fillS
  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const open=L.lanes.includes(r);g.fillStyle=open?((r+c)%2?'rgba(0,40,0,.07)':'rgba(255,255,220,.07)'):((r+c)%2?'rgba(122,86,46,.86)':'rgba(138,98,54,.86)');g.fillRect(GX+c*CW,GY+r*CH,CW,CH)}
  g.fillStyle='rgba(0,0,0,.05)';for(let r=0;r<ROWS;r++)g.fillRect(GX,GY+r*CH+CH-5,COLS*CW,5);
  if(L.mode==='bowl'){g.fillStyle='#e23a2e';g.fillRect(GX+3*CW-3,GY,6,ROWS*CH)}};
+const drawBGw=drawBG;drawBG=function(){drawBGw();drawWater()};
 // ---- jonlilik: ekilganda yerdan sakrab chiqadi, portlashda ekran silkinadi ----
 const drawPlant1=drawPlant;
 drawPlant=function(t,x,y,p){if(p.r==null||p.age>=.28)return drawPlant1(t,x,y,p);const u=p.age/.28,k=1+2.2*Math.pow(u-1,3)+1.2*Math.pow(u-1,2);g.save();g.translate(x,y);g.scale(.4+.6*k,.4+.6*k*(1+(1-u)*.25));g.translate(-x,-y);drawPlant1(t,x,y,p);g.restore()};
@@ -339,22 +406,26 @@ seedCard=function(t,x,y,w,h,dim,cdU,selq){const im=IMG.ui_card;if(!im)return see
 function hudBar(){const im=IMG.ui_bar;if(!im){g.fillStyle='rgba(60,40,15,.78)';rr(6,4,LW-12,84,12);g.fill();return}g.fillStyle='rgba(0,0,0,.22)';rr(8,8,LW-16,84,14);g.fill();nine(im,2,0,LW-4,92,46,40)}
 function hudPlate(x,y,w,h,on){const im=IMG.ui_plate;if(!im){g.fillStyle=on?'#fff3b0':'#f3ead2';rr(x,y,w,h,10);g.fill();return}if(on){g.fillStyle='#ffb21c';rr(x-3,y-3,w+6,h+6,14);g.fill()}nine(im,x,y,w,h,48,Math.min(30,h*.44))}
 // ---- vazifa belgilari: karta burchagida va rangida ----
-const ROLE={pea:'shoot',twin:'shoot',ice:'slow',sun:'sun',nut:'wall',xnut:'boom',bomb:'boom',mine:'boom',snap:'eat'};
-const ROLEC={shoot:['#cfe7b8','#3f9a3a'],sun:['#ffeeb0','#e0a000'],wall:['#ead8b4','#9a6a2a'],boom:['#ffd0c4','#d23a2a'],slow:['#cfeaf8','#2f8fc4'],eat:['#e6d3f2','#8a4fc4']};
-const ROLEN={shoot:'Otadi',sun:'Quyosh beradi',wall:"To'sadi",boom:'Portlaydi',slow:'Sekinlatadi',eat:'Yutadi'};
+const ROLE={raft:'base',jump:'crush',tri:'shoot',whirl:'eat',pea:'shoot',twin:'shoot',ice:'slow',sun:'sun',nut:'wall',xnut:'boom',bomb:'boom',mine:'boom',snap:'eat'};
+const ROLEC={shoot:['#cfe7b8','#3f9a3a'],sun:['#ffeeb0','#e0a000'],wall:['#ead8b4','#9a6a2a'],boom:['#ffd0c4','#d23a2a'],slow:['#cfeaf8','#2f8fc4'],eat:['#e6d3f2','#8a4fc4'],base:['#cfeaf8','#2a7fa8'],crush:['#ffe2b8','#d27a1a']};
+const ROLEN={shoot:'Otadi',sun:'Quyosh beradi',wall:"To'sadi",boom:'Portlaydi',slow:'Sekinlatadi',eat:'Yutadi',base:'Suvda turadi',crush:'Ezadi'};
 function roleBadge(k,x,y,r){g.save();g.translate(x,y);g.fillStyle=ROLEC[k][1];ci(0,0,r);g.fill();g.strokeStyle='#fff';g.fillStyle='#fff';g.lineWidth=r*.2;g.lineCap='round';
  if(k==='shoot'){ci(0,0,r*.5);g.stroke();ci(0,0,r*.14);g.fill()}
  else if(k==='sun'){ci(0,0,r*.3);g.fill();for(let i=0;i<8;i++){const a=i/8*TAU;g.beginPath();g.moveTo(Math.cos(a)*r*.48,Math.sin(a)*r*.48);g.lineTo(Math.cos(a)*r*.7,Math.sin(a)*r*.7);g.stroke()}}
  else if(k==='wall'){g.beginPath();g.moveTo(0,-r*.6);g.lineTo(r*.52,-r*.34);g.lineTo(r*.44,r*.24);g.lineTo(0,r*.62);g.lineTo(-r*.44,r*.24);g.lineTo(-r*.52,-r*.34);g.closePath();g.fill()}
  else if(k==='boom'){g.beginPath();for(let i=0;i<16;i++){const a=i/16*TAU,q=i%2?r*.3:r*.68;g.lineTo(Math.cos(a)*q,Math.sin(a)*q)}g.closePath();g.fill()}
+ else if(k==='base'){for(const yy of[-r*.28,r*.22]){g.beginPath();g.moveTo(-r*.6,yy);g.quadraticCurveTo(-r*.3,yy-r*.3,0,yy);g.quadraticCurveTo(r*.3,yy+r*.3,r*.6,yy);g.stroke()}}
+ else if(k==='crush'){g.beginPath();g.moveTo(0,-r*.62);g.lineTo(0,r*.3);g.stroke();g.beginPath();g.moveTo(-r*.5,r*.02);g.lineTo(0,r*.62);g.lineTo(r*.5,r*.02);g.closePath();g.fill()}
  else if(k==='slow'){for(let i=0;i<3;i++){const a=i/3*Math.PI;g.beginPath();g.moveTo(Math.cos(a)*r*.62,Math.sin(a)*r*.62);g.lineTo(-Math.cos(a)*r*.62,-Math.sin(a)*r*.62);g.stroke()}}
  else{g.beginPath();g.arc(0,0,r*.56,.45,TAU-.45);g.lineTo(0,0);g.closePath();g.fill()}
  g.restore()}
 // ekishdan oldin ta'sir doirasini ko'rsatadi
 function roleHint(t,r,c){const k=ROLE[t],x0=GX+c*CW,y0=GY+r*CH;g.save();
  if(t==='bomb'){g.fillStyle='rgba(230,60,40,.22)';for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const rr2=r+dr,cc=c+dc;if(rr2>=0&&rr2<ROWS&&cc>=0&&cc<COLS)g.fillRect(GX+cc*CW,GY+rr2*CH,CW,CH)}}
- else if(k==='shoot'||k==='slow'){g.fillStyle=k==='slow'?'rgba(80,170,230,.2)':'rgba(120,60,170,.18)';g.fillRect(x0+CW,y0+CH*.32,GX+COLS*CW-x0-CW,CH*.36)}
+ else if((k==='shoot'&&t!=='tri')||k==='slow'){g.fillStyle=k==='slow'?'rgba(80,170,230,.2)':'rgba(120,60,170,.18)';g.fillRect(x0+CW,y0+CH*.32,GX+COLS*CW-x0-CW,CH*.36)}
  else if(t==='snap'){g.fillStyle='rgba(138,79,196,.22)';g.fillRect(x0+CW,y0,CW*1.4,CH)}
+ else if(t==='whirl'||t==='jump'){g.fillStyle=t==='jump'?'rgba(210,122,26,.25)':'rgba(138,79,196,.22)';g.fillRect(x0+CW,y0,CW,CH)}
+ else if(t==='tri'){g.fillStyle='rgba(120,60,170,.18)';for(const q of[r-1,r,r+1])if(q>=0&&q<ROWS)g.fillRect(x0+CW,GY+q*CH+CH*.32,GX+COLS*CW-x0-CW,CH*.36)}
  else if(t==='mine'){g.restore();otxt(TX('15 soniyada tayyor'),x0+CW/2,y0-8,15,'#fff','#3b2a12',4,220);return}
  g.restore()}
 
@@ -430,29 +501,30 @@ function drawHUD(){const L=LV[LI];btns=[];
  const bw=210,bx=LW-bw-18,by=LH-20;g.fillStyle='rgba(30,20,10,.75)';rr(bx-8,by-11,bw+16,22,11);g.fill();g.fillStyle='#2c2a22';rr(bx,by-5,bw,10,5);g.fill();const u=cl((wave+(hugeMsg>0?0:cl(waveT/25))*0)/waves);g.fillStyle='#7ad13a';rr(bx+bw*(1-u),by-5,bw*u,10,5);g.fill();
  for(const f of flagAt){const fx_=bx+bw*(1-f/waves);g.strokeStyle='#ddd';g.lineWidth=2;g.beginPath();g.moveTo(fx_+2,by+6);g.lineTo(fx_+2,by-16);g.stroke();g.fillStyle=wave>=f?'#ff7a1a':'#c9c9c9';g.beginPath();g.moveTo(fx_+2,by-16);g.lineTo(fx_+16,by-11);g.lineTo(fx_+2,by-6);g.fill()}
  g.fillStyle='#a9c79a';ci(bx+bw*(1-u),by,8);g.fill();g.fillStyle='#16210f';ci(bx+bw*(1-u)-3,by-1,1.6);g.fill();
- otxt(TX('Bosqich')+' 1-'+(LI+1),78,LH-18,17,'#fff','#1b2b12',5);
+ otxt(TX('Bosqich')+' '+lvName(LI),78,LH-18,17,'#fff','#1b2b12',5);
 }
 function drawShovel(x,y,s){g.save();g.translate(x,y);g.scale(s,s);g.rotate(.6);g.fillStyle='#8a5a2a';rr(-4,-30,8,34,3);g.fill();g.fillStyle='#6b4420';rr(-10,-36,20,8,3);g.fill();g.fillStyle='#b9c2c9';g.beginPath();g.moveTo(-12,2);g.lineTo(12,2);g.lineTo(10,22);g.quadraticCurveTo(0,34,-10,22);g.closePath();g.fill();g.fillStyle='#e3eaee';g.fillRect(-8,4,5,16);g.restore()}
 let PT=[-99,-99];
 function drawPlay(){drawBG();
  // tanlangan katak
- if((sel!=null||shovel)&&ST==='play'){const c=Math.floor((PT[0]-GX)/CW),r=Math.floor((PT[1]-GY)/CH);if(r>=0&&r<ROWS&&c>=0&&c<COLS){const t=selType();if(shovel?plants[r][c]:(t&&canPlant(t,r,c))){g.fillStyle='rgba(255,255,255,.28)';g.fillRect(GX+c*CW,GY+r*CH,CW,CH);if(t){roleHint(t,r,c);g.globalAlpha=.55;icon(t,cellX(c),rowY(r),1);g.globalAlpha=1}}}}
+ if((sel!=null||shovel)&&ST==='play'){const c=Math.floor((PT[0]-GX)/CW),r=Math.floor((PT[1]-GY)/CH);if(r>=0&&r<ROWS&&c>=0&&c<COLS){const t=selType();if(shovel?(plants[r][c]||rafts[r][c]):(t&&canPlant(t,r,c))){g.fillStyle='rgba(255,255,255,.28)';g.fillRect(GX+c*CW,GY+r*CH,CW,CH);if(t){roleHint(t,r,c);g.globalAlpha=.55;icon(t,cellX(c),rowY(r),1);g.globalAlpha=1}}}}
  // o'rgichlar
  for(let r=0;r<ROWS;r++){const m=mowers[r];if(m&&!m.gone)drawMower(m.x,rowY(r)+2)}
  // qator bo'yicha: o'simlik, zombi
- for(let r=0;r<ROWS;r++){for(let c=0;c<COLS;c++){const p=plants[r][c];if(p){if(p.bit>0)p.bit-=1/60;drawPlant(p.t,cellX(c),rowY(r),p)}}
+ for(let r=0;r<ROWS;r++){for(let c=0;c<COLS;c++){const rf=rafts[r][c];if(rf)drawRaft(cellX(c),rowY(r),rf);const p=plants[r][c];if(p){if(p.bit>0)p.bit-=1/60;drawPlant(p.t,cellX(c),rowY(r),p)}}
   for(const n of nuts)if(Math.round((n.y+28-GY-CH+14)/CH)===r){g.save();g.translate(n.x,n.y+28);g.translate(0,-32);g.rotate(n.rot);g.translate(0,32);drawNut(0,0,1,1,n.x2,0);g.restore()}
   const zs=zombies.filter(z=>z.row===r).sort((a,b)=>b.x-a.x);for(const z of zs)drawZombie(z);
   for(const s of shots)if(s.row===r)drawShot(s)}
  // effektlar
  for(const f of fx){const u=f.t;if(f.k==='splat'){g.fillStyle=f.ice?'rgba(140,220,255,':'rgba(140,230,80,';for(let i=0;i<5;i++){const a=i*1.3+f.x;g.fillStyle=(f.ice?'rgba(140,220,255,':'rgba(140,230,80,')+(1-u/.45)+')';ci(f.x+Math.cos(a)*u*60,f.y+Math.sin(a)*u*60,4*(1-u/.45))}g.fill()}
+  else if(f.k==='drop'){const q=u/.6;g.strokeStyle=`rgba(255,255,255,${.8*(1-q)})`;g.lineWidth=3;g.beginPath();g.ellipse(f.x,f.y+8,14+q*34,4+q*9,0,0,TAU);g.stroke();g.fillStyle=`rgba(200,235,255,${1-q})`;for(let i=0;i<6;i++){const a=-Math.PI*(i+.5)/6;ci(f.x+Math.cos(a)*q*46,f.y+Math.sin(a)*q*70+q*q*90,3.5);g.fill()}}
   else if(f.k==='dirt'){for(let i=0;i<6;i++){const a=-Math.PI*(i+.5)/6;g.fillStyle=`rgba(110,75,40,${1-u/.45})`;ci(f.x+Math.cos(a)*u*70,f.y-6+Math.sin(a)*u*90+u*u*200,4)}g.fill()}
   else if(f.k==='boom'){const q=u/.7,r=f.r*(.4+q*.9);if(drawBoom(f,q,r)){if(!f.small&&q<.5)otxt('BUM!',f.x,f.y-10,44-q*20,'#fff','#b3261a',7);continue}g.fillStyle=`rgba(255,${200-q*140|0},40,${1-q})`;ci(f.x,f.y,r);g.fill();g.fillStyle=`rgba(255,250,200,${(1-q)*.9})`;ci(f.x,f.y,r*.55);g.fill();g.fillStyle=`rgba(60,50,45,${(1-q)*.6})`;for(let i=0;i<9;i++){const a=i*.7;ci(f.x+Math.cos(a)*r*1.05,f.y+Math.sin(a)*r*1.05,10*(1-q)+4)}g.fill();if(!f.small&&q<.5)otxt('BUM!',f.x,f.y-10,44-q*20,'#fff','#b3261a',7)}
   else if(f.k==='hat'){g.save();g.globalAlpha=cl(1.4-u*1.2);g.translate(f.x+f.vx*u,Math.min(rowY(0)+400,f.y+f.vy*u+420*u*u));g.rotate(u*5);drawHat(f.type,1);g.restore()}}
  // quyoshlar
  for(const s of suns){if(s.st===2){const e=1-Math.pow(1-s.u,2);drawSunCoin(lerp(s.x0,60,e),lerp(s.y0,36,e),19*(1-e*.3),T,1)}else drawSunCoin(s.x,s.y,19,T+s.x,s.st===1&&s.life>7?.4+.6*Math.abs(Math.sin(s.life*8)):1)}
  drawHUD();
- if(rewardDrop&&!rewardDrop.got){const rd=rewardDrop,b=Math.sin(T*5)*5,rw=LV[LI].reward;g.fillStyle='rgba(255,240,150,.5)';ci(rd.x,rd.y+b,46+Math.sin(T*6)*4);g.fill();if(P[rw])seedCard(rw,rd.x-30,rd.y-37+b,60,74,false,0,true);else{g.fillStyle='#fff3b0';rr(rd.x-30,rd.y-37+b,60,74,8);g.fill();g.strokeStyle='#ff9a1a';g.lineWidth=4;g.stroke();if(rw==='shovel')drawShovel(rd.x,rd.y+b,1);else txt(rw==='note'?'✉':'🏆',rd.x,rd.y+b,34)}btns.push({x:rd.x-50,y:rd.y-55,w:100,h:110,reward:true})}
+ if(rewardDrop&&!rewardDrop.got){const rd=rewardDrop,b=Math.sin(T*5)*5,rw=LV[LI].reward;g.fillStyle='rgba(255,240,150,.5)';ci(rd.x,rd.y+b,46+Math.sin(T*6)*4);g.fill();if(P[rw])seedCard(rw,rd.x-30,rd.y-37+b,60,74,false,0,true);else{g.fillStyle='#fff3b0';rr(rd.x-30,rd.y-37+b,60,74,8);g.fill();g.strokeStyle='#ff9a1a';g.lineWidth=4;g.stroke();if(rw==='shovel')drawShovel(rd.x,rd.y+b,1);else if(rw==='slot')txt('+1',rd.x,rd.y+b,30,'#e0a000');else txt(rw==='note'?'✉':'🏆',rd.x,rd.y+b,34)}btns.push({x:rd.x-50,y:rd.y-55,w:100,h:110,reward:true})}
  // xabarlar
  if(hugeMsg>0&&hugeMsg<3.6)otxt(TX("Katta to'lqin yaqinlashmoqda!"),LW/2,LH/2,40,'#ff4a3a','#3b0a0a',8,820);
  if(finalMsg>0){const s=1+cl(finalMsg-2.2,0,.4)*2;g.save();g.translate(LW/2,LH/2);g.scale(s,s);otxt(TX("SO'NGGI TO'LQIN"),0,0,58,'#ff4a3a','#3b0a0a',9,820);g.restore()}
@@ -471,19 +543,22 @@ function drawMenu(){btns=[];const gr=g.createLinearGradient(0,0,0,LH);gr.addColo
  const zz=[{type:'pot',x:840},{type:'helm',x:760},{type:'basic',x:690}];zz.forEach((q,i)=>drawZombie({...q,row:0,x:q.x,arm:1,armMax:1,ph:T+i,eat:null,dead:0,jump:0,slow:0,flash:0,pole:false,_y:1,row:(470-GY-CH+14)/CH}));
  otxt(TX("Bog' himoyasi"),LW/2,92,76,'#fff','#2c5a1f',12,820);
  otxt('O‘simliklar · zombilar · quyosh',LW/2,150,22,'#fff7c2','#2c5a1f',5);
- const bx=LW/2-150;button(bx,196,300,64,prog>0&&prog<10?TX('Davom etish')+' · 1-'+(Math.min(prog,9)+1):TX("O'ynash"),()=>{audio();newLevel(Math.min(prog,9))},'#ffb21c','#3b2a12',26);
- button(bx,272,300,50,TX('Bosqichlar'),()=>{ST='levels'},'#fff','#3b2a12',22);
+ const bx=LW/2-150;button(bx,196,300,64,prog>0&&prog<LV.length?TX('Davom etish')+' · '+lvName(prog):TX("O'ynash"),()=>{audio();newLevel(prog<LV.length?prog:0)},'#ffb21c','#3b2a12',26);
+ button(bx,272,300,50,TX('Bosqichlar'),()=>{lvPage=prog>=10?1:0;ST='levels'},'#fff','#3b2a12',22);
  button(bx,332,145,44,TX('Ovoz')+': '+TX(SND?'yoqilgan':"o'chirilgan"),()=>{SND=!SND;store.set('snd',SND);audio();SFX.tap()},'#e3f2d2','#2c5a1f',15);
  button(bx+155,332,145,44,TX('Hamrohga qaytish'),exitGame,'#e3f2d2','#2c5a1f',15);
 }
-function drawLevels(){btns=[];g.fillStyle='#4a9f3d';g.fillRect(0,0,LW,LH);if(IMG.bg){g.drawImage(IMG.bg,-211,-47,1234,689);g.fillStyle='rgba(20,45,20,.5)';g.fillRect(0,0,LW,LH)}else for(let i=0;i<12;i++){g.fillStyle=i%2?'#5cb84a':'#6cc755';g.fillRect(i*80,0,80,LH)}
- otxt(TX('Bosqichlar'),LW/2,54,44,'#fff','#2c5a1f',9);
- for(let i=0;i<10;i++){const x=120+(i%5)*150,y=120+Math.floor(i/5)*170,open=i<=prog;g.fillStyle='rgba(0,0,0,.25)';rr(x,y+5,120,140,16);g.fill();g.fillStyle=open?'#f3ead2':'#9bb08c';rr(x,y,120,140,16);g.fill();g.strokeStyle=open?'#8a6a3a':'#6f8463';g.lineWidth=4;g.stroke();
-  txt('1-'+(i+1),x+60,y+28,26,open?'#3b2a12':'#5f7355');const rw=LV[i].reward;if(open){if(P[rw])icon(rw,x+60,y+118,.85);else if(rw==='shovel')drawShovel(x+60,y+88,1.2);else txt(rw==='note'?'✉':'🏆',x+60,y+88,40);if(i<prog){g.fillStyle='#3fae3a';ci(x+100,y+22,13);g.fill();txt('✓',x+100,y+23,17,'#fff')}btns.push({x,y,w:120,h:140,cb:()=>{audio();newLevel(i)}})}else txt('🔒',x+60,y+88,36)}
- button(LW/2-110,472,220,48,TX('Menyu'),()=>{ST='menu'},'#fff','#3b2a12',20)}
+let lvPage=0;
+function drawLevels(){btns=[];g.fillStyle='#4a9f3d';g.fillRect(0,0,LW,LH);if(IMG.bg){g.drawImage(IMG.bg,-211,-47,1234,689);g.fillStyle=lvPage?'rgba(15,45,70,.55)':'rgba(20,45,20,.5)';g.fillRect(0,0,LW,LH)}else for(let i=0;i<12;i++){g.fillStyle=i%2?'#5cb84a':'#6cc755';g.fillRect(i*80,0,80,LH)}
+ otxt(TX('Bosqichlar'),LW/2,40,38,'#fff','#2c5a1f',8);
+ [TX('1-fasl')+' · '+TX('Hovli'),TX('2-fasl')+' · '+TX("Ariq bo'yi")].forEach((nm,k)=>{const lock=k===1&&prog<10;button(LW/2-270+k*280,70,260,42,(lock?'🔒 ':'')+nm,()=>{if(lock)SFX.no();else lvPage=k},lvPage===k?'#ffb21c':lock?'#c9c2ad':'#fff','#3b2a12',18)});
+ for(let k=0;k<10;k++){const i=lvPage*10+k,x=120+(k%5)*150,y=130+Math.floor(k/5)*166,has=i<LV.length,open=has&&i<=prog;g.fillStyle='rgba(0,0,0,.25)';rr(x,y+5,120,140,16);g.fill();g.fillStyle=open?'#f3ead2':'#9bb08c';rr(x,y,120,140,16);g.fill();g.strokeStyle=open?'#8a6a3a':'#6f8463';g.lineWidth=4;g.stroke();
+  txt(lvName(i),x+60,y+28,26,open?'#3b2a12':'#5f7355');if(!has){txt(TX('Tez orada'),x+60,y+88,15,'#5f7355','center',800,104);continue}const rw=LV[i].reward;if(open){if(P[rw])icon(rw,x+60,y+118,.85);else if(rw==='shovel')drawShovel(x+60,y+88,1.2);else if(rw==='slot')txt('+1',x+60,y+88,40,'#e0a000');else txt(rw==='note'?'✉':'🏆',x+60,y+88,40);if(i<prog){g.fillStyle='#3fae3a';ci(x+100,y+22,13);g.fill();txt('✓',x+100,y+23,17,'#fff')}btns.push({x,y,w:120,h:140,cb:()=>{audio();newLevel(i)}})}else txt('🔒',x+60,y+88,36)}
+ button(LW/2-110,478,220,46,TX('Menyu'),()=>{ST='menu'},'#fff','#3b2a12',20)}
 function drawChoose(){btns=[];drawBG();g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,0,LW,LH);panel(150,40,660,460);txt(TX("O'simliklarni tanlang")+'  '+chosen.length+'/'+SLOTS,LW/2,80,26,'#3b2a12');
- const av=seedsFor(LI);av.forEach((s,i)=>{const x=190+(i%4)*150,y=112+Math.floor(i/4)*150,on=chosen.includes(s);seedCard(s,x,y,84,104,false,0,on);txt(TX(P[s].n),x+42,y+116,13,'#3b2a12','center',700,140);txt(TX(ROLEN[ROLE[s]]),x+42,y+131,11,ROLEC[ROLE[s]][1],'center',800,140);if(on){g.fillStyle='#3fae3a';ci(x+76,y+8,12);g.fill();txt(String(chosen.indexOf(s)+1),x+76,y+9,15,'#fff')}btns.push({x:x-10,y:y-6,w:104,h:136,cb:()=>{SFX.tap();if(on)chosen=chosen.filter(q=>q!==s);else if(chosen.length<SLOTS)chosen.push(s);else SFX.no()}})});
- const ok=chosen.length===Math.min(SLOTS,av.length);button(LW/2-120,428,240,54,TX('Boshlash'),()=>{if(!ok){SFX.no();return}setSeeds(chosen);startReady()},ok?'#ffb21c':'#c9c2ad','#3b2a12',24)}
+ const av=seedsFor(LI),big=av.length<=8,n=big?4:6,cw=big?84:64,ch=big?104:80,sx=big?150:104,sy=big?150:106,x0=big?190:LW/2-(n*sx-(sx-cw))/2,y0=big?112:104;
+ av.forEach((s,i)=>{const x=x0+(i%n)*sx,y=y0+Math.floor(i/n)*sy,on=chosen.includes(s);seedCard(s,x,y,cw,ch,false,0,on);txt(TX(P[s].n),x+cw/2,y+ch+(big?12:9),big?13:10.5,'#3b2a12','center',700,big?140:100);if(big)txt(TX(ROLEN[ROLE[s]]),x+42,y+131,11,ROLEC[ROLE[s]][1],'center',800,140);if(on){g.fillStyle='#3fae3a';ci(x+cw-8,y+8,big?12:10);g.fill();txt(String(chosen.indexOf(s)+1),x+cw-8,y+9,big?15:13,'#fff')}btns.push({x:x-8,y:y-6,w:cw+16,h:ch+(big?32:20),cb:()=>{SFX.tap();if(on)chosen=chosen.filter(q=>q!==s);else if(chosen.length<SLOTS)chosen.push(s);else SFX.no()}})});
+ const ok=chosen.length===Math.min(SLOTS,av.length);button(LW/2-120,432,240,52,TX('Boshlash'),()=>{if(!ok){SFX.no();return}setSeeds(chosen);startReady()},ok?'#ffb21c':'#c9c2ad','#3b2a12',24)}
 function drawOverlay(){
  if(ST==='ready'){const i=readyT<.8?0:readyT<1.6?1:2,s=[TX('Tayyor…'),TX('Diqqat…'),TX('EKING!')][i],u=(readyT-[0,.8,1.6][i])/.8;g.save();g.translate(LW/2,LH/2);const sc=i===2?1+u*.25:.8+cl(u*3)*.2;g.scale(sc,sc);otxt(s,0,0,i===2?84:62,i===2?'#ffd23f':'#ff5a3a','#3b0a0a',10,700);g.restore()}
  if(ST==='paused'){g.fillStyle='rgba(0,0,0,.5)';g.fillRect(0,0,LW,LH);panel(LW/2-190,110,380,330);txt(TX('Pauza'),LW/2,158,34,'#3b2a12');btns=[];button(LW/2-140,196,280,56,TX('Davom'),()=>{ST='play'});button(LW/2-140,264,280,48,TX('Qaytadan'),()=>newLevel(LI),'#fff','#3b2a12',20);button(LW/2-140,322,280,48,TX('Menyu'),()=>{ST='menu'},'#fff','#3b2a12',20);button(LW/2-140,380,280,44,TX('Ovoz')+': '+TX(SND?'yoqilgan':"o'chirilgan"),()=>{SND=!SND;store.set('snd',SND)},'#e3f2d2','#2c5a1f',17)}
@@ -493,8 +568,10 @@ function drawOverlay(){
   if(P[rw]){txt(TX("Yangi o'simlik!"),LW/2,102,30,'#b3261a');g.fillStyle='#cfe7b8';rr(LW/2-70,128,140,130,14);g.fill();icon(rw,LW/2,244,1.5);txt(TX(P[rw].n),LW/2,288,28,'#3b2a12');wrap(TX(P[rw].d),LW/2,330,18,'#5a4a2a',440,24)}
   else if(rw==='shovel'){txt(TX('Belkurak'),LW/2,102,30,'#b3261a');drawShovel(LW/2,200,2.2);wrap(TX("Ekilgan o'simlikni olib tashlaydi."),LW/2,310,19,'#5a4a2a',440,24)}
   else if(rw==='note'){txt(TX('Zombilardan xat'),LW/2,102,30,'#b3261a');g.fillStyle='#fffdf2';g.save();g.translate(LW/2,230);g.rotate(-.03);rr(-200,-90,400,180,6);g.fill();g.strokeStyle='#d8d0b8';g.lineWidth=2;g.stroke();wrap(TX("Hurmatli uy egalari, biz baribir kiramiz. Eshikni ochiq qoldiring. — Zombilar"),0,0,20,'#3a4a2a',350,30);g.restore()}
-  else{txt(TX('Kunduz hududi tugadi!'),LW/2,110,30,'#b3261a','center',900,480);txt('🏆',LW/2,210,90);wrap(TX("Tun hududi tez orada qo'shiladi."),LW/2,310,20,'#5a4a2a',440,26)}
-  if(LI<9)button(LW/2-150,376,300,58,TX('Keyingi bosqich'),()=>newLevel(LI+1));else button(LW/2-150,376,300,58,TX('Menyu'),()=>{ST='menu'})}
+  else if(rw==='slot'){txt(TX('Yettinchi karta joyi!'),LW/2,102,30,'#b3261a','center',900,480);txt('+1',LW/2,205,96,'#e0a000');wrap(TX("Endi jangga 7 ta o'simlik olasiz."),LW/2,310,20,'#5a4a2a',440,26)}
+  else{txt(TX('Fasl tugadi!'),LW/2,110,30,'#b3261a','center',900,480);txt('🏆',LW/2,210,90)}
+  if(LI===9&&P[rw])wrap(TX("2-fasl ochildi: Ariq bo'yi"),LW/2,358,17,'#2a7fa8',440,22);if(LI===LV.length-1&&rw!=='end')wrap(TX("Keyingi bosqichlar tez orada qo'shiladi."),LW/2,358,16,'#5a4a2a',440,22);
+  if(LI<LV.length-1)button(LW/2-150,380,300,56,TX('Keyingi bosqich'),()=>newLevel(LI+1));else button(LW/2-150,380,300,56,TX('Menyu'),()=>{ST='menu'})}
 }
 function exitGame(){try{parent.postMessage('game-exit','*')}catch(e){}}
 
@@ -503,7 +580,7 @@ function hitBtn(x,y){for(let i=btns.length-1;i>=0;i--){const b=btns[i];if(x>=b.x
 let dragging=false,downAt=null;
 function trySun(x,y){let best=null,bd=46;for(const s of suns){if(s.st>1)continue;const d=Math.hypot(s.x-x,s.y-y);if(d<bd){bd=d;best=s}}if(best){best.st=2;best.u=0;best.x0=best.x;best.y0=best.y;SFX.sun();haptic('light');return true}return false}
 function tryCell(x,y){const c=Math.floor((x-GX)/CW),r=Math.floor((y-GY)/CH);if(r<0||r>=ROWS||c<0||c>=COLS)return false;
- if(shovel){if(plants[r][c]){plants[r][c]=null;SFX.plant();fx.push({k:'dirt',x:cellX(c),y:rowY(r),t:0})}shovel=false;return true}
+ if(shovel){if(plants[r][c]){plants[r][c]=null;SFX.plant();fx.push({k:isWater(r)?'drop':'dirt',x:cellX(c),y:rowY(r)-(isWater(r)?14:0),t:0})}else if(rafts[r][c]){rafts[r][c]=null;SFX.splash();fx.push({k:'drop',x:cellX(c),y:rowY(r)-14,t:0})}shovel=false;return true}
  const t=selType();if(!t)return false;if(!canPlant(t,r,c)){SFX.no();return true}
  if(LV[LI].mode){belt.splice(sel,1);plantAt(t,r,c);sel=null}else{if(sunN<P[t].cost||cdT[t]>0){SFX.no();sel=null;return true}sunN-=P[t].cost;cdT[t]=P[t].cd;plantAt(t,r,c);sel=null}return true}
 cv.addEventListener('pointerdown',e=>{e.preventDefault();audio();const[x,y]=toL(e);PT=[x,y];downAt=[x,y];
@@ -525,6 +602,6 @@ function render(){g.setTransform(1,0,0,1,0,0);g.fillStyle='#10160f';g.fillRect(0
  if(ST==='menu'){T+=1/60;drawMenu()}else if(ST==='levels'){T+=1/60;drawLevels()}else if(ST==='choose'){T+=1/60;drawChoose()}else{if(ST==='won'||ST==='paused')T+=ST==='won'?1/60:0;drawPlay();drawOverlay()}
  g.restore()}
 // sinov uchun
-window.__bog={IMG,spawnZ,get st(){return ST},set st(v){ST=v},newLevel,get s(){return {ST,LI,sunN,wave,waves,zombies:zombies&&zombies.length,prog,T,rewardDrop:!!rewardDrop,plants}},plantAt,P,LV,update,collectReward,setProg(v){prog=v},give(n){sunN+=n},render,spawnZ,get z(){return zombies}};
+window.__bog={IMG,spawnZ,get st(){return ST},set st(v){ST=v},newLevel,get s(){return {ST,LI,sunN,wave,waves,zombies:zombies&&zombies.length,prog,T,rewardDrop:!!rewardDrop,plants,rafts,seeds}},plantAt,Z,canPlant,setSeeds,seedsFor,P,LV,update,collectReward,setProg(v){prog=v},give(n){sunN+=n},render,spawnZ,get z(){return zombies}};
 requestAnimationFrame(frame);
 </script></body></html>
