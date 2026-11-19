@@ -271,7 +271,7 @@ function icon(t,x,y,s){g.save();g.translate(x,y);g.scale(s,s);drawPlant(t,0,0,t=
 
 // ================= RASMLI QAHRAMONLAR =================
 // O'simliklar tayyor rasmlardan chiziladi; rasm yuklanmagan bo'lsa eski chizma ishlaydi.
-const IMG={},IMGV=6;for(const n of ['pea0','pea1','twin0','twin1','ice0','ice1','sun0','sun1','nut0','nut1','nut2','xnut','bomb0','bomb1','mine0','mine1','snap0','snap1','shot','shoti','zb0','zb1','zbe','zf0','zf1','zs0','zs1','zsj','zr0','zr1','zre','sunc','pot0','pot1','pot2','bas0','bas1','shovel','cart0','cart1','boom','bg']){const im=new Image();im.onload=()=>{IMG[n]=im};im.src='img/'+n+'.webp?v='+IMGV}
+const IMG={},IMGV=7;for(const n of ['pea0','pea1','twin0','twin1','ice0','ice1','sun0','sun1','nut0','nut1','nut2','xnut','bomb0','bomb1','mine0','mine1','snap0','snap1','shot','shoti','zb0','zb1','zbe','zf0','zf1','zs0','zs1','zsj','zr0','zr1','zre','sunc','pot0','pot1','pot2','bas0','bas1','shovel','cart0','cart1','boom','bg','ui_card','ui_bar','ui_b1','ui_b2','ui_panel','ui_pause','ui_plate']){const im=new Image();im.onload=()=>{IMG[n]=im};im.src='img/'+n+'.webp?v='+IMGV}
 // rasmni pastki o'rtasi (x,y) nuqtaga, balandligi h qilib chizadi
 function spr(n,x,y,h,o){const im=IMG[n];if(!im)return false;const w=h*im.width/im.height;g.save();g.translate(x,y);if(o){if(o.rot)g.rotate(o.rot);if(o.sx||o.sy)g.scale(o.sx||1,o.sy||1)}g.drawImage(im,-w/2,-h,w,h);g.restore();return true}
 const drawPlant0=drawPlant,drawNut0=drawNut;
@@ -319,6 +319,24 @@ const drawPlant1=drawPlant;
 drawPlant=function(t,x,y,p){if(p.r==null||p.age>=.28)return drawPlant1(t,x,y,p);const u=p.age/.28,k=1+2.2*Math.pow(u-1,3)+1.2*Math.pow(u-1,2);g.save();g.translate(x,y);g.scale(.4+.6*k,.4+.6*k*(1+(1-u)*.25));g.translate(-x,-y);drawPlant1(t,x,y,p);g.restore()};
 const drawPlay0=drawPlay;
 drawPlay=function(){let a=0;for(const f of fx)if(f.k==='boom'&&f.t<.32)a=Math.max(a,(f.small?4:9)*(1-f.t/.32));if(a<=0)return drawPlay0();g.save();g.translate((Math.random()-.5)*a*2,(Math.random()-.5)*a*2);drawPlay0();g.restore()};
+
+// ---- interfeys rasmlari: yog'och panel, tugmalar, karta ramkasi ----
+// rasmni 9 bo'lakka bo'lib cho'zadi: burchaklar o'z shaklini saqlaydi (ms — manbadagi chet, md — ekrandagi chet)
+function nine(im,x,y,w,h,ms,md){const W=im.width,H=im.height,sx=[0,ms,W-ms,W],sy=[0,ms,H-ms,H],dx=[x,x+md,x+w-md,x+w],dy=[y,y+md,y+h-md,y+h];
+ for(let i=0;i<3;i++)for(let j=0;j<3;j++){const sw=sx[i+1]-sx[i],sh=sy[j+1]-sy[j],dw=dx[i+1]-dx[i],dh=dy[j+1]-dy[j];if(sw>0&&sh>0&&dw>0&&dh>0)g.drawImage(im,sx[i],sy[j],sw,sh,dx[i]-.3,dy[j]-.3,dw+.6,dh+.6)}}
+const panel0=panel,button0=button,seedCard0=seedCard;
+panel=function(x,y,w,h){const im=IMG.ui_panel;if(!im)return panel0(x,y,w,h);g.fillStyle='rgba(0,0,0,.28)';rr(x-4,y+6,w+8,h+6,18);g.fill();nine(im,x-10,y-10,w+20,h+20,58,36)};
+button=function(x,y,w,h,label,cb,col='#ffb21c',tc='#3b2a12',fs=24){const main=col==='#ffb21c',im=IMG[main?'ui_b1':'ui_b2'];if(!im)return button0(x,y,w,h,label,cb,col,tc,fs);
+ g.save();if(col==='#c9c2ad')g.globalAlpha=.55;g.fillStyle='rgba(0,0,0,.22)';rr(x+2,y+5,w-4,h,h/2);g.fill();const m=Math.min(h*.5,w*.3);nine(im,x,y,w,h,Math.floor(im.height*.48),m);g.restore();
+ txt(label,x+w/2,y+h/2+1,fs,main?'#4a2a06':tc,'center',900,w-28);btns.push({x,y,w,h,cb})};
+seedCard=function(t,x,y,w,h,dim,cdU,selq){const im=IMG.ui_card;if(!im)return seedCard0(t,x,y,w,h,dim,cdU,selq);g.save();
+ if(selq){g.fillStyle='#ffb21c';rr(x-3,y-3,w+6,h+6,8);g.fill()}g.drawImage(im,x,y,w,h);
+ const rk=ROLE[t]||'shoot',ax=x+w*.15,ay=y+h*.1,aw=w*.7,ah=h*.68;g.fillStyle=ROLEC[rk][0];g.globalAlpha=.8;rr(ax,ay,aw,ah,4);g.fill();g.globalAlpha=1;
+ g.save();g.beginPath();g.rect(ax,ay,aw,ah);g.clip();icon(t,x+w/2,ay+ah-1,w>70?.76:.52);g.restore();roleBadge(rk,x+w-10,y+10,w>70?10:8);
+ if(P[t].cost||!LV[LI].mode)txt(String(P[t].cost),x+w/2,y+h*.895,w>70?15:12.5,'#3b2a12','center',900);
+ if(dim){g.fillStyle='rgba(20,20,20,.45)';rr(x,y,w,h,7);g.fill()}if(cdU>0){g.fillStyle='rgba(20,20,20,.55)';rr(x,y,w,h*cdU,7);g.fill()}g.restore()};
+function hudBar(){const im=IMG.ui_bar;if(!im){g.fillStyle='rgba(60,40,15,.78)';rr(6,4,LW-12,84,12);g.fill();return}g.fillStyle='rgba(0,0,0,.22)';rr(8,8,LW-16,84,14);g.fill();nine(im,2,0,LW-4,92,46,40)}
+function hudPlate(x,y,w,h,on){const im=IMG.ui_plate;if(!im){g.fillStyle=on?'#fff3b0':'#f3ead2';rr(x,y,w,h,10);g.fill();return}if(on){g.fillStyle='#ffb21c';rr(x-3,y-3,w+6,h+6,14);g.fill()}nine(im,x,y,w,h,48,Math.min(30,h*.44))}
 // ---- vazifa belgilari: karta burchagida va rangida ----
 const ROLE={pea:'shoot',twin:'shoot',ice:'slow',sun:'sun',nut:'wall',xnut:'boom',bomb:'boom',mine:'boom',snap:'eat'};
 const ROLEC={shoot:['#cfe7b8','#3f9a3a'],sun:['#ffeeb0','#e0a000'],wall:['#ead8b4','#9a6a2a'],boom:['#ffd0c4','#d23a2a'],slow:['#cfeaf8','#2f8fc4'],eat:['#e6d3f2','#8a4fc4']};
@@ -398,15 +416,15 @@ function seedCard(t,x,y,w,h,dim,cdU,selq){g.save();g.fillStyle=selq?'#fff3b0':'#
  if(dim){g.fillStyle='rgba(20,20,20,.45)';rr(x,y,w,h,7);g.fill()}if(cdU>0){g.fillStyle='rgba(20,20,20,.55)';rr(x,y,w,h*cdU,7);g.fill()}g.restore()}
 const SEEDX=118,SEEDW=60,SEEDH=74;
 function drawHUD(){const L=LV[LI];btns=[];
- g.fillStyle='rgba(60,40,15,.78)';rr(6,4,LW-12,84,12);g.fill();
- if(!L.mode){g.fillStyle='#f3ead2';rr(14,10,92,72,10);g.fill();drawSunCoin(60,36,17,T);g.fillStyle='#fff';rr(22,58,76,20,8);g.fill();txt(String(sunN),60,69,17,'#3b2a12');
+ hudBar();
+ if(!L.mode){hudPlate(14,10,92,72);drawSunCoin(60,35,16,T);g.fillStyle='#fff7e0';rr(26,57,68,19,8);g.fill();txt(String(sunN),60,67.5,16,'#3b2a12');
   seeds.forEach((s,i)=>{const x=SEEDX+i*(SEEDW+6),dim=sunN<P[s].cost,u=cdT[s]>0?cdT[s]/P[s].cd:0;seedCard(s,x,9,SEEDW,SEEDH,dim&&u<=0,cl(u),sel===s);btns.push({x,y:9,w:SEEDW,h:SEEDH,seed:s})})}
  else{g.fillStyle='#4a3a2a';rr(108,14,LW-300,64,8);g.fill();g.fillStyle='#6b5a45';for(let x=112+((T*-70)%24+24)%24;x<LW-196;x+=24)g.fillRect(x,16,4,60);
   belt.forEach((b,i)=>{seedCard(b.t,b.x,9,SEEDW,SEEDH,false,0,sel===i);btns.push({x:b.x,y:9,w:SEEDW,h:SEEDH,belt:i})})}
  // belkurak
- const hasShovel=prog>=4||LI>=4;if(hasShovel&&!L.mode){const x=LW-176;g.fillStyle=shovel?'#fff3b0':'#f3ead2';rr(x,12,64,68,10);g.fill();g.strokeStyle=shovel?'#ff9a1a':'#8a6a3a';g.lineWidth=shovel?4:2.5;g.stroke();drawShovel(x+32,46,1);btns.push({x,y:12,w:64,h:68,shovel:true})}
+ const hasShovel=prog>=4||LI>=4;if(hasShovel&&!L.mode){const x=LW-176;hudPlate(x,12,64,68,shovel);drawShovel(x+32,46,.92);btns.push({x,y:12,w:64,h:68,shovel:true})}
  // pauza
- {const x=LW-98;g.fillStyle='#f3ead2';rr(x,12,82,68,10);g.fill();g.fillStyle='#6b4a2a';rr(x+26,30,10,32,3);g.fill();rr(x+46,30,10,32,3);g.fill();btns.push({x,y:12,w:82,h:68,pause:true})}
+ {const x=LW-98;if(IMG.ui_pause)g.drawImage(IMG.ui_pause,x+7,12,68,68);else{g.fillStyle='#f3ead2';rr(x,12,82,68,10);g.fill();g.fillStyle='#6b4a2a';rr(x+26,30,10,32,3);g.fill();rr(x+46,30,10,32,3);g.fill()}btns.push({x,y:12,w:82,h:68,pause:true})}
  // jarayon chizig'i
  const bw=210,bx=LW-bw-18,by=LH-20;g.fillStyle='rgba(30,20,10,.75)';rr(bx-8,by-11,bw+16,22,11);g.fill();g.fillStyle='#2c2a22';rr(bx,by-5,bw,10,5);g.fill();const u=cl((wave+(hugeMsg>0?0:cl(waveT/25))*0)/waves);g.fillStyle='#7ad13a';rr(bx+bw*(1-u),by-5,bw*u,10,5);g.fill();
  for(const f of flagAt){const fx_=bx+bw*(1-f/waves);g.strokeStyle='#ddd';g.lineWidth=2;g.beginPath();g.moveTo(fx_+2,by+6);g.lineTo(fx_+2,by-16);g.stroke();g.fillStyle=wave>=f?'#ff7a1a':'#c9c9c9';g.beginPath();g.moveTo(fx_+2,by-16);g.lineTo(fx_+16,by-11);g.lineTo(fx_+2,by-6);g.fill()}
