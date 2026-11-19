@@ -53,15 +53,27 @@ function step(dt){let moving=false;
 function ray(b,dx,dy){let best=1e9,hit=null;for(const o of balls){if(!o.on||o===b)continue;const ox=o.x-b.x,oy=o.y-b.y,pr=ox*dx+oy*dy;if(pr<=0)continue;const d2=ox*ox+oy*oy-pr*pr;if(d2>=4*R*R)continue;const t=pr-Math.sqrt(4*R*R-d2);if(t<best){best=t;hit=o}}
  let tw=1e9;if(dx>0)tw=Math.min(tw,(W-R-b.x)/dx);if(dx<0)tw=Math.min(tw,(R-b.x)/dx);if(dy>0)tw=Math.min(tw,(H-R-b.y)/dy);if(dy<0)tw=Math.min(tw,(R-b.y)/dy);
  if(tw<best)return{t:tw,hit:null};return{t:best,hit}}
-// ---------- o'yin (Amerikanka) ----------
-const NEED=8;let ST='menu',turn=0,score=[0,0],debt=[0,0],sel=null,ang=-Math.PI/2,pow=0,spin=[0,0],brk=true,place=false,msg='',msgT=0,winner=-1,MODE='two',spinOpen=false,T=0;
+// ---------- o'yin: Amerikanka ('am') va Moskva piramidasi ('ms') ----------
+const NEED=8;let VAR=store.get('var','am'),pick=false,ST='menu',turn=0,score=[0,0],debt=[0,0],sel=null,ang=-Math.PI/2,pow=0,spin=[0,0],brk=true,place=false,msg='',msgT=0,winner=-1,MODE='two',spinOpen=false,T=0;
 const NAMES=()=>MODE==='solo'?['Siz','—']:['1-o\'yinchi','2-o\'yinchi'];
 function say(s,t=2.4){msg=s;msgT=t}
-function newGame(mode){MODE=mode;rack();turn=0;score=[0,0];debt=[0,0];brk=true;place=true;winner=-1;sel=balls.find(b=>b.cue);ang=-Math.PI/2;pow=0;spin=[0,0];sim=false;shot=null;ST='play';say('Sharni "uy"da joylang va piramidani buzing',3.5)}
+function newGame(mode){MODE=mode;rack();turn=0;score=[0,0];debt=[0,0];brk=true;place=true;pick=false;winner=-1;sel=balls.find(b=>b.cue);ang=-Math.PI/2;pow=0;spin=[0,0];sim=false;shot=null;ST='play';say('Sharni "uy"da joylang va piramidani buzing',3.5)}
 function respot(b){b.on=true;b.pot=0;b.vx=b.vy=b.wx=b.wy=b.wz=0;let x=W/2,y=R+.002,k=0;const free=()=>balls.every(o=>o===b||!o.on||hyp(o.x-x,o.y-y)>2*R+.001);while(!free()&&k<60){k++;x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.004);if(x<R+.01||x>W-R-.01){y+=2*R+.004;x=W/2}}b.x=x;b.y=y}
-function fire(){if(sim||!sel||pow<.03)return;const V=.5+Math.pow(pow,1.35)*9,dx=Math.cos(ang),dy=Math.sin(ang);sel.vx=dx*V;sel.vy=dy*V;const k=2.5*V/R*.5;sel.wx=-dy*k*spin[1];sel.wy=dx*k*spin[1];sel.wz=-k*spin[0];
- shot={ball:sel,first:null,hits:0,rail:0,railAfter:0,pots:[],brk};sim=true;place=false;click(.4+pow*.6,1500,.05);haptic(pow>.6?'heavy':'light');pow=0}
-function endShot(){const s=shot,me=turn,op=1-turn;shot=null;sim=false;let foul='';
+function fire(){if(pick){pow=0;return}if(sim||!sel||pow<.03){pow=0;return}const V=.5+Math.pow(pow,1.35)*9,dx=Math.cos(ang),dy=Math.sin(ang);sel.vx=dx*V;sel.vy=dy*V;const k=2.5*V/R*.5;sel.wx=-dy*k*spin[1];sel.wy=dx*k*spin[1];sel.wz=-k*spin[0];
+ shot={ball:sel,first:null,hits:0,rail:0,railAfter:0,pots:[],brk,home:place&&!brk};sim=true;place=false;click(.4+pow*.6,1500,.05);haptic(pow>.6?'heavy':'light');pow=0}
+function cueHome(){const c=balls.find(b=>b.cue);c.on=true;c.pot=0;c.vx=c.vy=c.wx=c.wy=c.wz=0;c.x=W/2;c.y=H*3/4+.25;let k=0;while(balls.some(o=>o!==c&&o.on&&hyp(o.x-c.x,o.y-c.y)<2*R+.002)&&k++<40)c.x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.01);place=true;sel=c}
+function win(me){winner=me;ST='over';haptic('ok')}
+function endMs(){const s=shot,me=turn,op=1-turn,cue=balls.find(b=>b.cue),cuePot=s.pots.includes(cue),obj=s.pots.filter(b=>b!==cue);shot=null;sim=false;let foul='';
+ const inHome=b=>b.y>H*3/4,others=balls.filter(b=>b.on&&!b.cue||s.pots.includes(b)&&!b.cue);
+ if(!s.first)foul="Sariq shar hech narsaga tegmadi";else if(s.home&&inHome(s.first)&&others.some(b=>!inHome(b)))foul="Uydan urganda avval uydan tashqaridagi sharga tegish kerak";else if(!s.pots.length&&!s.railAfter&&!s.brk)foul="Urilgandan keyin hech bir shar bortga tegmadi";
+ brk=false;spin=[0,0];
+ if(foul){for(const b of obj)respot(b);if(score[me]>0){score[me]--;const b=balls.find(q=>!q.on&&q.pot===2+me);if(b)respot(b)}else debt[me]++;say('Jarima: '+foul+'. −1 shar',3.2);haptic('err');turn=MODE==='solo'?0:op;if(cuePot)cueHome()}
+ else if(s.pots.length){for(const b of obj){if(debt[me]>0){debt[me]--;respot(b)}else{b.pot=2+me;score[me]++}}
+  if(cuePot){cueHome();if(score[me]>=NEED)return win(me);if(balls.some(b=>b.on&&!b.cue)){pick=true;say('Sariq shar tushdi! Stoldan istalgan sharni tanlab oling',4)}}else say(obj.length>1?obj.length+' ta shar tushdi!':'Shar tushdi — yana uring',1.8);haptic('ok')}
+ else{turn=MODE==='solo'?0:op;if(MODE!=='solo')say(NAMES()[turn]+' navbati',1.6)}
+ if(score[me]>=NEED)return win(me);if(!balls.some(b=>b.on&&!b.cue)&&!pick)return win(score[0]>=score[1]?0:1);sel=cue}
+function takeBall(b){const me=turn;pick=false;b.on=false;if(debt[me]>0){debt[me]--;respot(b)}else{b.pot=2+me;score[me]++}thud();haptic('ok');if(score[me]>=NEED)return win(me);say('Sariq sharni uyda joylab, yana uring',2.6)}
+function endShot(){if(VAR==='ms')return endMs();const s=shot,me=turn,op=1-turn;shot=null;sim=false;let foul='';
  if(!s.first)foul="Shar hech narsaga tegmadi";else if(!s.pots.length&&!s.railAfter&&!s.brk)foul="Urilgandan keyin hech bir shar bortga tegmadi";
  if(foul){for(const b of s.pots)respot(b);if(score[me]>0){score[me]--;const b=balls.find(q=>!q.on&&q.pot===2+me);if(b){respot(b)}}else debt[me]++;say('Jarima: '+foul+'. −1 shar',3.2);haptic('err');turn=MODE==='solo'?0:op}
  else if(s.pots.length){for(const b of s.pots){if(debt[me]>0){debt[me]--;respot(b)}else{b.pot=2+me;score[me]++}}say(s.pots.length>1?s.pots.length+' ta shar tushdi!':'Shar tushdi — yana uring',1.8);haptic('ok')}
@@ -102,7 +114,7 @@ function drawBall(b,x,y,r,dim){g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ell
  // dumalashi ko'rinsin: shar sirtidagi kichik belgi
  const mx=Math.sin(b.rx)*Math.cos(b.ry),my=Math.sin(b.ry),mz=Math.cos(b.rx)*Math.cos(b.ry);if(mz>-.2){g.globalAlpha=cl(mz+.2)*.55;g.fillStyle=b.cue?'#7a4a00':'#8b1a1a';g.beginPath();g.arc(x+mx*r*.8,y+my*r*.8,r*.2*(.5+mz*.5),0,TAU);g.fill();g.globalAlpha=1}
  g.fillStyle='rgba(255,255,255,.75)';g.beginPath();g.ellipse(x-r*.36,y-r*.42,r*.2,r*.13,-.6,0,TAU);g.fill();if(dim){g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.arc(x,y,r,0,TAU);g.fill()}}
-function drawAim(){if(sim||!sel||ST!=='play'||place&&false)return;const dx=Math.cos(ang),dy=Math.sin(ang),h=ray(sel,dx,dy),gx=sel.x+dx*h.t,gy=sel.y+dy*h.t,r=R*S;
+function drawAim(){if(sim||!sel||ST!=='play'||pick)return;const dx=Math.cos(ang),dy=Math.sin(ang),h=ray(sel,dx,dy),gx=sel.x+dx*h.t,gy=sel.y+dy*h.t,r=R*S;
  g.save();g.beginPath();g.rect(0,L.top-6,VW,VH-L.top-L.bot+10);g.clip();g.strokeStyle='rgba(255,255,255,.85)';g.lineWidth=1.6;g.setLineDash([7,6]);g.beginPath();g.moveTo(X(sel.x+dx*R),Y(sel.y+dy*R));g.lineTo(X(gx),Y(gy));g.stroke();g.setLineDash([]);
  g.strokeStyle='rgba(255,255,255,.9)';g.lineWidth=1.5;g.beginPath();g.arc(X(gx),Y(gy),r,0,TAU);g.stroke();
  if(h.hit){const nx=(h.hit.x-gx)/(2*R),ny=(h.hit.y-gy)/(2*R),c=dx*nx+dy*ny,len=.12+.34*c;g.strokeStyle='rgba(255,255,255,.85)';g.lineWidth=2;g.beginPath();g.moveTo(X(h.hit.x),Y(h.hit.y));g.lineTo(X(h.hit.x+nx*len),Y(h.hit.y+ny*len));g.stroke();
@@ -130,12 +142,13 @@ function drawHUD(){const nm=NAMES();
 function overlay(title,sub,items){g.fillStyle='rgba(0,0,0,.62)';g.fillRect(0,0,VW,VH);const w=Math.min(320,VW-40),h=120+items.length*58,x=VW/2-w/2,y=VH/2-h/2;g.fillStyle='#211a12';rr(x,y,w,h,20);g.fill();g.strokeStyle='rgba(217,164,65,.5)';g.lineWidth=1.5;g.stroke();txt(title,VW/2,y+40,24,'#f5efe0',  'center',800);if(sub)txt(sub,VW/2,y+72,13.5,'#c9bfae','center',500);btns=[];items.forEach((it,i)=>button(x+22,y+100+i*58,w-44,46,it[0],it[1],i?'#3a2f22':'#d9a441',i?'#f5efe0':'#1a1208'))}
 function exitGame(){try{parent.postMessage('game-exit','*')}catch(e){}}
 function render(){g.setTransform(DPR,0,0,DPR,0,0);g.fillStyle='#14100c';g.fillRect(0,0,VW,VH);
- if(ST==='menu'){const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#1c140c');gr.addColorStop(1,'#0c3a24');g.fillStyle=gr;g.fillRect(0,0,VW,VH);txt('HAMROH',VW/2,VH*.16,13,'#d9a441','center',700);txt('Bilyard',VW/2,VH*.16+38,44,'#f5efe0','center',800);txt('Rus bilyardi · Amerikanka',VW/2,VH*.16+76,14,'#c9bfae','center',500);
+ if(ST==='menu'){const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#1c140c');gr.addColorStop(1,'#0c3a24');g.fillStyle=gr;g.fillRect(0,0,VW,VH);txt('HAMROH',VW/2,VH*.16,13,'#d9a441','center',700);txt('Bilyard',VW/2,VH*.16+38,44,'#f5efe0','center',800);txt('Rus bilyardi',VW/2,VH*.16+76,14,'#c9bfae','center',500);
   const demo=[[0,0,1],[-.9,.5,0],[.9,.5,0],[0,1.1,0]];demo.forEach(([a,b,c],i)=>drawBall({cue:!!c,rx:T*.6+i,ry:T*.4+i*2},VW/2+a*34,VH*.42+b*34,30));
-  btns=[];const w=Math.min(300,VW-48),x=VW/2-w/2;let y=VH*.6;button(x,y,w,52,'Ikki kishi',()=>newGame('two'));button(x,y+=64,w,52,'Mashq (yolg\'iz)',()=>newGame('solo'),'#3a2f22','#f5efe0');button(x,y+=64,w,46,'Ovoz: '+(SND?'yoqilgan':'o\'chirilgan'),()=>{SND=!SND;store.set('snd',SND)},'#2a2218','#c9bfae',15);button(x,y+=58,w,46,'Hamrohga qaytish',exitGame,'#2a2218','#c9bfae',15);return}
+  btns=[];const w=Math.min(300,VW-48),x=VW/2-w/2;let y=VH*.54;[['am','Amerikanka'],['ms','Moskva']].forEach(([k,n],i)=>button(x+i*(w/2+4),y,w/2-4,42,n,()=>{VAR=k;store.set('var',k)},VAR===k?'#f5efe0':'#2a2218',VAR===k?'#1a1208':'#c9bfae',15));txt(VAR==='am'?'Istalgan shar bilan uriladi':'Faqat sariq shar bilan uriladi',VW/2,y+58,12.5,'#a99f8e','center',500);y+=82;button(x,y,w,52,'Ikki kishi',()=>newGame('two'));button(x,y+=64,w,52,'Mashq (yolg\'iz)',()=>newGame('solo'),'#3a2f22','#f5efe0');button(x,y+=64,w,46,'Ovoz: '+(SND?'yoqilgan':'o\'chirilgan'),()=>{SND=!SND;store.set('snd',SND)},'#2a2218','#c9bfae',15);button(x,y+=58,w,46,'Hamrohga qaytish',exitGame,'#2a2218','#c9bfae',15);return}
  drawTable();
  for(const b of balls)if(b.on)drawBall(b,X(b.x),Y(b.y),R*S);
- if(sel&&sel.on&&!sim&&ST==='play'){g.strokeStyle='rgba(255,217,138,.9)';g.lineWidth=2;g.beginPath();g.arc(X(sel.x),Y(sel.y),R*S+3.5+Math.sin(T*5),0,TAU);g.stroke()}
+ if(pick&&ST==='play')for(const b of balls)if(b.on&&!b.cue){g.strokeStyle='rgba(255,217,138,'+(.5+.4*Math.sin(T*5))+')';g.lineWidth=2;g.beginPath();g.arc(X(b.x),Y(b.y),R*S+3,0,TAU);g.stroke()}
+ if(sel&&sel.on&&!sim&&ST==='play'&&!pick){g.strokeStyle='rgba(255,217,138,.9)';g.lineWidth=2;g.beginPath();g.arc(X(sel.x),Y(sel.y),R*S+3.5+Math.sin(T*5),0,TAU);g.stroke()}
  drawAim();drawHUD();
  if(spinOpen){g.fillStyle='rgba(0,0,0,.6)';g.fillRect(0,0,VW,VH);const r=Math.min(110,VW*.3),cx=VW/2,cy=VH/2;L.sr=r;const gr=g.createRadialGradient(cx-r*.3,cy-r*.35,r*.1,cx,cy,r);gr.addColorStop(0,'#fff');gr.addColorStop(1,'#a9a18c');g.fillStyle=gr;g.beginPath();g.arc(cx,cy,r,0,TAU);g.fill();g.strokeStyle='rgba(0,0,0,.15)';g.lineWidth=1;g.beginPath();g.moveTo(cx-r,cy);g.lineTo(cx+r,cy);g.moveTo(cx,cy-r);g.lineTo(cx,cy+r);g.stroke();g.beginPath();g.arc(cx,cy,r*.72,0,TAU);g.stroke();g.fillStyle='#d23a2a';g.beginPath();g.arc(cx+spin[0]*r*.72,cy-spin[1]*r*.72,r*.11,0,TAU);g.fill();txt('Sharning qayeriga urasiz?',cx,cy-r-34,16,'#f5efe0');txt('tepasi — oldinga dumalaydi · pasti — orqaga qaytadi',cx,cy+r+26,11.5,'#c9bfae','center',500);txt('yon tomoni — bortdan burilib qaytadi',cx,cy+r+44,11.5,'#c9bfae','center',500);btns=[];button(cx-110,cy+r+66,105,44,'O\'rtaga',()=>{spin=[0,0]},'#3a2f22','#f5efe0',15);button(cx+5,cy+r+66,105,44,'Tayyor',()=>{spinOpen=false},'#d9a441','#1a1208',15)}
  if(ST==='pause')overlay('Pauza','',[['Davom etish',()=>{ST='play'}],['Qaytadan',()=>newGame(MODE)],['Menyu',()=>{ST='menu'}]]);
@@ -146,11 +159,12 @@ function down(x,y){audio();
  if(spinOpen){const b=btns.find(b=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);if(b)return b.cb();drag={k:'spin'};return move(x,y)}
  const b=btns.find(b=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);if(b){click(.15,1800,.02);return b.cb()}
  if(ST!=='play'||sim)return;
+ if(pick){const[qx,qy]=toT(x,y);let best=null,bd=R*2.6;for(const o of balls)if(o.on&&!o.cue){const d=hyp(o.x-qx,o.y-qy);if(d<bd){bd=d;best=o}}if(best)takeBall(best);return}
  if(x>=L.px-14&&x<=L.px+L.pw+18&&y>=L.py-24&&y<=L.py+L.ph+24){drag={k:'pow'};return move(x,y)}
  if(y>=L.wy&&y<=L.wy+L.wh&&x>=L.wx&&x<=L.wx+L.ww){drag={k:'fine',x};return}
  const[tx,ty]=toT(x,y);if(tx<-.15||tx>W+.15||ty<-.15||ty>H+.15)return;
  if(place&&sel&&hyp(tx-sel.x,ty-sel.y)<R*2.6){drag={k:'place'};return}
- if(!brk){let best=null,bd=R*2.2;for(const o of balls)if(o.on){const d=hyp(o.x-tx,o.y-ty);if(d<bd){bd=d;best=o}}if(best&&best!==sel){sel=best;click(.12,1800,.02);haptic('light');return}}
+ if(!brk&&VAR==='am'){let best=null,bd=R*2.2;for(const o of balls)if(o.on){const d=hyp(o.x-tx,o.y-ty);if(d<bd){bd=d;best=o}}if(best&&best!==sel){sel=best;click(.12,1800,.02);haptic('light');return}}
  drag={k:'aim'};move(x,y)}
 function move(x,y){if(!drag)return;const[tx,ty]=toT(x,y);
  if(drag.k==='pow')pow=cl((y-L.py)/L.ph);
@@ -165,6 +179,6 @@ cv.addEventListener('pointermove',e=>{move(e.clientX,e.clientY)});cv.addEventLis
 let last=performance.now(),acc=0;
 function tick(dt){T+=dt;if(msgT>0)msgT-=dt;if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tick(dt);render();requestAnimationFrame(frame)}
-window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ST,turn,score,debt,sim,brk,place,msg,winner}},set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
+window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
 requestAnimationFrame(frame);
 </script></body></html>
