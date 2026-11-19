@@ -271,7 +271,7 @@ function icon(t,x,y,s){g.save();g.translate(x,y);g.scale(s,s);drawPlant(t,0,0,t=
 
 // ================= RASMLI QAHRAMONLAR =================
 // O'simliklar tayyor rasmlardan chiziladi; rasm yuklanmagan bo'lsa eski chizma ishlaydi.
-const IMG={},IMGV=8;for(const n of ['pea0','pea1','twin0','twin1','ice0','ice1','sun0','sun1','nut0','nut1','nut2','xnut','bomb0','bomb1','mine0','mine1','snap0','snap1','shot','shoti','zb0','zb1','zbe','zf0','zf1','zs0','zs1','zsj','zr0','zr1','zre','sunc','pot0','pot1','pot2','bas0','bas1','shovel','cart0','cart1','boom','bg','ui_card','ui_bar','ui_b1','ui_b2','ui_panel','ui_pause','ui_plate']){const im=new Image();im.onload=()=>{IMG[n]=im};im.src='img/'+n+'.webp?v='+IMGV}
+const IMG={},IMGV=9;for(const n of ['pea0','pea1','twin0','twin1','ice0','ice1','sun0','sun1','nut0','nut1','nut2','xnut','bomb0','bomb1','mine0','mine1','snap0','snap1','shot','shoti','zb0','zb1','zbe','zf0','zf1','zs0','zs1','zsj','zr0','zr1','zre','zfe','zfall','zash','sunc','pot0','pot1','pot2','bas0','bas1','shovel','cart0','cart1','boom','bg','ui_card','ui_bar','ui_b1','ui_b2','ui_panel','ui_pause','ui_plate']){const im=new Image();im.onload=()=>{IMG[n]=im};im.src='img/'+n+'.webp?v='+IMGV}
 // rasmni pastki o'rtasi (x,y) nuqtaga, balandligi h qilib chizadi
 function spr(n,x,y,h,o){const im=IMG[n];if(!im)return false;const w=h*im.width/im.height;g.save();g.translate(x,y);if(o){if(o.rot)g.rotate(o.rot);if(o.sx||o.sy)g.scale(o.sx||1,o.sy||1)}g.drawImage(im,-w/2,-h,w,h);g.restore();return true}
 const drawPlant0=drawPlant,drawNut0=drawNut;
@@ -293,12 +293,13 @@ const drawZombie0=drawZombie;
 drawZombie=function(z){if(z.gone)return;const base=z.type==='flag'?'zf':z.pole||z.jump>0?'zs':z.type==='pole'?'zr':'zb';let n,h=90,rot=0;
  if(z.jump>0){n='zsj';h=104}else if(z.eat){n=IMG[base+'e']?base+'e':base+'0';rot=Math.sin(z.ph*16)*.05;if(base==='zs')h=112}
  else{n=base+(Math.floor(z.ph*(z.pole?5:2.4))%2);if(base==='zs')h=112}
+ const burnt=z.ash&&IMG.zash,down=z.dead&&!z.ash&&IMG.zfall;if(burnt){n='zash';h=92;rot=0}else if(down){n='zfall';h=74;rot=0}
  if(!IMG[n])return drawZombie0(z);
  const y=rowY(z.row);let jy=0;if(z.jump>0)jy=-Math.sin(z.jump*Math.PI)*70;const d=z.dead;let alpha=1,fall=0;if(d){fall=cl(d/.5);alpha=1-cl((d-.7)/.5)}
  const bobY=z.eat||z.jump>0?0:Math.abs(Math.sin(z.ph*(z.pole?5:2.4)*Math.PI))*2.5;
- g.save();g.globalAlpha=alpha;shadow(z.x,y,22);g.translate(z.x,y+jy+4);if(fall){g.translate(fall*14,0);g.rotate(fall*1.45)}g.rotate(rot);g.scale(-1,1); // ko'zgu
- const k=z.ash?'ash':z.flash>0?'flash':z.slow>0?'slow':'',im=k?tinted(n,k):IMG[n],w=h*im.width/im.height;g.drawImage(im,-w/2,-h-bobY,w,h);
- if(z.arm>0){const dm=1-z.arm/z.armMax,hn=z.type==='helm'?(dm>.66?'pot2':dm>.33?'pot1':'pot0'):(dm>.5?'bas1':'bas0'),hi=IMG[hn];if(hi){const hw=z.type==='helm'?40:46,hh=hw*hi.height/hi.width;g.save();g.translate(z.eat?14:5,-h-bobY+(z.type==='helm'?27:24)+(z.eat?3:0));g.rotate(-.1);g.drawImage(z.ash?tinted(hn,'ash'):hi,-hw/2,-hh,hw,hh);g.restore()}else{g.translate(-7,-h-bobY+16);g.rotate(-.08);drawHat(z.type,dm)}}
+ g.save();g.globalAlpha=alpha;shadow(z.x,y,22);g.translate(z.x,y+jy+4);if(fall){if(down)g.translate(fall*10,(1-fall)*-10);else if(burnt)g.translate(0,0);else{g.translate(fall*14,0);g.rotate(fall*1.45)}}g.rotate(rot);g.scale(-1,1); // ko'zgu
+ const k=burnt?'':z.ash?'ash':z.flash>0&&!z.dead?'flash':z.slow>0?'slow':'',im=k?tinted(n,k):IMG[n],w=h*im.width/im.height;g.drawImage(im,-w/2,-h-bobY,w,h);
+ if(z.arm>0&&!z.dead){const dm=1-z.arm/z.armMax,hn=z.type==='helm'?(dm>.66?'pot2':dm>.33?'pot1':'pot0'):(dm>.5?'bas1':'bas0'),hi=IMG[hn];if(hi){const hw=z.type==='helm'?40:46,hh=hw*hi.height/hi.width;g.save();g.translate(z.eat?14:5,-h-bobY+(z.type==='helm'?27:24)+(z.eat?3:0));g.rotate(-.1);g.drawImage(z.ash?tinted(hn,'ash'):hi,-hw/2,-hh,hw,hh);g.restore()}else{g.translate(-7,-h-bobY+16);g.rotate(-.08);drawHat(z.type,dm)}}
  g.restore()};
 
 // ---- buyumlar: eshak arava (qatorni tozalaydi), belkurak, uchib ketgan zirh, portlash ----
@@ -463,7 +464,8 @@ function selType(){if(sel==null)return null;return LV[LI].mode?(belt[sel]&&belt[
 function button(x,y,w,h,label,cb,col='#ffb21c',tc='#3b2a12',fs=24){g.fillStyle='rgba(0,0,0,.25)';rr(x,y+4,w,h,h/2.6);g.fill();g.fillStyle=col;rr(x,y,w,h,h/2.6);g.fill();g.fillStyle='rgba(255,255,255,.25)';rr(x+6,y+4,w-12,h*.4,h/4);g.fill();txt(label,x+w/2,y+h/2+1,fs,tc,'center',900,w-24);btns.push({x,y,w,h,cb})}
 function panel(x,y,w,h){g.fillStyle='rgba(0,0,0,.3)';rr(x,y+6,w,h,22);g.fill();g.fillStyle='#f3ead2';rr(x,y,w,h,22);g.fill();g.strokeStyle='#8a6a3a';g.lineWidth=5;g.stroke()}
 function drawMenu(){btns=[];const gr=g.createLinearGradient(0,0,0,LH);gr.addColorStop(0,'#8fd0ee');gr.addColorStop(.55,'#cdeefa');gr.addColorStop(.56,'#6cc755');gr.addColorStop(1,'#3f8f36');g.fillStyle=gr;g.fillRect(0,0,LW,LH);
- drawSunCoin(840,90,46,T*.5);for(let i=0;i<9;i++){g.fillStyle=i%2?'#5cb84a':'#6cc755';g.fillRect(i*107,300,107,240)}
+ if(IMG.bg){g.drawImage(IMG.bg,-150,-40,1160,648);const sh=g.createLinearGradient(0,0,0,LH);sh.addColorStop(0,'rgba(20,50,20,.5)');sh.addColorStop(.6,'rgba(20,50,20,.12)');sh.addColorStop(1,'rgba(20,50,20,0)');g.fillStyle=sh;g.fillRect(0,0,LW,LH)}else for(let i=0;i<9;i++){g.fillStyle=i%2?'#5cb84a':'#6cc755';g.fillRect(i*107,300,107,240)}
+ drawSunCoin(840,90,46,T*.5);
  // sahna
  [['sun',120],['pea',215],['nut',310]].forEach(([t,x],i)=>drawPlant(t,x,470,{...ICONP,ph:T+i,tm:9}));
  const zz=[{type:'pot',x:840},{type:'helm',x:760},{type:'basic',x:690}];zz.forEach((q,i)=>drawZombie({...q,row:0,x:q.x,arm:1,armMax:1,ph:T+i,eat:null,dead:0,jump:0,slow:0,flash:0,pole:false,_y:1,row:(470-GY-CH+14)/CH}));
@@ -474,7 +476,7 @@ function drawMenu(){btns=[];const gr=g.createLinearGradient(0,0,0,LH);gr.addColo
  button(bx,332,145,44,TX('Ovoz')+': '+TX(SND?'yoqilgan':"o'chirilgan"),()=>{SND=!SND;store.set('snd',SND);audio();SFX.tap()},'#e3f2d2','#2c5a1f',15);
  button(bx+155,332,145,44,TX('Hamrohga qaytish'),exitGame,'#e3f2d2','#2c5a1f',15);
 }
-function drawLevels(){btns=[];g.fillStyle='#4a9f3d';g.fillRect(0,0,LW,LH);for(let i=0;i<12;i++){g.fillStyle=i%2?'#5cb84a':'#6cc755';g.fillRect(i*80,0,80,LH)}
+function drawLevels(){btns=[];g.fillStyle='#4a9f3d';g.fillRect(0,0,LW,LH);if(IMG.bg){g.drawImage(IMG.bg,-211,-47,1234,689);g.fillStyle='rgba(20,45,20,.5)';g.fillRect(0,0,LW,LH)}else for(let i=0;i<12;i++){g.fillStyle=i%2?'#5cb84a':'#6cc755';g.fillRect(i*80,0,80,LH)}
  otxt(TX('Bosqichlar'),LW/2,54,44,'#fff','#2c5a1f',9);
  for(let i=0;i<10;i++){const x=120+(i%5)*150,y=120+Math.floor(i/5)*170,open=i<=prog;g.fillStyle='rgba(0,0,0,.25)';rr(x,y+5,120,140,16);g.fill();g.fillStyle=open?'#f3ead2':'#9bb08c';rr(x,y,120,140,16);g.fill();g.strokeStyle=open?'#8a6a3a':'#6f8463';g.lineWidth=4;g.stroke();
   txt('1-'+(i+1),x+60,y+28,26,open?'#3b2a12':'#5f7355');const rw=LV[i].reward;if(open){if(P[rw])icon(rw,x+60,y+118,.85);else if(rw==='shovel')drawShovel(x+60,y+88,1.2);else txt(rw==='note'?'✉':'🏆',x+60,y+88,40);if(i<prog){g.fillStyle='#3fae3a';ci(x+100,y+22,13);g.fill();txt('✓',x+100,y+23,17,'#fff')}btns.push({x,y,w:120,h:140,cb:()=>{audio();newLevel(i)}})}else txt('🔒',x+60,y+88,36)}
