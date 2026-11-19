@@ -1,6 +1,6 @@
 <!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Bilyard — Hamroh</title>
-<style>html,body{margin:0;height:100%;background:#14100c;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}canvas{display:block;position:fixed;inset:0}</style></head><body><canvas id="c"></canvas><script>
+<style>html,body{margin:0;height:100%;background:#14100c;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}canvas{display:block;position:fixed;inset:0}#code{position:fixed;z-index:2;height:46px;box-sizing:border-box;border:1.5px solid rgba(217,164,65,.6);border-radius:14px;background:#14100c;color:#f5efe0;font:700 18px system-ui,sans-serif;letter-spacing:2px;padding:0 14px;outline:none;text-transform:lowercase}</style></head><body><canvas id="c"></canvas><input id="code" hidden maxlength="60" placeholder="kod" autocomplete="off" autocapitalize="off" spellcheck="false"><script>
 'use strict';
 // ================= HAMROH · BILYARD (rus bilyardi) =================
 // O'lchamlar metrda. Stol tik turadi: x — eni, y — bo'yi. "Uy" pastda, piramida tepada.
@@ -47,7 +47,7 @@ const mk=(x,y,cue,num)=>{const d=rnd3(),t=rnd3(),k=d[0]*t[0]+d[1]*t[1]+d[2]*t[2]
 // shar ustidagi raqam haqiqiy aylanish bo'yicha buriladi
 function spinMark(b,dt){const wx=b.wx,wy=b.wy,wz=b.wz;for(const v of[b.d,b.u]){const x=v[0],y=v[1],z=v[2];v[0]+=(wy*z-wz*y)*dt;v[1]+=(wz*x-wx*z)*dt;v[2]+=(wx*y-wy*x)*dt}const d=b.d,u=b.u;let l=hyp(d[0],d[1],d[2]);d[0]/=l;d[1]/=l;d[2]/=l;const k=d[0]*u[0]+d[1]*u[1]+d[2]*u[2];u[0]-=d[0]*k;u[1]-=d[1]*k;u[2]-=d[2]*k;l=hyp(u[0],u[1],u[2])||1;u[0]/=l;u[1]/=l;u[2]/=l}
 let JIT=.0002; // haqiqiy piramida ideal zich turmaydi: sharlar orasida mayda tirqishlar bor
-function rack(){balls=[];const ax=W/2,ay=H/4,d=2*R+JIT;let k=0;for(let row=0;row<5;row++)for(let i=0;i<=row;i++)balls.push(mk(ax+(i-row/2)*d+(Math.random()-.5)*JIT,ay-row*d*.8661+(Math.random()-.5)*JIT,false,++k));balls.push(mk(W/2,H*3/4+.25,true))}
+function rack(rnd=Math.random){balls=[];const ax=W/2,ay=H/4,d=2*R+JIT;let k=0;for(let row=0;row<5;row++)for(let i=0;i<=row;i++)balls.push(mk(ax+(i-row/2)*d+(rnd()-.5)*JIT,ay-row*d*.8661+(rnd()-.5)*JIT,false,++k));balls.push(mk(W/2,H*3/4+.25,true))}
 // ---------- fizika ----------
 // Tez sharlar bir qadamda bir-birining ichiga kirib ketmasligi uchun qadam maydalanadi (bir bo'lakda ko'pi bilan 4 mm yo'l).
 function step(dt){let vm=0;for(const b of balls)if(b.on){const v=Math.abs(b.vx)+Math.abs(b.vy);if(v>vm)vm=v}const k=Math.min(14,Math.max(1,Math.ceil(vm*dt/.004)));let mv=false;for(let i=0;i<k;i++)mv=sub(dt/k);return mv}
@@ -83,12 +83,12 @@ function ray(b,dx,dy){let best=1e9,hit=null;for(const o of balls){if(!o.on||o===
 // ---------- o'yin: Amerikanka ('am') va Moskva piramidasi ('ms') ----------
 const NEED=8;let VAR=store.get('var','am'),pick=false,ST='menu',turn=0,score=[0,0],debt=[0,0],sel=null,ang=-Math.PI/2,pow=0,spin=[0,0],brk=true,place=false,msg='',msgT=0,winner=-1,MODE='two',spinOpen=false,T=0;
 let LVL=store.get('lvl',1);const LVN=['Oson',"O'rta",'Kuchli'];
-const NAMES=()=>MODE==='solo'?['Siz','—']:MODE==='ai'?['Siz','Kompyuter']:['1-o\'yinchi','2-o\'yinchi'];
+const NAMES=()=>MODE==='net'?[0,1].map(i=>i===NB.you?'Siz':(NB.names[i]||'Raqib')):MODE==='solo'?['Siz','—']:MODE==='ai'?['Siz','Kompyuter']:['1-o\'yinchi','2-o\'yinchi'];
 function say(s,t=2.4){msg=s;msgT=t}
-function newGame(mode){MODE=mode;rack();turn=0;score=[0,0];debt=[0,0];brk=true;place=true;pick=false;winner=-1;sel=balls.find(b=>b.cue);ang=-Math.PI/2;pow=0;spin=[0,0];sim=false;shot=null;ST='play';AI=null;say('Sharni "uy"da joylang va piramidani buzing',3.5)}
+function newGame(mode,o){MODE=mode;rack(o&&o.rnd);turn=o&&o.first||0;NB.pend=null;score=[0,0];debt=[0,0];brk=true;place=true;pick=false;winner=-1;sel=balls.find(b=>b.cue);ang=-Math.PI/2;pow=0;spin=[0,0];sim=false;shot=null;ST='play';AI=null;say(MODE==='net'&&turn!==NB.you?'Raqib piramidani buzadi':'Sharni "uy"da joylang va piramidani buzing',3.5)}
 function respot(b){b.on=true;b.pot=0;b.fall=0;b.vx=b.vy=b.wx=b.wy=b.wz=0;let x=W/2,y=R+.002,k=0;const free=()=>balls.every(o=>o===b||!o.on||hyp(o.x-x,o.y-y)>2*R+.001);while(!free()&&k<60){k++;x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.004);if(x<R+.01||x>W-R-.01){y+=2*R+.004;x=W/2}}b.x=x;b.y=y}
 function strike(b,a,p,sp){const V=.4+Math.pow(p,1.35)*10.6,dx=Math.cos(a),dy=Math.sin(a),k=2.5*V/R*.5;b.vx=dx*V;b.vy=dy*V;b.wx=-dy*k*sp[1];b.wy=dx*k*sp[1];b.wz=-k*sp[0]}
-function fire(){if(pick){pow=0;return}if(sim||!sel||pow<.03){pow=0;return}strike(sel,ang,pow,spin);
+function fire(){if(pick){pow=0;return}if(sim||!sel||pow<.03){pow=0;return}if(MODE==='net'&&!NB.pend)NB.sh={i:balls.indexOf(sel),a:ang,p:pow,s:spin.slice(),x:sel.x,y:sel.y};strike(sel,ang,pow,spin);
  cueFx={x:sel.x,y:sel.y,a:ang,p:pow,t:0};shot={ball:sel,first:null,hits:0,rail:0,railAfter:0,pots:[],brk,home:place&&!brk};sim=true;place=false;click(.4+pow*.6,1500,.05);haptic(pow>.6?'heavy':'light');pow=0}
 function cueHome(){const c=balls.find(b=>b.cue);c.on=true;c.pot=0;c.fall=0;c.vx=c.vy=c.wx=c.wy=c.wz=0;c.x=W/2;c.y=H*3/4+.25;let k=0;while(balls.some(o=>o!==c&&o.on&&hyp(o.x-c.x,o.y-c.y)<2*R+.002)&&k++<40)c.x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.01);place=true;sel=c}
 function win(me){winner=me;ST='over';haptic('ok')}
@@ -101,8 +101,9 @@ function endMs(){const s=shot,me=turn,op=1-turn,cue=balls.find(b=>b.cue),cuePot=
   if(cuePot){cueHome();if(score[me]>=NEED)return win(me);if(balls.some(b=>b.on&&!b.cue)){pick=true;say('Sariq shar tushdi! Stoldan istalgan sharni tanlab oling',4)}}else say(obj.length>1?obj.length+' ta shar tushdi!':'Shar tushdi — yana uring',1.8);haptic('ok')}
  else{turn=MODE==='solo'?0:op;if(MODE!=='solo')say(NAMES()[turn]+' navbati',1.6)}
  if(score[me]>=NEED)return win(me);if(!balls.some(b=>b.on&&!b.cue)&&!pick)return win(score[0]>=score[1]?0:1);sel=cue}
-function takeBall(b){const me=turn;pick=false;b.on=false;if(debt[me]>0){debt[me]--;respot(b)}else{b.pot=2+me;score[me]++}thud();haptic('ok');if(score[me]>=NEED)return win(me);say('Sariq sharni uyda joylab, yana uring',2.6)}
-function endShot(){if(VAR==='ms')return endMs();const s=shot,me=turn,op=1-turn;shot=null;sim=false;let foul='';
+function takeBall(b){const me=turn;pick=false;b.on=false;if(debt[me]>0){debt[me]--;respot(b)}else{b.pot=2+me;score[me]++}thud();haptic('ok');if(MODE==='net'&&me===NB.you)setTimeout(()=>netPush({k:'k',sn:snap()}),0);if(score[me]>=NEED)return win(me);say('Sariq sharni uyda joylab, yana uring',2.6)}
+function endShot(){endShot0();if(MODE==='net')netAfter()}
+function endShot0(){if(VAR==='ms')return endMs();const s=shot,me=turn,op=1-turn;shot=null;sim=false;let foul='';
  if(!s.first)foul="Shar hech narsaga tegmadi";else if(!s.pots.length&&!s.railAfter&&!s.brk)foul="Urilgandan keyin hech bir shar bortga tegmadi";
  if(foul){for(const b of s.pots)respot(b);if(score[me]>0){score[me]--;const b=balls.find(q=>!q.on&&q.pot===2+me);if(b){respot(b)}}else debt[me]++;say('Jarima: '+foul+'. −1 shar',3.2);haptic('err');turn=MODE==='solo'?0:op}
  else if(s.pots.length){for(const b of s.pots){if(debt[me]>0){debt[me]--;respot(b)}else{b.pot=2+me;score[me]++}}say(s.pots.length>1?s.pots.length+' ta shar tushdi!':'Shar tushdi — yana uring',1.8);haptic('ok')}
@@ -111,6 +112,54 @@ function endShot(){if(VAR==='ms')return endMs();const s=shot,me=turn,op=1-turn;s
  if(score[me]>=NEED){winner=me;ST='over';return}
  const left=balls.filter(b=>b.on);if(left.length<2){winner=score[0]>=score[1]?0:1;ST='over';return}
  if(!sel||!sel.on)sel=null;if(!sel){sel=left.find(b=>b.cue)||left[0]}}
+// ================= DO'ST BILAN ONLAYN =================
+// Server faqat oxirgi holatni saqlaydi (/bl/new, /bl/join, /bl/push, /bl/poll). Zarba egasi zarba va undan keyingi holatni yuboradi;
+// raqib shu zarbani o'zida jonlantiradi, oxirida egasi yuborgan holatga tenglashadi — ikki telefonda sharlar bir xil turadi.
+const NB={room:'',you:-1,seq:0,names:[],first:0,pend:null,sh:null,busy:0,q:[],t:0,err:'',msg:'',code:''};
+const ROOM0=((location.hash||'').match(/r=([a-z0-9]{4,8})/)||[])[1]||'';
+const myTurn=()=>MODE!=='net'||turn===NB.you;
+const blApi=(p,o)=>{try{return parent!==window&&parent.rnApi?parent.rnApi(p,o):Promise.resolve(null)}catch(e){return Promise.resolve(null)}};
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function snap(){return{b:balls.map(b=>[Math.round(b.x*1e4),Math.round(b.y*1e4),b.on?0:(b.pot||1)]),t:turn,s:score.slice(),d:debt.slice(),f:[+brk,+place,+pick],w:winner}}
+function applySnap(sn){sn.b.forEach((q,i)=>{const b=balls[i];if(!b)return;b.x=q[0]/1e4;b.y=q[1]/1e4;b.on=!q[2];b.pot=q[2];b.vx=b.vy=b.wx=b.wy=b.wz=0;if(b.on)b.fall=0});turn=sn.t;score=sn.s.slice();debt=sn.d.slice();brk=!!sn.f[0];place=!!sn.f[1];pick=!!sn.f[2];winner=sn.w;sim=false;shot=null;pow=0;
+ const cue=balls.find(b=>b.cue);if(VAR==='ms'||brk||!sel||!sel.on)sel=cue&&cue.on?cue:balls.find(b=>b.on)||null;if(winner>=0){ST='over';store.set('net',null)}else if(ST==='over')ST='play'}
+function netNew(seed,first,v,pk){if(v){VAR=v;PK=pk;buildTable()}NB.first=first;NB.q=[];newGame('net',{rnd:rng(seed),first})}
+// zarba tugagach: o'zimniki bo'lsa — yuboraman; raqibniki bo'lsa — u yuborgan holatga tenglashaman
+function netAfter(){if(NB.pend){const d=NB.pend;NB.pend=null;const was=turn;applySnap(d.sn);if(ST==='play')say(turn===NB.you?'Navbat sizda':'Raqib yana uradi',1.8)}else{const sn=snap();applySnap(sn);netPush({k:'s',sh:NB.sh,sn})}}
+function netPush(d){d.by=NB.you;NB.q.push(d);netSend()}
+function netSend(){if(NB.busy||!NB.q.length||!NB.room)return;NB.busy=1;const d=NB.q[0],room=NB.room;blApi('/bl/push',{room,seq:NB.seq,data:JSON.stringify(d)}).then(j=>{NB.busy=0;if(room!==NB.room)return;
+  if(!j){NB.err='Aloqa yo\'q, qayta urinilmoqda…';setTimeout(netSend,1500);return}NB.err='';if(j.ok){NB.seq=j.seq;NB.q.shift();netSend()}else if(j.error==='seq'){NB.q=[];netSync()}else{NB.q.shift();NB.err='Xona topilmadi';}})}
+function netSync(){const room=NB.room;blApi('/bl/poll',{room,since:0}).then(j=>{if(room!==NB.room||!j||!j.ok)return;NB.names=j.names||NB.names;if(j.data)netRecv(JSON.parse(j.data),j.seq,true);NB.seq=j.seq})}
+function netRecv(d,seq,hard){if(d.k==='n'){netNew(d.seed,d.first);return}
+ if(d.k==='r'){if(ST!=='over'){winner=1-d.by;ST='over';say(d.by===NB.you?'Siz taslim bo\'ldingiz':'Raqib taslim bo\'ldi',3)}store.set('net',null);return}
+ if(!d.sn)return;if(d.by===NB.you&&!hard)return;
+ if(d.k==='s'&&d.by!==NB.you&&!hard&&seq===NB.seq+1&&!sim&&ST==='play'&&d.sh&&balls[d.sh.i]&&balls[d.sh.i].on){const b=balls[d.sh.i];b.x=d.sh.x;b.y=d.sh.y;sel=b;ang=d.sh.a;pow=d.sh.p;spin=d.sh.s;pick=false;NB.pend=d;fire();if(!sim){NB.pend=null;applySnap(d.sn)}}
+ else{NB.pend=null;applySnap(d.sn);if(d.k==='k'&&d.by!==NB.you)say('Raqib stoldan shar oldi',1.8)}}
+function netTick(dt){if(!NB.room||(MODE!=='net'&&ST!=='net'))return;NB.t-=dt;if(NB.t>0||NB.busy||NB.q.length||sim)return;NB.t=document.hidden?5:(ST==='net'||!myTurn()||ST==='over')?1.5:4;const room=NB.room,lob=ST==='net';
+ blApi('/bl/poll',{room,since:NB.seq}).then(j=>{if(room!==NB.room)return;if(!j){NB.err='Aloqa yo\'q…';return}NB.err='';if(!j.ok){if(j.error==='room'){NB.msg='Xona topilmadi yoki eskirgan';store.set('net',null);NB.room='';if(MODE==='net')ST='menu'}return}
+  NB.names=j.names||NB.names;if(lob&&ST==='net'&&NB.you===0&&NB.names[1]){NB.seq=j.seq;netNew(NB.seed,0);say((NB.names[1]||'Raqib')+' qo\'shildi! Piramidani buzing',3);haptic('ok');return}
+  if(j.seq>NB.seq&&j.data&&!NB.busy&&!NB.q.length&&!sim){let d=null;try{d=JSON.parse(j.data)}catch(e){}if(d)netRecv(d,j.seq);NB.seq=j.seq}})}
+const netInput=()=>document.getElementById('code');
+function netOpen(){ST='net';NB.msg='';NB.room='';NB.you=-1;const e=netInput();e.value='';e.hidden=false}
+function netCreate(){NB.msg='Xona ochilmoqda…';const seed=(Math.random()*2**31)|0;blApi('/bl/new',{game:'pyr',init:JSON.stringify({v:VAR,pk:PK,seed})}).then(j=>{if(!j||!j.ok){NB.msg=j?'Xona ochilmadi, qayta urinib ko\'ring':'Ulanib bo\'lmadi. Internetni tekshiring (onlayn o\'yin Telegram ichida ishlaydi)';return}
+  NB.room=j.room;NB.you=0;NB.seq=0;NB.seed=seed;NB.names=['Siz',null];NB.msg='';NB.t=0;store.set('net',j.room);netInput().hidden=true})}
+function netJoin(code){code=String(code||'').toLowerCase().replace(/^.*bl-/,'').replace(/[^a-z0-9]/g,'').slice(0,8);if(code.length<4){NB.msg='Kodni to\'liq kiriting';return}ST='net';NB.msg='Ulanmoqda…';netInput().hidden=true;
+ blApi('/bl/join',{room:code}).then(j=>{if(!j||!j.ok){NB.msg=!j?'Ulanib bo\'lmadi. Internetni tekshiring':j.error==='full'?'Bu xonada ikki o\'yinchi bor':'Xona topilmadi yoki eskirgan';if(j)store.set('net',null);NB.room='';netInput().hidden=false;return}
+  let init={};try{init=JSON.parse(j.init||'{}')}catch(e){}NB.room=code;NB.you=j.you;NB.names=j.names||[];NB.seed=init.seed|0;NB.msg='';NB.t=0;store.set('net',code);
+  if(j.you===0&&!NB.names[1]){NB.seq=j.seq||0;if(init.v){VAR=init.v;PK=init.pk;buildTable()}return} // o'z xonamga qaytdim, do'st hali kirmagan
+  netNew(NB.seed,0,init.v||'am',init.pk==null?1:init.pk);if(j.seq&&j.data){let d=null;try{d=JSON.parse(j.data)}catch(e){}if(d)netRecv(d,j.seq,true)}NB.seq=j.seq||0;if(ST==='play')say(turn===NB.you?'Navbat sizda':(NAMES()[1-NB.you])+' bilan o\'yin',2.5)})}
+function netAgain(){const seed=(Math.random()*2**31)|0,first=1-NB.first;store.set('net',NB.room);netNew(seed,first);netPush({k:'n',seed,first})}
+function netResign(){netPush({k:'r'});winner=1-NB.you;ST='over';store.set('net',null)}
+const netLink=()=>'https://t.me/Hamronilovabot/app?startapp=bl-'+NB.room;
+function netShare(){const tx="\nHamrohda men bilan bilyard o'ynang!\nXona kodi:\n"+NB.room;try{parent.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(netLink())+'&text='+encodeURIComponent(tx))}catch(e){netCopy(netLink());NB.msg='Havola nusxalandi'}}
+function netCopy(t){try{navigator.clipboard.writeText(t).then(()=>{},()=>{})}catch(e){}}
+function netLeave(){netInput().hidden=true;if(NB.room&&NB.you===0&&!NB.names[1])store.set('net',null);NB.room='';ST='menu'}
+function drawNet(){const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#1c140c');gr.addColorStop(1,'#0c3a24');g.fillStyle=gr;g.fillRect(0,0,VW,VH);btns=[];const w=Math.min(300,VW-48),x=VW/2-w/2;let y=VH*.14;
+ txt("Do'st bilan onlayn",VW/2,y,26,'#f5efe0','center',800);txt((VAR==='am'?'Amerikanka':'Moskva')+' · luza '+(PK?'haqiqiy':'keng'),VW/2,y+30,13,'#c9bfae','center',500);y+=70;const e=netInput();
+ if(NB.room&&NB.you===0){txt("Do'stingiz kutilmoqda"+'.'.repeat(1+Math.floor(T*2)%3),VW/2,y,15,'#d9a441','center',600);y+=40;g.fillStyle='rgba(255,255,255,.08)';rr(x,y,w,64,14);g.fill();txt(NB.room,VW/2,y+33,28,'#f5efe0','center',800);btns.push({x,y,w,h:64,cb:()=>{netCopy(NB.room);NB.msg='Kod nusxalandi'}});y+=80;
+  button(x,y,w,50,'Havolani do\'stga yuborish',netShare);button(x,y+=60,w,44,'Koddan nusxa olish',()=>{netCopy(NB.room);NB.msg='Kod nusxalandi'},'#3a2f22','#f5efe0',15);button(x,y+=54,w,44,'Bekor qilish',netLeave,'#2a2218','#c9bfae',15);y+=60}
+ else{button(x,y,w,52,'Xona ochish',netCreate);y+=78;txt("yoki do'stingiz bergan kodni kiriting",VW/2,y,12.5,'#a99f8e','center',500);y+=18;e.style.left=x+'px';e.style.top=y+'px';e.style.width=(w-96)+'px';button(x+w-88,y,88,46,'Kirish',()=>netJoin(e.value),'#1f6f8f','#f5efe0',15);y+=64;button(x,y,w,44,'Orqaga',netLeave,'#2a2218','#c9bfae',15);y+=60}
+ if(NB.msg)txt(NB.msg,VW/2,y+6,13,'#ffd98a','center',600)}
 // ================= KOMPYUTER RAQIB =================
 // Nomzod zarbalar geometriya bo'yicha topiladi, keyin har biri haqiqiy fizikada sinab ko'riladi; eng yaxshisi biroz xato bilan uriladi.
 let AI=null;const aiTurn=()=>MODE==='ai'&&turn===1&&ST==='play';
@@ -185,7 +234,7 @@ let btns=[];
 function button(x,y,w,h,label,cb,col='#d9a441',tc='#1a1208',sz=17){g.fillStyle='rgba(0,0,0,.35)';rr(x,y+3,w,h,h/2.6);g.fill();g.fillStyle=col;rr(x,y,w,h,h/2.6);g.fill();txt(label,x+w/2,y+h/2+1,sz,tc);btns.push({x,y,w,h,cb})}
 function drawHUD(){const nm=NAMES();
  // o'yinchilar va tokchalar
- if(aiTurn()&&AI&&AI.ph==='think')txt("o'ylayapti…",VW*.75,74+2,11,'#d9a441','center',600);
+ if(aiTurn()&&AI&&AI.ph==='think')txt("o'ylayapti…",VW*.75,74+2,11,'#d9a441','center',600);if(MODE==='net'&&ST==='play'){txt(myTurn()?'Navbat sizda':'Raqib navbati…',VW/2,74+2,11,myTurn()?'#7ad13a':'#d9a441','center',600);if(NB.err)txt(NB.err,VW/2,VH-L.bot+6,10.5,'#ff8a7a','center',600)}
  for(let p=0;p<(MODE==='solo'?1:2);p++){const w=VW/2-18,x=p?VW/2+6:12,y=10,act=turn===p&&ST==='play';g.fillStyle=act?'rgba(217,164,65,.22)':'rgba(255,255,255,.06)';rr(x,y,w,54,12);g.fill();if(act){g.strokeStyle='#d9a441';g.lineWidth=1.5;g.stroke()}
   txt(nm[p],x+12,y+16,14,act?'#ffd98a':'#c9bfae','left');txt(score[p]+' / '+NEED,x+w-12,y+16,14,'#fff','right',800);for(let i=0;i<NEED;i++){const bx=x+16+i*((w-32)/(NEED-1)),by=y+38;g.fillStyle=i<score[p]?'#f2ecdc':'rgba(255,255,255,.12)';g.beginPath();g.arc(bx,by,6.5,0,TAU);g.fill()}if(debt[p])txt('qarz: '+debt[p],x+w/2,y+16,11,'#ff8a7a')}
  if(MODE==='solo')txt('Mashq',VW*.75,37,16,'#c9bfae');
@@ -206,7 +255,7 @@ function exitGame(){try{parent.postMessage('game-exit','*')}catch(e){}}
 function render(){g.setTransform(DPR,0,0,DPR,0,0);g.fillStyle='#14100c';g.fillRect(0,0,VW,VH);
  if(ST==='menu'){const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#1c140c');gr.addColorStop(1,'#0c3a24');g.fillStyle=gr;g.fillRect(0,0,VW,VH);txt('HAMROH',VW/2,VH*.16,13,'#d9a441','center',700);txt('Bilyard',VW/2,VH*.16+38,44,'#f5efe0','center',800);txt('Rus bilyardi',VW/2,VH*.16+76,14,'#c9bfae','center',500);
   DEMO.forEach((b,i)=>{b.wx=.5+i*.2;b.wy=.9-i*.15;b.wz=.3;spinMark(b,1/60);drawBall(b,VW/2+b.x*22,VH*.16+118+b.y*22,20)});
-  btns=[];const w=Math.min(300,VW-48),x=VW/2-w/2;let y=VH*.44;[['am','Amerikanka'],['ms','Moskva']].forEach(([k,n],i)=>button(x+i*(w/2+4),y,w/2-4,42,n,()=>{VAR=k;store.set('var',k)},VAR===k?'#f5efe0':'#2a2218',VAR===k?'#1a1208':'#c9bfae',15));txt(VAR==='am'?'Istalgan shar bilan uriladi':'Faqat sariq shar bilan uriladi',VW/2,y+58,12.5,'#a99f8e','center',500);y+=78;button(x,y,w,50,'Kompyuterga qarshi',()=>newGame('ai'));y+=58;LVN.forEach((n,i)=>button(x+i*(w/3+2),y,w/3-4,36,n,()=>{LVL=i;store.set('lvl',i)},LVL===i?'#f5efe0':'#2a2218',LVL===i?'#1a1208':'#c9bfae',13.5));y+=46;button(x,y,w,48,'Ikki kishi',()=>newGame('two'),'#3a2f22','#f5efe0');button(x,y+=56,w,48,'Mashq (yolg\'iz)',()=>newGame('solo'),'#3a2f22','#f5efe0');button(x,y+=56,w/2-4,42,'Luza: '+(PK?'haqiqiy':'keng'),()=>{PK=PK?0:1;store.set('pk',PK);buildTable()},'#2a2218','#c9bfae',14);button(x+w/2+4,y,w/2-4,42,'Ovoz: '+(SND?'bor':'yo\'q'),()=>{SND=!SND;store.set('snd',SND)},'#2a2218','#c9bfae',14);button(x,y+=50,w,42,'Hamrohga qaytish',exitGame,'#2a2218','#c9bfae',15);return}
+  btns=[];const w=Math.min(300,VW-48),x=VW/2-w/2;let y=VH*.42;[['am','Amerikanka'],['ms','Moskva']].forEach(([k,n],i)=>button(x+i*(w/2+4),y,w/2-4,42,n,()=>{VAR=k;store.set('var',k)},VAR===k?'#f5efe0':'#2a2218',VAR===k?'#1a1208':'#c9bfae',15));txt(VAR==='am'?'Istalgan shar bilan uriladi':'Faqat sariq shar bilan uriladi',VW/2,y+58,12.5,'#a99f8e','center',500);y+=78;button(x,y,w,50,'Kompyuterga qarshi',()=>newGame('ai'));y+=58;LVN.forEach((n,i)=>button(x+i*(w/3+2),y,w/3-4,36,n,()=>{LVL=i;store.set('lvl',i)},LVL===i?'#f5efe0':'#2a2218',LVL===i?'#1a1208':'#c9bfae',13.5));y+=44;button(x,y,w,46,store.get('net',null)?'Onlayn o\'yinga qaytish':'Do\'st bilan onlayn',()=>{const r=store.get('net',null);if(r)netJoin(r);else netOpen()},'#1f6f8f','#f5efe0');button(x,y+=52,w/2-4,44,'Ikki kishi',()=>newGame('two'),'#3a2f22','#f5efe0',15);button(x+w/2+4,y,w/2-4,44,'Mashq',()=>newGame('solo'),'#3a2f22','#f5efe0',15);y-=4;button(x,y+=54,w/2-4,42,'Luza: '+(PK?'haqiqiy':'keng'),()=>{PK=PK?0:1;store.set('pk',PK);buildTable()},'#2a2218','#c9bfae',14);button(x+w/2+4,y,w/2-4,42,'Ovoz: '+(SND?'bor':'yo\'q'),()=>{SND=!SND;store.set('snd',SND)},'#2a2218','#c9bfae',14);button(x,y+=50,w,42,'Hamrohga qaytish',exitGame,'#2a2218','#c9bfae',15);return}
  drawTable();
  for(const b of balls)if(b.fall>0&&b.hole){const u=cl(b.fall),e=u*u;drawBall(b,X(b.x+(b.hole.x-b.x)*cl(u*1.6)),Y(b.y+(b.hole.y-b.y)*cl(u*1.6)),R*S*(1-e*.3),cl(u*1.3,0,.92))}
  for(const b of balls)if(b.on)drawBall(b,X(b.x),Y(b.y),R*S);
@@ -214,14 +263,15 @@ function render(){g.setTransform(DPR,0,0,DPR,0,0);g.fillStyle='#14100c';g.fillRe
  if(sel&&sel.on&&!sim&&ST==='play'&&!pick){g.strokeStyle='rgba(255,217,138,.9)';g.lineWidth=2;g.beginPath();g.arc(X(sel.x),Y(sel.y),R*S+3.5+Math.sin(T*5),0,TAU);g.stroke()}
  drawAim();drawHUD();
  if(spinOpen){g.fillStyle='rgba(0,0,0,.6)';g.fillRect(0,0,VW,VH);const r=Math.min(110,VW*.3),cx=VW/2,cy=VH/2;L.sr=r;const gr=g.createRadialGradient(cx-r*.3,cy-r*.35,r*.1,cx,cy,r);gr.addColorStop(0,'#fff');gr.addColorStop(1,'#a9a18c');g.fillStyle=gr;g.beginPath();g.arc(cx,cy,r,0,TAU);g.fill();g.strokeStyle='rgba(0,0,0,.15)';g.lineWidth=1;g.beginPath();g.moveTo(cx-r,cy);g.lineTo(cx+r,cy);g.moveTo(cx,cy-r);g.lineTo(cx,cy+r);g.stroke();g.beginPath();g.arc(cx,cy,r*.72,0,TAU);g.stroke();g.fillStyle='#d23a2a';g.beginPath();g.arc(cx+spin[0]*r*.72,cy-spin[1]*r*.72,r*.11,0,TAU);g.fill();txt('Sharning qayeriga urasiz?',cx,cy-r-34,16,'#f5efe0');txt('tepasi — oldinga dumalaydi · pasti — orqaga qaytadi',cx,cy+r+26,11.5,'#c9bfae','center',500);txt('yon tomoni — bortdan burilib qaytadi',cx,cy+r+44,11.5,'#c9bfae','center',500);btns=[];button(cx-110,cy+r+66,105,44,'O\'rtaga',()=>{spin=[0,0]},'#3a2f22','#f5efe0',15);button(cx+5,cy+r+66,105,44,'Tayyor',()=>{spinOpen=false},'#d9a441','#1a1208',15)}
- if(ST==='pause')overlay('Pauza','',[['Davom etish',()=>{ST='play'}],['Qaytadan',()=>newGame(MODE)],['Menyu',()=>{ST='menu'}]]);
- if(ST==='over')overlay(MODE==='solo'?'Tugadi!':NAMES()[winner]+' yutdi!',score[0]+' : '+score[1],[['Yana o\'ynash',()=>newGame(MODE)],['Menyu',()=>{ST='menu'}]])}
+ if(ST==='pause')overlay('Pauza',MODE==='net'?'Xona: '+NB.room:'',MODE==='net'?[['Davom etish',()=>{ST='play'}],["Taslim bo'lish",netResign],['Menyu',()=>{ST='menu'}]]:[['Davom etish',()=>{ST='play'}],['Qaytadan',()=>newGame(MODE)],['Menyu',()=>{ST='menu'}]]);
+ if(ST==='over')overlay(MODE==='solo'?'Tugadi!':MODE==='net'?(winner===NB.you?'Siz yutdingiz!':NAMES()[winner]+' yutdi'):NAMES()[winner]+' yutdi!',score[0]+' : '+score[1],[['Yana o\'ynash',()=>MODE==='net'?netAgain():newGame(MODE)],['Menyu',()=>{ST='menu'}]]);
+ if(ST==='net')drawNet()}
 // ================= BOSHQARUV =================
 const toT=(x,y)=>[(x-TX0)/S,(y-TY0)/S];let drag=null;
 function down(x,y){audio();
  if(spinOpen){const b=btns.find(b=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);if(b)return b.cb();drag={k:'spin'};return move(x,y)}
  const b=btns.find(b=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);if(b){click(.15,1800,.02);return b.cb()}
- if(ST!=='play'||sim||aiTurn())return;
+ if(ST!=='play'||sim||aiTurn()||!myTurn())return;
  if(pick){const[qx,qy]=toT(x,y);let best=null,bd=R*2.6;for(const o of balls)if(o.on&&!o.cue){const d=hyp(o.x-qx,o.y-qy);if(d<bd){bd=d;best=o}}if(best)takeBall(best);return}
  if(x>=L.px-14&&x<=L.px+L.pw+18&&y>=L.py-24&&y<=L.py+L.ph+24){drag={k:'fine',x:y};return}
  if(y>=L.wy-6&&y<=L.wy+L.wh+6&&x>=L.wx-14&&x<=L.wx+L.ww+14){drag={k:'pow'};return move(x,y)}
@@ -235,13 +285,14 @@ function move(x,y){if(!drag)return;const[tx,ty]=toT(x,y);
  else if(drag.k==='aim'&&sel){if(hyp(tx-sel.x,ty-sel.y)>R*1.5)ang=Math.atan2(ty-sel.y,tx-sel.x)}
  else if(drag.k==='place'&&sel){const nx=cl(tx,R+.002,W-R-.002),ny=cl(ty,H*3/4+R,H-R-.002);if(balls.every(o=>o===sel||!o.on||hyp(o.x-nx,o.y-ny)>2*R)){sel.x=nx;sel.y=ny}}
  else if(drag.k==='spin'){let sx=(x-VW/2)/(L.sr*.72),sy=-(y-VH/2)/(L.sr*.72);const m=hyp(sx,sy);if(m>1){sx/=m;sy/=m}spin=[sx,sy]}}
-function up(){if(drag&&drag.k==='pow'&&!aiTurn())fire();drag=null}
+function up(){if(drag&&drag.k==='pow'&&!aiTurn()&&myTurn())fire();else if(drag&&drag.k==='pow')pow=0;drag=null}
 cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);down(e.clientX,e.clientY)});
 cv.addEventListener('pointermove',e=>{move(e.clientX,e.clientY)});cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',()=>{if(drag&&drag.k==='pow')pow=0;drag=null});
 // ================= SIKL =================
 let last=performance.now(),acc=0;
-function tick(dt){T+=dt;if(msgT>0)msgT-=dt;if(cueFx&&(cueFx.t+=dt)>.28)cueFx=null;for(const b of balls)if(b.fall>0){b.fall+=dt/.32;if(b.fall>=1)b.fall=0}if(aiTurn()&&!sim){if(pick){AI=AI||{ph:'pick',t:0};AI.t+=dt;if(AI.t>1){AI=null;aiPick()}}else{if(!AI||AI.ph==='pick')aiStart();aiTick(dt)}}if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
+function tick(dt){T+=dt;netTick(dt);if(msgT>0)msgT-=dt;if(cueFx&&(cueFx.t+=dt)>.28)cueFx=null;for(const b of balls)if(b.fall>0){b.fall+=dt/.32;if(b.fall>=1)b.fall=0}if(aiTurn()&&!sim){if(pick){AI=AI||{ph:'pick',t:0};AI.t+=dt;if(AI.t>1){AI=null;aiPick()}}else{if(!AI||AI.ph==='pick')aiStart();aiTick(dt)}}if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tick(dt);render();requestAnimationFrame(frame)}
-window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ang,ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},setC(e,f){E_C=e;F_C=f},setMB(v){MU_BB=v},setJ2(e,k){E_J=e;HK=k},setJ(v){JIT=v},setPk(v){PK=v;buildTable()},get HOLES(){return HOLES},setLvl(v){LVL=v},tick,get ai(){return AI},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
+window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ang,ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},NB,netOpen,netCreate,netJoin,netAgain,netResign,snap,applySnap,setC(e,f){E_C=e;F_C=f},setMB(v){MU_BB=v},setJ2(e,k){E_J=e;HK=k},setJ(v){JIT=v},setPk(v){PK=v;buildTable()},get HOLES(){return HOLES},setLvl(v){LVL=v},tick,get ai(){return AI},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
+if(ROOM0)netJoin(ROOM0);
 requestAnimationFrame(frame);
 </script></body></html>
