@@ -16,11 +16,22 @@ const store={get(k,d){try{const v=localStorage.getItem('bil_'+k);return v==null?
 const haptic=k=>{if(QUIET)return;try{const h=parent.Telegram.WebApp.HapticFeedback;k==='ok'?h.notificationOccurred('success'):k==='err'?h.notificationOccurred('error'):h.impactOccurred(k||'light')}catch(e){}};
 // ---------- ovoz ----------
 let AC=null,SND=store.get('snd',true);
-function audio(){if(!AC)try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}if(AC&&AC.state==='suspended')AC.resume()}
 let QUIET=false;
-function click(vol,f=2200,d=.035){if(QUIET||!SND||!AC||vol<.01)return;const t=AC.currentTime,n=Math.floor(AC.sampleRate*d),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
- const s=AC.createBufferSource(),q=AC.createBiquadFilter(),v=AC.createGain();s.buffer=b;q.type='bandpass';q.frequency.value=f;q.Q.value=1.2;v.gain.value=cl(vol,0,1)*.7;s.connect(q).connect(v).connect(AC.destination);s.start(t)}
-function thud(){if(QUIET||!SND||!AC)return;const t=AC.currentTime,o=AC.createOscillator(),v=AC.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(55,t+.22);v.gain.setValueAtTime(.35,t);v.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(v).connect(AC.destination);o.start(t);o.stop(t+.26);click(.3,500,.12)}
+// Tovushlar oldindan hisoblab qo'yiladi: har biri tez so'nadigan bir necha ton va juda qisqa shovqin zarbasidan iborat.
+// shar-shar: qattiq, jarangdor "chaq"; kiy: yumshoqroq "tok"; bort: bo'g'iq "dup"; luza: tushish va to'r ichida dumalash.
+const BUF={};let sndN=0,sndT=0;
+function mkBuf(d,fn){const sr=AC.sampleRate,n=Math.floor(sr*d),b=AC.createBuffer(1,n,sr),a=b.getChannelData(0);let lp=0;for(let i=0;i<n;i++){const t=i/sr,nz=Math.random()*2-1;lp+=(nz-lp)*.12;a[i]=fn(t,nz,lp)}let pk=0;for(let i=0;i<n;i++)pk=Math.max(pk,Math.abs(a[i]));if(pk>0)for(let i=0;i<n;i++)a[i]*=.9/pk;return b}
+function mkSounds(){const s=(f,t,ph=0)=>Math.sin(TAU*f*t+ph),e=(t,k)=>Math.exp(-t/k);
+ BUF.clack=mkBuf(.05,(t,nz)=>(s(2250,t)*e(t,.0042)*.55+s(3850,t,.6)*e(t,.0026)*.5+s(6200,t,1.1)*e(t,.0014)*.32+s(1180,t)*e(t,.006)*.22+nz*e(t,.0007)*.6)*Math.min(1,t/.0002));
+ BUF.cue=mkBuf(.1,(t,nz,lp)=>(s(880,t)*e(t,.007)*.55+s(1650,t,.4)*e(t,.004)*.3+s(2900,t)*e(t,.0018)*.18+s(170,t)*e(t,.022)*.5+lp*e(t,.003)*1.2)*Math.min(1,t/.0003));
+ BUF.rail=mkBuf(.16,(t,nz,lp)=>(s(165,t)*e(t,.032)*.8+s(390,t,.3)*e(t,.012)*.3+s(95,t)*e(t,.05)*.4+lp*e(t,.012)*1.6)*Math.min(1,t/.0006));
+ BUF.pot=mkBuf(.5,(t,nz,lp)=>{let v=(s(120,t)*e(t,.05)*.9+lp*e(t,.02)*1.5)*Math.min(1,t/.001);for(const[t0,a]of[[.07,.5],[.13,.38],[.185,.28],[.235,.2],[.28,.13]])if(t>t0){const u=t-t0;v+=(s(620,u)*e(u,.006)*.5+s(240,u)*e(u,.014)*.7+lp*e(u,.004))*a}return v});
+ BUF.tap=mkBuf(.03,(t,nz)=>(s(1900,t)*e(t,.004)*.4+nz*e(t,.001)*.3))}
+function audio(){if(!AC)try{AC=new (window.AudioContext||window.webkitAudioContext)();mkSounds()}catch(e){}if(AC&&AC.state==='suspended')AC.resume()}
+function play(k,vol,rate=1){if(QUIET||!SND||!AC||!BUF[k]||vol<.012)return;const t=AC.currentTime;if(t-sndT>.03){sndT=t;sndN=0}if(++sndN>5)return; // bir lahzada juda ko'p tovush ustma-ust tushmasin
+ const src=AC.createBufferSource(),v=AC.createGain();src.buffer=BUF[k];src.playbackRate.value=rate;v.gain.value=Math.min(1,vol);src.connect(v).connect(AC.destination);src.start(t)}
+function click(vol,f=2200){const q=Math.pow(cl(vol),.75);if(f===2600)play('clack',q*.9,.94+Math.random()*.12-q*.05);else if(f===800)play('rail',q*.9,.9+Math.random()*.2);else if(f===1500)play('cue',q,.95+Math.random()*.1);else play('tap',q*.8)}
+function thud(){play('pot',.8,.92+Math.random()*.16)}
 // ---------- bortlar: kesmalar (luzalar orasida) va luza og'zi yonoqlari ----------
 let RAILS=[],HOLES=[];
 function buildTable(){const k=PK?1:1.18;MC=.0725*k;MM=.0825*k;RAILS=[];HOLES=[];const a=(x1,y1,x2,y2)=>RAILS.push({x1,y1,x2,y2});const m=H/2,d=MC/Math.SQRT2,h=MM/2,f=CW/Math.SQRT2;
@@ -52,14 +63,14 @@ function sub(dt){let moving=false;
    const nx=dx/d,ny=dy/d,ov=(2*R-d)/2;a.x-=nx*ov;a.y-=ny*ov;b.x+=nx*ov;b.y+=ny*ov;const rvx=a.vx-b.vx,rvy=a.vy-b.vy,vn=rvx*nx+rvy*ny;if(vn<=0)continue;
    const jn=(1+E_BB)/2*vn;a.vx-=jn*nx;a.vy-=jn*ny;b.vx+=jn*nx;b.vy+=jn*ny;
    const tx=-ny,ty=nx,vt=rvx*tx+rvy*ty-R*(a.wz+b.wz),jt=Math.sign(vt)*Math.min(MU_BB*jn,Math.abs(vt)*.14);a.vx-=jt*tx;a.vy-=jt*ty;b.vx+=jt*tx;b.vy+=jt*ty; // aylanish sharni biroz chetga suradi
-   if(shot){if(!shot.first&&(a===shot.ball||b===shot.ball))shot.first=a===shot.ball?b:a;shot.hits++}click(jn*.5,2600);moving=true;any=true}}}
+   if(shot){if(!shot.first&&(a===shot.ball||b===shot.ball))shot.first=a===shot.ball?b:a;shot.hits++}click(jn*.22,2600);moving=true;any=true}}}
  // bort va luza yonoqlari: bort sharga markazidan balandroqda tegadi, shuning uchun aylanish va tezlik birga o'zgaradi
  for(const b of balls){if(!b.on)continue;if(b.x>R+.001&&b.x<W-R-.001&&b.y>R+.001&&b.y<H-R-.001)continue;
   for(const s of RAILS){const ex=s.x2-s.x1,ey=s.y2-s.y1,t=cl(((b.x-s.x1)*ex+(b.y-s.y1)*ey)/(ex*ex+ey*ey)),px=s.x1+ex*t,py=s.y1+ey*t,dx=b.x-px,dy=b.y-py,d=hyp(dx,dy);if(d>=R||d===0)continue;
    const nx=dx/d,ny=dy/d;b.x=px+nx*R;b.y=py+ny*R;const ax=-nx,ay=-ny,bx=-ay,by=ax;let vx=b.vx*ax+b.vy*ay;if(vx<=0)continue;let vy=b.vx*bx+b.vy*by,wx=b.wx*ax+b.wy*ay,wy=b.wx*bx+b.wy*by;
    const sx=vx*ST_C+R*wy,sy=-vy-R*b.wz*CT_C+R*wx*ST_C,sl=hyp(sx,sy),pn=(1+E_C)*vx*CT_C;let fx,fy;if(sl/3.5<=F_C*pn){fx=sx/3.5;fy=sy/3.5}else{fx=F_C*pn*sx/sl;fy=F_C*pn*sy/sl}
    const PX=-fx*ST_C-pn*CT_C,PY=fy,PZ=fx*CT_C-pn*ST_C,v0=vx;vx+=PX;vy+=PY;wx-=2.5/R*PY*ST_C;wy+=2.5/R*(PX*ST_C-PZ*CT_C);b.wz+=2.5/R*PY*CT_C;
-   b.vx=vx*ax+vy*bx;b.vy=vx*ay+vy*by;b.wx=wx*ax+wy*bx;b.wy=wx*ay+wy*by;if(shot){shot.rail++;if(shot.first)shot.railAfter++}click(v0*.3,800,.05);moving=true}
+   b.vx=vx*ax+vy*bx;b.vy=vx*ay+vy*by;b.wx=wx*ax+wy*bx;b.wy=wx*ay+wy*by;if(shot){shot.rail++;if(shot.first)shot.railAfter++}click(v0*.2,800);moving=true}
   // luza: shar markazi teshik ustiga o'tsa, pastga tushadi
   let hole=null;for(const h of HOLES)if(hyp(b.x-h.x,b.y-h.y)<h.r){hole=h;break}if(!hole&&(b.x<-.09||b.x>W+.09||b.y<-.09||b.y>H+.09))hole=HOLES.reduce((p,h)=>hyp(b.x-h.x,b.y-h.y)<hyp(b.x-p.x,b.y-p.y)?h:p);
   if(hole){b.on=false;b.fvx=b.vx;b.fvy=b.vy;b.vx=b.vy=b.wx=b.wy=b.wz=0;b.pot=1;b.fall=.001;b.hole=hole;if(shot)shot.pots.push(b);thud();haptic('medium')}}
@@ -183,7 +194,7 @@ function drawHUD(){const nm=NAMES();
  // pastki qator: aylanish, nozik sozlash, menyu
  const by=VH-L.bot+14,bh=54;btns=btns.filter(b=>b.keep);
  {const x=14,r=bh/2;g.fillStyle='rgba(255,255,255,.08)';g.beginPath();g.arc(x+r,by+r,r,0,TAU);g.fill();const gr=g.createRadialGradient(x+r-6,by+r-7,2,x+r,by+r,r-5);gr.addColorStop(0,'#fff');gr.addColorStop(1,'#b9b19c');g.fillStyle=gr;g.beginPath();g.arc(x+r,by+r,r-5,0,TAU);g.fill();g.fillStyle='#d23a2a';g.beginPath();g.arc(x+r+spin[0]*(r-9),by+r-spin[1]*(r-9),4.5,0,TAU);g.fill();btns.push({x,y:by,w:bh,h:bh,cb:()=>{spinOpen=true}})}
- {const x=14+bh+10,w=VW-x-14-bh-10;L.wx=x;L.wy=by;L.ww=w;L.wh=bh;g.fillStyle='rgba(255,255,255,.08)';rr(x,by+8,w,bh-16,(bh-16)/2);g.fill();g.save();rr(x,by+8,w,bh-16,(bh-16)/2);g.clip();g.strokeStyle='rgba(255,255,255,.28)';g.lineWidth=1.5;const off=((ang*1100)%14+14)%14;for(let xx=x-14+off;xx<x+w+14;xx+=14){g.beginPath();g.moveTo(xx,by+16);g.lineTo(xx,by+bh-16);g.stroke()}g.restore();txt('◀  aniq nishon  ▶',x+w/2,by+bh/2,11,'rgba(255,255,255,.55)',  'center',600)}
+ {const x=14+bh+10,w=VW-x-14-bh-10;L.wx=x;L.wy=by;L.ww=w;L.wh=bh;g.fillStyle='rgba(255,255,255,.08)';rr(x,by+8,w,bh-16,(bh-16)/2);g.fill();g.save();rr(x,by+8,w,bh-16,(bh-16)/2);g.clip();g.strokeStyle='rgba(255,255,255,.28)';g.lineWidth=1.5;const off=((ang/.00035)%14+14)%14;for(let xx=x-14+off;xx<x+w+14;xx+=14){g.beginPath();g.moveTo(xx,by+16);g.lineTo(xx,by+bh-16);g.stroke()}g.restore();txt('◀  aniq nishon  ▶',x+w/2,by+bh/2,11,'rgba(255,255,255,.55)',  'center',600)}
  {const x=VW-14-bh;g.fillStyle='rgba(255,255,255,.08)';rr(x,by,bh,bh,14);g.fill();g.fillStyle='#c9bfae';for(let i=0;i<3;i++){rr(x+15,by+17+i*9,bh-30,3,1.5);g.fill()}btns.push({x,y:by,w:bh,h:bh,cb:()=>{ST='pause'}})}
  if(msgT>0){const a=cl(msgT/.4);g.globalAlpha=a;g.font='700 14px system-ui';const w=Math.min(VW-30,g.measureText(msg).width+34);g.fillStyle='rgba(10,8,6,.82)';rr(VW/2-w/2,Y(H*.62)-19,w,38,19);g.fill();txt(msg,VW/2,Y(H*.62)+1,14,'#ffe9b8');g.globalAlpha=1}
  if(place&&!sim){txt('Sharni shu yerda suring',X(W/2),Y(H*3/4)+14,11,'rgba(255,255,255,.5)',  'center',600)}}
@@ -217,7 +228,7 @@ function down(x,y){audio();
  drag={k:'aim'};move(x,y)}
 function move(x,y){if(!drag)return;const[tx,ty]=toT(x,y);
  if(drag.k==='pow')pow=cl((y-L.py)/L.ph);
- else if(drag.k==='fine'){ang+=(x-drag.x)*.0009;drag.x=x}
+ else if(drag.k==='fine'){ang+=(x-drag.x)*.00035;drag.x=x}
  else if(drag.k==='aim'&&sel){if(hyp(tx-sel.x,ty-sel.y)>R*1.5)ang=Math.atan2(ty-sel.y,tx-sel.x)}
  else if(drag.k==='place'&&sel){const nx=cl(tx,R+.002,W-R-.002),ny=cl(ty,H*3/4+R,H-R-.002);if(balls.every(o=>o===sel||!o.on||hyp(o.x-nx,o.y-ny)>2*R)){sel.x=nx;sel.y=ny}}
  else if(drag.k==='spin'){let sx=(x-VW/2)/(L.sr*.72),sy=-(y-VH/2)/(L.sr*.72);const m=hyp(sx,sy);if(m>1){sx/=m;sy/=m}spin=[sx,sy]}}
