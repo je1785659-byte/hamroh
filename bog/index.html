@@ -271,7 +271,7 @@ function icon(t,x,y,s){g.save();g.translate(x,y);g.scale(s,s);drawPlant(t,0,0,t=
 
 // ================= RASMLI QAHRAMONLAR =================
 // O'simliklar tayyor rasmlardan chiziladi; rasm yuklanmagan bo'lsa eski chizma ishlaydi.
-const IMG={},IMGV=7;for(const n of ['pea0','pea1','twin0','twin1','ice0','ice1','sun0','sun1','nut0','nut1','nut2','xnut','bomb0','bomb1','mine0','mine1','snap0','snap1','shot','shoti','zb0','zb1','zbe','zf0','zf1','zs0','zs1','zsj','zr0','zr1','zre','sunc','pot0','pot1','pot2','bas0','bas1','shovel','cart0','cart1','boom','bg','ui_card','ui_bar','ui_b1','ui_b2','ui_panel','ui_pause','ui_plate']){const im=new Image();im.onload=()=>{IMG[n]=im};im.src='img/'+n+'.webp?v='+IMGV}
+const IMG={},IMGV=8;for(const n of ['pea0','pea1','twin0','twin1','ice0','ice1','sun0','sun1','nut0','nut1','nut2','xnut','bomb0','bomb1','mine0','mine1','snap0','snap1','shot','shoti','zb0','zb1','zbe','zf0','zf1','zs0','zs1','zsj','zr0','zr1','zre','sunc','pot0','pot1','pot2','bas0','bas1','shovel','cart0','cart1','boom','bg','ui_card','ui_bar','ui_b1','ui_b2','ui_panel','ui_pause','ui_plate']){const im=new Image();im.onload=()=>{IMG[n]=im};im.src='img/'+n+'.webp?v='+IMGV}
 // rasmni pastki o'rtasi (x,y) nuqtaga, balandligi h qilib chizadi
 function spr(n,x,y,h,o){const im=IMG[n];if(!im)return false;const w=h*im.width/im.height;g.save();g.translate(x,y);if(o){if(o.rot)g.rotate(o.rot);if(o.sx||o.sy)g.scale(o.sx||1,o.sy||1)}g.drawImage(im,-w/2,-h,w,h);g.restore();return true}
 const drawPlant0=drawPlant,drawNut0=drawNut;
