@@ -32,7 +32,7 @@ export async function initData(user = { id: 42, first_name: 'Test' }, token = TO
 
 // Outside world. Each test sets world.claude / world.cbu as needed; world.tg collects Telegram calls.
 export const world = { tg: [], claude: null, claudeBodies: [], cbu: null, pinned: true };
-export function resetWorld() { world.tg = []; world.claude = null; world.claudeBodies = []; world.cbu = null; world.pinned = true; }
+export function resetWorld() { world.tg = []; world.claude = null; world.claudeBodies = []; world.cbu = null; world.pinned = true; world.fail = null; }
 globalThis.fetch = async (url, opts = {}) => {
   const u = String(url);
   if (u.includes('kkal.json')) return new Response(CATALOG);
@@ -40,6 +40,7 @@ globalThis.fetch = async (url, opts = {}) => {
   if (u.includes('api.telegram.org')) {
     const method = u.split('/').pop();
     world.tg.push({ method, body: JSON.parse(opts.body || '{}') });
+    if (world.fail && world.fail[method]) return new Response(JSON.stringify(world.fail[method]));
     if (method === 'getChat') return new Response(JSON.stringify({ ok: true, result: world.pinned ? { pinned_message: { message_id: 1 } } : {} }));
     return new Response(JSON.stringify({ ok: true, result: { message_id: 777 } }));
   }

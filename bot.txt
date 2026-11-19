@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 18.11.2026-18
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 20.11.2026-19
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -51,9 +51,11 @@ const namozCap=i=>{const o=namozData(i);return `🕌 ${o.n}, ${o.d}: `+o.t.map((
 let UPD_OK=false; // webhook vidjet so'rovlarini ham yuborsin
 async function ensureUpdates(env){if(UPD_OK)return;UPD_OK=true;try{const w=await tg(env,'getWebhookInfo',{});const au=w.ok&&w.result.allowed_updates;
   if(au&&au.length&&w.result.url&&!au.includes('widget_query'))await tg(env,'setWebhook',{url:w.result.url,allowed_updates:[...new Set([...au,'widget_query','shared_widget_query','my_chat_member'])],...(env.WEBHOOK_SECRET?{secret_token:env.WEBHOOK_SECRET}:{})})}catch(e){UPD_OK=false}}
-async function cmdNamoz(env,chat,priv){
-  if(priv){await ensureUpdates(env);const r=await tg(env,'sendWidget',{chat_id:chat,html:NAMOZ_HTML,chat_data:JSON.stringify(namozData(0)),allow_queries:true,caption:namozCap(0),reply_markup:regionKb()}).catch(()=>null);if(r&&r.ok)return r}
-  return say(env,chat,namozText(0)+'\n\nHududni tanlang:',{parse_mode:'HTML',reply_markup:regionKb()})}
+// Telegram vidjetni rad etsa, sababi jurnalga yoziladi; oddiy foydalanuvchi zaxira javobni ko'radi, sababni faqat admin ko'radi.
+async function widgetWhy(env,chat,r){const d=String((r&&r.description)||'Telegram javob bermadi').replace(/[<>&]/g,' ').slice(0,200);console.log('widget',d);try{const db=await D(env);if(db&&await isAdmin(db,chat))return '\n\n⚙️ Vidjet yuborilmadi: '+d}catch(e){}return ''}
+async function cmdNamoz(env,chat,priv){let why='';
+  if(priv){await ensureUpdates(env);const r=await tg(env,'sendWidget',{chat_id:chat,html:NAMOZ_HTML,chat_data:JSON.stringify(namozData(0)),allow_queries:true,caption:namozCap(0),reply_markup:regionKb()}).catch(()=>null);if(r&&r.ok)return r;why=await widgetWhy(env,chat,r)}
+  return say(env,chat,namozText(0)+'\n\nHududni tanlang:'+why,{parse_mode:'HTML',reply_markup:regionKb()})}
 async function onWidgetQuery(env,q){if((q.data||'').startsWith('m:'))return chwMove(env,q);const m=/^nm:(\d+)$/.exec(q.data||''),i=m?+m[1]:-1;let out='';
   if(CENTRES[i]){const d=JSON.stringify(namozData(i));out=d;if(q.chat&&q.message_id)await tg(env,'editMessageWidgetData',{chat_id:q.chat.id,message_id:q.message_id,chat_data:d}).catch(()=>{})}
   await tg(env,'answerWidgetQuery',{widget_query_id:q.id,...(out?{data:out}:{})})}
@@ -212,7 +214,7 @@ async function chwNew(env,db,chat,c,mid){const g=chNew(),h=[];if(c==='b'){const 
   if(db)await db.prepare('INSERT OR REPLACE INTO chw(k,h,c,upd) VALUES(?1,?2,?3,?4)').bind(chat+':'+mid,JSON.stringify(h),c,Date.now()).run();return {ok:true}}
 async function cmdChess(env,chat,priv){const db=await chwDb(env);
   if(!priv||!db)return say(env,chat,'♟ Shaxmat — ilovada: kompyuterga qarshi 8 daraja, masalalar va tahlil.',{reply_markup:{inline_keyboard:[[appBtn('♟ Shaxmatni ochish',APP_URL+'?t=shaxmat')]]}});
-  await ensureUpdates(env);const r=await chwNew(env,db,chat,'w',null);if(!r||!r.ok)return say(env,chat,'♟ Shaxmat — ilovada.',{reply_markup:{inline_keyboard:[[appBtn('♟ Shaxmatni ochish',APP_URL+'?t=shaxmat')]]}})}
+  await ensureUpdates(env);const r=await chwNew(env,db,chat,'w',null);if(!r||!r.ok)return say(env,chat,'♟ Shaxmat — ilovada.'+await widgetWhy(env,chat,r),{reply_markup:{inline_keyboard:[[appBtn('♟ Shaxmatni ochish',APP_URL+'?t=shaxmat')]]}})}
 async function chwMove(env,q){const ans=o=>tg(env,'answerWidgetQuery',{widget_query_id:q.id,data:JSON.stringify(o)});const db=await chwDb(env);
   const k=q.chat&&q.message_id?q.chat.id+':'+q.message_id:'',row=db&&k?await db.prepare('SELECT h,c FROM chw WHERE k=?1').bind(k).first():null;if(!row)return ans({e:'nogame'});
   const h=JSON.parse(row.h||'[]'),g=chwGame(h),u=(q.data||'').slice(2);

@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 01.11.2026-10
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 20.11.2026-19
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -44,6 +44,187 @@ function namozText(i){
   const rows=t.map((v,k)=>`${k===nx?'▶️':'▫️'} <b>${NAMES[k]}</b> — ${hhmm(v)}`).join('\n');
   return `🕌 <b>${name}</b> (${r})\n${d}.${String(m).padStart(2,'0')}.${y}\n\n${rows}\n\n${nx!==undefined?`Keyingi: <b>${NAMES[nx]}</b>, ${Math.floor((t[nx]-now)/60)?Math.floor((t[nx]-now)/60)+' soat ':''}${(t[nx]-now)%60} daqiqadan so‘ng`:'Bugungi namozlar tugadi'}\n\n<i>Tuman va qishloq bo‘yicha aniq vaqt — ilovada</i>`;
 }
+// ---- vidjet (Bot API 10.4): xabar ichida jonli namoz vaqtlari ----
+export const NAMOZ_HTML="<style>\nbody{margin:0;padding:10px 12px max(10px,env(safe-area-inset-bottom));font:15px/1.3 system-ui,sans-serif}\n.h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}\n.h b{font-size:17px}.h small,.m{color:var(--tg-theme-hint-color);font-size:13px}\n.nx{margin:9px 0 6px;padding:10px 12px;border-radius:12px;background:var(--tg-theme-secondary-bg-color)}\n.nx b{font-size:21px;font-variant-numeric:tabular-nums}\n.bar{height:5px;border-radius:3px;background:var(--tg-theme-section-separator-color);margin-top:8px;overflow:hidden}\n.bar i{display:block;height:100%;width:0;background:var(--tg-theme-button-color);transition:width .6s}\n.r{display:flex;justify-content:space-between;padding:6px 2px;border-bottom:1px solid var(--tg-theme-section-separator-color);font-variant-numeric:tabular-nums}\n.r:last-child{border:0}.r.on{color:var(--tg-theme-accent-text-color);font-weight:600}.r.p{color:var(--tg-theme-hint-color)}\n</style>\n<div class=\"h\"><b id=\"c\">🕌</b><small id=\"d\"></small></div>\n<div class=\"nx\"><div class=\"m\" id=\"l\"></div><b id=\"n\">…</b><div class=\"bar\"><i id=\"p\"></i></div></div>\n<div id=\"t\"></div>\n<script>\nvar W=window.TelegramWidget,N=['Bomdod','Quyosh','Peshin','Asr','Shom','Xufton'],P=[0,2,3,4,5],S=null,ask='';\nfunction $(i){return document.getElementById(i)}\nfunction z(n){return String(n).padStart(2,'0')}\nfunction hm(m){m=Math.round(m);return z(Math.floor(m/60)%24)+':'+z(m%60)}\nfunction now(){var d=new Date(Date.now()+18e6);return{day:d.getUTCDate()+'.'+z(d.getUTCMonth()+1)+'.'+d.getUTCFullYear(),m:d.getUTCHours()*60+d.getUTCMinutes()+d.getUTCSeconds()/60}}\nfunction load(){try{S=JSON.parse(W?W.chatData:'null')}catch(e){S=null}draw()}\nfunction draw(){if(!S||!S.t||S.t.length<6)return;var T=now(),t=S.t,k=P.find(function(i){return t[i]>T.m}),nx,pv;\n $('c').textContent='🕌 '+S.n;$('d').textContent=S.d;\n if(S.d!==T.day&&ask!==T.day&&W&&W.chatType==='private'){ask=T.day;W.request('nm:'+S.i).then(function(a){try{S=JSON.parse(a.result);draw()}catch(e){}},function(){})}\n if(k==null){nx=t[0]+1440;pv=t[5];$('l').textContent='Keyingi: Bomdod (ertaga)'}else{nx=t[k];pv=k?t[k-1]:t[5]-1440;$('l').textContent='Keyingi: '+N[k]+' · '+hm(t[k])}\n var L=Math.max(0,Math.ceil(nx-T.m)),h=Math.floor(L/60);\n $('n').textContent=(h?h+' soat ':'')+(L%60)+' daqiqa qoldi';\n $('p').style.width=Math.min(100,Math.max(0,(T.m-pv)/(nx-pv)*100))+'%';\n $('t').innerHTML=t.map(function(v,i){var c=i===k?' on':(k==null||i<k)?' p':'';return '<div class=\"r'+c+'\"><span>'+N[i]+'</span><span>'+hm(v)+'</span></div>'}).join('')}\nif(W)W.onEvent('chatDataChanged',load);\nload();setInterval(draw,20000);if(W&&W.ready)W.ready();\n</script>\n";
+function namozData(i){const [r,name,lat,lng]=CENTRES[i];const [y,m,d]=uzToday();return {i,n:name,d:d+'.'+String(m).padStart(2,'0')+'.'+y,t:prayerTimes(y,m,d,lat,lng)}}
+const namozCap=i=>{const o=namozData(i);return `🕌 ${o.n}, ${o.d}: `+o.t.map((v,k)=>NAMES[k]+' '+hhmm(v)).join(' · ')};
+let UPD_OK=false; // webhook vidjet so'rovlarini ham yuborsin
+async function ensureUpdates(env){if(UPD_OK)return;UPD_OK=true;try{const w=await tg(env,'getWebhookInfo',{});const au=w.ok&&w.result.allowed_updates;
+  if(au&&au.length&&w.result.url&&!au.includes('widget_query'))await tg(env,'setWebhook',{url:w.result.url,allowed_updates:[...new Set([...au,'widget_query','shared_widget_query','my_chat_member'])],...(env.WEBHOOK_SECRET?{secret_token:env.WEBHOOK_SECRET}:{})})}catch(e){UPD_OK=false}}
+// Telegram vidjetni rad etsa, sababi jurnalga yoziladi; oddiy foydalanuvchi zaxira javobni ko'radi, sababni faqat admin ko'radi.
+async function widgetWhy(env,chat,r){const d=String((r&&r.description)||'Telegram javob bermadi').replace(/[<>&]/g,' ').slice(0,200);console.log('widget',d);try{const db=await D(env);if(db&&await isAdmin(db,chat))return '\n\n⚙️ Vidjet yuborilmadi: '+d}catch(e){}return ''}
+async function cmdNamoz(env,chat,priv){let why='';
+  if(priv){await ensureUpdates(env);const r=await tg(env,'sendWidget',{chat_id:chat,html:NAMOZ_HTML,chat_data:JSON.stringify(namozData(0)),allow_queries:true,caption:namozCap(0),reply_markup:regionKb()}).catch(()=>null);if(r&&r.ok)return r;why=await widgetWhy(env,chat,r)}
+  return say(env,chat,namozText(0)+'\n\nHududni tanlang:'+why,{parse_mode:'HTML',reply_markup:regionKb()})}
+async function onWidgetQuery(env,q){if((q.data||'').startsWith('m:'))return chwMove(env,q);const m=/^nm:(\d+)$/.exec(q.data||''),i=m?+m[1]:-1;let out='';
+  if(CENTRES[i]){const d=JSON.stringify(namozData(i));out=d;if(q.chat&&q.message_id)await tg(env,'editMessageWidgetData',{chat_id:q.chat.id,message_id:q.message_id,chat_data:d}).catch(()=>{})}
+  await tg(env,'answerWidgetQuery',{widget_query_id:q.id,...(out?{data:out}:{})})}
+// ---- vidjet: chat ichida shaxmat (kompyuter — shu bot; holat D1 jadvalida chw) ----
+/* ---------- SHAXMAT: qoidalar va kompyuter raqibi (DOM'siz) ---------- */
+// Doska: 64 katak, indeks = qator*8 + ustun (0 = a1, 63 = h8). Katta harf — oq, kichik — qora.
+const CH_N=[[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]],CH_K=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
+const CH_RD=[[1,0],[-1,0],[0,1],[0,-1]],CH_BD=[[1,1],[1,-1],[-1,1],[-1,-1]];
+const chSq=i=>'abcdefgh'[i&7]+((i>>3)+1),chIx=s=>(s.charCodeAt(0)-97)+(s.charCodeAt(1)-49)*8;
+const chCol=p=>p?(p<'a'?'w':'b'):'',chUp=p=>p.toUpperCase();
+const CH_START='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+function chFen(f){const [pos,turn,cas,ep,half,full]=f.trim().split(/\s+/),b=new Array(64).fill('');let r=7,c=0;
+  for(const ch of pos){if(ch==='/'){r--;c=0}else if(ch>='1'&&ch<='8')c+=+ch;else{b[r*8+c]=ch;c++}}
+  const g={b,turn:turn||'w',cas:(cas&&cas!=='-')?((cas.includes('K')?1:0)|(cas.includes('Q')?2:0)|(cas.includes('k')?4:0)|(cas.includes('q')?8:0)):0,
+    ep:ep&&ep!=='-'?chIx(ep):-1,half:+(half||0),full:+(full||1),hist:[],keys:[],kw:b.indexOf('K'),kb:b.indexOf('k')};
+  g.keys.push(chKey(g));return g}
+const chNew=()=>chFen(CH_START);
+function chToFen(g){let s='';for(let r=7;r>=0;r--){let e=0;for(let c=0;c<8;c++){const p=g.b[r*8+c];if(!p)e++;else{if(e){s+=e;e=0}s+=p}}if(e)s+=e;if(r)s+='/'}
+  const cs=(g.cas&1?'K':'')+(g.cas&2?'Q':'')+(g.cas&4?'k':'')+(g.cas&8?'q':'')||'-';return `${s} ${g.turn} ${cs} ${g.ep>=0?chSq(g.ep):'-'} ${g.half} ${g.full}`}
+function chKey(g){return g.b.map(p=>p||'.').join('')+g.turn+g.cas+(g.ep>=0&&chEpUsable(g)?g.ep:'')}
+function chEpUsable(g){const P=g.turn==='w'?'P':'p',dr=g.turn==='w'?-1:1,c=g.ep&7,r=(g.ep>>3)+dr;for(const dc of [-1,1]){const cc=c+dc;if(cc>=0&&cc<8&&g.b[r*8+cc]===P)return true}return false}
+// katak `sq` ni `by` rangidagi dona urib turibdimi
+function chAttacked(g,sq,by){const b=g.b,r=sq>>3,c=sq&7,W=by==='w';
+  const pr=r+(W?-1:1);if(pr>=0&&pr<8){const P=W?'P':'p';if(c>0&&b[pr*8+c-1]===P)return true;if(c<7&&b[pr*8+c+1]===P)return true}
+  const N=W?'N':'n',K=W?'K':'k';for(const [dr,dc] of CH_N){const rr=r+dr,cc=c+dc;if(rr>=0&&rr<8&&cc>=0&&cc<8&&b[rr*8+cc]===N)return true}
+  for(const [dr,dc] of CH_K){const rr=r+dr,cc=c+dc;if(rr>=0&&rr<8&&cc>=0&&cc<8&&b[rr*8+cc]===K)return true}
+  const R=W?'R':'r',B=W?'B':'b',Q=W?'Q':'q';
+  for(const [dr,dc] of CH_RD){let rr=r+dr,cc=c+dc;while(rr>=0&&rr<8&&cc>=0&&cc<8){const p=b[rr*8+cc];if(p){if(p===R||p===Q)return true;break}rr+=dr;cc+=dc}}
+  for(const [dr,dc] of CH_BD){let rr=r+dr,cc=c+dc;while(rr>=0&&rr<8&&cc>=0&&cc<8){const p=b[rr*8+cc];if(p){if(p===B||p===Q)return true;break}rr+=dr;cc+=dc}}
+  return false}
+const chInCheck=(g,col)=>chAttacked(g,col==='w'?g.kw:g.kb,col==='w'?'b':'w');
+function chPseudo(g,caps){const b=g.b,me=g.turn,W=me==='w',L=[];
+  const add=(f,t,o)=>{L.push(Object.assign({f,t,p:b[f],c:b[t]},o||null))};
+  for(let f=0;f<64;f++){const p=b[f];if(!p||chCol(p)!==me)continue;const r=f>>3,c=f&7,u=chUp(p);
+    if(u==='P'){const d=W?1:-1,r1=r+d,last=W?7:0,start=W?1:6;
+      const pushP=(t,o)=>{if((t>>3)===last){for(const q of ['q','r','b','n'])add(t===f?f:f,t,Object.assign({promo:W?q.toUpperCase():q},o))}else add(f,t,o)};
+      if(r1>=0&&r1<8){const t=r1*8+c;
+        if(!b[t]&&(!caps||(t>>3)===last)){pushP(t);if(!caps&&r===start&&!b[(r+2*d)*8+c])add(f,(r+2*d)*8+c,{dbl:1})}
+        for(const dc of [-1,1]){const cc=c+dc;if(cc<0||cc>7)continue;const t2=r1*8+cc,q=b[t2];if(q&&chCol(q)!==me)pushP(t2);else if(t2===g.ep)add(f,t2,{ep:1,c:W?'p':'P'})}}
+      continue}
+    if(u==='N'||u==='K'){for(const [dr,dc] of (u==='N'?CH_N:CH_K)){const rr=r+dr,cc=c+dc;if(rr<0||rr>7||cc<0||cc>7)continue;const t=rr*8+cc,q=b[t];if(q&&chCol(q)===me)continue;if(caps&&!q)continue;add(f,t)}
+      if(u==='K'&&!caps){const rk=W?0:56,ks=W?1:4,qs=W?2:8,op=W?'b':'w';
+        if(f===rk+4&&(g.cas&ks)&&!b[rk+5]&&!b[rk+6]&&b[rk+7]===(W?'R':'r')&&!chAttacked(g,rk+4,op)&&!chAttacked(g,rk+5,op)&&!chAttacked(g,rk+6,op))add(f,rk+6,{cs:'k'});
+        if(f===rk+4&&(g.cas&qs)&&!b[rk+3]&&!b[rk+2]&&!b[rk+1]&&b[rk]===(W?'R':'r')&&!chAttacked(g,rk+4,op)&&!chAttacked(g,rk+3,op)&&!chAttacked(g,rk+2,op))add(f,rk+2,{cs:'q'})}
+      continue}
+    const dirs=u==='R'?CH_RD:u==='B'?CH_BD:CH_K;
+    for(const [dr,dc] of dirs){let rr=r+dr,cc=c+dc;while(rr>=0&&rr<8&&cc>=0&&cc<8){const t=rr*8+cc,q=b[t];if(q){if(chCol(q)!==me)add(f,t);break}if(!caps)add(f,t);rr+=dr;cc+=dc}}}
+  return L}
+const CH_CR=[];for(let i=0;i<64;i++)CH_CR[i]=15;CH_CR[0]&=~2;CH_CR[7]&=~1;CH_CR[4]&=~3;CH_CR[56]&=~8;CH_CR[63]&=~4;CH_CR[60]&=~12;
+function chMake(g,m){const b=g.b;g.hist.push({m,cas:g.cas,ep:g.ep,half:g.half,kw:g.kw,kb:g.kb});
+  b[m.t]=m.promo||m.p;b[m.f]='';if(m.ep)b[m.t+(g.turn==='w'?-8:8)]='';
+  if(m.cs){const rk=m.t>>3<<3;if(m.cs==='k'){b[rk+5]=b[rk+7];b[rk+7]=''}else{b[rk+3]=b[rk];b[rk]=''}}
+  if(m.p==='K')g.kw=m.t;else if(m.p==='k')g.kb=m.t;
+  g.cas&=CH_CR[m.f]&CH_CR[m.t];g.ep=m.dbl?(m.f+m.t)>>1:-1;g.half=(m.c||chUp(m.p)==='P')?0:g.half+1;if(g.turn==='b')g.full++;g.turn=g.turn==='w'?'b':'w'}
+function chUnmake(g){const h=g.hist.pop(),m=h.m,b=g.b;g.turn=g.turn==='w'?'b':'w';if(g.turn==='b')g.full--;
+  b[m.f]=m.p;b[m.t]=m.ep?'':m.c;if(m.ep)b[m.t+(g.turn==='w'?-8:8)]=m.c;
+  if(m.cs){const rk=m.t>>3<<3;if(m.cs==='k'){b[rk+7]=b[rk+5];b[rk+5]=''}else{b[rk]=b[rk+3];b[rk+3]=''}}
+  g.cas=h.cas;g.ep=h.ep;g.half=h.half;g.kw=h.kw;g.kb=h.kb}
+function chLegal(g,caps){const me=g.turn,out=[];for(const m of chPseudo(g,caps)){chMake(g,m);if(!chInCheck(g,me))out.push(m);chUnmake(g)}return out}
+function chMoves(g){return chLegal(g,false).map(m=>Object.assign(m,{from:chSq(m.f),to:chSq(m.t)}))}
+// ommaviy yurish: tarix va takrorlanish kalitlari bilan
+function chMove(g,m){chMake(g,m);g.keys.push(chKey(g));return m}
+function chUndo(g){if(!g.hist.length)return null;const m=g.hist[g.hist.length-1].m;g.keys.pop();chUnmake(g);return m}
+function chFromUci(g,u){const f=chIx(u.slice(0,2)),t=chIx(u.slice(2,4)),pr=u[4];return chMoves(g).find(m=>m.f===f&&m.t===t&&(!m.promo||chUp(m.promo)===chUp(pr||'q')))||null}
+function chPerft(g,d){if(d===0)return 1;const L=chLegal(g,false);if(d===1)return L.length;let n=0;for(const m of L){chMake(g,m);n+=chPerft(g,d-1);chUnmake(g)}return n}
+function chInsufficient(g){const P=g.b.filter(p=>p&&chUp(p)!=='K');if(!P.length)return true;if(P.length===1&&'NB'.includes(chUp(P[0])))return true;
+  if(P.every(p=>chUp(p)==='B')){const cs=new Set();g.b.forEach((p,i)=>{if(p&&chUp(p)==='B')cs.add(((i>>3)+(i&7))&1)});return cs.size===1}return false}
+// natija: r = play | mate | stalemate | material | repetition | fifty
+function chStatus(g){const L=chLegal(g,false),chk=chInCheck(g,g.turn);
+  if(!L.length)return chk?{r:'mate',win:g.turn==='w'?'b':'w',check:true}:{r:'stalemate'};
+  if(chInsufficient(g))return {r:'material'};if(g.half>=100)return {r:'fifty'};
+  const k=g.keys[g.keys.length-1];let n=0;for(const x of g.keys)if(x===k)n++;if(n>=3)return {r:'repetition'};
+  return {r:'play',check:chk}}
+function chSan(g,m){const u=chUp(m.p);let s;
+  if(m.cs)s=m.cs==='k'?'O-O':'O-O-O';
+  else{s=u==='P'?'':u;if(u==='P'){if(m.c)s=chSq(m.f)[0]}else{const amb=chLegal(g,false).filter(x=>x.p===m.p&&x.t===m.t&&x.f!==m.f);
+      if(amb.length){const sf=amb.some(x=>(x.f&7)===(m.f&7)),sr=amb.some(x=>(x.f>>3)===(m.f>>3));s+=!sf?chSq(m.f)[0]:!sr?chSq(m.f)[1]:chSq(m.f)}}
+    if(m.c)s+='x';s+=chSq(m.t);if(m.promo)s+='='+chUp(m.promo)}
+  chMake(g,m);const st=chLegal(g,false).length,ck=chInCheck(g,g.turn);chUnmake(g);return s+(ck?(st?'+':'#'):'')}
+// ---------- kompyuter: alfa-beta, iterativ chuqurlashuv, sokin qidiruv ----------
+const CH_V={P:100,N:320,B:330,R:500,Q:900,K:0};
+const CH_PST={ // oq uchun, a8 dan h1 gacha qatorlar
+  P:[0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0],
+  N:[-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50],
+  B:[-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20],
+  R:[0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,0,0,0,5,5,0,0,0],
+  Q:[-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20],
+  K:[-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20],
+  E:[-50,-40,-30,-20,-20,-30,-40,-50,-30,-20,-10,0,0,-10,-20,-30,-30,-10,20,30,30,20,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,20,30,30,20,-10,-30,-30,-30,0,0,0,0,-30,-30,-50,-30,-30,-30,-30,-30,-30,-50]};
+function chEval(g){let s=0,mat=0;for(let i=0;i<64;i++){const p=g.b[i];if(p&&chUp(p)!=='K'&&chUp(p)!=='P')mat+=CH_V[chUp(p)]}const end=mat<=1500;
+  for(let i=0;i<64;i++){const p=g.b[i];if(!p)continue;const u=chUp(p),W=p===u,r=i>>3,c=i&7,idx=W?(7-r)*8+c:r*8+c;
+    const v=CH_V[u]+(u==='K'&&end?CH_PST.E:CH_PST[u])[idx];s+=W?v:-v}
+  return g.turn==='w'?s:-s}
+function chOrder(L,best){for(const m of L)m.o=(best&&m.f===best.f&&m.t===best.t&&m.promo===best.promo?1e6:0)+(m.c?10*CH_V[chUp(m.c)]-CH_V[chUp(m.p)]+1000:0)+(m.promo?CH_V[chUp(m.promo)]:0);L.sort((a,b)=>b.o-a.o);return L}
+function chBest(g,o){o=o||{};const T0=Date.now(),ms=o.ms||1500,maxD=o.depth||4,noise=o.noise||0;let nodes=0,stop=false,best=null,bestS=0;
+  const out=()=>{if((++nodes&1023)===0&&Date.now()-T0>ms)stop=true;return stop};
+  function qs(a,b){if(out())return 0;const sp=chEval(g);if(sp>=b)return b;if(sp>a)a=sp;
+    for(const m of chOrder(chLegal(g,true))){chMake(g,m);const v=-qs(-b,-a);chUnmake(g);if(stop)return 0;if(v>=b)return b;if(v>a)a=v}return a}
+  function ab(d,a,b,ply){if(out())return 0;const L=chLegal(g,false);if(!L.length)return chInCheck(g,g.turn)?-100000+ply:0;if(g.half>=100)return 0;
+    if(d<=0)return qs(a,b);for(const m of chOrder(L)){chMake(g,m);const v=-ab(d-1,-b,-a,ply+1);chUnmake(g);if(stop)return 0;if(v>=b)return b;if(v>a)a=v}return a}
+  const root=chLegal(g,false);if(!root.length)return null;if(root.length===1)return Object.assign(root[0],{from:chSq(root[0].f),to:chSq(root[0].t)});
+  const jit=new Map(root.map(m=>[m,noise?(Math.random()-0.5)*2*noise:0]));
+  for(let d=1;d<=maxD;d++){let a=-1e9,cur=null;
+    for(const m of chOrder(root,best)){chMake(g,m);
+      // takrorlanishdan qochish: g'olib holatda bir xil pozitsiyaga qaytmaymiz
+      const rep=g.keys.includes(chKey(g));let v=-ab(d-1,-1e9,-a+ (noise?2*noise:0),1);chUnmake(g);if(stop)break;
+      if(rep)v=Math.min(v,0);v+=jit.get(m);if(v>a){a=v;cur=m}}
+    if(stop&&d>1)break;if(cur){best=cur;bestS=a}if(a>90000)break}
+  best=best||root[0];return Object.assign(best,{from:chSq(best.f),to:chSq(best.t),score:Math.round(bestS)})}
+
+// ---------- masalalar: majburiy mat ----------
+// yuruvchi tomon n ta o'z yurishi ichida mat qila oladimi
+function chMateIn(g,n){for(const m of chLegal(g,false)){chMake(g,m);const ok=chForced(g,n-1);chUnmake(g);if(ok)return true}return false}
+// raqib navbati: mat bo'lgan yoki har qanday javobdan keyin ham n yurishda mat bor
+function chForced(g,n){const L=chLegal(g,false);if(!L.length)return chInCheck(g,g.turn);if(n<=0)return false;
+  for(const m of L){chMake(g,m);const ok=chMateIn(g,n);chUnmake(g);if(!ok)return false}return true}
+// ---------- tahlil va reyting ----------
+const chWin=cp=>50+50*(2/(1+Math.exp(-0.00368208*cp))-1); // yutish ehtimoli, %
+const chAcc=(wb,wa)=>Math.max(0,Math.min(100,103.1668*Math.exp(-0.04354*Math.max(0,wb-wa))-3.1669)); // yurish aniqligi, %
+const chElo=(r,opp,sc,k)=>Math.round(r+(k||32)*(sc-1/(1+Math.pow(10,(opp-r)/400))));
+function chPgn(sans,res,tags){let h='';for(const k in tags)h+=`[${k} "${tags[k]}"]\n`;h+=`[Result "${res}"]\n\n`;let b='';sans.forEach((s,i)=>{b+=(i%2?'':(i/2+1)+'. ')+s+' '});return h+b+res+'\n'}
+// ---------- debyutlar: [yurishlar, o'zbekcha, ruscha, inglizcha] ----------
+const CH_OPEN=[
+['e4',"Qirol piyodasi debyuti",'Дебют королевской пешки',"King's Pawn Opening"],['d4',"Farzin piyodasi debyuti",'Дебют ферзевой пешки',"Queen's Pawn Opening"],
+['c4','Ingliz debyuti','Английское начало','English Opening'],['Nf3','Reti debyuti','Дебют Рети','Réti Opening'],['f4','Berd debyuti','Дебют Берда',"Bird's Opening"],['b3','Larsen debyuti','Дебют Ларсена','Larsen Opening'],
+['e4 c5','Sitsiliya himoyasi','Сицилианская защита','Sicilian Defence'],['e4 c5 c3','Sitsiliya himoyasi: Alapin varianti','Сицилианская защита: вариант Алапина','Sicilian Defence: Alapin'],
+['e4 c5 Nc3','Yopiq Sitsiliya','Закрытая сицилианская','Closed Sicilian'],['e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6','Sitsiliya himoyasi: Naydorf varianti','Сицилианская защита: вариант Найдорфа','Sicilian Defence: Najdorf'],
+['e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6','Sitsiliya himoyasi: Ajdar varianti','Сицилианская защита: вариант дракона','Sicilian Defence: Dragon'],
+['e4 c5 Nf3 Nc6 d4 cxd4 Nxd4','Ochiq Sitsiliya','Открытая сицилианская','Open Sicilian'],
+['e4 e6','Fransuz himoyasi','Французская защита','French Defence'],['e4 c6','Karo-Kann himoyasi','Защита Каро-Канн','Caro-Kann Defence'],['e4 d5','Skandinaviya himoyasi','Скандинавская защита','Scandinavian Defence'],
+['e4 d6','Pirs himoyasi','Защита Пирца','Pirc Defence'],['e4 Nf6','Alyoxin himoyasi','Защита Алехина',"Alekhine's Defence"],['e4 g6','Zamonaviy himoya','Современная защита','Modern Defence'],
+['e4 e5','Ochiq debyut','Открытый дебют','Open Game'],['e4 e5 Nf3 Nc6 Bb5','Ispan partiyasi','Испанская партия','Ruy Lopez'],['e4 e5 Nf3 Nc6 Bc4','Italyan partiyasi','Итальянская партия','Italian Game'],
+['e4 e5 Nf3 Nc6 Bc4 Bc5','Italyan partiyasi: Juoko Piano','Итальянская партия: джуоко пиано','Italian Game: Giuoco Piano'],['e4 e5 Nf3 Nc6 Bc4 Nf6','Ikki ot himoyasi','Защита двух коней','Two Knights Defence'],
+['e4 e5 Nf3 Nc6 d4','Shotland partiyasi','Шотландская партия','Scotch Game'],['e4 e5 Nf3 Nf6','Rus partiyasi','Русская партия',"Petrov's Defence"],['e4 e5 Nf3 d6','Filidor himoyasi','Защита Филидора','Philidor Defence'],
+['e4 e5 f4','Qirol gambiti','Королевский гамбит',"King's Gambit"],['e4 e5 Nc3','Vena partiyasi','Венская партия','Vienna Game'],['e4 e5 Nf3 Nc6 Nc3 Nf6',"To'rt ot debyuti",'Дебют четырёх коней','Four Knights Game'],
+['d4 d5','Yopiq debyut','Закрытый дебют','Closed Game'],['d4 d5 c4','Farzin gambiti','Ферзевый гамбит',"Queen's Gambit"],['d4 d5 c4 e6','Rad etilgan farzin gambiti','Отказанный ферзевый гамбит',"Queen's Gambit Declined"],
+['d4 d5 c4 dxc4','Qabul qilingan farzin gambiti','Принятый ферзевый гамбит',"Queen's Gambit Accepted"],['d4 d5 c4 c6','Slavyan himoyasi','Славянская защита','Slav Defence'],
+['d4 d5 Bf4','London tizimi','Лондонская система','London System'],['d4 Nf6 Bf4','London tizimi','Лондонская система','London System'],['d4 d5 Nf3 Nf6 Bf4','London tizimi','Лондонская система','London System'],
+['d4 Nf6','Hind himoyasi','Индийская защита','Indian Defence'],['d4 Nf6 c4 g6 Nc3 Bg7','Qirol hind himoyasi','Староиндийская защита',"King's Indian Defence"],['d4 Nf6 c4 g6 Nc3 d5','Gryunfeld himoyasi','Защита Грюнфельда','Grünfeld Defence'],
+['d4 Nf6 c4 e6 Nc3 Bb4','Nimtsovich himoyasi','Защита Нимцовича','Nimzo-Indian Defence'],['d4 Nf6 c4 e6 Nf3 b6','Farzin hind himoyasi','Новоиндийская защита',"Queen's Indian Defence"],
+['d4 Nf6 c4 e6 g3','Katalon debyuti','Каталонское начало','Catalan Opening'],['d4 Nf6 c4 c5','Benoni himoyasi','Защита Бенони','Benoni Defence'],['d4 f5','Golland himoyasi','Голландская защита','Dutch Defence']];
+const CH_OPM=new Map(CH_OPEN.map(o=>[o[0],[o[1],o[2],o[3]]]));
+function chOpening(sans){const a=sans.slice(0,10).map(s=>s.replace(/[+#]/g,''));for(let k=a.length;k>0;k--){const o=CH_OPM.get(a.slice(0,k).join(' '));if(o)return o}return null}
+
+export const CHESS_HTML="<style>\nbody{margin:0;padding:8px 10px max(8px,env(safe-area-inset-bottom));font:14px/1.3 system-ui,sans-serif}\n.h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}\n.h b{font-size:15px}.h small{color:var(--tg-theme-hint-color)}\n#b{display:grid;grid-template-columns:repeat(8,1fr);border-radius:8px;overflow:hidden;touch-action:none;aspect-ratio:1}\n.q{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:min(9.2vw,40px);line-height:1}\n.l{background:#ecd9b6}.d{background:#b0845a}\n.q.m{box-shadow:inset 0 0 0 99px rgba(240,200,70,.38)}.q.s{box-shadow:inset 0 0 0 99px rgba(90,170,240,.5)}.q.k{box-shadow:inset 0 0 0 99px rgba(230,60,40,.55)}\n.q i{position:absolute;width:30%;height:30%;border-radius:50%;background:rgba(20,20,20,.3)}.q i.x{width:86%;height:86%;background:none;border:4px solid rgba(20,20,20,.3)}\n.p{position:relative}.p u{position:absolute;left:0;top:0;text-decoration:none;color:#1b130d}\n.w{color:#fff}.bk{color:#1b130d}\n.f{position:absolute;bottom:1px;left:3px;font-size:10px;color:rgba(0,0,0,.45)}\n</style>\n<div class=\"h\"><b id=\"t\">♟</b><small id=\"o\"></small></div>\n<div id=\"b\"></div>\n<script>\nvar W=window.TelegramWidget,S=null,sel=-1,busy=0,G={k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'},O={k:'♔',q:'♕',r:'♖',b:'♗',n:'♘',p:'♙'};\nfunction sq(i){return 'abcdefgh'[i&7]+((i>>3)+1)}\nfunction ix(s){return s.charCodeAt(0)-97+(s.charCodeAt(1)-49)*8}\nfunction board(){var b=[],r=7,c=0,f=S.f.split(' ')[0];for(var i=0;i<f.length;i++){var ch=f[i];if(ch=='/'){r--;c=0}else if(ch>='1'&&ch<='8')c+=+ch;else{b[r*8+c]=ch;c++}}return b}\nfunction mv(){var a=[];for(var i=0;i<S.l.length;i+=4)a.push(S.l.substr(i,4));return a}\nfunction load(){try{S=JSON.parse(W?W.chatData:'null')}catch(e){S=null}sel=-1;draw()}\nfunction draw(){if(!S)return;var b=board(),my=S.c,turn=S.f.slice(-1),M=mv(),T=sel<0?[]:M.filter(function(m){return ix(m)==sel}).map(function(m){return ix(m.slice(2))}),h='',st=S.s;\n var msg=st=='mate'?(S.w==my?'Mat! Siz yutdingiz 🎉':'Mat. Kompyuter yutdi'):st=='draw'?'Durang':busy?'Kompyuter o‘ylayapti…':turn==my?(st=='check'?'Shax! Sizning navbat':'Sizning navbatingiz'):'Kompyuter navbati';\n document.getElementById('t').textContent=msg;document.getElementById('o').textContent=S.n?Math.ceil(S.n/2)+'-yurish':'';\n var lm=S.m?[ix(S.m),ix(S.m.slice(2))]:[];\n for(var v=0;v<64;v++){var r=my=='w'?7-(v>>3):v>>3,c=my=='w'?v&7:7-(v&7),i=r*8+c,p=b[i],cl='q '+((r+c)%2?'l':'d');\n  if(lm.indexOf(i)>=0)cl+=' m';if(i==sel)cl+=' s';if(p&&p.toLowerCase()=='k'&&(st=='check'||st=='mate')&&(p=='K')==(turn=='w'))cl+=' k';\n  var x='';if(p){var lo=p.toLowerCase(),wh=p!=lo;x='<span class=\"p '+(wh?'w':'bk')+'\">'+G[lo]+'︎'+(wh?'<u>'+O[lo]+'︎</u>':'')+'</span>'}\n  if(T.indexOf(i)>=0)x+='<i'+(p?' class=\"x\"':'')+'></i>';\n  if((my=='w'?r==0:r==7))x+='<span class=\"f\">'+'abcdefgh'[c]+'</span>';\n  h+='<div class=\"'+cl+'\" data-i=\"'+i+'\">'+x+'</div>'}\n document.getElementById('b').innerHTML=h}\ndocument.getElementById('b').addEventListener('click',function(e){var el=e.target.closest('[data-i]');if(!el||!S||busy||S.s=='mate'||S.s=='draw'||S.f.slice(-1)!=S.c)return;var i=+el.dataset.i,b=board(),M=mv();\n if(sel>=0){var m=M.find(function(m){return ix(m)==sel&&ix(m.slice(2))==i});if(m){busy=1;sel=-1;S.m=m;draw();W.request('m:'+m).then(function(a){busy=0;try{var d=JSON.parse(a.result);if(d.f)S=d}catch(e){}draw();W.HapticFeedback&&W.HapticFeedback.impactOccurred('light')},function(){busy=0;load()});return}}\n var p=b[i];sel=p&&((p<'a')==(S.c=='w'))&&M.some(function(m){return ix(m)==i})&&sel!=i?i:-1;draw()});\nif(W)W.onEvent('chatDataChanged',function(){if(!busy)load()});\nload();if(W&&W.ready)W.ready();\n</script>\n";
+const CHW_KB=()=>({inline_keyboard:[[{text:'♔ Yangi o‘yin (oq)',callback_data:'chw:w'},{text:'♚ Qora bilan',callback_data:'chw:b'}],[appBtn('🎮 To‘liq 3D shaxmat',APP_URL+'?t=shaxmat')]]});
+async function chwDb(env){const db=await D(env).catch(()=>null);if(!db)return null;if(!chwDb.ok){await db.prepare('CREATE TABLE IF NOT EXISTS chw(k TEXT PRIMARY KEY,h TEXT,c TEXT,upd INTEGER)').run();chwDb.ok=1}return db}
+function chwGame(h){const g=chNew();for(const u of h){const m=chFromUci(g,u);if(!m)break;chMove(g,m)}return g}
+function chwState(g,c){const st=chStatus(g),L=[...new Set(chMoves(g).map(m=>m.from+m.to))].join(''),last=g.hist[g.hist.length-1];
+  return {f:chToFen(g).split(' ').slice(0,2).join(' '),c,l:st.r==='play'?L:'',m:last?chSq(last.m.f)+chSq(last.m.t):'',n:g.hist.length,s:st.r==='play'?(st.check?'check':'play'):st.r==='mate'?'mate':'draw',w:st.win||''}}
+function chwAi(g){if(chStatus(g).r!=='play')return null;return chBest(g,{depth:2,ms:6,noise:25})}
+const chwCap=d=>d.s==='mate'?'♟ Shaxmat: mat!':d.s==='draw'?'♟ Shaxmat: durang':'♟ Shaxmat — kompyuterga qarshi. Donani, keyin katakni bosing.';
+async function chwNew(env,db,chat,c,mid){const g=chNew(),h=[];if(c==='b'){const m=chwAi(g);if(m){chMove(g,m);h.push(m.from+m.to+(m.promo?m.promo.toLowerCase():''))}}
+  const d=chwState(g,c);if(mid==null){const r=await tg(env,'sendWidget',{chat_id:chat,html:CHESS_HTML,chat_data:JSON.stringify(d),allow_queries:true,caption:chwCap(d),reply_markup:CHW_KB()}).catch(()=>null);if(!r||!r.ok)return r;mid=r.result.message_id}
+  else await tg(env,'editMessageWidgetData',{chat_id:chat,message_id:mid,chat_data:JSON.stringify(d)}).catch(()=>{});
+  if(db)await db.prepare('INSERT OR REPLACE INTO chw(k,h,c,upd) VALUES(?1,?2,?3,?4)').bind(chat+':'+mid,JSON.stringify(h),c,Date.now()).run();return {ok:true}}
+async function cmdChess(env,chat,priv){const db=await chwDb(env);
+  if(!priv||!db)return say(env,chat,'♟ Shaxmat — ilovada: kompyuterga qarshi 8 daraja, masalalar va tahlil.',{reply_markup:{inline_keyboard:[[appBtn('♟ Shaxmatni ochish',APP_URL+'?t=shaxmat')]]}});
+  await ensureUpdates(env);const r=await chwNew(env,db,chat,'w',null);if(!r||!r.ok)return say(env,chat,'♟ Shaxmat — ilovada.'+await widgetWhy(env,chat,r),{reply_markup:{inline_keyboard:[[appBtn('♟ Shaxmatni ochish',APP_URL+'?t=shaxmat')]]}})}
+async function chwMove(env,q){const ans=o=>tg(env,'answerWidgetQuery',{widget_query_id:q.id,data:JSON.stringify(o)});const db=await chwDb(env);
+  const k=q.chat&&q.message_id?q.chat.id+':'+q.message_id:'',row=db&&k?await db.prepare('SELECT h,c FROM chw WHERE k=?1').bind(k).first():null;if(!row)return ans({e:'nogame'});
+  const h=JSON.parse(row.h||'[]'),g=chwGame(h),u=(q.data||'').slice(2);
+  if(g.turn!==row.c||chStatus(g).r!=='play'||!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(u))return ans({e:'illegal'});
+  const m=chFromUci(g,u);if(!m)return ans({e:'illegal'});chMove(g,m);h.push(m.from+m.to+(m.promo?m.promo.toLowerCase():''));
+  const a=chwAi(g);if(a){chMove(g,a);h.push(a.from+a.to+(a.promo?a.promo.toLowerCase():''))}
+  const d=chwState(g,row.c);await db.prepare('UPDATE chw SET h=?1,upd=?2 WHERE k=?3').bind(JSON.stringify(h),Date.now(),k).run();
+  await tg(env,'editMessageWidgetData',{chat_id:q.chat.id,message_id:q.message_id,chat_data:JSON.stringify(d)}).catch(()=>{});
+  if(d.s!=='play'&&d.s!=='check')await tg(env,'editMessageCaption',{chat_id:q.chat.id,message_id:q.message_id,caption:chwCap(d),reply_markup:CHW_KB()}).catch(()=>{});
+  return ans(d)}
 const regionKb=()=>({inline_keyboard:[...Array.from({length:Math.ceil(CENTRES.length/2)},(_,i)=>CENTRES.slice(i*2,i*2+2).map((c,k)=>({text:c[0],callback_data:'nm:'+(i*2+k)}))),[appBtn('📍 Joylashuv bo‘yicha — ilovada',APP_URL)]]});
 async function kursText(){
   try{const r=await fetch('https://cbu.uz/uz/arkhiv-kursov-valyut/json/',{cf:{cacheTtl:1800}});const j=await r.json();
@@ -81,16 +262,17 @@ async function handleHello(req,env){
 // Bot buyruqlari: har biri o'z funksiyasida, onMessage faqat yo'naltiradi.
 const say=(env,chat,text,extra={})=>tg(env,'sendMessage',{chat_id:chat,text,...extra});
 const HUJJAT_TEXT=`📄 <b>Hujjatlar bilan ishlash</b>\n\n• Rasmlardan PDF\n• PDF birlashtirish\n• Sahifalarni ajratish\n• PDF → rasm\n• Rasmdan matn (o‘zbek, rus, ingliz)\n• Rasmni siqish\n• Lotin ↔ Kirill\n\nTayyor fayl shu chatga yuboriladi.`;
-const HELP_TEXT=`<b>Hamroh bot buyruqlari</b>\n\n/start — bosh sahifa\n/namoz — bugungi namoz vaqtlari\n/kurs — valyuta kursi\n/taom — bugun nima pishiramiz?\n/hujjat — PDF va hujjatlar\n\nTo‘liq imkoniyatlar — «Hamroh» ilovasida.`;
+const HELP_TEXT=`<b>Hamroh bot buyruqlari</b>\n\n/start — bosh sahifa\n/namoz — bugungi namoz vaqtlari\n/kurs — valyuta kursi\n/taom — bugun nima pishiramiz?\n/shaxmat — chat ichida shaxmat\n/hujjat — PDF va hujjatlar\n\nTo‘liq imkoniyatlar — «Hamroh» ilovasida.`;
 async function cmdTaom(env,chat){
   const C=await cfg(),DL=(C.dishes&&C.dishes.length)?C.dishes:DISHES,n=DL[Math.floor(Math.random()*DL.length)];
   return say(env,chat,`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,{parse_mode:'HTML',
     reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',web_app:{url:APP_URL+'?r='+slug(n)}}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}});
 }
 const COMMANDS={
-  '/namoz':(env,chat)=>say(env,chat,namozText(0)+'\n\nHududni tanlang:',{parse_mode:'HTML',reply_markup:regionKb()}),
+  '/namoz':(env,chat,priv)=>cmdNamoz(env,chat,priv),
   '/kurs':async(env,chat)=>say(env,chat,await kursText(),{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('💱 Konvertorni ochish')]]}}),
   '/taom':cmdTaom,
+  '/shaxmat':(env,chat,priv)=>cmdChess(env,chat,priv),
   '/hujjat':(env,chat)=>say(env,chat,HUJJAT_TEXT,{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('📄 Hujjatlar bo‘limini ochish',APP_URL+'?t=doc')]]}}),
   '/yordam':(env,chat)=>say(env,chat,HELP_TEXT,{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn()]]}})
 };
@@ -119,13 +301,17 @@ async function onMessage(env,msg){
   if(!priv&&!text.startsWith('/'))return;
   if(cmd==='/start')return sendStart(env,chat,await cfg(),priv);
   if(await adminRoute(env,msg,priv,cmd,text))return;
-  if(COMMANDS[cmd])return COMMANDS[cmd](env,chat);
+  if(COMMANDS[cmd])return COMMANDS[cmd](env,chat,priv);
   if(priv)return say(env,chat,'Quyidagi tugma orqali ilovani oching yoki /yordam ni bosing.',{reply_markup:{inline_keyboard:[[appBtn()]]}});
 }
 async function onCallback(env,q){
   const C=await cfg(); const DL=(C.dishes&&C.dishes.length)?C.dishes:DISHES;
   const d=q.data||'';
-  if(d.startsWith('nm:')){const i=+d.slice(3);if(CENTRES[i]) await tg(env,'editMessageText',{chat_id:q.message.chat.id,message_id:q.message.message_id,text:namozText(i)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()})}
+  if((d==='chw:w'||d==='chw:b')&&q.message){const db=await chwDb(env);await chwNew(env,db,q.message.chat.id,d.slice(4),q.message.message_id);
+    await tg(env,'editMessageCaption',{chat_id:q.message.chat.id,message_id:q.message.message_id,caption:chwCap({s:'play'}),reply_markup:CHW_KB()}).catch(()=>{})}
+  if(d.startsWith('nm:')&&q.message&&q.message.widget){const i=+d.slice(3);if(CENTRES[i]){const c=q.message.chat.id,mid=q.message.message_id;
+    await tg(env,'editMessageWidgetData',{chat_id:c,message_id:mid,chat_data:JSON.stringify(namozData(i))});await tg(env,'editMessageCaption',{chat_id:c,message_id:mid,caption:namozCap(i),reply_markup:regionKb()})}}
+  else if(d.startsWith('nm:')){const i=+d.slice(3);if(CENTRES[i]) await tg(env,'editMessageText',{chat_id:q.message.chat.id,message_id:q.message.message_id,text:namozText(i)+'\n\nHududni tanlang:',parse_mode:'HTML',reply_markup:regionKb()})}
   if(d==='taom'){const n=DL[Math.floor(Math.random()*DL.length)];
     await tg(env,'editMessageText',{chat_id:q.message.chat.id,message_id:q.message.message_id,parse_mode:'HTML',text:`🍲 Bugun nima pishiramiz?\n\n<b>${n}</b>\n\nRetsept, masalliqlar va qadamma-qadam pishirish ilovada.`,
       reply_markup:{inline_keyboard:[[{text:'📖 Retseptni ochish',web_app:{url:APP_URL+'?r='+slug(n)}}],[{text:'🔄 Boshqa taom',callback_data:'taom'}]]}})}
@@ -227,8 +413,15 @@ async function D(env){
       env.DB.prepare('CREATE TABLE IF NOT EXISTS food(day TEXT,uid INTEGER,n INTEGER DEFAULT 0,PRIMARY KEY(day,uid))'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS blroom(id TEXT PRIMARY KEY,game TEXT,p0 INTEGER,p1 INTEGER,n0 TEXT,n1 TEXT,seq INTEGER DEFAULT 0,data TEXT,init TEXT,created INTEGER,updated INTEGER,lp0 INTEGER DEFAULT 0,lp1 INTEGER DEFAULT 0)'),
       env.DB.prepare('CREATE TABLE IF NOT EXISTS foodfix(day TEXT,k TEXT,a TEXT,u TEXT,n INTEGER DEFAULT 0,r REAL DEFAULT 0,PRIMARY KEY(day,k,a,u))'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_user(uid INTEGER PRIMARY KEY,name TEXT,region TEXT,rwk TEXT,ref INTEGER,bonus INTEGER DEFAULT 0,wkc TEXT,card INTEGER DEFAULT 0)'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_room(room TEXT PRIMARY KEY,p TEXT,st INTEGER DEFAULT 0,t INTEGER)'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_sig(id INTEGER PRIMARY KEY AUTOINCREMENT,room TEXT,src INTEGER,dst INTEGER,data TEXT,t INTEGER)'),
+      env.DB.prepare("CREATE TABLE IF NOT EXISTS bg_room(room TEXT PRIMARY KEY,g TEXT,w INTEGER,b INTEGER,wn TEXT,bn TEXT,mv TEXT DEFAULT '',gn INTEGER DEFAULT 0,res TEXT,dr TEXT,rm TEXT,ws INTEGER DEFAULT 0,bs INTEGER DEFAULT 0,t INTEGER,sgw TEXT,sgb TEXT)"),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS pt_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
+      env.DB.prepare('CREATE TABLE IF NOT EXISTS rn_week(wk TEXT,uid INTEGER,best INTEGER DEFAULT 0,dist INTEGER DEFAULT 0,runs INTEGER DEFAULT 0,last INTEGER DEFAULT 0,PRIMARY KEY(wk,uid))'),
       env.DB.prepare("INSERT OR IGNORE INTO meta(k,v) VALUES('since',?1)").bind(String(Date.now()))
     ]);
+    for(const c of ['sgw','sgb'])await env.DB.prepare(`ALTER TABLE bg_room ADD COLUMN ${c} TEXT`).run().catch(()=>{}); // eski bazaga yangi ustunlar
     SCH=true;
   }
   return env.DB;
@@ -265,7 +458,7 @@ async function handlePing(req,env){
   const db=await D(env).catch(()=>null);if(!db)return J({ok:true,admin:false,nodb:true,hq:!!env.ANTHROPIC_API_KEY});
   const secs=Math.max(0,Math.min(900,parseInt(f.get('secs'))||0)), open=f.get('open')==='1'?1:0, day=dstr(Date.now());
   let secList=[];try{secList=JSON.parse(f.get('sec')||'[]').filter(x=>typeof x==='string'&&/^[a-z0-9_:-]{1,30}$/.test(x)).slice(0,15)}catch(e){}
-  const sp=String(f.get('sp')||'').replace(/[^\w-]/g,'').slice(0,40);
+  const sp=String(f.get('sp')||'').replace(/[^\w-]/g,'').slice(0,40).replace(/^yugur-r\d+$/,'yugur-ref');
   const st=[userStmt(db,u,{src:sp||'app',app_lang:String(f.get('lang')||'').slice(0,5)||null,platform:String(f.get('pf')||'').slice(0,12)||null}),
     db.prepare('INSERT INTO daily(day,uid,secs,opens) VALUES(?1,?2,?3,?4) ON CONFLICT(day,uid) DO UPDATE SET secs=secs+?3,opens=opens+?4').bind(day,u.id,secs,open),
     ...secList.map(x=>db.prepare('INSERT INTO sections(day,sec,n) VALUES(?1,?2,1) ON CONFLICT(day,sec) DO UPDATE SET n=n+1').bind(day,x)),
@@ -284,7 +477,7 @@ async function computeStats(db,env){
     q('SELECT COUNT(DISTINCT uid) n FROM daily WHERE day>=?1',d30),
     q('SELECT day,COUNT(*) u,SUM(secs) s,SUM(secs>0) au,SUM(opens) o,SUM(msgs) m FROM daily WHERE day>=?1 GROUP BY day ORDER BY day',d60),
     q("SELECT strftime('%Y-%m-%d',(first_seen+?2)/1000,'unixepoch') day,COUNT(*) n FROM users WHERE first_seen>=?1 GROUP BY day",now-60*DAY,TZMS),
-    q('SELECT sec k,SUM(n) n FROM sections WHERE day>=?1 GROUP BY sec ORDER BY n DESC LIMIT 16',d30),
+    q("SELECT sec k,SUM(n) n FROM sections WHERE day>=?1 AND sec NOT LIKE 'p-%' GROUP BY sec ORDER BY n DESC LIMIT 16",d30),
     q("SELECT COALESCE(app_lang,tg_lang,'?') k,COUNT(*) n FROM users GROUP BY k ORDER BY n DESC LIMIT 8"),
     q("SELECT COALESCE(platform,'?') k,COUNT(*) n FROM users GROUP BY k ORDER BY n DESC LIMIT 8"),
     q("SELECT COALESCE(src,'?') k,COUNT(*) n FROM users GROUP BY k ORDER BY n DESC LIMIT 30"),
@@ -292,14 +485,15 @@ async function computeStats(db,env){
     q('SELECT COUNT(*) n,SUM(EXISTS(SELECT 1 FROM daily d WHERE d.uid=users.id AND d.day>=?3)) back FROM users WHERE first_seen<?1 AND first_seen>=?2',t7,t7-7*DAY,d7),
     q('SELECT SUM(secs) s,SUM(secs>0) au FROM daily WHERE day>=?1',d7),
     q('SELECT COALESCE(SUM(CASE WHEN day=?1 THEN n END),0) d1,COALESCE(SUM(n),0) d7,COUNT(DISTINCT uid) u7 FROM food WHERE day>=?2',today,d7),
-    q("SELECT k,a,u,SUM(n) n,SUM(r) r FROM foodfix WHERE day>=?1 GROUP BY k,a,u ORDER BY (k='photo') DESC,n DESC LIMIT 25",d30)
+    q("SELECT k,a,u,SUM(n) n,SUM(r) r FROM foodfix WHERE day>=?1 GROUP BY k,a,u ORDER BY (k='photo') DESC,n DESC LIMIT 25",d30),
+    q("SELECT sec k,SUM(n) n FROM sections WHERE day>=?1 AND sec LIKE 'p-%' GROUP BY sec ORDER BY k LIMIT 40",d30)
   ]);
   const one=i=>r[i].results[0]||{}, all=i=>r[i].results||[];
   const meta=Object.fromEntries(all(10).map(x=>[x.k,x.v]));
   let wh=null;try{const w=await tg(env,'getWebhookInfo',{});if(w.ok){wh={pending:w.result.pending_update_count||0,error:w.result.last_error_message||null,fixed:false};
     const au=w.result.allowed_updates;if(au&&au.length&&!au.includes('my_chat_member')&&w.result.url){await tg(env,'setWebhook',{url:w.result.url,allowed_updates:[...au,'my_chat_member'],...(env.WEBHOOK_SECRET?{secret_token:env.WEBHOOK_SECRET}:{})});wh.fixed=true}}}catch(e){}
   return {now,today,users:one(0),dau:one(1).n||0,wau:one(2).n||0,mau:one(3).n||0,days:all(4),newDays:all(5),sections:all(6),langs:all(7),platforms:all(8),sources:all(9),
-    since:+meta.since||null,checked:+meta.checked||null,ret:one(11),avg7:one(12),food:one(13),fixes:all(14),wh};
+    since:+meta.since||null,checked:+meta.checked||null,ret:one(11),avg7:one(12),food:one(13),fixes:all(14),perf:all(15),wh};
 }
 async function adminReq(req,env){
   let f;try{f=await req.formData()}catch(e){return [null,J({ok:false,error:'form'},400)]}
@@ -526,6 +720,134 @@ async function statsText(env,db){
   const S=await computeStats(db,env),U=S.users;
   return `📊 <b>Hamroh statistikasi</b>\n\n👥 Jami foydalanuvchi: <b>${U.total||0}</b>\n▶️ Botda start bosgan: <b>${U.started||0}</b>\n✅ Faol (bloklamagan): <b>${U.active||0}</b>\n⛔ Bloklagan: <b>${U.blocked||0}</b>\n\n📅 Bugun: <b>${S.dau}</b> · 7 kun: <b>${S.wau}</b> · 30 kun: <b>${S.mau}</b>\n🆕 Yangi: bugun <b>${U.n1||0}</b> · 7 kun <b>${U.n7||0}</b> · 30 kun <b>${U.n30||0}</b>\n⏱ O‘rtacha kunlik vaqt (7 kun): <b>${S.avg7.au?fmtMin(S.avg7.s/S.avg7.au):'—'}</b>\n\n<i>Batafsil — admin panelda.</i>`;
 }
+// ---------- Shaxmat va shashka: do'st bilan onlayn o'yin (/bg/room) ----------
+// Xona: ikki o'rin (w — oqlar, b — qoralar), yurishlar ro'yxati (mv, bo'sh joy bilan ajratilgan), o'yin raqami (gn — "yana" bosilganda oshadi),
+// natija (res: "w resign", "d agree"), ochiq durang taklifi (dr) va "yana" so'rovi (rm) — ikkalasida ham so'ragan tomon.
+// Yurishning to'g'riligini ikkala mijoz o'z qoidalari bilan tekshiradi; bot faqat navbat va tartibni saqlaydi.
+const BG_TTL=24*3600e3,BG_ON=20000,BG_MAX=700,bgOpp=s=>s==='w'?'b':'w',bgList=mv=>mv?mv.split(' '):[];
+function bgView(r,side,since,now){const L=bgList(r.mv),o=bgOpp(side);
+  return {ok:true,room:r.room,g:r.g,side,gn:r.gn,ready:!!(r.w&&r.b),opp:r[o+'n']||null,on:now-(r[o+'s']||0)<BG_ON,n:L.length,moves:L.slice(Math.max(0,since)),res:r.res||null,dr:r.dr||null,rm:r.rm||null}}
+// Bitta amal: xona holatidan yangi qiymatlarni qaytaradi (o'zgarish bo'lmasa {}), rad etilsa null.
+function bgStep(r,side,op,a){const L=bgList(r.mv),live=r.w&&r.b&&!r.res;
+  if(op==='move'){const dup=a.n<L.length&&L[a.n]===a.mv&&(a.n%2?'b':'w')===side;if(dup)return {};
+    if(!live||a.n!==L.length||(L.length%2?'b':'w')!==side||L.length>=BG_MAX||!/^[A-Za-z0-9:x=+-]{2,24}$/.test(a.mv))return null;
+    return {mv:r.mv?r.mv+' '+a.mv:a.mv,dr:null}}
+  if(op==='resign')return live?{res:bgOpp(side)+' resign',dr:null}:{};
+  if(op==='draw'){if(!live)return {};if(a.v==='offer')return {dr:side};if(r.dr!==bgOpp(side))return {};return a.v==='yes'?{res:'d agree',dr:null}:{dr:null}}
+  if(op==='again'){if(!(r.w&&r.b)||!(r.res||a.over))return {};if(r.rm!==bgOpp(side))return {rm:side};
+    return {mv:'',gn:r.gn+1,res:null,dr:null,rm:null,w:r.b,b:r.w,wn:r.bn,bn:r.wn,ws:r.bs,bs:r.ws,sgw:r.sgb||null,sgb:r.sgw||null}}
+  return op==='poll'?{}:null}
+async function handleBg(req,env){
+  let f;try{f=await req.formData()}catch(e){return J({ok:false},400)}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false},403);
+  const db=await D(env).catch(()=>null);if(!db)return J({ok:false,nodb:true});
+  const now=Date.now(),op=String(f.get('op')||''),name=rnName(u),since=parseInt(f.get('n'))||0;
+  if(op==='create'){const g=String(f.get('g')||'');if(g!=='ch'&&g!=='dk')return J({ok:false},400);
+    const c=String(f.get('col')||''),side=c==='w'||c==='b'?c:(Math.random()<.5?'w':'b');
+    if(Math.random()<.1)await db.prepare('DELETE FROM bg_room WHERE t<?1').bind(now-BG_TTL).run();
+    for(let k=0;k<5;k++){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let room='';for(let i=0;i<5;i++)room+=A[Math.random()*A.length|0];
+      const r=await db.prepare(`INSERT OR IGNORE INTO bg_room(room,g,${side},${side}n,${side}s,t) VALUES(?1,?2,?3,?4,?5,?5)`).bind(room,g,u.id,name,now).run();
+      if(r.meta.changes)return J(bgView({room,g,gn:0,mv:'',[side]:u.id},side,0,now))}
+    return J({ok:false})}
+  const room=String(f.get('room')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);
+  let r=await db.prepare('SELECT * FROM bg_room WHERE room=?1 AND t>?2').bind(room,now-BG_TTL).first();if(!r)return J({ok:false,gone:true});
+  let side=r.w===u.id?'w':r.b===u.id?'b':'';
+  if(op==='join'&&!side){side=!r.w?'w':!r.b?'b':'';if(!side)return J({ok:false,full:true});
+    const x=await db.prepare(`UPDATE bg_room SET ${side}=?2,${side}n=?3,${side}s=?4 WHERE room=?1 AND ${side} IS NULL`).bind(room,u.id,name,now).run();if(!x.meta.changes)return J({ok:false,full:true});
+    r={...r,[side]:u.id,[side+'n']:name,[side+'s']:now}}
+  if(!side)return J({ok:false},403);
+  if(op==='sig'){ // to'g'ridan-to'g'ri ulanish (WebRTC) xabari: raqibga yetkaziladi, yurishlarga tegmaydi
+    const data=String(f.get('data')||''),o=bgOpp(side);if(!(r.w&&r.b)||!data||data.length>12000)return J({ok:false});
+    await db.prepare(`UPDATE bg_room SET sg${o}=?2 WHERE room=?1`).bind(room,data).run();return J({ok:true})}
+  const set=bgStep(r,side,op==='join'?'poll':op,{n:since,mv:String(f.get('mv')||''),v:String(f.get('v')||''),over:f.get('over')==='1'});if(!set)return J({ok:false,n:bgList(r.mv).length});
+  if(set.w)side=bgOpp(side);
+  if(f.get('hb')==='1'||op==='join')set[side+'s']=now;
+  const ks=Object.keys(set);
+  if(ks.length){if('mv' in set||'res' in set)set.t=now;const kk=Object.keys(set);
+    // ikki so'rov bir vaqtda kelsa, faqat o'zi ko'rgan holat ustiga yozgani o'tadi
+    const x=await db.prepare(`UPDATE bg_room SET ${kk.map((k,i)=>k+'=?'+(i+4)).join(',')} WHERE room=?1 AND gn=?2 AND mv=?3`).bind(room,r.gn,r.mv,...kk.map(k=>set[k])).run();
+    if(!x.meta.changes)return J({ok:false,n:bgList(r.mv).length});r={...r,...set}}
+  const out=bgView(r,side,op==='again'&&set.w?0:since,now),sg=r['sg'+side];out.sig=null;
+  if(sg){const x=await db.prepare(`UPDATE bg_room SET sg${side}=NULL WHERE room=?1 AND sg${side}=?2`).bind(room,sg).run();if(x.meta.changes)out.sig=sg} // har bir xabar bir marta beriladi
+  return J(out);
+}
+// ---------- Yugur!: viloyatlar bellashuvi, haftalik reyting, do'stni chaqirish ----------
+const RN_REG=['tsh','tsv','and','bux','far','jiz','xor','nam','nav','qas','qqr','sam','sir','sur'];
+const RN_ROUTES={'/rn/me':1,'/rn/run':1,'/rn/card':1,'/pt/run':1,'/pt/me':1,'/pt/sig':1};
+// hafta: Toshkent vaqti bo'yicha dushanbadan boshlanadi
+function rnWeek(t){const d=new Date(t+TZMS),wd=(d.getUTCDay()+6)%7;return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-wd)).toISOString().slice(0,10)}
+const rnName=u=>((u.first_name||'').trim().slice(0,16)+(u.last_name?' '+u.last_name.trim()[0]+'.':''))||'O\'yinchi';
+async function handleRn(path,req,env){
+  let f;try{f=await req.formData()}catch(e){return J({ok:false},400)}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false},403);
+  const db=await D(env).catch(()=>null);if(!db)return J({ok:false,nodb:true});
+  const now=Date.now(),wk=rnWeek(now),lwk=rnWeek(now-7*DAY);
+  await db.prepare('INSERT INTO rn_user(uid,name) VALUES(?1,?2) ON CONFLICT(uid) DO UPDATE SET name=?2').bind(u.id,rnName(u)).run();
+  if(path==='/pt/sig'){ // Port dueli: xona va WebRTC ulanishi uchun xabar almashish (o'yin ma'lumoti bu yerdan o'tmaydi)
+    const op=String(f.get('op')||''),name=rnName(u);
+    if(op==='create'){if(Math.random()<.1){await db.prepare('DELETE FROM pt_room WHERE t<?1').bind(now-2*3600e3).run();await db.prepare('DELETE FROM pt_sig WHERE t<?1').bind(now-2*3600e3).run()}
+      for(let k=0;k<5;k++){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let room='';for(let i=0;i<5;i++)room+=A[Math.random()*A.length|0];
+        const r=await db.prepare('INSERT OR IGNORE INTO pt_room(room,p,st,t) VALUES(?1,?2,0,?3)').bind(room,JSON.stringify([{uid:u.id,name}]),now).run();if(r.meta.changes)return J({ok:true,room,slot:0,players:[{name}]})}
+      return J({ok:false})}
+    const room=String(f.get('room')||'').toUpperCase().slice(0,8),row=await db.prepare('SELECT p,st FROM pt_room WHERE room=?1 AND t>?2').bind(room,now-2*3600e3).first();if(!row)return J({ok:false,gone:true});
+    const pl=JSON.parse(row.p);let slot=pl.findIndex(x=>x.uid===u.id);const pub=()=>pl.map(x=>({name:x.name}));
+    if(op==='join'){if(slot<0){if(row.st)return J({ok:false,started:true});if(pl.length>=4)return J({ok:false,full:true});pl.push({uid:u.id,name});slot=pl.length-1;await db.prepare('UPDATE pt_room SET p=?2 WHERE room=?1').bind(room,JSON.stringify(pl)).run()}return J({ok:true,room,slot,players:pub()})}
+    if(slot<0)return J({ok:false},403);
+    if(op==='start'){if(slot!==0)return J({ok:false});await db.prepare('UPDATE pt_room SET st=1 WHERE room=?1').bind(room).run();return J({ok:true})}
+    if(op==='send'){const to=parseInt(f.get('to')),data=String(f.get('data')||'');if(!(to>=0&&to<4)||!data||data.length>12000)return J({ok:false});await db.prepare('INSERT INTO pt_sig(room,src,dst,data,t) VALUES(?1,?2,?3,?4,?5)').bind(room,slot,to,data,now).run();return J({ok:true})}
+    if(op==='poll'){const since=parseInt(f.get('since'))||0;const msgs=(await db.prepare('SELECT id,src,data FROM pt_sig WHERE room=?1 AND dst=?2 AND id>?3 ORDER BY id LIMIT 20').bind(room,slot,since).all()).results;return J({ok:true,slot,started:!!row.st,players:pub(),msgs})}
+    return J({ok:false},400);
+  }
+  if(path==='/pt/run'||path==='/pt/me'){ // Port o'yini: haftalik reyting
+    if(path==='/pt/run'){const sc=Math.max(0,Math.min(200000,parseInt(f.get('score'))||0));
+      const row=await db.prepare('SELECT last FROM pt_week WHERE wk=?1 AND uid=?2').bind(wk,u.id).first();if(row&&now-row.last<8000)return J({ok:false,slow:true});
+      await db.prepare('INSERT INTO pt_week(wk,uid,best,runs,last) VALUES(?1,?2,?3,1,?4) ON CONFLICT(wk,uid) DO UPDATE SET best=MAX(best,?3),runs=runs+1,last=?4').bind(wk,u.id,sc,now).run()}
+    const top=(await db.prepare('SELECT u.name name,w.best best FROM pt_week w JOIN rn_user u ON u.uid=w.uid WHERE w.wk=?1 ORDER BY w.best DESC,w.last ASC LIMIT 10').bind(wk).all()).results;
+    const me=await db.prepare('SELECT best FROM pt_week WHERE wk=?1 AND uid=?2').bind(wk,u.id).first();
+    const rank=me?(await db.prepare('SELECT COUNT(*) c FROM pt_week WHERE wk=?1 AND best>?2').bind(wk,me.best).first()).c+1:0;
+    return J({ok:true,top,best:me?me.best:0,rank});
+  }
+  if(path==='/rn/run'){
+    const sc=Math.max(0,Math.min(3e6,parseInt(f.get('score'))||0)),di=Math.max(0,Math.min(2e5,parseInt(f.get('dist'))||0));
+    const row=await db.prepare('SELECT last FROM rn_week WHERE wk=?1 AND uid=?2').bind(wk,u.id).first();
+    if(row&&now-row.last<8000)return J({ok:false,slow:true}); // juda tez-tez yuborilmasin
+    await db.prepare('INSERT INTO rn_week(wk,uid,best,dist,runs,last) VALUES(?1,?2,?3,?4,1,?5) ON CONFLICT(wk,uid) DO UPDATE SET best=MAX(best,?3),dist=dist+?4,runs=runs+1,last=?5').bind(wk,u.id,sc,di,now).run();
+    return J({ok:true});
+  }
+  if(path==='/rn/card'){ // natija kartasini foydalanuvchining o'ziga rasm qilib yuboradi — u do'stlariga uzatadi
+    const img=f.get('img'),cap=String(f.get('cap')||'').slice(0,300);if(!img||typeof img==='string'||img.size>1.5e6)return J({ok:false},400);
+    const cu=await db.prepare('SELECT card FROM rn_user WHERE uid=?1').bind(u.id).first();if(cu&&now-cu.card<20000)return J({ok:false,slow:true});
+    await db.prepare('UPDATE rn_user SET card=?2 WHERE uid=?1').bind(u.id,now).run();
+    const fd=new FormData();fd.append('chat_id',String(u.id));fd.append('photo',img,'yugur.png');fd.append('caption',cap);fd.append('parse_mode','HTML');
+    fd.append('reply_markup',JSON.stringify({inline_keyboard:[[{text:'🏃 Yugur! o\'ynash',url:'https://t.me/Hamronilovabot/app?startapp=yugur-r'+u.id}]]}));
+    const r=await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/sendPhoto`,{method:'POST',body:fd}).then(r=>r.json()).catch(()=>({ok:false}));
+    return J({ok:!!r.ok,blocked:r.error_code===403});
+  }
+  // /rn/me: viloyat, taklif bonusi, reyting
+  const reg=String(f.get('region')||'');let me=await db.prepare('SELECT * FROM rn_user WHERE uid=?1').bind(u.id).first();
+  if(RN_REG.includes(reg)&&reg!==me.region&&me.rwk!==wk){await db.prepare('UPDATE rn_user SET region=?2,rwk=?3 WHERE uid=?1').bind(u.id,reg,wk).run();me.region=reg;me.rwk=wk}
+  const ref=parseInt(f.get('ref'))||0;let refOk=false;
+  if(ref&&ref!==u.id&&!me.ref){
+    const nu=await db.prepare('SELECT first_seen FROM users WHERE id=?1').bind(u.id).first(),ru=await db.prepare('SELECT uid FROM rn_user WHERE uid=?1').bind(ref).first();
+    if(ru&&(!nu||!nu.first_seen||now-nu.first_seen<3*DAY)){
+      await db.batch([db.prepare('UPDATE rn_user SET ref=?2,bonus=bonus+500 WHERE uid=?1 AND ref IS NULL').bind(u.id,ref),db.prepare('UPDATE rn_user SET bonus=bonus+500 WHERE uid=?1').bind(ref)]);refOk=true}
+  }
+  const [top,regs,lastRegs,mine,rank,lastMine]=(await db.batch([
+    db.prepare('SELECT u.name,u.region,w.best FROM rn_week w JOIN rn_user u ON u.uid=w.uid WHERE w.wk=?1 ORDER BY w.best DESC LIMIT 10').bind(wk),
+    db.prepare('SELECT u.region k,SUM(w.dist) d,COUNT(*) n FROM rn_week w JOIN rn_user u ON u.uid=w.uid WHERE w.wk=?1 AND u.region IS NOT NULL GROUP BY u.region ORDER BY d DESC').bind(wk),
+    db.prepare('SELECT u.region k,SUM(w.dist) d FROM rn_week w JOIN rn_user u ON u.uid=w.uid WHERE w.wk=?1 AND u.region IS NOT NULL GROUP BY u.region ORDER BY d DESC LIMIT 1').bind(lwk),
+    db.prepare('SELECT best,dist,runs FROM rn_week WHERE wk=?1 AND uid=?2').bind(wk,u.id),
+    db.prepare('SELECT COUNT(*)+1 r FROM rn_week WHERE wk=?1 AND best>(SELECT COALESCE(MAX(best),0) FROM rn_week WHERE wk=?1 AND uid=?2)').bind(wk,u.id),
+    db.prepare('SELECT dist FROM rn_week WHERE wk=?1 AND uid=?2').bind(lwk,u.id)
+  ])).map(r=>r.results||[]);
+  const win=lastRegs[0]&&lastRegs[0].k;let wbonus=0;
+  me=await db.prepare('SELECT * FROM rn_user WHERE uid=?1').bind(u.id).first();
+  if(win&&me.region===win&&me.wkc!==lwk&&lastMine[0]&&lastMine[0].dist>0){wbonus=300;await db.prepare('UPDATE rn_user SET wkc=?2,bonus=bonus+300 WHERE uid=?1').bind(u.id,lwk).run()}
+  // bonus bir marta beriladi: ayirib olamiz (parallel so'rovda ikki marta berilmaydi)
+  const cur=await db.prepare('SELECT bonus FROM rn_user WHERE uid=?1').bind(u.id).first();let bonus=0;
+  if(cur&&cur.bonus>0){const r=await db.prepare('UPDATE rn_user SET bonus=bonus-?2 WHERE uid=?1 AND bonus>=?2').bind(u.id,cur.bonus).run();if(r.meta&&r.meta.changes)bonus=cur.bonus}
+  return J({ok:true,wk,region:me.region||null,canMove:me.rwk!==wk,bonus,refOk,win,winBonus:wbonus,top,regs,me:mine[0]||null,rank:mine[0]?rank[0].r:null});
+}
 export default {
   async fetch(req,env){
     const path=new URL(req.url).pathname;
@@ -538,10 +860,12 @@ export default {
     if(path==='/food'&&req.method==='POST')return handleFood(req,env);
     if(path==='/food/fix'&&req.method==='POST')return handleFoodFix(req,env);
     if(BL_ROUTES[path]&&req.method==='POST')return handleBl(path,req,env);
+    if(path==='/bg/room'&&req.method==='POST')return handleBg(req,env);
+    if(RN_ROUTES[path]&&req.method==='POST')return handleRn(path,req,env);
     if(req.method!=='POST') return new Response('Hamroh bot ishlayapti ✅');
     if(env.WEBHOOK_SECRET&&req.headers.get('x-telegram-bot-api-secret-token')!==env.WEBHOOK_SECRET) return new Response('forbidden',{status:403});
     const u=await req.json().catch(()=>({}));
-    try{ if(u.message) await onMessage(env,u.message); else if(u.callback_query) await onCallback(env,u.callback_query); }catch(e){console.log(e)}
+    try{ if(u.message) await onMessage(env,u.message); else if(u.callback_query) await onCallback(env,u.callback_query); else if(u.widget_query) return (await onWidgetQuery(env,u.widget_query),new Response('ok')); else if(u.shared_widget_query){await tg(env,'answerWidgetQuery',{widget_query_id:u.shared_widget_query.id});return new Response('ok')} }catch(e){console.log(e)}
     try{ await trackBot(env,u) }catch(e){console.log('stats',e)}
     if(u.my_chat_member) return new Response('ok');
     try{ const m=u.message||(u.callback_query&&u.callback_query.message); const cid=m&&m.chat&&m.chat.type==='private'&&m.chat.id;

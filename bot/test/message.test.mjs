@@ -22,11 +22,35 @@ test('in a group, plain messages are ignored', async () => {
   assert.equal(sent().length, 0);
 });
 
-test('/namoz answers with prayer times and a region keyboard', async () => {
+test('/namoz in a private chat sends the live widget with a region keyboard', async () => {
   await webhook(msg('/namoz'), { DB });
-  const m = sent().at(-1);
-  assert.match(m.body.text, /Hududni tanlang/);
-  assert.ok(m.body.reply_markup.inline_keyboard.flat().some(b => String(b.callback_data).startsWith('nm:')));
+  const w = world.tg.find(c => c.method === 'sendWidget');
+  assert.ok(w, 'widget sent');
+  assert.match(w.body.caption, /Bomdod/);
+  assert.ok(w.body.reply_markup.inline_keyboard.flat().some(b => String(b.callback_data).startsWith('nm:')));
+  assert.equal(sent().length, 0, 'no extra text message');
+});
+
+const REFUSED = { ok: false, error_code: 400, description: 'Bad Request: WIDGETS_DISABLED_TEST' };
+test('/namoz falls back to the text timetable when Telegram refuses the widget', async () => {
+  world.fail = { sendWidget: REFUSED };
+  await webhook(msg('/namoz'), { DB });
+  assert.match(lastText(), /Hududni tanlang/);
+  assert.doesNotMatch(lastText(), /WIDGETS_DISABLED_TEST/, 'ordinary users never see the technical reason');
+});
+
+test('/shaxmat falls back to the app button when the widget is refused, and only an admin is told why', async () => {
+  world.fail = { sendWidget: REFUSED };
+  await webhook(msg('/shaxmat'), { DB });
+  assert.match(lastText(), /Shaxmat/);
+  assert.doesNotMatch(lastText(), /WIDGETS_DISABLED_TEST/);
+  assert.ok(sent().at(-1).body.reply_markup.inline_keyboard.flat().some(b => b.web_app));
+  resetWorld(); world.fail = { sendWidget: REFUSED }; makeAdmin(DB, 5);
+  await webhook(msg('/shaxmat'), { DB });
+  assert.match(lastText(), /WIDGETS_DISABLED_TEST/, 'admin sees the reason Telegram gave');
+  resetWorld(); world.fail = { sendWidget: REFUSED }; makeAdmin(DB, 5);
+  await webhook(msg('/namoz'), { DB });
+  assert.match(lastText(), /WIDGETS_DISABLED_TEST/);
 });
 
 test('/kurs shows Central Bank rates', async () => {
