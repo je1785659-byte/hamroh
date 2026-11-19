@@ -57,7 +57,7 @@ function ray(b,dx,dy){let best=1e9,hit=null;for(const o of balls){if(!o.on||o===
 // ---------- o'yin: Amerikanka ('am') va Moskva piramidasi ('ms') ----------
 const NEED=8;let VAR=store.get('var','am'),pick=false,ST='menu',turn=0,score=[0,0],debt=[0,0],sel=null,ang=-Math.PI/2,pow=0,spin=[0,0],brk=true,place=false,msg='',msgT=0,winner=-1,MODE='two',spinOpen=false,T=0;
 let LVL=store.get('lvl',1);const LVN=['Oson',"O'rta",'Kuchli'];
-const NAMES=()=>MODE==='solo'?['Siz','—']:MODE==='ai'?['Siz','Kompyuter · '+LVN[LVL]]:['1-o\'yinchi','2-o\'yinchi'];
+const NAMES=()=>MODE==='solo'?['Siz','—']:MODE==='ai'?['Siz','Kompyuter']:['1-o\'yinchi','2-o\'yinchi'];
 function say(s,t=2.4){msg=s;msgT=t}
 function newGame(mode){MODE=mode;rack();turn=0;score=[0,0];debt=[0,0];brk=true;place=true;pick=false;winner=-1;sel=balls.find(b=>b.cue);ang=-Math.PI/2;pow=0;spin=[0,0];sim=false;shot=null;ST='play';AI=null;say('Sharni "uy"da joylang va piramidani buzing',3.5)}
 function respot(b){b.on=true;b.pot=0;b.vx=b.vy=b.wx=b.wy=b.wz=0;let x=W/2,y=R+.002,k=0;const free=()=>balls.every(o=>o===b||!o.on||hyp(o.x-x,o.y-y)>2*R+.001);while(!free()&&k<60){k++;x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.004);if(x<R+.01||x>W-R-.01){y+=2*R+.004;x=W/2}}b.x=x;b.y=y}
