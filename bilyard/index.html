@@ -5,8 +5,11 @@
 // ================= HAMROH · BILYARD (rus bilyardi) =================
 // O'lchamlar metrda. Stol tik turadi: x — eni, y — bo'yi. "Uy" pastda, piramida tepada.
 const W=1.775,H=3.55,R=.034,G=9.8;
-const MU_S=.2,MU_R=.011,MU_SP=.044,E_BB=.95,E_C=.76,K_C=.14,MU_BB=.03; // sirpanish, dumalash, aylanish, shar-shar, bort
-const DC=.068,MH=.053,DT=1/300;             // burchak luzasi (bort uchidan burchakkacha), o'rta luza yarim eni
+// O'lchangan qiymatlar (pooltool loyihasi va bilyard fizikasi bo'yicha maqolalardan): mato, shar va bort
+let E_C=.95,F_C=.35;const MU_S=.2,MU_R=.01,SPIN_DEC=2.5*(4/9)*G,E_BB=.95,MU_BB=.05,ST_C=.4,CT_C=Math.sqrt(1-.16); // bort sharga markazidan 0.4R balandda tegadi
+const DT=1/300,CW=.05;                       // CW — bort rezinasi eni
+// Luza og'zi (bort uchlari orasi): rasmiy o'lcham — burchak 72,5 mm, o'rta 82,5 mm (shar 68 mm). "Keng" rejimda 18% kattaroq.
+let PK=1,MC=.0725,MM=.0825;
 const cv=document.getElementById('c'),g=cv.getContext('2d');
 const cl=(v,a=0,b=1)=>v<a?a:v>b?b:v,TAU=Math.PI*2,hyp=Math.hypot;
 const store={get(k,d){try{const v=localStorage.getItem('bil_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('bil_'+k,JSON.stringify(v))}catch(e){}}};
@@ -19,36 +22,47 @@ function click(vol,f=2200,d=.035){if(QUIET||!SND||!AC||vol<.01)return;const t=AC
  const s=AC.createBufferSource(),q=AC.createBiquadFilter(),v=AC.createGain();s.buffer=b;q.type='bandpass';q.frequency.value=f;q.Q.value=1.2;v.gain.value=cl(vol,0,1)*.7;s.connect(q).connect(v).connect(AC.destination);s.start(t)}
 function thud(){if(QUIET||!SND||!AC)return;const t=AC.currentTime,o=AC.createOscillator(),v=AC.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(55,t+.22);v.gain.setValueAtTime(.35,t);v.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(v).connect(AC.destination);o.start(t);o.stop(t+.26);click(.3,500,.12)}
 // ---------- bortlar: kesmalar (luzalar orasida) va luza og'zi yonoqlari ----------
-const RAILS=[];{const a=(x1,y1,x2,y2)=>RAILS.push({x1,y1,x2,y2});const m=H/2,f=.036,o=.044;
- a(DC,0,W-DC,0);a(DC,H,W-DC,H);a(0,DC,0,m-MH);a(0,m+MH,0,H-DC);a(W,DC,W,m-MH);a(W,m+MH,W,H-DC);
- for(const sx of[0,1])for(const sy of[0,1]){const X=sx?W:0,Y=sy?H:0,dx=sx?-1:1,dy=sy?-1:1;a(X+dx*DC,Y,X+dx*(DC-f),Y-dy*o);a(X,Y+dy*DC,X-dx*o,Y+dy*(DC-f))}
- for(const sx of[0,1]){const X=sx?W:0,dx=sx?1:-1;a(X,m-MH,X+dx*o,m-MH+.012);a(X,m+MH,X+dx*o,m+MH-.012)}}
-const POCKETS=[[0,0],[W,0],[0,H/2],[W,H/2],[0,H],[W,H]];
+let RAILS=[],HOLES=[];
+function buildTable(){const k=PK?1:1.18;MC=.0725*k;MM=.0825*k;RAILS=[];HOLES=[];const a=(x1,y1,x2,y2)=>RAILS.push({x1,y1,x2,y2});const m=H/2,d=MC/Math.SQRT2,h=MM/2,f=CW/Math.SQRT2;
+ a(d,0,W-d,0);a(d,H,W-d,H);a(0,d,0,m-h);a(0,m+h,0,H-d);a(W,d,W,m-h);a(W,m+h,W,H-d);
+ for(const sx of[0,1])for(const sy of[0,1]){const X=sx?W:0,Y=sy?H:0,dx=sx?-1:1,dy=sy?-1:1;a(X+dx*d,Y,X+dx*(d-f),Y-dy*f);a(X,Y+dy*d,X-dx*f,Y+dy*(d-f));HOLES.push({x:X-dx*.0154,y:Y-dy*.0154,r:.046,mx:X+dx*d/2,my:Y+dy*d/2,vr:MC/2+.004,q:[[X+dx*d,Y],[X+dx*(d-f),Y-dy*f],[X-dx*f,Y+dy*(d-f)],[X,Y+dy*d]]})}
+ for(const sx of[0,1]){const X=sx?W:0,dx=sx?1:-1;a(X,m-h,X+dx*CW,m-h+.006);a(X,m+h,X+dx*CW,m+h-.006);HOLES.push({x:X+dx*.05,y:m,r:.042,mx:X,my:m,vr:MM/2+.002,q:[[X,m-h],[X+dx*CW,m-h+.006],[X+dx*CW,m+h-.006],[X,m+h]]})}
+ tableCv=null}
+const POCKETS=[[0,0],[W,0],[0,H/2],[W,H/2],[0,H],[W,H]];let tableCv=null;
 // ---------- holat ----------
 let balls=[],shot=null,sim=false;
-const mk=(x,y,cue)=>({x,y,vx:0,vy:0,wx:0,wy:0,wz:0,on:true,cue:!!cue,pot:0,rx:Math.random()*TAU,ry:Math.random()*TAU});
-function rack(){balls=[];const ax=W/2,ay=H/4,d=2*R+.0006;let k=0;for(let row=0;row<5;row++)for(let i=0;i<=row;i++)balls.push(mk(ax+(i-row/2)*d,ay-row*d*.8661,false));balls.push(mk(W/2,H*3/4+.25,true))}
+const rnd3=()=>{const a=Math.random()*TAU,z=Math.random()*2-1,q=Math.sqrt(1-z*z);return[Math.cos(a)*q,Math.sin(a)*q,z]};
+const mk=(x,y,cue,num)=>{const d=rnd3(),t=rnd3(),k=d[0]*t[0]+d[1]*t[1]+d[2]*t[2];let u=[t[0]-d[0]*k,t[1]-d[1]*k,t[2]-d[2]*k];const l=hyp(u[0],u[1],u[2])||1;u=u.map(q=>q/l);return{x,y,vx:0,vy:0,wx:0,wy:0,wz:0,on:true,cue:!!cue,num:num||0,pot:0,fall:0,d,u}};
+// shar ustidagi raqam haqiqiy aylanish bo'yicha buriladi
+function spinMark(b,dt){const wx=b.wx,wy=b.wy,wz=b.wz;for(const v of[b.d,b.u]){const x=v[0],y=v[1],z=v[2];v[0]+=(wy*z-wz*y)*dt;v[1]+=(wz*x-wx*z)*dt;v[2]+=(wx*y-wy*x)*dt}const d=b.d,u=b.u;let l=hyp(d[0],d[1],d[2]);d[0]/=l;d[1]/=l;d[2]/=l;const k=d[0]*u[0]+d[1]*u[1]+d[2]*u[2];u[0]-=d[0]*k;u[1]-=d[1]*k;u[2]-=d[2]*k;l=hyp(u[0],u[1],u[2])||1;u[0]/=l;u[1]/=l;u[2]/=l}
+let JIT=.0002; // haqiqiy piramida ideal zich turmaydi: sharlar orasida mayda tirqishlar bor
+function rack(){balls=[];const ax=W/2,ay=H/4,d=2*R+JIT;let k=0;for(let row=0;row<5;row++)for(let i=0;i<=row;i++)balls.push(mk(ax+(i-row/2)*d+(Math.random()-.5)*JIT,ay-row*d*.8661+(Math.random()-.5)*JIT,false,++k));balls.push(mk(W/2,H*3/4+.25,true))}
 // ---------- fizika ----------
-function step(dt){let moving=false;
+// Tez sharlar bir qadamda bir-birining ichiga kirib ketmasligi uchun qadam maydalanadi (bir bo'lakda ko'pi bilan 4 mm yo'l).
+function step(dt){let vm=0;for(const b of balls)if(b.on){const v=Math.abs(b.vx)+Math.abs(b.vy);if(v>vm)vm=v}const k=Math.min(14,Math.max(1,Math.ceil(vm*dt/.004)));let mv=false;for(let i=0;i<k;i++)mv=sub(dt/k);return mv}
+function sub(dt){let moving=false;
  for(const b of balls){if(!b.on)continue;const ux=b.vx-R*b.wy,uy=b.vy+R*b.wx,us=hyp(ux,uy),sp=hyp(b.vx,b.vy);
   if(us>1e-4){const a=MU_S*G*dt;if(us<=3.5*a){b.vx-=ux/3.5;b.vy-=uy/3.5;b.wy=b.vx/R;b.wx=-b.vy/R}else{const ex=ux/us,ey=uy/us;b.vx-=a*ex;b.vy-=a*ey;b.wx-=2.5*a/R*ey;b.wy+=2.5*a/R*ex}}
   else if(sp>0){const dec=MU_R*G*dt;if(sp<=dec){b.vx=b.vy=0}else{const k=(sp-dec)/sp;b.vx*=k;b.vy*=k}b.wy=b.vx/R;b.wx=-b.vy/R}
-  if(b.wz){const dz=2.5*MU_SP*G/R*dt;b.wz=Math.abs(b.wz)<=dz?0:b.wz-Math.sign(b.wz)*dz}
-  b.x+=b.vx*dt;b.y+=b.vy*dt;b.rx+=b.vx*dt/R;b.ry+=b.vy*dt/R;
+  if(b.wz){const dz=SPIN_DEC*dt;b.wz=Math.abs(b.wz)<=dz?0:b.wz-Math.sign(b.wz)*dz}
+  b.x+=b.vx*dt;b.y+=b.vy*dt;if(!QUIET)spinMark(b,dt);
   if(hyp(b.vx,b.vy)>.004||Math.abs(b.wz)>.6||hyp(b.vx-R*b.wy,b.vy+R*b.wx)>.004)moving=true;else{b.vx=b.vy=b.wx=b.wy=b.wz=0}}
  // shar — shar
- for(let i=0;i<balls.length;i++){const a=balls[i];if(!a.on)continue;for(let j=i+1;j<balls.length;j++){const b=balls[j];if(!b.on)continue;const dx=b.x-a.x,dy=b.y-a.y;if(Math.abs(dx)>2*R||Math.abs(dy)>2*R)continue;const d=hyp(dx,dy);if(d>=2*R||d===0)continue;
+ for(let it=0,any=true;it<5&&any;it++){any=false;for(let i=0;i<balls.length;i++){const a=balls[i];if(!a.on)continue;for(let j=i+1;j<balls.length;j++){const b=balls[j];if(!b.on)continue;const dx=b.x-a.x,dy=b.y-a.y;if(Math.abs(dx)>2*R||Math.abs(dy)>2*R)continue;const d=hyp(dx,dy);if(d>=2*R||d===0)continue;
    const nx=dx/d,ny=dy/d,ov=(2*R-d)/2;a.x-=nx*ov;a.y-=ny*ov;b.x+=nx*ov;b.y+=ny*ov;const rvx=a.vx-b.vx,rvy=a.vy-b.vy,vn=rvx*nx+rvy*ny;if(vn<=0)continue;
    const jn=(1+E_BB)/2*vn;a.vx-=jn*nx;a.vy-=jn*ny;b.vx+=jn*nx;b.vy+=jn*ny;
    const tx=-ny,ty=nx,vt=rvx*tx+rvy*ty-R*(a.wz+b.wz),jt=Math.sign(vt)*Math.min(MU_BB*jn,Math.abs(vt)*.14);a.vx-=jt*tx;a.vy-=jt*ty;b.vx+=jt*tx;b.vy+=jt*ty; // aylanish sharni biroz chetga suradi
-   if(shot){if(!shot.first&&(a===shot.ball||b===shot.ball))shot.first=a===shot.ball?b:a;shot.hits++}click(jn*.5,2600);moving=true}}
- // bort
+   if(shot){if(!shot.first&&(a===shot.ball||b===shot.ball))shot.first=a===shot.ball?b:a;shot.hits++}click(jn*.5,2600);moving=true;any=true}}}
+ // bort va luza yonoqlari: bort sharga markazidan balandroqda tegadi, shuning uchun aylanish va tezlik birga o'zgaradi
  for(const b of balls){if(!b.on)continue;if(b.x>R+.001&&b.x<W-R-.001&&b.y>R+.001&&b.y<H-R-.001)continue;
   for(const s of RAILS){const ex=s.x2-s.x1,ey=s.y2-s.y1,t=cl(((b.x-s.x1)*ex+(b.y-s.y1)*ey)/(ex*ex+ey*ey)),px=s.x1+ex*t,py=s.y1+ey*t,dx=b.x-px,dy=b.y-py,d=hyp(dx,dy);if(d>=R||d===0)continue;
-   const nx=dx/d,ny=dy/d;b.x=px+nx*R;b.y=py+ny*R;const vn=b.vx*nx+b.vy*ny;if(vn>=0)continue;const tx=-ny,ty=nx,vt=b.vx*tx+b.vy*ty,slip=vt-R*b.wz;
-   const vn2=-E_C*vn,vt2=vt-K_C*slip;b.wz+=2.5*K_C*slip/R;b.vx=nx*vn2+tx*vt2;b.vy=ny*vn2+ty*vt2;if(shot){shot.rail++;if(shot.first)shot.railAfter++}click(-vn*.35,900,.05)}
-  // luza: chegaradan chiqqan shar tushgan hisoblanadi
-  if(b.x<-R*.45||b.x>W+R*.45||b.y<-R*.45||b.y>H+R*.45){b.on=false;b.vx=b.vy=b.wx=b.wy=b.wz=0;b.pot=1;let best=0,bd=9;POCKETS.forEach((p,i)=>{const q=hyp(p[0]-b.x,p[1]-b.y);if(q<bd){bd=q;best=i}});b.pk=best;if(shot)shot.pots.push(b);thud();haptic('medium')}}
+   const nx=dx/d,ny=dy/d;b.x=px+nx*R;b.y=py+ny*R;const ax=-nx,ay=-ny,bx=-ay,by=ax;let vx=b.vx*ax+b.vy*ay;if(vx<=0)continue;let vy=b.vx*bx+b.vy*by,wx=b.wx*ax+b.wy*ay,wy=b.wx*bx+b.wy*by;
+   const sx=vx*ST_C+R*wy,sy=-vy-R*b.wz*CT_C+R*wx*ST_C,sl=hyp(sx,sy),pn=(1+E_C)*vx*CT_C;let fx,fy;if(sl/3.5<=F_C*pn){fx=sx/3.5;fy=sy/3.5}else{fx=F_C*pn*sx/sl;fy=F_C*pn*sy/sl}
+   const PX=-fx*ST_C-pn*CT_C,PY=fy,PZ=fx*CT_C-pn*ST_C,v0=vx;vx+=PX;vy+=PY;wx-=2.5/R*PY*ST_C;wy+=2.5/R*(PX*ST_C-PZ*CT_C);b.wz+=2.5/R*PY*CT_C;
+   b.vx=vx*ax+vy*bx;b.vy=vx*ay+vy*by;b.wx=wx*ax+wy*bx;b.wy=wx*ay+wy*by;if(shot){shot.rail++;if(shot.first)shot.railAfter++}click(v0*.3,800,.05);moving=true}
+  // luza: shar markazi teshik ustiga o'tsa, pastga tushadi
+  let hole=null;for(const h of HOLES)if(hyp(b.x-h.x,b.y-h.y)<h.r){hole=h;break}if(!hole&&(b.x<-.09||b.x>W+.09||b.y<-.09||b.y>H+.09))hole=HOLES.reduce((p,h)=>hyp(b.x-h.x,b.y-h.y)<hyp(b.x-p.x,b.y-p.y)?h:p);
+  if(hole){b.on=false;b.fvx=b.vx;b.fvy=b.vy;b.vx=b.vy=b.wx=b.wy=b.wz=0;b.pot=1;b.fall=.001;b.hole=hole;if(shot)shot.pots.push(b);thud();haptic('medium')}}
  return moving}
 // nishon chizig'i: birinchi to'qnashuvgacha
 function ray(b,dx,dy){let best=1e9,hit=null;for(const o of balls){if(!o.on||o===b)continue;const ox=o.x-b.x,oy=o.y-b.y,pr=ox*dx+oy*dy;if(pr<=0)continue;const d2=ox*ox+oy*oy-pr*pr;if(d2>=4*R*R)continue;const t=pr-Math.sqrt(4*R*R-d2);if(t<best){best=t;hit=o}}
@@ -60,11 +74,11 @@ let LVL=store.get('lvl',1);const LVN=['Oson',"O'rta",'Kuchli'];
 const NAMES=()=>MODE==='solo'?['Siz','—']:MODE==='ai'?['Siz','Kompyuter']:['1-o\'yinchi','2-o\'yinchi'];
 function say(s,t=2.4){msg=s;msgT=t}
 function newGame(mode){MODE=mode;rack();turn=0;score=[0,0];debt=[0,0];brk=true;place=true;pick=false;winner=-1;sel=balls.find(b=>b.cue);ang=-Math.PI/2;pow=0;spin=[0,0];sim=false;shot=null;ST='play';AI=null;say('Sharni "uy"da joylang va piramidani buzing',3.5)}
-function respot(b){b.on=true;b.pot=0;b.vx=b.vy=b.wx=b.wy=b.wz=0;let x=W/2,y=R+.002,k=0;const free=()=>balls.every(o=>o===b||!o.on||hyp(o.x-x,o.y-y)>2*R+.001);while(!free()&&k<60){k++;x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.004);if(x<R+.01||x>W-R-.01){y+=2*R+.004;x=W/2}}b.x=x;b.y=y}
-function strike(b,a,p,sp){const V=.5+Math.pow(p,1.35)*9,dx=Math.cos(a),dy=Math.sin(a),k=2.5*V/R*.5;b.vx=dx*V;b.vy=dy*V;b.wx=-dy*k*sp[1];b.wy=dx*k*sp[1];b.wz=-k*sp[0]}
+function respot(b){b.on=true;b.pot=0;b.fall=0;b.vx=b.vy=b.wx=b.wy=b.wz=0;let x=W/2,y=R+.002,k=0;const free=()=>balls.every(o=>o===b||!o.on||hyp(o.x-x,o.y-y)>2*R+.001);while(!free()&&k<60){k++;x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.004);if(x<R+.01||x>W-R-.01){y+=2*R+.004;x=W/2}}b.x=x;b.y=y}
+function strike(b,a,p,sp){const V=.4+Math.pow(p,1.35)*10.6,dx=Math.cos(a),dy=Math.sin(a),k=2.5*V/R*.5;b.vx=dx*V;b.vy=dy*V;b.wx=-dy*k*sp[1];b.wy=dx*k*sp[1];b.wz=-k*sp[0]}
 function fire(){if(pick){pow=0;return}if(sim||!sel||pow<.03){pow=0;return}strike(sel,ang,pow,spin);
- shot={ball:sel,first:null,hits:0,rail:0,railAfter:0,pots:[],brk,home:place&&!brk};sim=true;place=false;click(.4+pow*.6,1500,.05);haptic(pow>.6?'heavy':'light');pow=0}
-function cueHome(){const c=balls.find(b=>b.cue);c.on=true;c.pot=0;c.vx=c.vy=c.wx=c.wy=c.wz=0;c.x=W/2;c.y=H*3/4+.25;let k=0;while(balls.some(o=>o!==c&&o.on&&hyp(o.x-c.x,o.y-c.y)<2*R+.002)&&k++<40)c.x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.01);place=true;sel=c}
+ cueFx={x:sel.x,y:sel.y,a:ang,p:pow,t:0};shot={ball:sel,first:null,hits:0,rail:0,railAfter:0,pots:[],brk,home:place&&!brk};sim=true;place=false;click(.4+pow*.6,1500,.05);haptic(pow>.6?'heavy':'light');pow=0}
+function cueHome(){const c=balls.find(b=>b.cue);c.on=true;c.pot=0;c.fall=0;c.vx=c.vy=c.wx=c.wy=c.wz=0;c.x=W/2;c.y=H*3/4+.25;let k=0;while(balls.some(o=>o!==c&&o.on&&hyp(o.x-c.x,o.y-c.y)<2*R+.002)&&k++<40)c.x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.01);place=true;sel=c}
 function win(me){winner=me;ST='over';haptic('ok')}
 function endMs(){const s=shot,me=turn,op=1-turn,cue=balls.find(b=>b.cue),cuePot=s.pots.includes(cue),obj=s.pots.filter(b=>b!==cue);shot=null;sim=false;let foul='';
  const inHome=b=>b.y>H*3/4,others=balls.filter(b=>b.on&&!b.cue||s.pots.includes(b)&&!b.cue);
@@ -88,15 +102,15 @@ function endShot(){if(VAR==='ms')return endMs();const s=shot,me=turn,op=1-turn;s
 // ================= KOMPYUTER RAQIB =================
 // Nomzod zarbalar geometriya bo'yicha topiladi, keyin har biri haqiqiy fizikada sinab ko'riladi; eng yaxshisi biroz xato bilan uriladi.
 let AI=null;const aiTurn=()=>MODE==='ai'&&turn===1&&ST==='play';
-const PAIM=[[.028,.028],[W-.028,.028],[-.01,H/2],[W+.01,H/2],[.028,H-.028],[W-.028,H-.028]];
+
 function simShot(state,idx,a,p,home){const kb=balls,ks=shot;balls=state.map(b=>({...b}));QUIET=true;const b=balls[idx];strike(b,a,p,[0,0]);shot={ball:b,first:null,hits:0,rail:0,railAfter:0,pots:[],brk:false,home};let n=0;while(n++<7000&&step(DT));
  const cue=balls.find(q=>q.cue),r={first:shot.first,pots:shot.pots.length,cuePot:shot.pots.includes(cue),railAfter:shot.railAfter,selfPot:shot.pots.includes(b)};balls=kb;shot=ks;QUIET=false;return r}
 function aiValue(r,home,state){if(!r.first)return -6;if(VAR==='ms'&&home&&r.first.y>H*3/4&&state.some(b=>b.on&&!b.cue&&b.y<=H*3/4))return -6;if(!r.pots)return r.railAfter?-1:-6;return r.pots*10}
 function blocked(state,ax,ay,bx,by,skip,rad){const dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy;for(let i=0;i<state.length;i++){const o=state[i];if(!o.on||skip.includes(i))continue;const t=((o.x-ax)*dx+(o.y-ay)*dy)/L2;if(t<=0||t>=1)continue;if(hyp(o.x-ax-dx*t,o.y-ay-dy*t)<rad)return true}return false}
 function aiCands(state,home){const out=[];const strikers=[];state.forEach((b,i)=>{if(b.on&&(VAR==='am'&&!brk||b.cue))strikers.push(i)});
  for(const si of strikers){const s=state[si];for(let oi=0;oi<state.length;oi++){const o=state[oi];if(!o.on||oi===si)continue;if(VAR==='ms'&&o.cue)continue;
-   for(let k=0;k<6;k++){const P=PAIM[k],d2=hyp(P[0]-o.x,P[1]-o.y),dx=(P[0]-o.x)/d2,dy=(P[1]-o.y)/d2;if((k===2||k===3)&&Math.abs(dx)<.45)continue;const gx=o.x-dx*2*R,gy=o.y-dy*2*R,d1=hyp(gx-s.x,gy-s.y);if(d1<.01)continue;const ax=(gx-s.x)/d1,ay=(gy-s.y)/d1,cut=ax*dx+ay*dy;if(cut<.3)continue;
-    if(blocked(state,s.x,s.y,gx,gy,[si,oi],2*R)||blocked(state,o.x,o.y,P[0],P[1],[si,oi],2*R*.92))continue;out.push({si,ang:Math.atan2(ay,ax),g:Math.pow(cut,1.6)/(1+d1*.3+d2*.55),home})}}}
+   for(let k=0;k<6;k++){const hh=HOLES[k],mid=k>3,P=[hh.mx,hh.my],d2=hyp(P[0]-o.x,P[1]-o.y),dx=(P[0]-o.x)/d2,dy=(P[1]-o.y)/d2;if(mid?Math.abs(dx)<.62:Math.min(Math.abs(dx),Math.abs(dy))<.3)continue;const gx=o.x-dx*2*R,gy=o.y-dy*2*R,d1=hyp(gx-s.x,gy-s.y);if(d1<.01)continue;const ax=(gx-s.x)/d1,ay=(gy-s.y)/d1,cut=ax*dx+ay*dy;if(cut<.3)continue;
+    if(blocked(state,s.x,s.y,gx,gy,[si,oi],2*R)||blocked(state,o.x,o.y,P[0],P[1],[si,oi],2*R*.98))continue;out.push({si,ang:Math.atan2(ay,ax),g:Math.pow(cut,1.6)/(1+d1*.3+d2*.55),home})}}}
  return out.sort((a,b)=>b.g-a.g)}
 const gauss=()=>{let u=0;for(let i=0;i<6;i++)u+=Math.random();return (u-3)/.707};
 function aiStart(){const cue=balls.find(b=>b.cue),base=balls.map(b=>({...b})),N=[5,12,26][LVL],PW=[[.5],[.4,.65],[.33,.52,.75]][LVL];let jobs=[];
@@ -107,7 +121,7 @@ function aiTick(dt){const A=AI;A.t+=dt;
  if(A.ph==='think'){let n=0;while(A.i<A.jobs.length&&n++<3){const j=A.jobs[A.i++],r=simShot(j.state,j.c.si,j.c.ang,j.p,j.c.home),v=aiValue(r,j.c.home,j.state)+j.c.g*.5-j.p*.2+Math.random()*.2;if(v>A.bv){A.bv=v;A.best={si:j.c.si,ang:j.c.ang,pow:j.p,pos:j.pos}}}
   if(A.i>=A.jobs.length&&A.t>.8){if(!A.best||A.bv<-2){ // tushadigan zarba yo'q — eng yaqin sharga yumshoq o'ynaydi
      const cue=balls.find(b=>b.cue),si=VAR==='ms'||brk?balls.indexOf(cue):balls.findIndex(b=>b.on);let best=null,bv=-99;const s=balls[si],hm=VAR==='ms'&&place&&!brk;balls.forEach((o,oi)=>{if(!o.on||oi===si)return;const a=Math.atan2(o.y-s.y,o.x-s.x);for(const p of[.3,.5]){const r=simShot(A.base,si,a,p,hm),v=aiValue(r,hm,A.base)-hyp(o.x-s.x,o.y-s.y)*.1;if(v>bv){bv=v;best={si,ang:a,pow:p,pos:null}}}});A.best=best||{si,ang:-Math.PI/2,pow:.5,pos:null}}
-   const b=A.best;if(brk)b.pow=1;b.ang+=gauss()*[.04,.014,.005][LVL];b.pow=cl(b.pow*(1+gauss()*.05),.12,1);sel=balls[b.si];if(b.pos){sel.x=b.pos[0];sel.y=b.pos[1]}A.a0=ang;A.ph='aim';A.t=0}}
+   const b=A.best;if(brk)b.pow=1;b.ang+=gauss()*[.008,.0035,.0012][LVL];b.pow=cl(b.pow*(1+gauss()*.05),.12,1);sel=balls[b.si];if(b.pos){sel.x=b.pos[0];sel.y=b.pos[1]}A.a0=ang;A.ph='aim';A.t=0}}
  else if(A.ph==='aim'){const b=A.best,u=cl(A.t/.75),e=u*u*(3-2*u);let d=((b.ang-A.a0)%TAU+TAU*1.5)%TAU-Math.PI;ang=A.a0+d*e;pow=cl((A.t-.75)/.45)*b.pow;if(A.t>1.3){ang=b.ang;pow=b.pow;AI=null;fire()}}}
 function aiPick(){const obs=balls.filter(b=>b.on&&!b.cue);let best=obs[0],bd=-1;for(const o of obs){const d=Math.min(...POCKETS.map(p=>hyp(p[0]-o.x,p[1]-o.y)));if(d>bd){bd=d;best=o}}if(best)takeBall(best)}
 // ================= CHIZISH =================
@@ -115,41 +129,46 @@ let VW=0,VH=0,DPR=1,S=1,TX0=0,TY0=0,L={};
 function fit(){DPR=Math.min(2.5,devicePixelRatio||1);VW=innerWidth;VH=innerHeight;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);cv.style.width=VW+'px';cv.style.height=VH+'px';
  const top=74,bot=84,side=14,pw=46,rim=22,aw=VW-side-pw-rim*2-6,ah=VH-top-bot-rim*2;S=Math.min(aw/W,ah/H);TX0=side+rim+(aw-W*S)/2;TY0=top+rim+(ah-H*S)/2;
  L={top,bot,rim,px:TX0+W*S+rim+8,pw:pw-14,py:TY0+30,ph:H*S-60}}
-addEventListener('resize',fit);fit();
+addEventListener('resize',fit);fit();PK=store.get('pk',1);buildTable();
 const X=x=>TX0+x*S,Y=y=>TY0+y*S;
 function rr(x,y,w,h,r){g.beginPath();g.roundRect(x,y,w,h,r)}
 function txt(s,x,y,sz,col,al='center',wt=700){g.font=wt+' '+sz+'px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';g.fillStyle=col;g.textAlign=al;g.textBaseline='middle';g.fillText(s,x,y)}
-let tableCv=null;
-function drawTable(){if(!tableCv||tableCv.width!==cv.width||tableCv.height!==cv.height){tableCv=document.createElement('canvas');tableCv.width=cv.width;tableCv.height=cv.height;const c=tableCv.getContext('2d');c.scale(DPR,DPR);const rim=L.rim,x0=X(0)-rim,y0=Y(0)-rim,w=W*S+rim*2,h=H*S+rim*2;
+function drawTable(){if(!tableCv||tableCv.width!==cv.width||tableCv.height!==cv.height){tableCv=document.createElement('canvas');tableCv.width=cv.width;tableCv.height=cv.height;const c=tableCv.getContext('2d');c.scale(DPR,DPR);const rim=L.rim,cw=CW*S,x0=X(0)-rim,y0=Y(0)-rim,w=W*S+rim*2,h=H*S+rim*2;
   c.fillStyle='rgba(0,0,0,.5)';c.beginPath();c.roundRect(x0-3,y0+5,w+6,h+6,18);c.fill();
-  const wd=c.createLinearGradient(x0,0,x0+w,0);wd.addColorStop(0,'#3a1d0c');wd.addColorStop(.12,'#6b3a1a');wd.addColorStop(.5,'#84491f');wd.addColorStop(.88,'#6b3a1a');wd.addColorStop(1,'#3a1d0c');c.fillStyle=wd;c.beginPath();c.roundRect(x0,y0,w,h,16);c.fill();
+  const wd=c.createLinearGradient(x0,0,x0+w,0);wd.addColorStop(0,'#3a1d0c');wd.addColorStop(.1,'#6b3a1a');wd.addColorStop(.5,'#84491f');wd.addColorStop(.9,'#6b3a1a');wd.addColorStop(1,'#3a1d0c');c.fillStyle=wd;c.beginPath();c.roundRect(x0,y0,w,h,16);c.fill();
   c.strokeStyle='rgba(255,220,160,.18)';c.lineWidth=1;c.beginPath();c.roundRect(x0+3,y0+3,w-6,h-6,13);c.stroke();
-  // mato
-  const cg=c.createRadialGradient(X(W/2),Y(H/2),10,X(W/2),Y(H/2),H*S*.62);cg.addColorStop(0,'#1f8a52');cg.addColorStop(.7,'#167043');cg.addColorStop(1,'#0e5231');c.fillStyle=cg;c.fillRect(X(0)-8,Y(0)-8,W*S+16,H*S+16);
-  // bort rezinasi
-  c.fillStyle='#0c4a2c';const cu=7;c.fillRect(X(0)-cu,Y(0)-cu,W*S+cu*2,cu);c.fillRect(X(0)-cu,Y(H),W*S+cu*2,cu);c.fillRect(X(0)-cu,Y(0),cu,H*S);c.fillRect(X(W),Y(0),cu,H*S);
-  c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=1;c.strokeRect(X(0)+.5,Y(0)+.5,W*S-1,H*S-1);
-  // luzalar
-  for(const[px,py]of POCKETS){const mid=py===H/2,ox=mid?(px?1:-1)*.03:(px?1:-1)*.012,oy=mid?0:(py?1:-1)*.012,rad=(mid?.062:.07)*S;c.fillStyle='#050505';c.beginPath();c.arc(X(px+ox),Y(py+oy),rad,0,TAU);c.fill();c.strokeStyle='#2a1508';c.lineWidth=3;c.stroke();const pg=c.createRadialGradient(X(px+ox),Y(py+oy),rad*.2,X(px+ox),Y(py+oy),rad);pg.addColorStop(0,'rgba(0,0,0,0)');pg.addColorStop(1,'rgba(90,60,30,.35)');c.fillStyle=pg;c.fill()}
-  // chiziqlar va nuqtalar
+  // mato va bort rezinasi
+  c.fillStyle='#0b4a2b';c.fillRect(X(0)-cw,Y(0)-cw,W*S+cw*2,H*S+cw*2);
+  const cg=c.createRadialGradient(X(W/2),Y(H/2),10,X(W/2),Y(H/2),H*S*.62);cg.addColorStop(0,'#1f8a52');cg.addColorStop(.7,'#177345');cg.addColorStop(1,'#105a36');c.fillStyle=cg;c.fillRect(X(0),Y(0),W*S,H*S);
+  c.strokeStyle='rgba(190,255,215,.22)';c.lineWidth=1.2;c.strokeRect(X(0),Y(0),W*S,H*S);c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=1;c.strokeRect(X(0)-cw+.5,Y(0)-cw+.5,W*S+cw*2-1,H*S+cw*2-1);
+  // luzalar: bortdagi kesik (og'iz), teshik va charm halqa
+  for(const hh of HOLES){const q=hh.q;c.fillStyle='#0d4f30';c.beginPath();c.moveTo(X(q[0][0]),Y(q[0][1]));for(let i=1;i<4;i++)c.lineTo(X(q[i][0]),Y(q[i][1]));c.fill();
+   const hx=X(hh.x),hy=Y(hh.y),hr=hh.vr*S;c.save();c.beginPath();c.moveTo(X(q[0][0]),Y(q[0][1]));c.lineTo(X(q[1][0]),Y(q[1][1]));const ox=hh.x-hh.mx,oy=hh.y-hh.my,ol=hyp(ox,oy)||1,far=.12;c.lineTo(X(q[1][0]+ox/ol*far),Y(q[1][1]+oy/ol*far));c.lineTo(X(q[2][0]+ox/ol*far),Y(q[2][1]+oy/ol*far));c.lineTo(X(q[2][0]),Y(q[2][1]));c.lineTo(X(q[3][0]),Y(q[3][1]));c.closePath();c.clip();
+   const pg=c.createRadialGradient(hx,hy,hr*.2,hx,hy,hr*1.25);pg.addColorStop(0,'#000');pg.addColorStop(.75,'#070707');pg.addColorStop(1,'#1c120a');c.fillStyle=pg;c.beginPath();c.arc(hx,hy,hr*1.25,0,TAU);c.fill();c.restore();
+   c.strokeStyle='#2a1508';c.lineWidth=Math.max(2.5,hr*.28);c.beginPath();const a0=Math.atan2(oy,ox);c.arc(hx,hy,hr*1.12,a0-1.25,a0+1.25);c.stroke();c.strokeStyle='rgba(255,220,160,.25)';c.lineWidth=1;c.beginPath();c.arc(hx,hy,hr*1.12+c.lineWidth,a0-1.2,a0+1.2);c.stroke();
+   // yonoq uchlari (rezina burchagi)
+   c.strokeStyle='rgba(190,255,215,.3)';c.lineWidth=1.2;c.beginPath();c.moveTo(X(q[0][0]),Y(q[0][1]));c.lineTo(X(q[1][0]),Y(q[1][1]));c.moveTo(X(q[3][0]),Y(q[3][1]));c.lineTo(X(q[2][0]),Y(q[2][1]));c.stroke()}
+  // chiziq, nuqtalar, olmos belgilar
   c.strokeStyle='rgba(255,255,255,.16)';c.lineWidth=1;c.beginPath();c.moveTo(X(0),Y(H*3/4));c.lineTo(X(W),Y(H*3/4));c.stroke();c.fillStyle='rgba(255,255,255,.3)';for(const yy of[H/4,H/2,H*3/4]){c.beginPath();c.arc(X(W/2),Y(yy),2,0,TAU);c.fill()}
-  // olmos belgilar
-  c.fillStyle='rgba(255,230,180,.55)';for(let i=1;i<8;i++){if(i===4)continue;for(const xx of[x0+rim/2,x0+w-rim/2]){c.beginPath();c.arc(xx,Y(H*i/8),2,0,TAU);c.fill()}}for(let i=1;i<4;i++)for(const yy of[y0+rim/2,y0+h-rim/2]){c.beginPath();c.arc(X(W*i/4),yy,2,0,TAU);c.fill()}}
+  c.fillStyle='rgba(255,230,180,.55)';const wm=(rim+cw)/2;for(let i=1;i<8;i++){if(i===4)continue;for(const xx of[x0+(rim-cw)/2,x0+w-(rim-cw)/2]){c.beginPath();c.arc(xx,Y(H*i/8),2,0,TAU);c.fill()}}for(let i=1;i<4;i++)for(const yy of[y0+(rim-cw)/2,y0+h-(rim-cw)/2]){c.beginPath();c.arc(X(W*i/4),yy,2,0,TAU);c.fill()}}
  g.drawImage(tableCv,0,0,VW,VH)}
-function drawBall(b,x,y,r,dim){g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(x+r*.25,y+r*.35,r*1.02,r*.95,0,0,TAU);g.fill();
- const gr=g.createRadialGradient(x-r*.35,y-r*.4,r*.1,x,y,r);if(b.cue){gr.addColorStop(0,'#fff0a8');gr.addColorStop(.45,'#e8b62a');gr.addColorStop(1,'#8a5f08')}else{gr.addColorStop(0,'#ffffff');gr.addColorStop(.5,'#ece6d6');gr.addColorStop(1,'#9a927e')}
- g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,TAU);g.fill();
- // dumalashi ko'rinsin: shar sirtidagi kichik belgi
- const mx=Math.sin(b.rx)*Math.cos(b.ry),my=Math.sin(b.ry),mz=Math.cos(b.rx)*Math.cos(b.ry);if(mz>-.2){g.globalAlpha=cl(mz+.2)*.55;g.fillStyle=b.cue?'#7a4a00':'#8b1a1a';g.beginPath();g.arc(x+mx*r*.8,y+my*r*.8,r*.2*(.5+mz*.5),0,TAU);g.fill();g.globalAlpha=1}
- g.fillStyle='rgba(255,255,255,.75)';g.beginPath();g.ellipse(x-r*.36,y-r*.42,r*.2,r*.13,-.6,0,TAU);g.fill();if(dim){g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.arc(x,y,r,0,TAU);g.fill()}}
-function drawAim(){if(sim||!sel||ST!=='play'||pick)return;const dx=Math.cos(ang),dy=Math.sin(ang),h=ray(sel,dx,dy),gx=sel.x+dx*h.t,gy=sel.y+dy*h.t,r=R*S;
+function decal(b,x,y,r,sg){const d=b.d,u=b.u,dz=d[2]*sg;if(dz<.06)return;const px=x+d[0]*sg*r*.93,py=y+d[1]*sg*r*.93;g.save();g.translate(px,py);g.rotate(Math.atan2(d[1]*sg,d[0]*sg));g.scale(dz,1);g.rotate(-Math.atan2(d[1]*sg,d[0]*sg));
+ if(b.cue){g.fillStyle='rgba(120,20,20,.85)';g.beginPath();g.arc(0,0,r*.16,0,TAU);g.fill()}else{g.strokeStyle='rgba(40,40,40,.75)';g.lineWidth=Math.max(.6,r*.07);g.beginPath();g.arc(0,0,r*.4,0,TAU);g.stroke();if(r>5.5){g.rotate(Math.atan2(u[1]*sg,u[0]*sg)+Math.PI/2);g.font='800 '+(r*(b.num>9?.46:.56))+'px system-ui,sans-serif';g.fillStyle='rgba(25,25,25,.9)';g.textAlign='center';g.textBaseline='middle';g.fillText(b.num,0,r*.03)}}g.restore()}
+function drawBall(b,x,y,r,dark){g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(x+r*.25,y+r*.35,r*1.02,r*.95,0,0,TAU);g.fill();
+ const gr=g.createRadialGradient(x-r*.35,y-r*.4,r*.1,x,y,r);if(b.cue){gr.addColorStop(0,'#fff0a8');gr.addColorStop(.45,'#e8b62a');gr.addColorStop(1,'#8a5f08')}else{gr.addColorStop(0,'#ffffff');gr.addColorStop(.5,'#efe9d9');gr.addColorStop(1,'#a39b86')}
+ g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,TAU);g.fill();g.save();g.beginPath();g.arc(x,y,r,0,TAU);g.clip();decal(b,x,y,r,1);decal(b,x,y,r,-1);
+ const sh=g.createRadialGradient(x-r*.3,y-r*.35,r*.5,x,y,r*1.05);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(0,0,0,.28)');g.fillStyle=sh;g.fillRect(x-r,y-r,r*2,r*2);if(dark){g.fillStyle='rgba(0,0,0,'+dark+')';g.fillRect(x-r,y-r,r*2,r*2)}g.restore();
+ g.fillStyle='rgba(255,255,255,.8)';g.beginPath();g.ellipse(x-r*.36,y-r*.42,r*.2,r*.13,-.6,0,TAU);g.fill()}
+const DEMO=[mk(0,0,true),mk(-.9,.5,false,7),mk(.9,.5,false,12),mk(0,1.1,false,3)];let cueFx=null;
+function drawCue(bx,by,a,back,al){const dx=Math.cos(a),dy=Math.sin(a),cl_=1.25*S,cx=X(bx)-dx*back,cy=Y(by)-dy*back;g.save();g.globalAlpha=al;g.translate(cx,cy);g.rotate(a);const cg=g.createLinearGradient(0,-4,0,4);cg.addColorStop(0,'#f3d9a0');cg.addColorStop(.5,'#c9944a');cg.addColorStop(1,'#7a4f1f');g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.moveTo(0,3);g.lineTo(-cl_,8);g.lineTo(-cl_,12);g.lineTo(0,6);g.fill();
+ g.fillStyle=cg;g.beginPath();g.moveTo(0,-2.2);g.lineTo(-cl_,-5);g.lineTo(-cl_,5);g.lineTo(0,2.2);g.fill();g.fillStyle='#2a4f9a';g.fillRect(-3,-2.3,3,4.6);g.fillStyle='#f5f0e0';g.fillRect(-9,-2.5,6,5);g.fillStyle='#2a1508';g.fillRect(-cl_,-5,cl_*.3,10);g.restore()}
+function drawAim(){if(cueFx){const u=cueFx.t/.28;g.save();g.beginPath();g.rect(0,L.top-6,VW,VH-L.top-L.bot+10);g.clip();drawCue(cueFx.x,cueFx.y,cueFx.a,(R+.02)*S-u*.05*S*(1+cueFx.p),1-u);g.restore()}if(sim||!sel||ST!=='play'||pick)return;const dx=Math.cos(ang),dy=Math.sin(ang),h=ray(sel,dx,dy),gx=sel.x+dx*h.t,gy=sel.y+dy*h.t,r=R*S;
  g.save();g.beginPath();g.rect(0,L.top-6,VW,VH-L.top-L.bot+10);g.clip();g.strokeStyle='rgba(255,255,255,.85)';g.lineWidth=1.6;g.setLineDash([7,6]);g.beginPath();g.moveTo(X(sel.x+dx*R),Y(sel.y+dy*R));g.lineTo(X(gx),Y(gy));g.stroke();g.setLineDash([]);
  g.strokeStyle='rgba(255,255,255,.9)';g.lineWidth=1.5;g.beginPath();g.arc(X(gx),Y(gy),r,0,TAU);g.stroke();
  if(h.hit){const nx=(h.hit.x-gx)/(2*R),ny=(h.hit.y-gy)/(2*R),c=dx*nx+dy*ny,len=.12+.34*c;g.strokeStyle='rgba(255,255,255,.85)';g.lineWidth=2;g.beginPath();g.moveTo(X(h.hit.x),Y(h.hit.y));g.lineTo(X(h.hit.x+nx*len),Y(h.hit.y+ny*len));g.stroke();
   const tx=dx-nx*c,ty=dy-ny*c,tl=hyp(tx,ty);if(tl>.05){const l2=.1+.25*tl;g.strokeStyle='rgba(255,220,120,.7)';g.beginPath();g.moveTo(X(gx),Y(gy));g.lineTo(X(gx+tx/tl*l2),Y(gy+ty/tl*l2));g.stroke()}}
  // kiy
- const back=(R+.02+pow*.32)*S,cl_=1.25*S,cx=X(sel.x)-dx*back,cy=Y(sel.y)-dy*back;g.translate(cx,cy);g.rotate(ang);const cg=g.createLinearGradient(0,-4,0,4);cg.addColorStop(0,'#f3d9a0');cg.addColorStop(.5,'#c9944a');cg.addColorStop(1,'#7a4f1f');g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.moveTo(0,3);g.lineTo(-cl_,8);g.lineTo(-cl_,12);g.lineTo(0,6);g.fill();
- g.fillStyle=cg;g.beginPath();g.moveTo(0,-2.2);g.lineTo(-cl_,-5);g.lineTo(-cl_,5);g.lineTo(0,2.2);g.fill();g.fillStyle='#2a4f9a';g.fillRect(-3,-2.3,3,4.6);g.fillStyle='#f5f0e0';g.fillRect(-9,-2.5,6,5);g.fillStyle='#2a1508';g.fillRect(-cl_,-5,cl_*.3,10);g.restore()}
+ drawCue(sel.x,sel.y,ang,(R+.02+pow*.32)*S,1);g.restore()}
 let btns=[];
 function button(x,y,w,h,label,cb,col='#d9a441',tc='#1a1208',sz=17){g.fillStyle='rgba(0,0,0,.35)';rr(x,y+3,w,h,h/2.6);g.fill();g.fillStyle=col;rr(x,y,w,h,h/2.6);g.fill();txt(label,x+w/2,y+h/2+1,sz,tc);btns.push({x,y,w,h,cb})}
 function drawHUD(){const nm=NAMES();
@@ -164,17 +183,18 @@ function drawHUD(){const nm=NAMES();
  // pastki qator: aylanish, nozik sozlash, menyu
  const by=VH-L.bot+14,bh=54;btns=btns.filter(b=>b.keep);
  {const x=14,r=bh/2;g.fillStyle='rgba(255,255,255,.08)';g.beginPath();g.arc(x+r,by+r,r,0,TAU);g.fill();const gr=g.createRadialGradient(x+r-6,by+r-7,2,x+r,by+r,r-5);gr.addColorStop(0,'#fff');gr.addColorStop(1,'#b9b19c');g.fillStyle=gr;g.beginPath();g.arc(x+r,by+r,r-5,0,TAU);g.fill();g.fillStyle='#d23a2a';g.beginPath();g.arc(x+r+spin[0]*(r-9),by+r-spin[1]*(r-9),4.5,0,TAU);g.fill();btns.push({x,y:by,w:bh,h:bh,cb:()=>{spinOpen=true}})}
- {const x=14+bh+10,w=VW-x-14-bh-10;L.wx=x;L.wy=by;L.ww=w;L.wh=bh;g.fillStyle='rgba(255,255,255,.08)';rr(x,by+8,w,bh-16,(bh-16)/2);g.fill();g.save();rr(x,by+8,w,bh-16,(bh-16)/2);g.clip();g.strokeStyle='rgba(255,255,255,.28)';g.lineWidth=1.5;const off=((ang*260)%14+14)%14;for(let xx=x-14+off;xx<x+w+14;xx+=14){g.beginPath();g.moveTo(xx,by+16);g.lineTo(xx,by+bh-16);g.stroke()}g.restore();txt('◀  aniq nishon  ▶',x+w/2,by+bh/2,11,'rgba(255,255,255,.55)',  'center',600)}
+ {const x=14+bh+10,w=VW-x-14-bh-10;L.wx=x;L.wy=by;L.ww=w;L.wh=bh;g.fillStyle='rgba(255,255,255,.08)';rr(x,by+8,w,bh-16,(bh-16)/2);g.fill();g.save();rr(x,by+8,w,bh-16,(bh-16)/2);g.clip();g.strokeStyle='rgba(255,255,255,.28)';g.lineWidth=1.5;const off=((ang*1100)%14+14)%14;for(let xx=x-14+off;xx<x+w+14;xx+=14){g.beginPath();g.moveTo(xx,by+16);g.lineTo(xx,by+bh-16);g.stroke()}g.restore();txt('◀  aniq nishon  ▶',x+w/2,by+bh/2,11,'rgba(255,255,255,.55)',  'center',600)}
  {const x=VW-14-bh;g.fillStyle='rgba(255,255,255,.08)';rr(x,by,bh,bh,14);g.fill();g.fillStyle='#c9bfae';for(let i=0;i<3;i++){rr(x+15,by+17+i*9,bh-30,3,1.5);g.fill()}btns.push({x,y:by,w:bh,h:bh,cb:()=>{ST='pause'}})}
- if(msgT>0){const a=cl(msgT/.4);g.globalAlpha=a;g.font='700 14px system-ui';const w=Math.min(VW-30,g.measureText(msg).width+34);g.fillStyle='rgba(10,8,6,.82)';rr(VW/2-w/2,Y(H/2)-19,w,38,19);g.fill();txt(msg,VW/2,Y(H/2)+1,14,'#ffe9b8');g.globalAlpha=1}
+ if(msgT>0){const a=cl(msgT/.4);g.globalAlpha=a;g.font='700 14px system-ui';const w=Math.min(VW-30,g.measureText(msg).width+34);g.fillStyle='rgba(10,8,6,.82)';rr(VW/2-w/2,Y(H*.62)-19,w,38,19);g.fill();txt(msg,VW/2,Y(H*.62)+1,14,'#ffe9b8');g.globalAlpha=1}
  if(place&&!sim){txt('Sharni shu yerda suring',X(W/2),Y(H*3/4)+14,11,'rgba(255,255,255,.5)',  'center',600)}}
 function overlay(title,sub,items){g.fillStyle='rgba(0,0,0,.62)';g.fillRect(0,0,VW,VH);const w=Math.min(320,VW-40),h=120+items.length*58,x=VW/2-w/2,y=VH/2-h/2;g.fillStyle='#211a12';rr(x,y,w,h,20);g.fill();g.strokeStyle='rgba(217,164,65,.5)';g.lineWidth=1.5;g.stroke();txt(title,VW/2,y+40,24,'#f5efe0',  'center',800);if(sub)txt(sub,VW/2,y+72,13.5,'#c9bfae','center',500);btns=[];items.forEach((it,i)=>button(x+22,y+100+i*58,w-44,46,it[0],it[1],i?'#3a2f22':'#d9a441',i?'#f5efe0':'#1a1208'))}
 function exitGame(){try{parent.postMessage('game-exit','*')}catch(e){}}
 function render(){g.setTransform(DPR,0,0,DPR,0,0);g.fillStyle='#14100c';g.fillRect(0,0,VW,VH);
  if(ST==='menu'){const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#1c140c');gr.addColorStop(1,'#0c3a24');g.fillStyle=gr;g.fillRect(0,0,VW,VH);txt('HAMROH',VW/2,VH*.16,13,'#d9a441','center',700);txt('Bilyard',VW/2,VH*.16+38,44,'#f5efe0','center',800);txt('Rus bilyardi',VW/2,VH*.16+76,14,'#c9bfae','center',500);
-  const demo=[[0,0,1],[-.9,.5,0],[.9,.5,0],[0,1.1,0]];demo.forEach(([a,b,c],i)=>drawBall({cue:!!c,rx:T*.6+i,ry:T*.4+i*2},VW/2+a*22,VH*.16+118+b*22,20));
-  btns=[];const w=Math.min(300,VW-48),x=VW/2-w/2;let y=VH*.44;[['am','Amerikanka'],['ms','Moskva']].forEach(([k,n],i)=>button(x+i*(w/2+4),y,w/2-4,42,n,()=>{VAR=k;store.set('var',k)},VAR===k?'#f5efe0':'#2a2218',VAR===k?'#1a1208':'#c9bfae',15));txt(VAR==='am'?'Istalgan shar bilan uriladi':'Faqat sariq shar bilan uriladi',VW/2,y+58,12.5,'#a99f8e','center',500);y+=78;button(x,y,w,50,'Kompyuterga qarshi',()=>newGame('ai'));y+=58;LVN.forEach((n,i)=>button(x+i*(w/3+2),y,w/3-4,36,n,()=>{LVL=i;store.set('lvl',i)},LVL===i?'#f5efe0':'#2a2218',LVL===i?'#1a1208':'#c9bfae',13.5));y+=46;button(x,y,w,48,'Ikki kishi',()=>newGame('two'),'#3a2f22','#f5efe0');button(x,y+=56,w,48,'Mashq (yolg\'iz)',()=>newGame('solo'),'#3a2f22','#f5efe0');button(x,y+=56,w,42,'Ovoz: '+(SND?'yoqilgan':'o\'chirilgan'),()=>{SND=!SND;store.set('snd',SND)},'#2a2218','#c9bfae',15);button(x,y+=50,w,42,'Hamrohga qaytish',exitGame,'#2a2218','#c9bfae',15);return}
+  DEMO.forEach((b,i)=>{b.wx=.5+i*.2;b.wy=.9-i*.15;b.wz=.3;spinMark(b,1/60);drawBall(b,VW/2+b.x*22,VH*.16+118+b.y*22,20)});
+  btns=[];const w=Math.min(300,VW-48),x=VW/2-w/2;let y=VH*.44;[['am','Amerikanka'],['ms','Moskva']].forEach(([k,n],i)=>button(x+i*(w/2+4),y,w/2-4,42,n,()=>{VAR=k;store.set('var',k)},VAR===k?'#f5efe0':'#2a2218',VAR===k?'#1a1208':'#c9bfae',15));txt(VAR==='am'?'Istalgan shar bilan uriladi':'Faqat sariq shar bilan uriladi',VW/2,y+58,12.5,'#a99f8e','center',500);y+=78;button(x,y,w,50,'Kompyuterga qarshi',()=>newGame('ai'));y+=58;LVN.forEach((n,i)=>button(x+i*(w/3+2),y,w/3-4,36,n,()=>{LVL=i;store.set('lvl',i)},LVL===i?'#f5efe0':'#2a2218',LVL===i?'#1a1208':'#c9bfae',13.5));y+=46;button(x,y,w,48,'Ikki kishi',()=>newGame('two'),'#3a2f22','#f5efe0');button(x,y+=56,w,48,'Mashq (yolg\'iz)',()=>newGame('solo'),'#3a2f22','#f5efe0');button(x,y+=56,w/2-4,42,'Luza: '+(PK?'haqiqiy':'keng'),()=>{PK=PK?0:1;store.set('pk',PK);buildTable()},'#2a2218','#c9bfae',14);button(x+w/2+4,y,w/2-4,42,'Ovoz: '+(SND?'bor':'yo\'q'),()=>{SND=!SND;store.set('snd',SND)},'#2a2218','#c9bfae',14);button(x,y+=50,w,42,'Hamrohga qaytish',exitGame,'#2a2218','#c9bfae',15);return}
  drawTable();
+ for(const b of balls)if(b.fall>0&&b.hole){const u=cl(b.fall),e=u*u;drawBall(b,X(b.x+(b.hole.x-b.x)*cl(u*1.6)),Y(b.y+(b.hole.y-b.y)*cl(u*1.6)),R*S*(1-e*.3),cl(u*1.3,0,.92))}
  for(const b of balls)if(b.on)drawBall(b,X(b.x),Y(b.y),R*S);
  if(pick&&ST==='play')for(const b of balls)if(b.on&&!b.cue){g.strokeStyle='rgba(255,217,138,'+(.5+.4*Math.sin(T*5))+')';g.lineWidth=2;g.beginPath();g.arc(X(b.x),Y(b.y),R*S+3,0,TAU);g.stroke()}
  if(sel&&sel.on&&!sim&&ST==='play'&&!pick){g.strokeStyle='rgba(255,217,138,.9)';g.lineWidth=2;g.beginPath();g.arc(X(sel.x),Y(sel.y),R*S+3.5+Math.sin(T*5),0,TAU);g.stroke()}
@@ -197,7 +217,7 @@ function down(x,y){audio();
  drag={k:'aim'};move(x,y)}
 function move(x,y){if(!drag)return;const[tx,ty]=toT(x,y);
  if(drag.k==='pow')pow=cl((y-L.py)/L.ph);
- else if(drag.k==='fine'){ang+=(x-drag.x)*.0022;drag.x=x}
+ else if(drag.k==='fine'){ang+=(x-drag.x)*.0009;drag.x=x}
  else if(drag.k==='aim'&&sel){if(hyp(tx-sel.x,ty-sel.y)>R*1.5)ang=Math.atan2(ty-sel.y,tx-sel.x)}
  else if(drag.k==='place'&&sel){const nx=cl(tx,R+.002,W-R-.002),ny=cl(ty,H*3/4+R,H-R-.002);if(balls.every(o=>o===sel||!o.on||hyp(o.x-nx,o.y-ny)>2*R)){sel.x=nx;sel.y=ny}}
  else if(drag.k==='spin'){let sx=(x-VW/2)/(L.sr*.72),sy=-(y-VH/2)/(L.sr*.72);const m=hyp(sx,sy);if(m>1){sx/=m;sy/=m}spin=[sx,sy]}}
@@ -206,8 +226,8 @@ cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.
 cv.addEventListener('pointermove',e=>{move(e.clientX,e.clientY)});cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',()=>{if(drag&&drag.k==='pow')pow=0;drag=null});
 // ================= SIKL =================
 let last=performance.now(),acc=0;
-function tick(dt){T+=dt;if(msgT>0)msgT-=dt;if(aiTurn()&&!sim){if(pick){AI=AI||{ph:'pick',t:0};AI.t+=dt;if(AI.t>1){AI=null;aiPick()}}else{if(!AI||AI.ph==='pick')aiStart();aiTick(dt)}}if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
+function tick(dt){T+=dt;if(msgT>0)msgT-=dt;if(cueFx&&(cueFx.t+=dt)>.28)cueFx=null;for(const b of balls)if(b.fall>0){b.fall+=dt/.32;if(b.fall>=1)b.fall=0}if(aiTurn()&&!sim){if(pick){AI=AI||{ph:'pick',t:0};AI.t+=dt;if(AI.t>1){AI=null;aiPick()}}else{if(!AI||AI.ph==='pick')aiStart();aiTick(dt)}}if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tick(dt);render();requestAnimationFrame(frame)}
-window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},setLvl(v){LVL=v},tick,get ai(){return AI},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
+window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},setC(e,f){E_C=e;F_C=f},setJ(v){JIT=v},setPk(v){PK=v;buildTable()},get HOLES(){return HOLES},setLvl(v){LVL=v},tick,get ai(){return AI},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
 requestAnimationFrame(frame);
 </script></body></html>
