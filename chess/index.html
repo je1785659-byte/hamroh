@@ -812,7 +812,7 @@ const _end=end;end=function(st){_end(st);if(MODE!=='net')return;const win=st.win
   $('#orate').hidden=true};
 const _menuUI=menuUI;menuUI=function(keep){_menuUI();const net=CFG.mode==='net';$('#gnet').hidden=!net;$('#pdraw').hidden=true;
   if(net){$('#gcol').hidden=false;$('#glvl').hidden=true;$('#stime').closest('.grp').hidden=true;$('#start').textContent=TX('Xona ochish');const sv=store.get('net',null);$('#resume').hidden=!sv;$('#resume').textContent=TX("Onlayn o'yinga qaytish");if(keep!==true)netMsg(TX(NET_HELP))}
-  else{$('#stime').closest('.grp').hidden=CFG.mode==='puz';$('#resume').textContent=TX('Davom etish')}};
+  else{$('#stime').closest('.grp').hidden=CFG.mode==='puz';$('#start').textContent=TX("Yangi o'yin");$('#resume').textContent=TX('Davom etish')}};
 const _start=$('#start').onclick,_resume=$('#resume').onclick,_again=$('#again').onclick,_resign=$('#presign').onclick,_bmenu=$('#bmenu').onclick;
 $('#start').onclick=()=>{if(CFG.mode!=='net')return _start();audio();netStop();netOpen({op:'create',g:'ch',col:CFG.col})};
 $('#resume').onclick=()=>{if(CFG.mode!=='net')return _resume();audio();const sv=store.get('net',null);if(sv){netStop();netJoin(sv.room)}};
