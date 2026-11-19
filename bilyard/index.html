@@ -6,7 +6,7 @@
 // O'lchamlar metrda. Stol tik turadi: x — eni, y — bo'yi. "Uy" pastda, piramida tepada.
 const W=1.775,H=3.55,R=.034,G=9.8;
 // O'lchangan qiymatlar (pooltool loyihasi va bilyard fizikasi bo'yicha maqolalardan): mato, shar va bort
-let E_C=.95,F_C=.35;const MU_S=.2,MU_R=.01,SPIN_DEC=2.5*(4/9)*G,E_BB=.95,MU_BB=.05,ST_C=.4,CT_C=Math.sqrt(1-.16); // bort sharga markazidan 0.4R balandda tegadi
+let E_C=.95,F_C=.35,E_J=.35,HK=1.15;const MU_S=.2,MU_R=.01,SPIN_DEC=2.5*(4/9)*G,E_BB=.95,MU_BB=.05,ST_C=.4,CT_C=Math.sqrt(1-.16); // bort sharga markazidan 0.4R balandda tegadi
 const DT=1/300,CW=.05;                       // CW — bort rezinasi eni
 // Luza og'zi (bort uchlari orasi): rasmiy o'lcham — burchak 72,5 mm, o'rta 82,5 mm (shar 68 mm). "Keng" rejimda 18% kattaroq.
 let PK=1,MC=.0725,MM=.0825;
@@ -34,7 +34,7 @@ function click(vol,f=2200){const q=Math.pow(cl(vol),.75);if(f===2600)play('clack
 function thud(){play('pot',.8,.92+Math.random()*.16)}
 // ---------- bortlar: kesmalar (luzalar orasida) va luza og'zi yonoqlari ----------
 let RAILS=[],HOLES=[];
-function buildTable(){const k=PK?1:1.18;MC=.0725*k;MM=.0825*k;RAILS=[];HOLES=[];const a=(x1,y1,x2,y2)=>RAILS.push({x1,y1,x2,y2});const m=H/2,d=MC/Math.SQRT2,h=MM/2,f=CW/Math.SQRT2;
+function buildTable(){const k=PK?1:1.18;MC=.0725*k;MM=.0825*k;RAILS=[];HOLES=[];const a=(x1,y1,x2,y2)=>RAILS.push({x1,y1,x2,y2,j:RAILS.length>5});const m=H/2,d=MC/Math.SQRT2,h=MM/2,f=CW/Math.SQRT2;
  a(d,0,W-d,0);a(d,H,W-d,H);a(0,d,0,m-h);a(0,m+h,0,H-d);a(W,d,W,m-h);a(W,m+h,W,H-d);
  for(const sx of[0,1])for(const sy of[0,1]){const X=sx?W:0,Y=sy?H:0,dx=sx?-1:1,dy=sy?-1:1;a(X+dx*d,Y,X+dx*(d-f),Y-dy*f);a(X,Y+dy*d,X-dx*f,Y+dy*(d-f));HOLES.push({x:X-dx*.0154,y:Y-dy*.0154,r:.046,mx:X+dx*d/2,my:Y+dy*d/2,vr:MC/2+.004,q:[[X+dx*d,Y],[X+dx*(d-f),Y-dy*f],[X-dx*f,Y+dy*(d-f)],[X,Y+dy*d]]})}
  for(const sx of[0,1]){const X=sx?W:0,dx=sx?1:-1;a(X,m-h,X+dx*CW,m-h+.006);a(X,m+h,X+dx*CW,m+h-.006);HOLES.push({x:X+dx*.05,y:m,r:.042,mx:X,my:m,vr:MM/2+.002,q:[[X,m-h],[X+dx*CW,m-h+.006],[X+dx*CW,m+h-.006],[X,m+h]]})}
@@ -68,11 +68,11 @@ function sub(dt){let moving=false;
  for(const b of balls){if(!b.on)continue;if(b.x>R+.001&&b.x<W-R-.001&&b.y>R+.001&&b.y<H-R-.001)continue;
   for(const s of RAILS){const ex=s.x2-s.x1,ey=s.y2-s.y1,t=cl(((b.x-s.x1)*ex+(b.y-s.y1)*ey)/(ex*ex+ey*ey)),px=s.x1+ex*t,py=s.y1+ey*t,dx=b.x-px,dy=b.y-py,d=hyp(dx,dy);if(d>=R||d===0)continue;
    const nx=dx/d,ny=dy/d;b.x=px+nx*R;b.y=py+ny*R;const ax=-nx,ay=-ny,bx=-ay,by=ax;let vx=b.vx*ax+b.vy*ay;if(vx<=0)continue;let vy=b.vx*bx+b.vy*by,wx=b.wx*ax+b.wy*ay,wy=b.wx*bx+b.wy*by;
-   const sx=vx*ST_C+R*wy,sy=-vy-R*b.wz*CT_C+R*wx*ST_C,sl=hyp(sx,sy),pn=(1+E_C)*vx*CT_C;let fx,fy;if(sl/3.5<=F_C*pn){fx=sx/3.5;fy=sy/3.5}else{fx=F_C*pn*sx/sl;fy=F_C*pn*sy/sl}
+   const jaw=s.j||t<=0||t>=1,sx=vx*ST_C+R*wy,sy=-vy-R*b.wz*CT_C+R*wx*ST_C,sl=hyp(sx,sy),pn=(1+(jaw?E_J:E_C))*vx*CT_C;let fx,fy;if(sl/3.5<=F_C*pn){fx=sx/3.5;fy=sy/3.5}else{fx=F_C*pn*sx/sl;fy=F_C*pn*sy/sl}
    const PX=-fx*ST_C-pn*CT_C,PY=fy,PZ=fx*CT_C-pn*ST_C,v0=vx;vx+=PX;vy+=PY;wx-=2.5/R*PY*ST_C;wy+=2.5/R*(PX*ST_C-PZ*CT_C);b.wz+=2.5/R*PY*CT_C;
    b.vx=vx*ax+vy*bx;b.vy=vx*ay+vy*by;b.wx=wx*ax+wy*bx;b.wy=wx*ay+wy*by;if(shot){shot.rail++;if(shot.first)shot.railAfter++}click(v0*.2,800);moving=true}
   // luza: shar markazi teshik ustiga o'tsa, pastga tushadi
-  let hole=null;for(const h of HOLES)if(hyp(b.x-h.x,b.y-h.y)<h.r){hole=h;break}if(!hole&&(b.x<-.09||b.x>W+.09||b.y<-.09||b.y>H+.09))hole=HOLES.reduce((p,h)=>hyp(b.x-h.x,b.y-h.y)<hyp(b.x-p.x,b.y-p.y)?h:p);
+  let hole=null;for(const h of HOLES)if(hyp(b.x-h.x,b.y-h.y)<h.r*HK){hole=h;break}if(!hole&&(b.x<-.09||b.x>W+.09||b.y<-.09||b.y>H+.09))hole=HOLES.reduce((p,h)=>hyp(b.x-h.x,b.y-h.y)<hyp(b.x-p.x,b.y-p.y)?h:p);
   if(hole){b.on=false;b.fvx=b.vx;b.fvy=b.vy;b.vx=b.vy=b.wx=b.wy=b.wz=0;b.pot=1;b.fall=.001;b.hole=hole;if(shot)shot.pots.push(b);thud();haptic('medium')}}
  return moving}
 // nishon chizig'i: birinchi to'qnashuvgacha
@@ -239,6 +239,6 @@ cv.addEventListener('pointermove',e=>{move(e.clientX,e.clientY)});cv.addEventLis
 let last=performance.now(),acc=0;
 function tick(dt){T+=dt;if(msgT>0)msgT-=dt;if(cueFx&&(cueFx.t+=dt)>.28)cueFx=null;for(const b of balls)if(b.fall>0){b.fall+=dt/.32;if(b.fall>=1)b.fall=0}if(aiTurn()&&!sim){if(pick){AI=AI||{ph:'pick',t:0};AI.t+=dt;if(AI.t>1){AI=null;aiPick()}}else{if(!AI||AI.ph==='pick')aiStart();aiTick(dt)}}if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tick(dt);render();requestAnimationFrame(frame)}
-window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},setC(e,f){E_C=e;F_C=f},setJ(v){JIT=v},setPk(v){PK=v;buildTable()},get HOLES(){return HOLES},setLvl(v){LVL=v},tick,get ai(){return AI},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
+window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},setC(e,f){E_C=e;F_C=f},setJ2(e,k){E_J=e;HK=k},setJ(v){JIT=v},setPk(v){PK=v;buildTable()},get HOLES(){return HOLES},setLvl(v){LVL=v},tick,get ai(){return AI},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
 requestAnimationFrame(frame);
 </script></body></html>
