@@ -870,7 +870,7 @@ const sig=o=>{try{if(window.parent!==window&&parent.rnApi)return parent.rnApi('/
 const ICE={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]};
 function iceDone(pc){return new Promise(r=>{if(pc.iceGatheringState==='complete')return r();const t=setTimeout(r,2600);pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState==='complete'){clearTimeout(t);r()}})})}
 function dMsg(t){$('#dmsg').textContent=WNAME(t)}
-function dList(){$('#dlist').innerHTML=DUEL.names.map((n,i)=>(i+1)+'. '+String(n).replace(/[<>&]/g,'')+(i===DUEL.slot?' <b>('+WNAME('siz')+')</b>':'')+'<i>'+(i===0||DUEL.conn(i)?'✓':'…')+'</i>').join('<br>');
+function dList(){$('#dlist').innerHTML=DUEL.names.map((n,i)=>(i+1)+'. '+String(n).replace(/[<>&]/g,'')+(i===DUEL.slot?' <b>('+WNAME('siz')+')</b>':'')+'<i>'+(i===DUEL.slot?'✓':DUEL.conn(DUEL.host?i:0)?'⚡':'…')+'</i>').join('<br>')+(Object.keys(DUEL.ch).some(k=>DUEL.conn(+k))?'<br><small>⚡ '+WNAME("telefonlar to'g'ridan-to'g'ri ulangan")+'</small>':'');
   if(DUEL.host){const n=Object.keys(DUEL.ch).filter(k=>DUEL.conn(+k)).length;$('#dgo').hidden=n<1;$('#dgo').textContent=WNAME('Boshlash')+' ('+(n+1)+')'}}
 DUEL.conn=i=>{const c=DUEL.ch[i];return !!(c&&c.e&&c.e.readyState==='open')};
 function dRaw(i,ch,m){const c=DUEL.ch[i];if(c&&c[ch]&&c[ch].readyState==='open'){try{c[ch].send(m)}catch(e){}}}
