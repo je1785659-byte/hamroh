@@ -10,13 +10,14 @@ const DC=.068,MH=.053,DT=1/300;             // burchak luzasi (bort uchidan burc
 const cv=document.getElementById('c'),g=cv.getContext('2d');
 const cl=(v,a=0,b=1)=>v<a?a:v>b?b:v,TAU=Math.PI*2,hyp=Math.hypot;
 const store={get(k,d){try{const v=localStorage.getItem('bil_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('bil_'+k,JSON.stringify(v))}catch(e){}}};
-const haptic=k=>{try{const h=parent.Telegram.WebApp.HapticFeedback;k==='ok'?h.notificationOccurred('success'):k==='err'?h.notificationOccurred('error'):h.impactOccurred(k||'light')}catch(e){}};
+const haptic=k=>{if(QUIET)return;try{const h=parent.Telegram.WebApp.HapticFeedback;k==='ok'?h.notificationOccurred('success'):k==='err'?h.notificationOccurred('error'):h.impactOccurred(k||'light')}catch(e){}};
 // ---------- ovoz ----------
 let AC=null,SND=store.get('snd',true);
 function audio(){if(!AC)try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}if(AC&&AC.state==='suspended')AC.resume()}
-function click(vol,f=2200,d=.035){if(!SND||!AC||vol<.01)return;const t=AC.currentTime,n=Math.floor(AC.sampleRate*d),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
+let QUIET=false;
+function click(vol,f=2200,d=.035){if(QUIET||!SND||!AC||vol<.01)return;const t=AC.currentTime,n=Math.floor(AC.sampleRate*d),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
  const s=AC.createBufferSource(),q=AC.createBiquadFilter(),v=AC.createGain();s.buffer=b;q.type='bandpass';q.frequency.value=f;q.Q.value=1.2;v.gain.value=cl(vol,0,1)*.7;s.connect(q).connect(v).connect(AC.destination);s.start(t)}
-function thud(){if(!SND||!AC)return;const t=AC.currentTime,o=AC.createOscillator(),v=AC.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(55,t+.22);v.gain.setValueAtTime(.35,t);v.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(v).connect(AC.destination);o.start(t);o.stop(t+.26);click(.3,500,.12)}
+function thud(){if(QUIET||!SND||!AC)return;const t=AC.currentTime,o=AC.createOscillator(),v=AC.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(55,t+.22);v.gain.setValueAtTime(.35,t);v.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(v).connect(AC.destination);o.start(t);o.stop(t+.26);click(.3,500,.12)}
 // ---------- bortlar: kesmalar (luzalar orasida) va luza og'zi yonoqlari ----------
 const RAILS=[];{const a=(x1,y1,x2,y2)=>RAILS.push({x1,y1,x2,y2});const m=H/2,f=.036,o=.044;
  a(DC,0,W-DC,0);a(DC,H,W-DC,H);a(0,DC,0,m-MH);a(0,m+MH,0,H-DC);a(W,DC,W,m-MH);a(W,m+MH,W,H-DC);
@@ -55,11 +56,13 @@ function ray(b,dx,dy){let best=1e9,hit=null;for(const o of balls){if(!o.on||o===
  if(tw<best)return{t:tw,hit:null};return{t:best,hit}}
 // ---------- o'yin: Amerikanka ('am') va Moskva piramidasi ('ms') ----------
 const NEED=8;let VAR=store.get('var','am'),pick=false,ST='menu',turn=0,score=[0,0],debt=[0,0],sel=null,ang=-Math.PI/2,pow=0,spin=[0,0],brk=true,place=false,msg='',msgT=0,winner=-1,MODE='two',spinOpen=false,T=0;
-const NAMES=()=>MODE==='solo'?['Siz','—']:['1-o\'yinchi','2-o\'yinchi'];
+let LVL=store.get('lvl',1);const LVN=['Oson',"O'rta",'Kuchli'];
+const NAMES=()=>MODE==='solo'?['Siz','—']:MODE==='ai'?['Siz','Kompyuter · '+LVN[LVL]]:['1-o\'yinchi','2-o\'yinchi'];
 function say(s,t=2.4){msg=s;msgT=t}
-function newGame(mode){MODE=mode;rack();turn=0;score=[0,0];debt=[0,0];brk=true;place=true;pick=false;winner=-1;sel=balls.find(b=>b.cue);ang=-Math.PI/2;pow=0;spin=[0,0];sim=false;shot=null;ST='play';say('Sharni "uy"da joylang va piramidani buzing',3.5)}
+function newGame(mode){MODE=mode;rack();turn=0;score=[0,0];debt=[0,0];brk=true;place=true;pick=false;winner=-1;sel=balls.find(b=>b.cue);ang=-Math.PI/2;pow=0;spin=[0,0];sim=false;shot=null;ST='play';AI=null;say('Sharni "uy"da joylang va piramidani buzing',3.5)}
 function respot(b){b.on=true;b.pot=0;b.vx=b.vy=b.wx=b.wy=b.wz=0;let x=W/2,y=R+.002,k=0;const free=()=>balls.every(o=>o===b||!o.on||hyp(o.x-x,o.y-y)>2*R+.001);while(!free()&&k<60){k++;x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.004);if(x<R+.01||x>W-R-.01){y+=2*R+.004;x=W/2}}b.x=x;b.y=y}
-function fire(){if(pick){pow=0;return}if(sim||!sel||pow<.03){pow=0;return}const V=.5+Math.pow(pow,1.35)*9,dx=Math.cos(ang),dy=Math.sin(ang);sel.vx=dx*V;sel.vy=dy*V;const k=2.5*V/R*.5;sel.wx=-dy*k*spin[1];sel.wy=dx*k*spin[1];sel.wz=-k*spin[0];
+function strike(b,a,p,sp){const V=.5+Math.pow(p,1.35)*9,dx=Math.cos(a),dy=Math.sin(a),k=2.5*V/R*.5;b.vx=dx*V;b.vy=dy*V;b.wx=-dy*k*sp[1];b.wy=dx*k*sp[1];b.wz=-k*sp[0]}
+function fire(){if(pick){pow=0;return}if(sim||!sel||pow<.03){pow=0;return}strike(sel,ang,pow,spin);
  shot={ball:sel,first:null,hits:0,rail:0,railAfter:0,pots:[],brk,home:place&&!brk};sim=true;place=false;click(.4+pow*.6,1500,.05);haptic(pow>.6?'heavy':'light');pow=0}
 function cueHome(){const c=balls.find(b=>b.cue);c.on=true;c.pot=0;c.vx=c.vy=c.wx=c.wy=c.wz=0;c.x=W/2;c.y=H*3/4+.25;let k=0;while(balls.some(o=>o!==c&&o.on&&hyp(o.x-c.x,o.y-c.y)<2*R+.002)&&k++<40)c.x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.01);place=true;sel=c}
 function win(me){winner=me;ST='over';haptic('ok')}
@@ -82,6 +85,31 @@ function endShot(){if(VAR==='ms')return endMs();const s=shot,me=turn,op=1-turn;s
  if(score[me]>=NEED){winner=me;ST='over';return}
  const left=balls.filter(b=>b.on);if(left.length<2){winner=score[0]>=score[1]?0:1;ST='over';return}
  if(!sel||!sel.on)sel=null;if(!sel){sel=left.find(b=>b.cue)||left[0]}}
+// ================= KOMPYUTER RAQIB =================
+// Nomzod zarbalar geometriya bo'yicha topiladi, keyin har biri haqiqiy fizikada sinab ko'riladi; eng yaxshisi biroz xato bilan uriladi.
+let AI=null;const aiTurn=()=>MODE==='ai'&&turn===1&&ST==='play';
+const PAIM=[[.028,.028],[W-.028,.028],[-.01,H/2],[W+.01,H/2],[.028,H-.028],[W-.028,H-.028]];
+function simShot(state,idx,a,p,home){const kb=balls,ks=shot;balls=state.map(b=>({...b}));QUIET=true;const b=balls[idx];strike(b,a,p,[0,0]);shot={ball:b,first:null,hits:0,rail:0,railAfter:0,pots:[],brk:false,home};let n=0;while(n++<7000&&step(DT));
+ const cue=balls.find(q=>q.cue),r={first:shot.first,pots:shot.pots.length,cuePot:shot.pots.includes(cue),railAfter:shot.railAfter,selfPot:shot.pots.includes(b)};balls=kb;shot=ks;QUIET=false;return r}
+function aiValue(r,home,state){if(!r.first)return -6;if(VAR==='ms'&&home&&r.first.y>H*3/4&&state.some(b=>b.on&&!b.cue&&b.y<=H*3/4))return -6;if(!r.pots)return r.railAfter?-1:-6;return r.pots*10}
+function blocked(state,ax,ay,bx,by,skip,rad){const dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy;for(let i=0;i<state.length;i++){const o=state[i];if(!o.on||skip.includes(i))continue;const t=((o.x-ax)*dx+(o.y-ay)*dy)/L2;if(t<=0||t>=1)continue;if(hyp(o.x-ax-dx*t,o.y-ay-dy*t)<rad)return true}return false}
+function aiCands(state,home){const out=[];const strikers=[];state.forEach((b,i)=>{if(b.on&&(VAR==='am'&&!brk||b.cue))strikers.push(i)});
+ for(const si of strikers){const s=state[si];for(let oi=0;oi<state.length;oi++){const o=state[oi];if(!o.on||oi===si)continue;if(VAR==='ms'&&o.cue)continue;
+   for(let k=0;k<6;k++){const P=PAIM[k],d2=hyp(P[0]-o.x,P[1]-o.y),dx=(P[0]-o.x)/d2,dy=(P[1]-o.y)/d2;if((k===2||k===3)&&Math.abs(dx)<.45)continue;const gx=o.x-dx*2*R,gy=o.y-dy*2*R,d1=hyp(gx-s.x,gy-s.y);if(d1<.01)continue;const ax=(gx-s.x)/d1,ay=(gy-s.y)/d1,cut=ax*dx+ay*dy;if(cut<.3)continue;
+    if(blocked(state,s.x,s.y,gx,gy,[si,oi],2*R)||blocked(state,o.x,o.y,P[0],P[1],[si,oi],2*R*.92))continue;out.push({si,ang:Math.atan2(ay,ax),g:Math.pow(cut,1.6)/(1+d1*.3+d2*.55),home})}}}
+ return out.sort((a,b)=>b.g-a.g)}
+const gauss=()=>{let u=0;for(let i=0;i<6;i++)u+=Math.random();return (u-3)/.707};
+function aiStart(){const cue=balls.find(b=>b.cue),base=balls.map(b=>({...b})),N=[5,12,26][LVL],PW=[[.5],[.4,.65],[.33,.52,.75]][LVL];let jobs=[];
+ const add=(state,home,pos)=>{for(const c of aiCands(state,home).slice(0,N))for(const p of PW)jobs.push({state,c,p,pos})};
+ if(place&&cue&&cue.on){const ci=balls.indexOf(cue);for(const px of [cue.x,.35,.7,W/2,W-.7,W-.35]){const st=base.map(b=>({...b}));st[ci].x=px;st[ci].y=H*3/4+.22;if(st.some((o,i)=>i!==ci&&o.on&&hyp(o.x-px,o.y-st[ci].y)<2*R+.003))continue;add(st,VAR==='ms'&&!brk,[px,st[ci].y])}jobs=jobs.slice(0,N*PW.length*2)}else add(base,false,null);
+ AI={ph:'think',t:0,jobs,i:0,best:null,bv:-99,base}}
+function aiTick(dt){const A=AI;A.t+=dt;
+ if(A.ph==='think'){let n=0;while(A.i<A.jobs.length&&n++<3){const j=A.jobs[A.i++],r=simShot(j.state,j.c.si,j.c.ang,j.p,j.c.home),v=aiValue(r,j.c.home,j.state)+j.c.g*.5-j.p*.2+Math.random()*.2;if(v>A.bv){A.bv=v;A.best={si:j.c.si,ang:j.c.ang,pow:j.p,pos:j.pos}}}
+  if(A.i>=A.jobs.length&&A.t>.8){if(!A.best||A.bv<-2){ // tushadigan zarba yo'q — eng yaqin sharga yumshoq o'ynaydi
+     const cue=balls.find(b=>b.cue),si=VAR==='ms'||brk?balls.indexOf(cue):balls.findIndex(b=>b.on);let best=null,bv=-99;const s=balls[si],hm=VAR==='ms'&&place&&!brk;balls.forEach((o,oi)=>{if(!o.on||oi===si)return;const a=Math.atan2(o.y-s.y,o.x-s.x);for(const p of[.3,.5]){const r=simShot(A.base,si,a,p,hm),v=aiValue(r,hm,A.base)-hyp(o.x-s.x,o.y-s.y)*.1;if(v>bv){bv=v;best={si,ang:a,pow:p,pos:null}}}});A.best=best||{si,ang:-Math.PI/2,pow:.5,pos:null}}
+   const b=A.best;if(brk)b.pow=1;b.ang+=gauss()*[.04,.014,.005][LVL];b.pow=cl(b.pow*(1+gauss()*.05),.12,1);sel=balls[b.si];if(b.pos){sel.x=b.pos[0];sel.y=b.pos[1]}A.a0=ang;A.ph='aim';A.t=0}}
+ else if(A.ph==='aim'){const b=A.best,u=cl(A.t/.75),e=u*u*(3-2*u);let d=((b.ang-A.a0)%TAU+TAU*1.5)%TAU-Math.PI;ang=A.a0+d*e;pow=cl((A.t-.75)/.45)*b.pow;if(A.t>1.3){ang=b.ang;pow=b.pow;AI=null;fire()}}}
+function aiPick(){const obs=balls.filter(b=>b.on&&!b.cue);let best=obs[0],bd=-1;for(const o of obs){const d=Math.min(...POCKETS.map(p=>hyp(p[0]-o.x,p[1]-o.y)));if(d>bd){bd=d;best=o}}if(best)takeBall(best)}
 // ================= CHIZISH =================
 let VW=0,VH=0,DPR=1,S=1,TX0=0,TY0=0,L={};
 function fit(){DPR=Math.min(2.5,devicePixelRatio||1);VW=innerWidth;VH=innerHeight;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);cv.style.width=VW+'px';cv.style.height=VH+'px';
@@ -126,6 +154,7 @@ let btns=[];
 function button(x,y,w,h,label,cb,col='#d9a441',tc='#1a1208',sz=17){g.fillStyle='rgba(0,0,0,.35)';rr(x,y+3,w,h,h/2.6);g.fill();g.fillStyle=col;rr(x,y,w,h,h/2.6);g.fill();txt(label,x+w/2,y+h/2+1,sz,tc);btns.push({x,y,w,h,cb})}
 function drawHUD(){const nm=NAMES();
  // o'yinchilar va tokchalar
+ if(aiTurn()&&AI&&AI.ph==='think')txt("o'ylayapti…",VW*.75,74+2,11,'#d9a441','center',600);
  for(let p=0;p<(MODE==='solo'?1:2);p++){const w=VW/2-18,x=p?VW/2+6:12,y=10,act=turn===p&&ST==='play';g.fillStyle=act?'rgba(217,164,65,.22)':'rgba(255,255,255,.06)';rr(x,y,w,54,12);g.fill();if(act){g.strokeStyle='#d9a441';g.lineWidth=1.5;g.stroke()}
   txt(nm[p],x+12,y+16,14,act?'#ffd98a':'#c9bfae','left');txt(score[p]+' / '+NEED,x+w-12,y+16,14,'#fff','right',800);for(let i=0;i<NEED;i++){const bx=x+16+i*((w-32)/(NEED-1)),by=y+38;g.fillStyle=i<score[p]?'#f2ecdc':'rgba(255,255,255,.12)';g.beginPath();g.arc(bx,by,6.5,0,TAU);g.fill()}if(debt[p])txt('qarz: '+debt[p],x+w/2,y+16,11,'#ff8a7a')}
  if(MODE==='solo')txt('Mashq',VW*.75,37,16,'#c9bfae');
@@ -143,8 +172,8 @@ function overlay(title,sub,items){g.fillStyle='rgba(0,0,0,.62)';g.fillRect(0,0,V
 function exitGame(){try{parent.postMessage('game-exit','*')}catch(e){}}
 function render(){g.setTransform(DPR,0,0,DPR,0,0);g.fillStyle='#14100c';g.fillRect(0,0,VW,VH);
  if(ST==='menu'){const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#1c140c');gr.addColorStop(1,'#0c3a24');g.fillStyle=gr;g.fillRect(0,0,VW,VH);txt('HAMROH',VW/2,VH*.16,13,'#d9a441','center',700);txt('Bilyard',VW/2,VH*.16+38,44,'#f5efe0','center',800);txt('Rus bilyardi',VW/2,VH*.16+76,14,'#c9bfae','center',500);
-  const demo=[[0,0,1],[-.9,.5,0],[.9,.5,0],[0,1.1,0]];demo.forEach(([a,b,c],i)=>drawBall({cue:!!c,rx:T*.6+i,ry:T*.4+i*2},VW/2+a*34,VH*.42+b*34,30));
-  btns=[];const w=Math.min(300,VW-48),x=VW/2-w/2;let y=VH*.54;[['am','Amerikanka'],['ms','Moskva']].forEach(([k,n],i)=>button(x+i*(w/2+4),y,w/2-4,42,n,()=>{VAR=k;store.set('var',k)},VAR===k?'#f5efe0':'#2a2218',VAR===k?'#1a1208':'#c9bfae',15));txt(VAR==='am'?'Istalgan shar bilan uriladi':'Faqat sariq shar bilan uriladi',VW/2,y+58,12.5,'#a99f8e','center',500);y+=82;button(x,y,w,52,'Ikki kishi',()=>newGame('two'));button(x,y+=64,w,52,'Mashq (yolg\'iz)',()=>newGame('solo'),'#3a2f22','#f5efe0');button(x,y+=64,w,46,'Ovoz: '+(SND?'yoqilgan':'o\'chirilgan'),()=>{SND=!SND;store.set('snd',SND)},'#2a2218','#c9bfae',15);button(x,y+=58,w,46,'Hamrohga qaytish',exitGame,'#2a2218','#c9bfae',15);return}
+  const demo=[[0,0,1],[-.9,.5,0],[.9,.5,0],[0,1.1,0]];demo.forEach(([a,b,c],i)=>drawBall({cue:!!c,rx:T*.6+i,ry:T*.4+i*2},VW/2+a*22,VH*.16+118+b*22,20));
+  btns=[];const w=Math.min(300,VW-48),x=VW/2-w/2;let y=VH*.44;[['am','Amerikanka'],['ms','Moskva']].forEach(([k,n],i)=>button(x+i*(w/2+4),y,w/2-4,42,n,()=>{VAR=k;store.set('var',k)},VAR===k?'#f5efe0':'#2a2218',VAR===k?'#1a1208':'#c9bfae',15));txt(VAR==='am'?'Istalgan shar bilan uriladi':'Faqat sariq shar bilan uriladi',VW/2,y+58,12.5,'#a99f8e','center',500);y+=78;button(x,y,w,50,'Kompyuterga qarshi',()=>newGame('ai'));y+=58;LVN.forEach((n,i)=>button(x+i*(w/3+2),y,w/3-4,36,n,()=>{LVL=i;store.set('lvl',i)},LVL===i?'#f5efe0':'#2a2218',LVL===i?'#1a1208':'#c9bfae',13.5));y+=46;button(x,y,w,48,'Ikki kishi',()=>newGame('two'),'#3a2f22','#f5efe0');button(x,y+=56,w,48,'Mashq (yolg\'iz)',()=>newGame('solo'),'#3a2f22','#f5efe0');button(x,y+=56,w,42,'Ovoz: '+(SND?'yoqilgan':'o\'chirilgan'),()=>{SND=!SND;store.set('snd',SND)},'#2a2218','#c9bfae',15);button(x,y+=50,w,42,'Hamrohga qaytish',exitGame,'#2a2218','#c9bfae',15);return}
  drawTable();
  for(const b of balls)if(b.on)drawBall(b,X(b.x),Y(b.y),R*S);
  if(pick&&ST==='play')for(const b of balls)if(b.on&&!b.cue){g.strokeStyle='rgba(255,217,138,'+(.5+.4*Math.sin(T*5))+')';g.lineWidth=2;g.beginPath();g.arc(X(b.x),Y(b.y),R*S+3,0,TAU);g.stroke()}
@@ -158,7 +187,7 @@ const toT=(x,y)=>[(x-TX0)/S,(y-TY0)/S];let drag=null;
 function down(x,y){audio();
  if(spinOpen){const b=btns.find(b=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);if(b)return b.cb();drag={k:'spin'};return move(x,y)}
  const b=btns.find(b=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);if(b){click(.15,1800,.02);return b.cb()}
- if(ST!=='play'||sim)return;
+ if(ST!=='play'||sim||aiTurn())return;
  if(pick){const[qx,qy]=toT(x,y);let best=null,bd=R*2.6;for(const o of balls)if(o.on&&!o.cue){const d=hyp(o.x-qx,o.y-qy);if(d<bd){bd=d;best=o}}if(best)takeBall(best);return}
  if(x>=L.px-14&&x<=L.px+L.pw+18&&y>=L.py-24&&y<=L.py+L.ph+24){drag={k:'pow'};return move(x,y)}
  if(y>=L.wy&&y<=L.wy+L.wh&&x>=L.wx&&x<=L.wx+L.ww){drag={k:'fine',x};return}
@@ -172,13 +201,13 @@ function move(x,y){if(!drag)return;const[tx,ty]=toT(x,y);
  else if(drag.k==='aim'&&sel){if(hyp(tx-sel.x,ty-sel.y)>R*1.5)ang=Math.atan2(ty-sel.y,tx-sel.x)}
  else if(drag.k==='place'&&sel){const nx=cl(tx,R+.002,W-R-.002),ny=cl(ty,H*3/4+R,H-R-.002);if(balls.every(o=>o===sel||!o.on||hyp(o.x-nx,o.y-ny)>2*R)){sel.x=nx;sel.y=ny}}
  else if(drag.k==='spin'){let sx=(x-VW/2)/(L.sr*.72),sy=-(y-VH/2)/(L.sr*.72);const m=hyp(sx,sy);if(m>1){sx/=m;sy/=m}spin=[sx,sy]}}
-function up(){if(drag&&drag.k==='pow')fire();drag=null}
+function up(){if(drag&&drag.k==='pow'&&!aiTurn())fire();drag=null}
 cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);down(e.clientX,e.clientY)});
 cv.addEventListener('pointermove',e=>{move(e.clientX,e.clientY)});cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',()=>{if(drag&&drag.k==='pow')pow=0;drag=null});
 // ================= SIKL =================
 let last=performance.now(),acc=0;
-function tick(dt){T+=dt;if(msgT>0)msgT-=dt;if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
+function tick(dt){T+=dt;if(msgT>0)msgT-=dt;if(aiTurn()&&!sim){if(pick){AI=AI||{ph:'pick',t:0};AI.t+=dt;if(AI.t>1){AI=null;aiPick()}}else{if(!AI||AI.ph==='pick')aiStart();aiTick(dt)}}if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tick(dt);render();requestAnimationFrame(frame)}
-window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
+window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},setLvl(v){LVL=v},tick,get ai(){return AI},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
 requestAnimationFrame(frame);
 </script></body></html>
