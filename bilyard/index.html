@@ -89,7 +89,7 @@ let LVL=store.get('lvl',1),AIM=store.get('aim',1),AIMG=1; // AIM — menyuda tan
 const LVN=['Oson',"O'rta",'Kuchli'];
 const NAMES=()=>MODE==='net'?[0,1].map(i=>i===NB.you?'Siz':(NB.names[i]||'Raqib')):MODE==='solo'?['Siz','—']:MODE==='ai'?['Siz',CUP.on?CUP.r.n:'Kompyuter']:['1-o\'yinchi','2-o\'yinchi'];
 function say(s,t=2.4){msg=s;msgT=t}
-function newGame(mode,o){MODE=mode;AIMG=mode==='net'?NB.aim:AIM;rack(o&&o.rnd);turn=o&&o.first||0;NB.pend=null;score=[0,0];debt=[0,0];brk=true;place=true;pick=false;winner=-1;sel=balls.find(b=>b.cue);ang=-Math.PI/2;pow=0;spin=[0,0];sim=false;shot=null;ST='play';AI=null;say(MODE==='net'&&turn!==NB.you?'Raqib piramidani buzadi':'Sharni "uy"da joylang va piramidani buzing',3.5)}
+function newGame(mode,o){ERR=null;MODE=mode;AIMG=mode==='net'?NB.aim:AIM;rack(o&&o.rnd);turn=o&&o.first||0;NB.pend=null;score=[0,0];debt=[0,0];brk=true;place=true;pick=false;winner=-1;sel=balls.find(b=>b.cue);ang=-Math.PI/2;pow=0;spin=[0,0];sim=false;shot=null;ST='play';AI=null;say(MODE==='net'&&turn!==NB.you?'Raqib piramidani buzadi':'Sharni "uy"da joylang va piramidani buzing',3.5)}
 function respot(b){b.on=true;b.pot=0;b.fall=0;b.vx=b.vy=b.wx=b.wy=b.wz=0;let x=W/2,y=R+.002,k=0;const free=()=>balls.every(o=>o===b||!o.on||hyp(o.x-x,o.y-y)>2*R+.001);while(!free()&&k<60){k++;x=W/2+((k%2?1:-1)*Math.ceil(k/2))*(2*R+.004);if(x<R+.01||x>W-R-.01){y+=2*R+.004;x=W/2}}b.x=x;b.y=y}
 function strike(b,a,p,sp){const V=.4+Math.pow(p,1.35)*10.6,dx=Math.cos(a),dy=Math.sin(a),k=2.5*V/R*.5;b.vx=dx*V;b.vy=dy*V;b.wx=-dy*k*sp[1];b.wy=dx*k*sp[1];b.wz=-k*sp[0]}
 function fire(){if(pick){pow=0;return}if(sim||!sel||pow<.03){pow=0;return}lastPow=pow;if(MODE==='net'&&!NB.pend)NB.sh={i:balls.indexOf(sel),a:ang,p:pow,s:spin.slice(),x:sel.x,y:sel.y};strike(sel,ang,pow,spin);
@@ -362,8 +362,15 @@ cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.
 cv.addEventListener('pointermove',e=>{move(e.clientX,e.clientY)});cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',()=>{if(drag&&drag.k==='pow')pow=0;drag=null});
 // ================= SIKL =================
 let last=performance.now(),acc=0;
-function tick(dt){T+=dt;if(CUP.on&&ST==='over'&&!CUP.done){CUP.done=true;cupResult(winner===0)}netTick(dt);if(msgT>0)msgT-=dt;if(cueFx&&(cueFx.t+=dt)>.28)cueFx=null;for(const b of balls)if(b.fall>0){b.ft+=dt;if(fallPos(b)[2]>=1&&b.ft>.06)b.fall=0}if(aiTurn()&&!sim){if(pick){AI=AI||{ph:'pick',t:0};AI.t+=dt;if(AI.t>1){AI=null;aiPick()}}else{if(!AI||AI.ph==='pick')aiStart();aiTick(dt)}}if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
-function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tick(dt);render();requestAnimationFrame(frame)}
+function tick(dt){T+=dt;if(CUP.on&&ST==='over'&&!CUP.done){CUP.done=true;cupResult(winner===0)}netTick(dt);if(msgT>0)msgT-=dt;if(cueFx&&(cueFx.t+=dt)>.28)cueFx=null;for(const b of balls)if(b.fall>0){b.ft+=dt;if(fallPos(b)[2]>=1&&b.ft>.06)b.fall=0}if(aiTurn()&&!sim){if(pick){AI=AI||{ph:'pick',t:0};AI.t+=dt;if(AI.t>1){AI=null;aiPick()}}else{if(!AI||AI.ph==='pick')aiStart();aiTick(dt)}}if(!sim)simT=0;else if((simT+=dt)>30){for(const b of balls)b.vx=b.vy=b.wx=b.wy=b.wz=0}
+ if(ST==='play'&&!sim&&!pick&&(!sel||!sel.on))sel=balls.find(b=>b.on&&b.cue)||balls.find(b=>b.on)||null;
+ if(sim&&ST==='play'){acc+=dt;let n=0,mv=true;while(acc>=DT&&n++<40){mv=step(DT);acc-=DT;if(!mv)break}if(!mv){acc=0;endShot()}}}
+// Bitta kadrda xato chiqsa ham o'yin to'xtab qolmasin: avval xato butun siklni o'ldirib, ekran "qotib" qolardi.
+let ERR=null,simT=0;
+function oops(e,w){const m=(w+': '+((e&&e.message)||e)).slice(0,90)+' | '+(((e&&e.stack)||'').split('\n')[1]||'').trim().replace(/^at /,'').replace(/https?:\/\/[^ )]*\//,'').slice(0,70);
+ if(ERR!==m){ERR=m;store.set('err',{m,v:VAR,mode:MODE,t:Date.now()})}
+ if(w==='o\'yin'){try{if(sim){for(const b of balls)b.vx=b.vy=b.wx=b.wy=b.wz=0}AI=null;if(!sel||!sel.on)sel=balls.find(b=>b.on&&b.cue)||balls.find(b=>b.on)||null}catch(_){}}}
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;try{tick(dt)}catch(e){oops(e,"o'yin")}try{render();if(ERR&&ST!=='menu'){g.setTransform(DPR,0,0,DPR,0,0);txt('⚠ '+ERR,VW/2,VH-6,9,'#ff9a8a','center',600)}}catch(e){oops(e,'chizish')}requestAnimationFrame(frame)}
 window.__bil={get balls(){return balls},step,newGame,fire,endShot,RAILS,get s(){return{ang,ST,turn,score,debt,sim,brk,place,msg,winner,pick,VAR}},setVar(v){VAR=v},cupStart,cupExit,get CS(){return CS},set CS(v){CS=v},get CUP(){return CUP},RIV,predict,setAim(v){AIM=v},get AIMG(){return AIMG},NB,netOpen,netCreate,netJoin,netAgain,netResign,snap,applySnap,setC(e,f){E_C=e;F_C=f},setMB(v){MU_BB=v},setJ2(e,k){E_J=e;HK=k},setJ(v){JIT=v},setPk(v){PK=v;buildTable()},get HOLES(){return HOLES},setLvl(v){LVL=v},tick,get ai(){return AI},takeBall,set(o){if(o.ang!=null)ang=o.ang;if(o.pow!=null)pow=o.pow;if(o.spin)spin=o.spin;if(o.sel!=null)sel=balls[o.sel]},run(){let n=0;while(sim&&n++<200000){if(!step(DT)){endShot();break}}return n},W,H,R};
 if(ROOM0)netJoin(ROOM0);
 requestAnimationFrame(frame);
