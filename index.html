@@ -2363,6 +2363,21 @@ function viewAudio(){
 /* ---------- HUJJATLAR ---------- */
 // Files are processed on the phone. Results go to the user's bot chat via the Worker (/send), or download outside Telegram.
 const BOT_API='https://hamroh-bot.je1785659.workers.dev';
+// ---- O'yin xatolari botga: har xil xato sessiyada bir marta (ko'pi bilan 10 ta) yuboriladi; ekran 5 s+ qotsa ham. Shaxsiy ma'lumot yuborilmaydi ----
+const ERRS={seen:{},n:0};
+function hamrohErr(g,k,m,s){try{m=String(m||'').slice(0,300);if(!(tg&&tg.initData)||!m||/^Script error\.?$/.test(m))return;const key=g+'|'+k+'|'+m.replace(/\d+/g,'#');if(ERRS.seen[key]||ERRS.n>=10)return;ERRS.seen[key]=1;ERRS.n++;
+  const fd=new FormData();fd.append('initData',tg.initData);fd.append('g',g);fd.append('k',k);fd.append('m',m);fd.append('s',String(s||'').replace(/https?:\/\/[^\s)]*?\/hamroh\//g,'').slice(0,1200));fd.append('v',APP_VER);fd.append('pf',String(tg.platform||'').slice(0,12));
+  fetch(BOT_API+'/err',{method:'POST',body:fd,keepalive:true}).catch(()=>{})}catch(e){}}
+function hamrohHook(w,g){try{const G=typeof g==='function'?g:()=>g;
+  w.addEventListener('error',e=>{if(e.message||e.error)hamrohErr(G(),'err',e.message||String(e.error),(e.error&&e.error.stack)||((e.filename||'')+':'+e.lineno+':'+e.colno))});
+  w.addEventListener('unhandledrejection',e=>{const r=e.reason;hamrohErr(G(),'err','Promise: '+((r&&r.message)||String(r)),r&&r.stack)})}catch(e){}}
+window.hamrohErr=hamrohErr;window.hamrohHook=hamrohHook;
+const errGame=()=>({shaxmat:'shaxmat',shashka:'shashka',bog:'bog',bilyard:'bilyard',port:'port',yugur:'yugur',prava:'prava',sert:'sert',kkal:'kkal'}[current]||'ilova');
+hamrohHook(window,errGame);
+// qotish sezgichi: o'yin va ilova bitta oqimda ishlaydi, shuning uchun soat 5 s+ "sakrasa" — ekran shuncha qotgan. Fon/uyqu hisobga olinmaydi.
+(function(){let last=performance.now(),vis=last;document.addEventListener('visibilitychange',()=>{vis=last=performance.now()});
+  setInterval(()=>{const t=performance.now(),gap=t-last;last=t;if(document.visibilityState!=='visible'||t-vis<gap+500||gap<5000)return;
+    hamrohErr(errGame(),'freeze','Ekran '+(gap<10000?'5–10':gap<30000?'10–30':'30+')+' s qotib qoldi')},1000)})();
 /* ---------- STATISTIKA: ilovada o'tkazilgan vaqt (faqat Telegram ichida) ---------- */
 function statTick(){const n=Date.now();if(document.visibilityState==='visible')STAT.secs+=Math.min(30,(n-STAT.last)/1000);STAT.last=n}
 function statSend(beacon){
@@ -3992,7 +4007,7 @@ function viewSp(B,i){
   $('#spback').onclick=()=>{srHush();clearInterval(spTimer);srView='menu';viewSert()};
 }
 
-const APP_VER='20261121c';
+const APP_VER='20261121d';
 (function(){try{fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||j.v===APP_VER)return;
   const k='hv_'+j.v;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,1);const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.toString())}).catch(()=>{})}catch(e){}})();
 // oflayn rejim: ilova va o'yinlar internetsiz ham ochiladi

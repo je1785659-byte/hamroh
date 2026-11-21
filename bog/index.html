@@ -6,6 +6,7 @@
 html,body{margin:0;height:100%;background:#10160f;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 canvas{position:fixed;left:0;top:0;display:block}
 </style></head><body><canvas id="c"></canvas>
+<script>try{parent.hamrohHook&&parent.hamrohHook(window,'bog')}catch(e){}</script>
 <script>
 'use strict';
 // ================= Bog' himoyasi — Hamroh o'yini =================
@@ -654,7 +655,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&ST==='play
 
 // ================= SIKL =================
 let last=performance.now(),acc=0;
-function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;acc+=dt;let n=0;while(acc>=1/60&&n++<6){update(1/60);acc-=1/60}if(ST==='menu'||ST==='levels'||ST==='choose'||ST==='won')T+=0;render();requestAnimationFrame(frame)}
+function frame(now){requestAnimationFrame(frame);/* avval: update xato bersa sikl to'xtab, o'yin butunlay qotardi */const dt=Math.min(.1,(now-last)/1000);last=now;acc+=dt;let n=0;while(acc>=1/60&&n++<6){update(1/60);acc-=1/60}if(ST==='menu'||ST==='levels'||ST==='choose'||ST==='won')T+=0;render()}
 function render(){g.setTransform(1,0,0,1,0,0);g.fillStyle='#10160f';g.fillRect(0,0,cv.width,cv.height);
  if(ROT){g.setTransform(0,DPR,-DPR,0,cv.width,0)}else g.setTransform(DPR,0,0,DPR,0,0);g.translate(OX,OY);g.scale(SC,SC);g.save();g.beginPath();g.rect(0,0,LW,LH);g.clip();
  if(ST==='menu'){T+=1/60;drawMenu()}else if(ST==='levels'){T+=1/60;drawLevels()}else if(ST==='choose'){T+=1/60;drawChoose()}else{if(ST==='won'||ST==='paused')T+=ST==='won'?1/60:0;drawPlay();drawOverlay()}

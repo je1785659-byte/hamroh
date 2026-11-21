@@ -1,4 +1,4 @@
-// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 20.11.2026-19
+// Hamroh bot — Cloudflare Worker (Telegram webhook). Versiya: 21.11.2026-20
 // Settings → Variables and Secrets: BOT_TOKEN (secret). Optional: WEBHOOK_SECRET (secret).
 // Settings → Bindings: D1 database, variable name DB (statistika va admin panel uchun).
 // Settings → Bindings: Workers AI, variable name AI (kaloriya: suratdan taomni aniqlash). Optional vars: FOOD_MODEL, FOOD_USER_DAY, FOOD_ALL_DAY.
@@ -290,10 +290,11 @@ async function cmdAdmin(env,msg,cmd,text){
   const code=cmd==='/admin'?(text.split(/\s+/)[1]||'').trim():'';
   if(code&&!await claimAdmin(env,msg,db,code))return true;
   if(!await isAdmin(db,msg.from.id))return false;
+  if(cmd==='/xatolar'){await say(env,chat,await errListText(db),{parse_mode:'HTML'});return true}
   await say(env,chat,(code?'✅ Siz admin bo‘ldingiz.\n\n':'')+await statsText(env,db),{parse_mode:'HTML',reply_markup:{inline_keyboard:[[appBtn('📊 Admin panelni ochish',APP_URL+'?t=admin')]]}});
   return true;
 }
-const ADMIN_CMDS=['/admin','/stats'];
+const ADMIN_CMDS=['/admin','/stats','/xatolar'];
 const adminRoute=(env,msg,priv,cmd,text)=>priv&&ADMIN_CMDS.includes(cmd)?cmdAdmin(env,msg,cmd,text):false;
 const cmdOf=text=>text.split(/[\s@]/)[0].toLowerCase();
 async function onMessage(env,msg){
@@ -465,6 +466,43 @@ async function handlePing(req,env){
     db.prepare("SELECT v FROM meta WHERE k='admins'")];
   const r=await db.batch(st);const row=r[r.length-1].results[0];
   return J({ok:true,admin:((row&&row.v)||'').split(',').includes(String(u.id)),hq:!!env.ANTHROPIC_API_KEY});
+}
+// ---- O'yin xatolari: ilova xatoni /err ga yuboradi; bir xil xato (raqamlari boshqa bo'lsa ham) sanaladi,
+// yangisi haqida adminga kuniga ≤10 marta xabar boriladi; bitta foydalanuvchidan kuniga ≤30 ta. Admin /xatolar bilan ro'yxatni ko'radi.
+const ERR_GAMES=['bilyard','shaxmat','shashka','bog','port','yugur','prava','sert','kkal','ilova'], ERR_DAY_MAX=30, ERR_NOTE_MAX=10;
+const escH=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const errClean=f=>{const g=String(f.get('g')||'');return {g:ERR_GAMES.includes(g)?g:'boshqa',k:f.get('k')==='freeze'?'freeze':'err',
+  m:String(f.get('m')||'').slice(0,300),s:String(f.get('s')||'').slice(0,1200),v:String(f.get('v')||'').replace(/[^\w.-]/g,'').slice(0,16),pf:String(f.get('pf')||'').replace(/[^\w-]/g,'').slice(0,12)}};
+async function errSchema(db){if(errSchema.ok)return;await db.batch([
+  db.prepare('CREATE TABLE IF NOT EXISTS errs(k TEXT PRIMARY KEY,g TEXT,kind TEXT,m TEXT,s TEXT,v TEXT,pf TEXT,n INTEGER DEFAULT 0,users INTEGER DEFAULT 0,first INTEGER,last INTEGER)'),
+  db.prepare('CREATE TABLE IF NOT EXISTS erru(k TEXT,uid INTEGER,PRIMARY KEY(k,uid))'),
+  db.prepare('CREATE TABLE IF NOT EXISTS errday(day TEXT,uid INTEGER,n INTEGER DEFAULT 0,PRIMARY KEY(day,uid))')]);errSchema.ok=1}
+async function handleErr(req,env){
+  let f;try{f=await req.formData()}catch(e){return J({ok:false},400)}
+  const u=await verifyInit(f.get('initData')||'',env.BOT_TOKEN);if(!u||!u.id)return J({ok:false},403);
+  const db=await D(env).catch(()=>null);if(!db)return J({ok:true,nodb:true});await errSchema(db);
+  const e=errClean(f),now=Date.now(),day=dstr(now);
+  const lim=await db.prepare('INSERT INTO errday(day,uid,n) VALUES(?1,?2,1) ON CONFLICT(day,uid) DO UPDATE SET n=n+1 RETURNING n').bind(day,u.id).first();
+  if(lim&&lim.n>ERR_DAY_MAX)return J({ok:true,dropped:true});
+  const key=(await sha256hex(e.g+'|'+e.k+'|'+e.m.replace(/\d+/g,'#'))).slice(0,16);
+  const old=await db.prepare('SELECT n FROM errs WHERE k=?1').bind(key).first();
+  await db.batch([
+    db.prepare('INSERT INTO errs(k,g,kind,m,s,v,pf,n,first,last) VALUES(?1,?2,?3,?4,?5,?6,?7,1,?8,?8) ON CONFLICT(k) DO UPDATE SET n=n+1,last=?8,v=?6,s=?5').bind(key,e.g,e.k,e.m,e.s,e.v,e.pf,now),
+    db.prepare('INSERT OR IGNORE INTO erru(k,uid) VALUES(?1,?2)').bind(key,u.id),
+    db.prepare('UPDATE errs SET users=(SELECT count(*) FROM erru WHERE k=?1) WHERE k=?1').bind(key)]);
+  if(!old)await errNotify(env,db,day,e);
+  return J({ok:true});
+}
+async function errNotify(env,db,day,e){
+  const r=await db.prepare("INSERT INTO meta(k,v) VALUES(?1,'1') ON CONFLICT(k) DO UPDATE SET v=CAST(v AS INTEGER)+1 RETURNING v").bind('errnote:'+day).first();
+  if(+(r&&r.v)>ERR_NOTE_MAX)return;
+  const t='⚠️ <b>Yangi xato</b> · '+escH(e.g)+(e.k==='freeze'?' (qotib qoldi)':'')+'\n<code>'+escH(e.m)+'</code>\n'+escH(e.v)+' · '+escH(e.pf)+(e.s?'\n<pre>'+escH(e.s.slice(0,500))+'</pre>':'')+'\n\nHammasi: /xatolar';
+  for(const a of await getAdmins(db))try{await say(env,+a,t,{parse_mode:'HTML'})}catch(x){}
+}
+async function errListText(db){await errSchema(db);
+  const r=(await db.prepare('SELECT g,kind,m,n,users FROM errs WHERE last>=?1 ORDER BY n DESC LIMIT 15').bind(Date.now()-7*DAY).all()).results;
+  if(!r.length)return '✅ Oxirgi 7 kunda o‘yinlarda xato qayd etilmadi.';
+  return '🐞 <b>Oxirgi 7 kundagi xatolar</b> (ko‘pidan kamiga)\n\n'+r.map((x,i)=>`${i+1}. <b>${escH(x.g)}</b>${x.kind==='freeze'?' ⏸ qotish':''} — ${x.n} marta, ${x.users} kishi\n<code>${escH(String(x.m).slice(0,160))}</code>`).join('\n\n');
 }
 async function computeStats(db,env){
   const now=Date.now(),today=dstr(now),d7=dstr(now-6*DAY),d30=dstr(now-29*DAY),d60=dstr(now-59*DAY);
@@ -855,6 +893,7 @@ export default {
     if(path==='/send'&&req.method==='POST')return handleSend(req,env);
     if(path==='/hello'&&req.method==='POST')return handleHello(req,env);
     if(path==='/ping'&&req.method==='POST')return handlePing(req,env);
+    if(path==='/err'&&req.method==='POST')return handleErr(req,env);
     if(path==='/admin/stats'&&req.method==='POST')return handleStats(req,env);
     if(path==='/admin/check'&&req.method==='POST')return handleCheck(req,env);
     if(path==='/food'&&req.method==='POST')return handleFood(req,env);
