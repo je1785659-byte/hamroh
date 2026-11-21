@@ -11,6 +11,7 @@ run "Yugur: 1000 yo'l" node tests/soak/yugur.cjs 1000
 run "Savollar bazasi" python3 tests/soak/savollar.py
 run "Bog' himoyasi: barcha bosqichlar" node tests/soak/bog.cjs 3
 run "Bilyard: 300 aylanishli zarba" node tests/soak/bilyard.cjs
+run "Bilyard darslari" node tests/soak/darslar.cjs
 run "Port: missiyalar va 10 daqiqalik o'yin" node tests/soak/port.cjs
 run "Bot sinovlari" bash -c 'cd bot && npm test --silent 2>&1 | grep -E "^# (pass|fail)"; cd .. && npm --prefix bot test --silent >/dev/null 2>&1'
 echo; [ $ok = 0 ] && echo "HAMMASI JOYIDA" || echo "MUAMMO TOPILDI — yuqoriga qarang"; exit $ok
