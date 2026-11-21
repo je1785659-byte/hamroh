@@ -60,7 +60,7 @@ function sub(dt){let moving=false;
   else if(sp>0){const dec=MU_R*G*dt;if(sp<=dec){b.vx=b.vy=0}else{const k=(sp-dec)/sp;b.vx*=k;b.vy*=k}b.wy=b.vx/R;b.wx=-b.vy/R}
   if(b.wz){const dz=SPIN_DEC*dt;b.wz=Math.abs(b.wz)<=dz?0:b.wz-Math.sign(b.wz)*dz}
   b.x+=b.vx*dt;b.y+=b.vy*dt;if(!QUIET)spinMark(b,dt);
-  if(hyp(b.vx,b.vy)>.004||Math.abs(b.wz)>.6||hyp(b.vx-R*b.wy,b.vy+R*b.wx)>.004)moving=true;else{b.vx=b.vy=b.wx=b.wy=b.wz=0}}
+  if(hyp(b.vx,b.vy)>.004||hyp(b.vx-R*b.wy,b.vy+R*b.wx)>.004)moving=true;else{b.vx=b.vy=b.wx=b.wy=b.wz=0}/* joyida aylanayotgan (yon aylanish) shar endi kutilmaydi: u hech narsani qimirlatmaydi */}
  // shar — shar
  for(let it=0,any=true;it<5&&any;it++){any=false;for(let i=0;i<balls.length;i++){const a=balls[i];if(!a.on)continue;for(let j=i+1;j<balls.length;j++){const b=balls[j];if(!b.on)continue;const dx=b.x-a.x,dy=b.y-a.y;if(Math.abs(dx)>2*R||Math.abs(dy)>2*R)continue;const d=hyp(dx,dy);if(d>=2*R||d===0)continue;
    const rvx=a.vx-b.vx,rvy=a.vy-b.vy;let nx=dx/d,ny=dy/d;const A=rvx*rvx+rvy*rvy,Bq=dx*rvx+dy*rvy;if(Bq>0&&A>1e-9){const tau=Math.min(dt*1.5,(-Bq+Math.sqrt(Bq*Bq-A*(d*d-4*R*R)))/A),ex=dx+rvx*tau,ey=dy+rvy*tau,el=hyp(ex,ey)||1;nx=ex/el;ny=ey/el} // tegish lahzasidagi yo'nalish
